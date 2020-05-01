@@ -1,0 +1,6 @@
+Config:
+  database: 'pluginData'
+  host: 'localhost'
+  user: 'BauPlugin'
+  password: 'r0gltuXNFEqKDCy3'
+  path: /root/WargearWorld/bau
