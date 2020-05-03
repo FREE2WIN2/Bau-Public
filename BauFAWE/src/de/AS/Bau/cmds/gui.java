@@ -125,13 +125,13 @@ public class gui implements CommandExecutor {
 			ItemMeta torchAnMeta = torchAn.getItemMeta();
 			torchAnMeta.setDisplayName(StringGetterBau.getString(p,"torchOff"));
 			torchAn.setItemMeta(torchAnMeta);
-			inv.setItem(25, torchAn);
+			inv.setItem(24, torchAn);
 		} else {
 			ItemStack torchAus = new ItemStack(Material.GUNPOWDER);
 			ItemMeta torchAusMeta = torchAus.getItemMeta();
 			torchAusMeta.setDisplayName(StringGetterBau.getString(p,"torchOn"));
 			torchAus.setItemMeta(torchAusMeta);
-			inv.setItem(25, torchAus);
+			inv.setItem(24, torchAus);
 		}
 
 		// rakete für track
