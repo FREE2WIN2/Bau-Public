@@ -20,10 +20,11 @@ public class onPlayerTeleport implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerTeleportEvent(PlayerTeleportEvent e) {
-		if(e.getTo().getWorld().getName().contains("test")){
+		Player p = e.getPlayer();
+		if(e.getTo().getWorld().getName().contains("test")&& !p.hasPermission("supporter")){
 			return;
 		}
-		Player p = e.getPlayer();
+		
 		if (!p.hasPermission("moderator")) {
 			if (!e.getTo().getWorld().getName().equals(p.getUniqueId().toString())&&!p.getWorld().getName().equals("world")) {
 				// wenn er nicht owner ist
