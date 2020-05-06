@@ -130,24 +130,13 @@ public class onPlayerJoin implements Listener {
 	}
 
 	public static World loadWorld(String worldName) {
-		//Main main = Main.getPlugin();
-		//String path = main.getCustomConfig().getString("Config.path");
-		//File dir = new File(path + "/" + worldName);
-		//if (!dir.exists()) {
-			//dir.mkdir();
-			//dir.setExecutable(true, false);
-			//dir.setReadable(true, false);
-			//dir.setWritable(true, false);
-		//}
-		//File source = new File(path + "/Worlds/" + worldName);
-		//copyFolder_raw(source, dir);
-
 		WorldCreator wc = new WorldCreator(worldName);
 		wc.type(WorldType.NORMAL);
 		World w = Bukkit.getServer().createWorld(wc);
 		w.setStorm(false);
 		w.setThundering(false);
 		w.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
+		w.setGameRule(GameRule.DO_MOB_SPAWNING, false);
 		WorldBorder b = w.getWorldBorder();
 		b.setCenter(-208.53, 17.23);
 		b.setSize(400);
