@@ -21,7 +21,7 @@ public class onPlayerTeleport implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerTeleportEvent(PlayerTeleportEvent e) {
 		Player p = e.getPlayer();
-		if(e.getTo().getWorld().getName().contains("test")&& !p.hasPermission("supporter")){
+		if(e.getTo().getWorld().getName().contains("test")&& p.hasPermission("supporter")){
 			return;
 		}
 		
