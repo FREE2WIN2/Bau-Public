@@ -5,7 +5,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -24,23 +26,20 @@ import de.AS.Bau.StringGetterBau;
 
 public class SpawnEvent implements Listener {
 
-	public static HashMap<World,Boolean> worldRemoveEntities = new HashMap<>();
+	public static Set<UUID>worldSpawnEntitiesBlocked = new HashSet<>(); 
 	public SpawnEvent(JavaPlugin plugin) {
 		Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
 	}
 @SuppressWarnings("unlikely-arg-type")
 @EventHandler
 public void onEntitSpawn(EntitySpawnEvent e) {
-	if(!worldRemoveEntities.containsKey(e.getLocation().getWorld())) {
-		worldRemoveEntities.put(e.getLocation().getWorld(), false);
-	}
 	EntityType etype = e.getEntityType();
-	if(worldRemoveEntities.get(e.getLocation().getWorld())){
+	if(worldSpawnEntitiesBlocked.contains(e.getLocation().getWorld().getUID())){
 		e.setCancelled(true);
 		return;
 	}
 	if(etype.equals(EntityType.FALLING_BLOCK)) {
-		if(!(etype.equals(EntityType.FALLING_BLOCK))&&!e.getEntity().isCustomNameVisible()){
+		if(!e.getEntity().isCustomNameVisible()){
 			e.setCancelled(true);
 		}else {
 			if(e.getLocation().getWorld().getEntities().size() > 2000) {
@@ -56,12 +55,12 @@ public void onEntitSpawn(EntitySpawnEvent e) {
 					p.sendMessage(Main.prefix +StringGetterBau.getString(p,"tooManyEntities"));
 					//Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kick "+ p.getName());
 				}
-				worldRemoveEntities.put(e.getLocation().getWorld(), true);
+				worldSpawnEntitiesBlocked.add(e.getLocation().getWorld().getUID());
 				Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.getPlugin(), new Runnable() {
 					
 					@Override
 					public void run() {
-						worldRemoveEntities.put(e.getLocation().getWorld(), false);
+						worldSpawnEntitiesBlocked.remove(e.getLocation().getWorld().getUID());
 					}
 				}, 80);
 			}
@@ -71,7 +70,7 @@ public void onEntitSpawn(EntitySpawnEvent e) {
 		if(e.getLocation().getWorld().getEntities().size() > 1000) {
 			
 			logeintrag(e.getLocation().getWorld(),e.getLocation().getWorld().getEntities().size());
-			worldRemoveEntities.put(e.getLocation().getWorld(), true);
+			worldSpawnEntitiesBlocked.add(e.getLocation().getWorld().getUID());
 			
 			for(Entity en:e.getLocation().getWorld().getEntities()) {
 				if(!en.getType().equals(EntityType.PLAYER)) {
@@ -86,7 +85,7 @@ public void onEntitSpawn(EntitySpawnEvent e) {
 				
 				@Override
 				public void run() {
-					worldRemoveEntities.put(e.getLocation().getWorld(), false);
+					worldSpawnEntitiesBlocked.remove(e.getLocation().getWorld().getUID());
 				}
 			}, 200);
 			//wann wieder false? ->

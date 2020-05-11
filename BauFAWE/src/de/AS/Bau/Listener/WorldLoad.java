@@ -17,7 +17,6 @@ public class WorldLoad implements Listener {
 	}
 	@EventHandler
 	public void onWorldLoad(WorldLoadEvent e) {
-		SpawnEvent.worldRemoveEntities.put(e.getWorld(), false);
 		Main main = Main.getPlugin();
 		if(!main.getCustomConfig().contains("stoplag."+e.getWorld().getName())){
 			main.getCustomConfig().createSection("stoplag."+e.getWorld().getName()+".plot1");
