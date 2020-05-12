@@ -39,7 +39,7 @@ public void onEntitSpawn(EntitySpawnEvent e) {
 		return;
 	}
 	if(etype.equals(EntityType.FALLING_BLOCK)) {
-		if(!e.getEntity().isCustomNameVisible()){
+		if(!etype.equals(EntityType.FALLING_BLOCK)&&!e.getEntity().isCustomNameVisible()){
 			e.setCancelled(true);
 		}else {
 			if(e.getLocation().getWorld().getEntities().size() > 2000) {
