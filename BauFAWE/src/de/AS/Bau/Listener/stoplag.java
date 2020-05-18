@@ -34,7 +34,7 @@ public class stoplag implements Listener {
 		Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.LOWEST)
 	public static void pistonextend(BlockPistonExtendEvent e) {
 		Main main = Main.getPlugin();
 		RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
@@ -55,7 +55,7 @@ public class stoplag implements Listener {
 
 	}
  
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.LOWEST)
 	public static void pistonRetract(BlockPistonRetractEvent e) {
 		Main main = Main.getPlugin();
 		RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
@@ -75,7 +75,7 @@ public class stoplag implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.LOWEST)
 	public static void redstone(BlockRedstoneEvent e) {
 		Main main = Main.getPlugin();
 		RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
@@ -105,7 +105,7 @@ public class stoplag implements Listener {
 		main.getCustomConfig().set("stoplag." + worldName + "." + plot, "an");
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.LOWEST)
 	public static void onBlockFade(BlockFadeEvent e) {
 		// wenn zb unter redstone block abgebrut wird
 		Main main = Main.getPlugin();
@@ -124,7 +124,7 @@ public class stoplag implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.LOWEST)
 	public static void onBlockForm(BlockFormEvent e) {
 		// wenn zb unter redstone block abgebrut wird
 		Main main = Main.getPlugin();
@@ -143,7 +143,7 @@ public class stoplag implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.LOWEST)
 	public static void onBlockPhysics(BlockPhysicsEvent e) {
 		// wenn zb unter redstone block abgebrut wird
 
@@ -163,7 +163,7 @@ public class stoplag implements Listener {
 
 		}
 	}
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.LOWEST)
 	public static void onBlockFromTo(BlockFromToEvent e) {
 		Main main = Main.getPlugin();
 		RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
@@ -183,22 +183,22 @@ public class stoplag implements Listener {
 
 	/* permanent canceled Events */
 	
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler
 	public void BlockSpread(BlockSpreadEvent e) {
 		e.setCancelled(true);
 	}
 	
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler
 	public void LeavedDecay(LeavesDecayEvent e) {
 		e.setCancelled(true);
 	}
 	
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler
 	public void SpongeAbsorb(SpongeAbsorbEvent e) {
 		e.setCancelled(true);
 	}
 	
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler
 	public void BlockGrow(BlockGrowEvent e) {
 		e.setCancelled(true);
 	}
