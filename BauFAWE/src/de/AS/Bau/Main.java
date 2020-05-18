@@ -9,6 +9,7 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.sk89q.worldguard.WorldGuard;
@@ -33,6 +34,7 @@ import de.AS.Bau.Listener.onPlayerTeleport;
 import de.AS.Bau.Listener.stoplag;
 import de.AS.Bau.TabCompleter.gsTC;
 import de.AS.Bau.TabCompleter.tbsTC;
+import de.AS.Bau.Tools.TestBlockSklave;
 import de.AS.Bau.cmds.Bau;
 import de.AS.Bau.cmds.chest;
 import de.AS.Bau.cmds.delcon;
@@ -42,7 +44,6 @@ import de.AS.Bau.cmds.gs;
 import de.AS.Bau.cmds.gui;
 import de.AS.Bau.cmds.sl;
 import de.AS.Bau.cmds.stats;
-import de.AS.Bau.cmds.t;
 import de.AS.Bau.cmds.tnt;
 import de.AS.Bau.utils.worldCheck;
 
@@ -59,20 +60,16 @@ public class Main extends JavaPlugin {
 @Override
 public void onEnable() {
 	plugin = this;
-	this.getCommand("gs").setExecutor(new gs());
-	this.getCommand("gs").setTabCompleter(new gsTC());
-	this.getCommand("tnt").setExecutor(new tnt());
-	this.getCommand("gui").setExecutor(new gui());
-	this.getCommand("tbs").setExecutor(new t());
-	this.getCommand("tbs").setTabCompleter(new tbsTC());
-	this.getCommand("sl").setExecutor(new sl());
-	this.getCommand("dt").setExecutor(new dt());
-	this.getCommand("ds").setExecutor(new ds());
-	this.getCommand("debugstick").setExecutor(new ds());
-	this.getCommand("chest").setExecutor(new chest());
-	this.getCommand("stats").setExecutor(new stats());
-	this.getCommand("delcon").setExecutor(new delcon());
-	getCommand("bau").setExecutor(new Bau());
+	registerCommands();
+	registerListener();
+	
+	
+	configcreate();
+	createTempAddConfig();
+	gs.startCheckForTempAdd();
+	super.onEnable();
+}
+private void registerListener() {
 	new onPlayerJoin(this);
 	new chestAndsignListener(this);
 	new OnInvClick(this);
@@ -88,10 +85,27 @@ public void onEnable() {
 	new WorldLoad(this);
 	new onPlayerRespawn(this);
 	new worldCheck();
-	configcreate();
-	createTempAddConfig();
-	gs.startCheckForTempAdd();
-	super.onEnable();
+	
+	PluginManager pm = Bukkit.getPluginManager();
+	pm.registerEvents(new TestBlockSklave(), this);
+	
+}
+private void registerCommands() {
+	getCommand("gs").setExecutor(new gs());
+	getCommand("gs").setTabCompleter(new gsTC());
+	getCommand("tnt").setExecutor(new tnt());
+	getCommand("gui").setExecutor(new gui());
+	getCommand("tbs").setExecutor(new TestBlockSklave());
+	getCommand("tbs").setTabCompleter(new tbsTC());
+	getCommand("sl").setExecutor(new sl());
+	getCommand("dt").setExecutor(new dt());
+	getCommand("ds").setExecutor(new ds());
+	getCommand("debugstick").setExecutor(new ds());
+	getCommand("chest").setExecutor(new chest());
+	getCommand("stats").setExecutor(new stats());
+	getCommand("delcon").setExecutor(new delcon());
+	getCommand("bau").setExecutor(new Bau());
+	
 }
 public static Main getPlugin() {
 	return plugin;

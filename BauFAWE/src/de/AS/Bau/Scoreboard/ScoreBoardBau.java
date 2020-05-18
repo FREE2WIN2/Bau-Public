@@ -120,8 +120,8 @@ public class ScoreBoardBau {
 	}
 
 	private static String getDt(Player p) {
-		if (dt.playerHasDtOn.containsKey(p)) {
-			if (dt.playerHasDtOn.get(p)) {
+		if (dt.playerHasDtOn.containsKey(p.getUniqueId())) {
+			if (dt.playerHasDtOn.get(p.getUniqueId())) {
 				//System.out.println("dt on");
 				return StringGetterBau.getString(p, "boardOn");
 			} else {

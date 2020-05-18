@@ -44,7 +44,7 @@ public class onPlayerJoin implements Listener {
 		//p.teleport(new Location(Bukkit.getWorld("world"), 0, 30, 0));
 		DBConnection conn = new DBConnection();
 		String lang = conn.getLanguage(p);
-		StringGetterBau.playersLanguage.put(p, lang);
+		StringGetterBau.playersLanguage.put(p.getUniqueId(), lang);
 		Main main = Main.getPlugin();
 		// has own gs?
 		String path = main.getCustomConfig().getString("Config.path");
@@ -57,7 +57,7 @@ public class onPlayerJoin implements Listener {
 		}
 		World world = loadWorld(p.getUniqueId().toString());
 
-		dt.playerHasDtOn.put(p, false);
+		dt.playerHasDtOn.put(p.getUniqueId(), false);
 		Location loc = new Location(world, -208, 8, 17);
 		onPlayerMove.playersLastPlot.put(p, "plot2");
 

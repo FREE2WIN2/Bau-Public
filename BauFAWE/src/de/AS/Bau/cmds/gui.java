@@ -169,7 +169,7 @@ public class gui implements CommandExecutor {
 		String dtName;
 		ItemStack dst = new ItemStack(Material.WOODEN_SHOVEL);
 		ItemMeta dtIM = observer.getItemMeta();
-		if(dt.playerHasDtOn.get(p)) {
+		if(dt.playerHasDtOn.get(p.getUniqueId())) {
 			dtName = StringGetterBau.getString(p, "dtItemOn");
 			dtIM.addEnchant(Enchantment.SILK_TOUCH, 1, true);
 			dtIM.addItemFlags(ItemFlag.HIDE_ENCHANTS);

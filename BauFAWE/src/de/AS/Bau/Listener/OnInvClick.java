@@ -1,14 +1,10 @@
 package de.AS.Bau.Listener;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -23,21 +19,10 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.extent.clipboard.Clipboard;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
-import com.sk89q.worldedit.function.operation.Operation;
-import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -46,18 +31,18 @@ import com.sk89q.worldguard.protection.regions.RegionContainer;
 import de.AS.Bau.DBConnection;
 import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
-import de.AS.Bau.utils.Banner;
+import de.AS.Bau.Tools.TestBlockSklave;
 import de.AS.Bau.utils.ClickAction;
 import de.AS.Bau.utils.JsonCreater;
 import de.AS.Bau.utils.Scheduler;
+import net.minecraft.server.v1_15_R1.IChatBaseComponent.ChatSerializer;
 import net.minecraft.server.v1_15_R1.PacketPlayOutChat;
 import net.minecraft.server.v1_15_R1.PlayerConnection;
-import net.minecraft.server.v1_15_R1.IChatBaseComponent.ChatSerializer;
 
 public class OnInvClick implements Listener {
-	public static HashMap<Player, String> playerLastPaste = new HashMap<Player, String>();
-	public static List<Player> playerBlockedDelete = new ArrayList<>();
-	String aushwalString = "";
+
+
+	private static HashSet<UUID> playerBlockedDelete = new HashSet<>();
 
 	public OnInvClick(JavaPlugin plugin) {
 		Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
@@ -89,21 +74,6 @@ public class OnInvClick implements Listener {
 							&& event.getClickedInventory().equals(pInv)) {
 						event.setCancelled(true);
 						inventoryGUI(p, pInv, clicked);
-					} else if (invName.equals(StringGetterBau.getString(p, "testBlockSklaveTierInv"))
-							&& event.getClickedInventory().equals(pInv)) {
-
-						event.setCancelled(true);
-						tierINventory(p, pInv, clicked);
-					} else if (invName.equals(StringGetterBau.getString(p, "testBlockSklaveFacingInv"))
-							&& event.getClickedInventory().equals(pInv)) {
-						event.setCancelled(true);
-						facingInv(p, pInv, clicked);
-
-					} else if (invName.equals(StringGetterBau.getString(p, "testBlockSklaveTypeInv"))
-							&& event.getClickedInventory().equals(pInv)) {
-						event.setCancelled(true);
-						typeInv(p, pInv, clicked);
-
 					}
 
 				}
@@ -173,177 +143,6 @@ public class OnInvClick implements Listener {
 
 	}
 
-	private void tierINventory(Player p, Inventory pInv, ItemStack clicked) {
-		String close = StringGetterBau.getString(p, "close");
-		String lastPaste = StringGetterBau.getString(p, "lastPaste");
-		String clickedName = clicked.getItemMeta().getDisplayName();
-		RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-		RegionManager regions = container.get(BukkitAdapter.adapt(p.getWorld()));
-		String rgID = regions.getApplicableRegionsIDs(
-				BlockVector3.at(p.getLocation().getX(), p.getLocation().getY(), p.getLocation().getZ())).get(0);
-		switch (clickedName) {
-		case "§rTier I":
-			aushwalString = "T1_";
-			p.openInventory(richtungsInventory(p));
-			break;
-		case "§rTier II":
-			aushwalString = "T2_";
-			p.openInventory(richtungsInventory(p));
-			break;
-		case "§rTier III/IV":
-		case "§rTier IV":
-			aushwalString = "T3_";
-			p.openInventory(richtungsInventory(p));
-			break;
-		}
-		if (clickedName.equals(close)) {
-			p.closeInventory();
-		} else if (clickedName.equals(lastPaste)) {
-			if (playerLastPaste.containsKey(p)) {
-				pasten(aushwalString, rgID, p);
-				p.closeInventory();
-			} else {
-				p.closeInventory();
-				p.sendMessage(Main.prefix + StringGetterBau.getString(p, "noLastPaste"));
-			}
-		}
-
-	}
-
-	private void facingInv(Player p, Inventory pInv, ItemStack clicked) {
-		String south = StringGetterBau.getString(p, "facingSouth");
-		String north = StringGetterBau.getString(p, "facingNorth");
-		String clickedName = clicked.getItemMeta().getDisplayName();
-		if (north.equals(clickedName)) {
-			aushwalString = aushwalString + "N_";
-		} else if (south.equals(clickedName)) {
-			aushwalString = aushwalString + "S_";
-		}
-		p.openInventory(schildRahmenNormalInventory(p));
-	}
-
-	private void typeInv(Player p, Inventory pInv, ItemStack clicked) {
-		String normal = "§rNormal";
-		String frame = StringGetterBau.getString(p, "frame");
-		String shield = StringGetterBau.getString(p, "shield");
-		String clickedName = clicked.getItemMeta().getDisplayName();
-		if (clickedName.equals(normal)) {
-			aushwalString = aushwalString + "N";
-		} else if (clickedName.equals(frame)) {
-			aushwalString = aushwalString + "F";
-		} else if (clickedName.equals(shield)) {
-			aushwalString = aushwalString + "S";
-		}
-		p.closeInventory();
-		RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-		RegionManager regions = container.get(BukkitAdapter.adapt(p.getWorld()));
-		String rgID = regions.getApplicableRegionsIDs(
-				BlockVector3.at(p.getLocation().getX(), p.getLocation().getY(), p.getLocation().getZ())).get(0);
-		pasten(aushwalString, rgID, p);
-		playerLastPaste.put(p, aushwalString);
-	}
-
-	public Inventory richtungsInventory(Player p) {
-		// norden
-		
-		ItemStack isN = Banner.N.setName(StringGetterBau.getString(p, "facingNorth"));
-		// süden
-		ItemStack isS = Banner.S.setName(StringGetterBau.getString(p, "facingSouth"));
-		// setzen
-		Inventory inv = Bukkit.createInventory(null, 9, StringGetterBau.getString(p, "testBlockSklaveFacingInv"));
-		inv.setItem(2, isN);
-		inv.setItem(6, isS);
-		return inv;
-	}
-
-	public Inventory schildRahmenNormalInventory(Player p) {
-		// Schild
-		ItemStack isSchild = new ItemStack(Material.SHIELD);
-		ItemMeta imSchild = isSchild.getItemMeta();
-		imSchild.setDisplayName(StringGetterBau.getString(p, "shield"));
-		isSchild.setItemMeta(imSchild);
-		// Rahmen
-		ItemStack isRahmen = new ItemStack(Material.SCAFFOLDING);
-		ItemMeta imRahmen = isRahmen.getItemMeta();
-		imRahmen.setDisplayName(StringGetterBau.getString(p, "frame"));
-		isRahmen.setItemMeta(imRahmen);
-		// normal
-		ItemStack isNormal = new ItemStack(Material.WHITE_WOOL);
-		ItemMeta imNormal = isNormal.getItemMeta();
-		imNormal.setDisplayName("§rNormal");
-		isNormal.setItemMeta(imNormal);
-		// setzen
-		Inventory inv = Bukkit.createInventory(null, 9, StringGetterBau.getString(p, "testBlockSklaveTypeInv"));
-		inv.setItem(1, isSchild);
-		inv.setItem(4, isNormal);
-		inv.setItem(7, isRahmen);
-		return inv;
-	}
-
-	public static void pasten(String auswahl, String regionID, Player p) {
-		int ID = Integer.parseInt(regionID.replace("plot", ""));
-		try {
-			// für jede Zeile rgid festlegen
-
-			int x = -101 - (ID - 1) * 108;
-			int y = 8;
-			int z = 17;
-			// paste
-			Clipboard clipboard = createClipboard(auswahl);
-
-			EditSession editSession = (EditSession) WorldEdit.getInstance().getEditSessionFactory()
-					.getEditSession(BukkitAdapter.adapt(p.getWorld()), -1);
-			editSession.setFastMode(false);
-			editSession.enableStandardMode();
-			Operation operation;
-			if (auswahl.contains("_F")) {
-				operation = new ClipboardHolder(clipboard).createPaste(editSession).to(BlockVector3.at(x, y, z))
-						.ignoreAirBlocks(true).build();
-			} else {
-				operation = new ClipboardHolder(clipboard).createPaste(editSession).to(BlockVector3.at(x, y, z))
-						.ignoreAirBlocks(false).build();
-			}
-
-			try {
-				Operations.complete(operation);
-				WorldEdit.getInstance().getSessionManager().get(BukkitAdapter.adapt(p)).remember(editSession);
-				editSession.flushSession();
-			} catch (WorldEditException e) {
-				p.sendMessage(
-						Main.prefix + "irgendetwas ist schiefgelaufen, überprüfe ob alle dummys eingespeichert sind!");
-				e.printStackTrace();
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	public static Clipboard createClipboard(String filename) {
-		Main main = Main.getPlugin();
-		String path = main.getCustomConfig().getString("Config.path");
-		File pathFile = new File(path);
-		path = pathFile.getParentFile().getAbsolutePath();
-		File dir = new File(path + "/schematics/TestBlockSklave");
-		File schem = new File(dir.getAbsolutePath() + "/" + filename + ".schem");
-		ClipboardFormat format = ClipboardFormats.findByFile(schem);
-		try {
-			ClipboardReader reader = format.getReader(new FileInputStream(schem));
-			Clipboard clipboard = reader.read();
-			return clipboard;
-		} catch (FileNotFoundException e) {
-
-			e.printStackTrace();
-		} catch (IOException e) {
-
-			e.printStackTrace();
-		}
-
-		return null;
-
-	}
-
 	public static void resetRegion(String rgID, Player p, boolean confirmed) {
 		int rgIDint = Integer.parseInt(rgID.replace("plot", ""));
 		if (!confirmed) {
@@ -354,11 +153,11 @@ public class OnInvClick implements Listener {
 			creater2.addClickEvent("/delcon " + rgID + " " + p.getUniqueId(), ClickAction.RUN_COMMAND);
 			creater1.addJson(creater2).send(p);
 		} else {
-			if(playerBlockedDelete.contains(p)) {
+			if(playerBlockedDelete .contains(p.getUniqueId())) {
 				p.sendMessage(StringGetterBau.getString(p, "deletePlotAntiSpaw"));
 				return;
 			}
-				playerBlockedDelete.add(p);
+				playerBlockedDelete.add(p.getUniqueId());
 			p.sendMessage(StringGetterBau.getString(p, "delePlot").replace("%r", ""+rgIDint));
 			// für jede Zeile rgid festlegen
 			ProtectedRegion rg = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(p.getWorld())).getRegion(rgID);
@@ -377,7 +176,7 @@ public class OnInvClick implements Listener {
 			scheduler.setZ(zmin);
 			World world = p.getWorld();
 			// paste
-			pasten("ground", rgID, p);
+			TestBlockSklave.pasten("ground", rgID, p,true);
 			scheduler.setTask(Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), new Runnable() {
 
 						@Override
@@ -411,9 +210,9 @@ public class OnInvClick implements Listener {
 				
 				@Override
 				public void run() {
-					playerBlockedDelete.remove(p);
+					playerBlockedDelete.remove(p.getUniqueId());
 				}
-			}, 20*60*5);
+			}, 20*60*1);
 		}
 	}
 

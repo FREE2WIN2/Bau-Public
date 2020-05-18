@@ -1,8 +1,8 @@
 package de.AS.Bau.Listener;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -32,11 +32,9 @@ import net.minecraft.server.v1_15_R1.BlockPosition;
 
 @SuppressWarnings("deprecation")
 public class ClickListener implements Listener {
-	public static HashMap<Player, Block> playersDetonator = new HashMap<>();
-	public static HashMap<Player, Material> playersDetonatorBlockMaterial = new HashMap<>();
-	public static HashMap<Player, Boolean> playersBehindPowered = new HashMap<>();
+	public static HashMap<UUID, Block> playersDetonator = new HashMap<>();
 	public static HashMap<Location, Integer> redstoneWireActive = new HashMap<>();
-	public static List<Player> blockedForFZ = new ArrayList<>();
+	public static HashSet<UUID> blockedForFZ = new HashSet<>();
 
 	public ClickListener(JavaPlugin plugin) {
 		Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
@@ -61,7 +59,7 @@ public class ClickListener implements Listener {
 				// dt
 				ItemStack inhands = p.getItemInHand();
 
-				if (inhands.getType().isBlock() && dt.playerHasDtOn.get(p) == true && e.getClickedBlock() != null) {
+				if (inhands.getType().isBlock() && dt.playerHasDtOn.get(p.getUniqueId()) == true && e.getClickedBlock() != null) {
 					Location locBlock = e.getClickedBlock().getLocation();
 					Action action = e.getAction();
 					if ((-65 > locBlock.getBlockX() && locBlock.getBlockX() > -371)
@@ -81,10 +79,10 @@ public class ClickListener implements Listener {
 	private void fernzuender(PlayerInteractEvent e) {
 		Player p = e.getPlayer();
 		Action a = e.getAction();
-		if (!blockedForFZ.contains(p)) {
+		if (!blockedForFZ.contains(p.getUniqueId())) {
 			if (a.equals(Action.RIGHT_CLICK_AIR) || a.equals(Action.LEFT_CLICK_AIR)) {
 				// zünden
-				if (playersDetonator.containsKey(p)) {
+				if (playersDetonator.containsKey(p.getUniqueId())) {
 					zuenden(e);
 
 					// spam block
@@ -107,11 +105,11 @@ public class ClickListener implements Listener {
 				// speichern oder zündeln!
 				Block b = e.getClickedBlock();
 				if (b.getBlockData() instanceof Switch) {
-					playersDetonator.put(p, b);
+					playersDetonator.put(p.getUniqueId(), b);
 					p.sendMessage(Main.prefix + StringGetterBau.getString(p, "fzSaved"));
 					e.setCancelled(true);
 				} else {
-					if (playersDetonator.containsKey(p)) {
+					if (playersDetonator.containsKey(p.getUniqueId())) {
 						zuenden(e);
 						e.setCancelled(true);
 					} else {
@@ -127,7 +125,7 @@ public class ClickListener implements Listener {
 
 	private void zuenden(PlayerInteractEvent e) {
 		Player p = e.getPlayer();
-		Block b = playersDetonator.get(p);
+		Block b = playersDetonator.get(p.getUniqueId());
 		BlockData bd = b.getState().getBlockData();
 		Switch switchData = (Switch) bd;
 		Switch.Face face = switchData.getFace();
