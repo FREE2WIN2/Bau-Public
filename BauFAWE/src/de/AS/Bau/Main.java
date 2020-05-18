@@ -2,6 +2,11 @@ package de.AS.Bau;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -45,6 +50,7 @@ import de.AS.Bau.cmds.gui;
 import de.AS.Bau.cmds.sl;
 import de.AS.Bau.cmds.stats;
 import de.AS.Bau.cmds.tnt;
+import de.AS.Bau.utils.UndoManager;
 import de.AS.Bau.utils.worldCheck;
 
 
@@ -57,6 +63,8 @@ public class Main extends JavaPlugin {
 	
 	private static File tempAddConfigFile;
 	private static YamlConfiguration tempAddConfig;
+	
+	public static Map<UUID,UndoManager> playersUndoManager = new HashMap<>();
 @Override
 public void onEnable() {
 	plugin = this;

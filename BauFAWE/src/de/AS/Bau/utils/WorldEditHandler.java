@@ -19,6 +19,8 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
 
@@ -57,7 +59,8 @@ public class WorldEditHandler {
 
 	public static Clipboard createClipboard(String filename) {
 		String path = Main.getPlugin().getCustomConfig().getString("Config.path");
-		File schem = new File(path + "/schematics/TestBlockSklave" + "/" + filename + ".schem");
+		File pathFile = new File(path);
+		File schem = new File(pathFile.getParentFile().getAbsolutePath() + "/schematics/TestBlockSklave" + "/" + filename + ".schem");
 		ClipboardFormat format = ClipboardFormats.findByFile(schem);
 		try {
 			ClipboardReader reader = format.getReader(new FileInputStream(schem));
@@ -82,12 +85,20 @@ public class WorldEditHandler {
 	 * @param ticksPerPasteInterval -> Speed of paste: min 1
 	 */
 	public static void pasteAsync(Clipboard clipboard, int x, int y, int z, Player p, boolean ignoreAir,
-			int ticksPerPasteInterval) {
+			int ticksPerPasteInterval,boolean saveUndo) {
 		// offset from origin pasteloc and new pasteloc -> have to be added
+		if(clipboard == null) {
+			System.err.println("Clipboard TBS -> null");
+			return;
+		}
 		BlockVector3 offset = BlockVector3.at(x, y, z).subtract(clipboard.getOrigin());
 
 		BlockVector3 min = clipboard.getMinimumPoint();
 		BlockVector3 max = clipboard.getMaximumPoint();
+		if(saveUndo) {
+			Region rg = new CuboidRegion(min.add(offset), max.add(offset));
+			createUndo(rg,p);
+		}
 		World world = BukkitAdapter.adapt(p.getWorld());
 		Scheduler animation = new Scheduler();
 		int xmin = min.getX();
@@ -126,9 +137,19 @@ public class WorldEditHandler {
 	}
 
 	public static void pasteAsync(String fileName, int x, int y, int z, Player p, boolean ignoreAir,
-			int ticksPerPasteInterval) {
+			int ticksPerPasteInterval,boolean saveUndo) {
 		Clipboard board = createClipboard(fileName);
-		pasteAsync(board, x, y, z, p, ignoreAir, ticksPerPasteInterval);
+		pasteAsync(board, x, y, z, p, ignoreAir, ticksPerPasteInterval,saveUndo);
 	}
 
+	public static void createUndo(Region rg, Player p) {
+		UndoManager manager;
+		if(!Main.playersUndoManager.containsKey(p.getUniqueId())) {
+			manager = new UndoManager(p);
+		}else {
+			manager = Main.playersUndoManager.get(p.getUniqueId());
+		}
+		manager.addUndo(rg);
+	}
+		
 }

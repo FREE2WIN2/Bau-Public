@@ -20,6 +20,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -28,6 +29,7 @@ import com.sk89q.worldguard.protection.regions.RegionContainer;
 import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
 import de.AS.Bau.utils.Banner;
+import de.AS.Bau.utils.UndoManager;
 import de.AS.Bau.utils.WorldEditHandler;
 
 public class TestBlockSklave implements CommandExecutor, Listener {
@@ -43,7 +45,8 @@ public class TestBlockSklave implements CommandExecutor, Listener {
 			p.openInventory(tbsStartInv(p));
 			return true;
 		} else if (args.length == 1) {
-			if (args[1].equalsIgnoreCase("last")) {
+			if (args[0].equalsIgnoreCase("last")) {
+
 				if (playerLastPaste.containsKey(p.getUniqueId())) {
 					RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
 					RegionManager regions = container.get(BukkitAdapter.adapt(p.getWorld()));
@@ -59,7 +62,28 @@ public class TestBlockSklave implements CommandExecutor, Listener {
 					p.sendMessage(Main.prefix + StringGetterBau.getString(p, "noLastPaste"));
 					return true;
 				}
-			} else {
+			} else if(args[0].equalsIgnoreCase("undo")){
+				
+				/* Undo last TB*/
+				UndoManager manager;
+				if(Main.playersUndoManager.containsKey(p.getUniqueId())){
+					//TODO noch kein UNDO -> print
+					return true;
+				}else {
+					manager = Main.playersUndoManager.get(p.getUniqueId());
+				}
+				Clipboard undo = manager.getUndo();
+				if(undo == null) {
+					//TODO noch kein UNDO -> print
+				}
+				int x = undo.getOrigin().getBlockX();
+				int y = undo.getOrigin().getBlockY();
+				int z = undo.getOrigin().getBlockZ();
+				WorldEditHandler.pasteAsync(undo, x, y, z, p, false, 1, false);
+				
+				//TODO chat-Feedback
+				
+			}else {
 				return false;
 			}
 		} else if (args.length == 3) {
@@ -300,7 +324,7 @@ public class TestBlockSklave implements CommandExecutor, Listener {
 			int z = 17;
 			// paste
 			if(async) {
-			WorldEditHandler.pasteAsync(fileName, x, y, z, p, true, 1);
+			WorldEditHandler.pasteAsync(fileName, x, y, z, p, true, 1,true);
 
 			}else {
 				WorldEditHandler.pasten(fileName, x, y, z, p, true);
