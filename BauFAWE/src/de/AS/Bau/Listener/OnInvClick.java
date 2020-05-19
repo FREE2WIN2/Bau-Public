@@ -31,7 +31,7 @@ import com.sk89q.worldguard.protection.regions.RegionContainer;
 import de.AS.Bau.DBConnection;
 import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
-import de.AS.Bau.Tools.TestBlockSklave;
+import de.AS.Bau.WorldEdit.WorldEditHandler;
 import de.AS.Bau.utils.ClickAction;
 import de.AS.Bau.utils.JsonCreater;
 import de.AS.Bau.utils.Scheduler;
@@ -176,7 +176,9 @@ public class OnInvClick implements Listener {
 			scheduler.setZ(zmin);
 			World world = p.getWorld();
 			// paste
-			TestBlockSklave.pasten("ground", rgID, p,true);
+			WorldEditHandler.pasten("ground", rgID, p,true,false,false);
+			//TODO paste without saving in undo
+			
 			scheduler.setTask(Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), new Runnable() {
 
 						@Override

@@ -1,4 +1,4 @@
-package de.AS.Bau.utils;
+package de.AS.Bau.WorldEdit;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -6,55 +6,35 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.bukkit.Bukkit;
+import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.type.Sign;
 import org.bukkit.entity.Player;
 
-import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
-import com.sk89q.worldedit.function.operation.Operation;
-import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
 
 import de.AS.Bau.Main;
+import de.AS.Bau.utils.Scheduler;
 
 public class WorldEditHandler {
 
-	public static void pasten(String fileName, int x, int y, int z, Player p, boolean b) {
-		try {
-
-			Clipboard clipboard = createClipboard(fileName);
-
-			EditSession editSession = (EditSession) WorldEdit.getInstance().getEditSessionFactory()
-					.getEditSession(BukkitAdapter.adapt(p.getWorld()), -1);
-			editSession.setFastMode(false);
-			editSession.enableStandardMode();
-			Operation operation;
-
-			operation = new ClipboardHolder(clipboard).createPaste(editSession).to(BlockVector3.at(x, y, z))
-					.ignoreAirBlocks(true).build();
-			try {
-				Operations.complete(operation);
-				WorldEdit.getInstance().getSessionManager().get(BukkitAdapter.adapt(p)).remember(editSession);
-				editSession.flushSession();
-			} catch (WorldEditException e) {
-				p.sendMessage(
-						Main.prefix + "irgendetwas ist schiefgelaufen, überprüfe ob alle dummys eingespeichert sind!");
-				e.printStackTrace();
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
+	public static void pasten(String fileName, String rgID, Player p, boolean ignoreAir, boolean undo, boolean tbs) {
+		Clipboard board = createClipboard(fileName);
+		int ID = Integer.parseInt(rgID.replace("plot",""));
+		int x = -101 - (ID - 1) * 108;
+		int y = 8;
+		int z = 17;
+		
+		pasteAsync(board, x, y, z, p, ignoreAir, 1, undo,tbs);
 	}
 
 	public static Clipboard createClipboard(String filename) {
@@ -83,9 +63,11 @@ public class WorldEditHandler {
 	 * @param p                     -> player which paste something
 	 * @param ignoreAir             -> true if paste -a
 	 * @param ticksPerPasteInterval -> Speed of paste: min 1
+	 * @param saveUndo              -> Save overwritten Region to undo it
+	 * @param tbs                   -> true if paste as testblocksklave, false if it used to normal worldeditOperation
 	 */
 	public static void pasteAsync(Clipboard clipboard, int x, int y, int z, Player p, boolean ignoreAir,
-			int ticksPerPasteInterval,boolean saveUndo) {
+			int ticksPerPasteInterval,boolean saveUndo, boolean tbs) {
 		// offset from origin pasteloc and new pasteloc -> have to be added
 		if(clipboard == null) {
 			System.err.println("Clipboard TBS -> null");
@@ -96,8 +78,13 @@ public class WorldEditHandler {
 		BlockVector3 min = clipboard.getMinimumPoint();
 		BlockVector3 max = clipboard.getMaximumPoint();
 		if(saveUndo) {
+			if(tbs) {
 			Region rg = new CuboidRegion(min.add(offset), max.add(offset));
-			createUndo(rg,p);
+			createUndo(rg,p,x,y,z);
+			}else {
+				//normal undo
+				
+			}
 		}
 		World world = BukkitAdapter.adapt(p.getWorld());
 		Scheduler animation = new Scheduler();
@@ -116,12 +103,13 @@ public class WorldEditHandler {
 				int z = animation.getZ();
 				for (int x = xmin; x <= xmax; x++) {
 					for (int y = ymin; y <= ymax; y++) {
-
-						try {
-							BlockVector3 blockLoc = BlockVector3.at(x, y, z).add(offset);
-							world.setBlock(blockLoc, clipboard.getFullBlock(BlockVector3.at(x, y, z)));
-						} catch (WorldEditException e) {
-							e.printStackTrace();
+						BlockVector3 blockLoc = BlockVector3.at(x, y, z).add(offset);
+						if(!(clipboard.getFullBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial().isAir()&&ignoreAir)) {
+							try {
+								world.setBlock(blockLoc, clipboard.getBlock(BlockVector3.at(x, y, z)),false);
+							} catch (WorldEditException e) {
+								e.printStackTrace();
+							}
 						}
 					}
 				}
@@ -137,19 +125,19 @@ public class WorldEditHandler {
 	}
 
 	public static void pasteAsync(String fileName, int x, int y, int z, Player p, boolean ignoreAir,
-			int ticksPerPasteInterval,boolean saveUndo) {
+			int ticksPerPasteInterval,boolean saveUndo,boolean tbs) {
 		Clipboard board = createClipboard(fileName);
-		pasteAsync(board, x, y, z, p, ignoreAir, ticksPerPasteInterval,saveUndo);
+		pasteAsync(board, x, y, z, p, ignoreAir, ticksPerPasteInterval,saveUndo,tbs);
 	}
 
-	public static void createUndo(Region rg, Player p) {
+	public static void createUndo(Region rg, Player p, int x, int y, int z) {
 		UndoManager manager;
-		if(!Main.playersUndoManager.containsKey(p.getUniqueId())) {
-			manager = new UndoManager(p);
-		}else {
+		if(Main.playersUndoManager.containsKey(p.getUniqueId())) {
 			manager = Main.playersUndoManager.get(p.getUniqueId());
+		}else {
+			manager = new UndoManager(p);
 		}
-		manager.addUndo(rg);
+		manager.addUndo(rg,x,y,z,BukkitAdapter.adapt(p.getWorld()));
 	}
 		
 }

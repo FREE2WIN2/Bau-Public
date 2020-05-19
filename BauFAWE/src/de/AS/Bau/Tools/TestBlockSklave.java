@@ -28,9 +28,10 @@ import com.sk89q.worldguard.protection.regions.RegionContainer;
 
 import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
+import de.AS.Bau.WorldEdit.UndoManager;
+import de.AS.Bau.WorldEdit.WorldEditHandler;
+import de.AS.Bau.WorldEdit.WorldGuardHandler;
 import de.AS.Bau.utils.Banner;
-import de.AS.Bau.utils.UndoManager;
-import de.AS.Bau.utils.WorldEditHandler;
 
 public class TestBlockSklave implements CommandExecutor, Listener {
 
@@ -56,34 +57,37 @@ public class TestBlockSklave implements CommandExecutor, Listener {
 
 					/* paste */
 
-					pasten(playerLastPaste.get(p.getUniqueId()), rgID, p, true);
+					WorldEditHandler.pasten(playerLastPaste.get(p.getUniqueId()), rgID, p, true, true,true);
 					return true;
 				} else {
 					p.sendMessage(Main.prefix + StringGetterBau.getString(p, "noLastPaste"));
 					return true;
 				}
-			} else if(args[0].equalsIgnoreCase("undo")){
-				
-				/* Undo last TB*/
+			} else if (args[0].equalsIgnoreCase("undo")) {
+				/* Undo last TB */
 				UndoManager manager;
-				if(Main.playersUndoManager.containsKey(p.getUniqueId())){
-					//TODO noch kein UNDO -> print
+				if (!Main.playersUndoManager.containsKey(p.getUniqueId())) {
+					// TODO noch kein UNDO -> print
+					System.out.println("not containing");
 					return true;
-				}else {
+				} else {
 					manager = Main.playersUndoManager.get(p.getUniqueId());
 				}
 				Clipboard undo = manager.getUndo();
-				if(undo == null) {
-					//TODO noch kein UNDO -> print
+				if (undo == null) {
+					System.out.println("undo == null");
+					// TODO noch kein UNDO -> print
+					return true;
 				}
 				int x = undo.getOrigin().getBlockX();
 				int y = undo.getOrigin().getBlockY();
 				int z = undo.getOrigin().getBlockZ();
-				WorldEditHandler.pasteAsync(undo, x, y, z, p, false, 1, false);
-				
-				//TODO chat-Feedback
-				
-			}else {
+				Stoplag.setStatusTemp(undo.getRegion().getWorld().getName(),
+						WorldGuardHandler.getPlotId(undo.getOrigin(), undo.getRegion().getWorld()), true, 10);
+				WorldEditHandler.pasteAsync(undo, x, y, z, p, false, 1, false,true);
+				// TODO chat-Feedback
+				return true;
+			} else {
 				return false;
 			}
 		} else if (args.length == 3) {
@@ -123,7 +127,7 @@ public class TestBlockSklave implements CommandExecutor, Listener {
 
 				/* paste */
 
-				pasten(auswahl, rgID, p, true);
+				WorldEditHandler.pasten(auswahl, rgID, p, true, true,true);
 				playerLastPaste.put(p.getUniqueId(), auswahl);
 				return true;
 			} else {
@@ -133,7 +137,6 @@ public class TestBlockSklave implements CommandExecutor, Listener {
 		}
 		return false;
 	}
-
 
 	@SuppressWarnings("deprecation")
 	public Inventory tbsStartInv(Player p) {
@@ -231,7 +234,7 @@ public class TestBlockSklave implements CommandExecutor, Listener {
 		} else if (clickedName.equals(lastPaste)) {
 			if (playerLastPaste.containsKey(p.getUniqueId())) {
 
-				pasten(playerLastPaste.get(p.getUniqueId()), rgID, p,true);
+				WorldEditHandler.pasten(playerLastPaste.get(p.getUniqueId()), rgID, p, true, true,true);
 				p.closeInventory();
 			} else {
 				p.closeInventory();
@@ -273,7 +276,7 @@ public class TestBlockSklave implements CommandExecutor, Listener {
 		RegionManager regions = container.get(BukkitAdapter.adapt(p.getWorld()));
 		String rgID = regions.getApplicableRegionsIDs(
 				BlockVector3.at(p.getLocation().getX(), p.getLocation().getY(), p.getLocation().getZ())).get(0);
-		pasten(current, rgID, p,true);
+		WorldEditHandler.pasten(current, rgID, p, true, true,true);
 		playerLastPaste.put(p.getUniqueId(), current);
 	}
 
@@ -314,20 +317,4 @@ public class TestBlockSklave implements CommandExecutor, Listener {
 		return inv;
 	}
 
-	public static void pasten(String fileName, String regionID, Player p,boolean async) {
-		int ID = Integer.parseInt(regionID.replace("plot", ""));
-
-			// für jede Zeile rgid festlegen
-
-			int x = -101 - (ID - 1) * 108;
-			int y = 8;
-			int z = 17;
-			// paste
-			if(async) {
-			WorldEditHandler.pasteAsync(fileName, x, y, z, p, true, 1,true);
-
-			}else {
-				WorldEditHandler.pasten(fileName, x, y, z, p, true);
-			}
-	}
 }

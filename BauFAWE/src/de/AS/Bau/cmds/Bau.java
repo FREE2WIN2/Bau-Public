@@ -16,7 +16,7 @@ public class Bau implements CommandExecutor {
 			}
 			if(args.length == 1) {
 				if(args[0].equalsIgnoreCase("reload")) {
-					Main.getPlugin().configcreate();
+					Main.getPlugin().createConfigs();
 					sender.sendMessage(Main.prefix + "Configs successfully reloaded!");
 				}
 			}

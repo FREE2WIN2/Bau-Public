@@ -23,6 +23,7 @@ import com.sk89q.worldguard.protection.regions.RegionContainer;
 import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
 import de.AS.Bau.Listener.onPlayerMove;
+import de.AS.Bau.Tools.Stoplag;
 import de.AS.Bau.cmds.dt;
 
 public class ScoreBoardBau {
@@ -87,9 +88,8 @@ public class ScoreBoardBau {
 	}
 
 	public static String getSl(Player p) {
-		Main main = Main.getPlugin();
 		String rgID = onPlayerMove.playersLastPlot.get(p);
-			if (main.getCustomConfig().getString("stoplag."+p.getWorld().getName()+"."+rgID).equals("an")) {
+			if (Stoplag.getStatus(p.getWorld().getName(), rgID)) {
 				//System.out.println("sl on");
 				return StringGetterBau.getString(p, "boardOn");
 			} else {

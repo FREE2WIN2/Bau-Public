@@ -13,6 +13,8 @@ public class tbsTC implements TabCompleter {
 	public List<String> onTabComplete(CommandSender sender, Command cmd, String string, String[] args) {
 		List<String> out = new ArrayList<>();
 		if(args.length ==1) {
+			out.add("last");
+			out.add("undo");
 			out.add("1");
 			out.add("2");
 			out.add("3");

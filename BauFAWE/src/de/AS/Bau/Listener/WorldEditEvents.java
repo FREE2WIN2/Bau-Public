@@ -22,6 +22,7 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 
 import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
+import de.AS.Bau.Tools.Stoplag;
 
 public class WorldEditEvents implements Listener {
 	public WorldEditEvents(JavaPlugin plugin) {
@@ -38,6 +39,10 @@ public class WorldEditEvents implements Listener {
 		if(command.equalsIgnoreCase("//rotate")) {
 			e.setCancelled(true);
 			rotateClipboard(p);
+		}
+		if (command.startsWith("//paste")) {
+			Stoplag.setStatusTemp(e.getPlayer().getLocation(), true,5);
+
 		}
 		if (command.startsWith("//stack")) {
 			if(args.length==2) {
