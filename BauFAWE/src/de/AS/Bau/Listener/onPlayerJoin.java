@@ -27,7 +27,6 @@ import de.AS.Bau.DBConnection;
 import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
 import de.AS.Bau.Scoreboard.ScoreBoardBau;
-import de.AS.Bau.Tools.Stoplag;
 import de.AS.Bau.cmds.dt;
 
 public class onPlayerJoin implements Listener {
@@ -61,15 +60,6 @@ public class onPlayerJoin implements Listener {
 		dt.playerHasDtOn.put(p.getUniqueId(), false);
 		Location loc = new Location(world, -208, 8, 17);
 		onPlayerMove.playersLastPlot.put(p, "plot2");
-
-//		if (!main.getCustomConfig().contains("stoplag." + p.getUniqueId().toString())) {
-////			main.getCustomConfig().createSection("stoplag." + p.getUniqueId().toString() + ".plot1");
-////			main.getCustomConfig().createSection("stoplag." + p.getUniqueId().toString() + ".plot2");
-////			main.getCustomConfig().createSection("stoplag." + p.getUniqueId().toString() + ".plot3");
-//			Stoplag.setStatus(p.getUniqueId().toString(), "plot1", false);
-//			Stoplag.setStatus(p.getUniqueId().toString(), "plot2", false);
-//			Stoplag.setStatus(p.getUniqueId().toString(), "plot3", false);
-//		}
 		p.teleport(loc);
 		// wenn ja-> teleportieren
 		// item

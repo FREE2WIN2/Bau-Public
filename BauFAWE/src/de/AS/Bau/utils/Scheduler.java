@@ -5,7 +5,7 @@ import org.bukkit.Bukkit;
 public class Scheduler {
 
 	int id;
-	int xCoord;
+	int x;
 	int y;
 	int ymin;
 	int z;
@@ -15,10 +15,10 @@ public class Scheduler {
 		Bukkit.getScheduler().cancelTask(id);
 	}
 	public void setX(int x) {
-		xCoord = x;
+		this.x= x;
 	}
 	public int getX() {
-		return xCoord;
+		return x;
 	}
 	public void setY(int y) {
 		this.y=y;

@@ -40,6 +40,7 @@ import de.AS.Bau.TabCompleter.tbsTC;
 import de.AS.Bau.Tools.Stoplag;
 import de.AS.Bau.Tools.TestBlockSklave;
 import de.AS.Bau.WorldEdit.UndoManager;
+import de.AS.Bau.WorldEdit.WorldEditPreCommand;
 import de.AS.Bau.cmds.Bau;
 import de.AS.Bau.cmds.chest;
 import de.AS.Bau.cmds.delcon;
@@ -94,6 +95,7 @@ public class Main extends JavaPlugin {
 		pm.registerEvents(new TestBlockSklave(), this);
 		pm.registerEvents(new eventsToCancel(), this);
 		pm.registerEvents(new Stoplag(), this);
+		pm.registerEvents(new WorldEditPreCommand(), this);
 	}
 
 	private void registerCommands() {

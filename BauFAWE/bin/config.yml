@@ -4,3 +4,6 @@ Config:
   user: 'BauPlugin'
   password: 'r0gltuXNFEqKDCy3'
   path: /root/WargearWorld/bau
+
+worldEdit:
+  maxBlockPerSecond: 10000

@@ -22,6 +22,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
@@ -82,9 +83,7 @@ public class TestBlockSklave implements CommandExecutor, Listener {
 				int x = undo.getOrigin().getBlockX();
 				int y = undo.getOrigin().getBlockY();
 				int z = undo.getOrigin().getBlockZ();
-				Stoplag.setStatusTemp(undo.getRegion().getWorld().getName(),
-						WorldGuardHandler.getPlotId(undo.getOrigin(), undo.getRegion().getWorld()), true, 10);
-				WorldEditHandler.pasteAsync(undo, x, y, z, p, false, 1, false,true);
+				WorldEditHandler.pasteAsync(new ClipboardHolder(undo), x, y, z, p, false, 1, false,true);
 				// TODO chat-Feedback
 				return true;
 			} else {
@@ -118,12 +117,7 @@ public class TestBlockSklave implements CommandExecutor, Listener {
 					return false;
 				}
 				String auswahl = tier + "_" + Richtung + "_" + typ;
-				RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-				RegionManager regions = container.get(BukkitAdapter.adapt(p.getWorld()));
-				String rgID = regions
-						.getApplicableRegionsIDs(
-								BlockVector3.at(p.getLocation().getX(), p.getLocation().getY(), p.getLocation().getZ()))
-						.get(0);
+				String rgID = WorldGuardHandler.getPlotId(p.getLocation());
 
 				/* paste */
 
@@ -272,10 +266,7 @@ public class TestBlockSklave implements CommandExecutor, Listener {
 			current += "S";
 		}
 		p.closeInventory();
-		RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-		RegionManager regions = container.get(BukkitAdapter.adapt(p.getWorld()));
-		String rgID = regions.getApplicableRegionsIDs(
-				BlockVector3.at(p.getLocation().getX(), p.getLocation().getY(), p.getLocation().getZ())).get(0);
+		String rgID = WorldGuardHandler.getPlotId(p.getLocation());
 		WorldEditHandler.pasten(current, rgID, p, true, true,true);
 		playerLastPaste.put(p.getUniqueId(), current);
 	}

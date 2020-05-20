@@ -9,20 +9,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.IncompleteRegionException;
-import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
-import com.sk89q.worldedit.math.transform.AffineTransform;
-import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.session.ClipboardHolder;
 
 import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
-import de.AS.Bau.Tools.Stoplag;
 
 public class WorldEditEvents implements Listener {
 	public WorldEditEvents(JavaPlugin plugin) {
@@ -35,15 +28,8 @@ public class WorldEditEvents implements Listener {
 		String command = e.getMessage();
 		Player p = e.getPlayer();
 		String[] args = command.split(" ");
-		
-		if(command.equalsIgnoreCase("//rotate")) {
-			e.setCancelled(true);
-			rotateClipboard(p);
-		}
-		if (command.startsWith("//paste")) {
-			Stoplag.setStatusTemp(e.getPlayer().getLocation(), true,5);
 
-		}
+
 		if (command.startsWith("//stack")) {
 			if(args.length==2) {
 				WorldEditPlugin wep = (WorldEditPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
@@ -260,21 +246,6 @@ public class WorldEditEvents implements Listener {
 		}
 		
 
-	}
-
-	private void rotateClipboard(Player p) {
-		LocalSession session = WorldEdit.getInstance().getSessionManager().get(BukkitAdapter.adapt(p));
-		
-			ClipboardHolder holder;
-			try {
-				holder = session.getClipboard();
-				AffineTransform transform = new AffineTransform().rotateY(180);
-				holder.setTransform(holder.getTransform().combine((Transform) transform));
-				session.setClipboard(holder);
-				p.sendMessage("§dThe clipboard copy has been rotatet by 180 degrees.");
-			} catch (EmptyClipboardException e) {
-				e.printStackTrace();
-			}	
 	}
 
 	private BlockFace getFacing(float pitch, float yaw) {
