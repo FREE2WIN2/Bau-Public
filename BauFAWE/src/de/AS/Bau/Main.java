@@ -26,7 +26,6 @@ import de.AS.Bau.Listener.ClickListener;
 import de.AS.Bau.Listener.ExplosioneventListener;
 import de.AS.Bau.Listener.OnInvClick;
 import de.AS.Bau.Listener.SpawnEvent;
-import de.AS.Bau.Listener.WorldLoad;
 import de.AS.Bau.Listener.chestAndsignListener;
 import de.AS.Bau.Listener.eventsToCancel;
 import de.AS.Bau.Listener.onPlayerJoin;
@@ -36,6 +35,8 @@ import de.AS.Bau.Listener.onPlayerRespawn;
 import de.AS.Bau.Listener.onPlayerTeleport;
 import de.AS.Bau.TabCompleter.gsTC;
 import de.AS.Bau.TabCompleter.tbsTC;
+import de.AS.Bau.Tools.DesignTool;
+import de.AS.Bau.Tools.FernzuenderListener;
 import de.AS.Bau.Tools.Stoplag;
 import de.AS.Bau.Tools.TestBlockSklave;
 import de.AS.Bau.WorldEdit.UndoManager;
@@ -45,7 +46,6 @@ import de.AS.Bau.cmds.Bau;
 import de.AS.Bau.cmds.chest;
 import de.AS.Bau.cmds.delcon;
 import de.AS.Bau.cmds.ds;
-import de.AS.Bau.cmds.dt;
 import de.AS.Bau.cmds.gs;
 import de.AS.Bau.cmds.gui;
 import de.AS.Bau.cmds.sl;
@@ -87,7 +87,6 @@ public class Main extends JavaPlugin {
 		new onPlayerTeleport(this);
 		new ExplosioneventListener(this);
 		new SpawnEvent(this);
-		new WorldLoad(this);
 		new onPlayerRespawn(this);
 		new worldCheck();
 
@@ -96,6 +95,8 @@ public class Main extends JavaPlugin {
 		pm.registerEvents(new eventsToCancel(), this);
 		pm.registerEvents(new Stoplag(), this);
 		pm.registerEvents(new WorldEditPreCommand(), this);
+		pm.registerEvents(new DesignTool(), this);
+		pm.registerEvents(new FernzuenderListener(), this);
 	}
 
 	private void registerCommands() {
@@ -106,7 +107,7 @@ public class Main extends JavaPlugin {
 		getCommand("tbs").setExecutor(new TestBlockSklave());
 		getCommand("tbs").setTabCompleter(new tbsTC());
 		getCommand("sl").setExecutor(new sl());
-		getCommand("dt").setExecutor(new dt());
+		getCommand("dt").setExecutor(new DesignTool());
 		getCommand("ds").setExecutor(new ds());
 		getCommand("debugstick").setExecutor(new ds());
 		getCommand("chest").setExecutor(new chest());

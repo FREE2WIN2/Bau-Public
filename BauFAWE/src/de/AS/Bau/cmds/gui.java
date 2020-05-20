@@ -23,6 +23,7 @@ import com.sk89q.worldguard.protection.regions.RegionContainer;
 import de.AS.Bau.DBConnection;
 import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
+import de.AS.Bau.Tools.DesignTool;
 
 public class gui implements CommandExecutor {
 
@@ -169,7 +170,7 @@ public class gui implements CommandExecutor {
 		String dtName;
 		ItemStack dst = new ItemStack(Material.WOODEN_SHOVEL);
 		ItemMeta dtIM = observer.getItemMeta();
-		if(dt.playerHasDtOn.get(p.getUniqueId())) {
+		if(DesignTool.playerHasDtOn.get(p.getUniqueId())) {
 			dtName = StringGetterBau.getString(p, "dtItemOn");
 			dtIM.addEnchant(Enchantment.SILK_TOUCH, 1, true);
 			dtIM.addItemFlags(ItemFlag.HIDE_ENCHANTS);
