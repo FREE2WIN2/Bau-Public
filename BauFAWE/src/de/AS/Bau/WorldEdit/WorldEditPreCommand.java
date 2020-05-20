@@ -14,7 +14,7 @@ public class WorldEditPreCommand implements Listener{
 
 		String command = event.getMessage();
 		Player p = event.getPlayer();
-		String[] args = command.split(" ");
+//		String[] args = command.split(" ");
 		if (command.startsWith("//paste")) {
 //			boolean air = false;
 //			if (command.contains(" -a") && args.length >= 2) {

@@ -9,7 +9,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 
 import de.AS.Bau.Scoreboard.ScoreBoardBau;
-import de.AS.Bau.cmds.dt;
+import de.AS.Bau.Tools.DesignTool;
+import de.AS.Bau.Tools.FernzuenderListener;
 
 public class onPlayerQuit implements Listener {
 public onPlayerQuit(JavaPlugin plugin) {
@@ -18,8 +19,8 @@ public onPlayerQuit(JavaPlugin plugin) {
 @EventHandler(priority = EventPriority.LOWEST)
 public void onPlayerLeaveevent(PlayerQuitEvent e) {
 	onPlayerMove.playersLastPlot.remove(e.getPlayer());
-	dt.playerHasDtOn.remove(e.getPlayer().getUniqueId());
+	DesignTool.playerHasDtOn.remove(e.getPlayer().getUniqueId());
 	ScoreBoardBau.stopPlayersScoreboard.put(e.getPlayer(), true);
-	ClickListener.playersDetonator.remove(e.getPlayer().getUniqueId());
+	FernzuenderListener.playersDetonator.remove(e.getPlayer().getUniqueId());
 }
 }

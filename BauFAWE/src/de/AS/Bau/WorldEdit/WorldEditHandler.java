@@ -8,7 +8,6 @@ import java.io.IOException;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -18,7 +17,6 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
-import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.Transform;
@@ -35,7 +33,7 @@ public class WorldEditHandler {
 
 	private final static int maxBlockChangePerTick = Main.getPlugin().getCustomConfig()
 			.getInt("worldEdit.maxBlockPerSecond");
-	private final static WorldEdit we = WorldEdit.getInstance();
+//	private final static WorldEdit we = WorldEdit.getInstance();
 
 	public static void pasten(String fileName, String rgID, Player p, boolean ignoreAir, boolean undo, boolean tbs) {
 		Clipboard board = createClipboard(fileName);
@@ -105,10 +103,10 @@ public class WorldEditHandler {
 				createUndo(rg, p, x, y, z);
 			} else {
 				// normal undo
-				EditSession es = we.getEditSessionFactory().getEditSession(world, -1);
-				Operation op = clipboardHolder.createPaste(es).ignoreAirBlocks(ignoreAir).to(BlockVector3.at(x, y, z)).build();
-				we.getSessionManager().get(BukkitAdapter.adapt(p));
-				es.flushSession();
+//				EditSession es = we.getEditSessionFactory().getEditSession(world, -1);
+//				Operation op = clipboardHolder.createPaste(es).ignoreAirBlocks(ignoreAir).to(BlockVector3.at(x, y, z)).build();
+//				we.getSessionManager().get(BukkitAdapter.adapt(p));
+//				es.flushSession();
 				
 			}
 		}

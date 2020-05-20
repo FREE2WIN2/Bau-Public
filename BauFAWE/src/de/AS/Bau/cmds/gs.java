@@ -1,6 +1,5 @@
 package de.AS.Bau.cmds;
 
-import java.io.File;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -33,7 +32,7 @@ import de.AS.Bau.DBConnection;
 import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
 import de.AS.Bau.Listener.OnInvClick;
-import de.AS.Bau.Listener.onPlayerJoin;
+import de.AS.Bau.utils.WorldHandler;
 import net.minecraft.server.v1_15_R1.IChatBaseComponent;
 import net.minecraft.server.v1_15_R1.IChatBaseComponent.ChatSerializer;
 import net.minecraft.server.v1_15_R1.PacketPlayOutChat;
@@ -49,7 +48,7 @@ public class gs implements CommandExecutor {
 		if (args.length == 0) {
 			// gs -> tp zum own gs
 			if (!Bukkit.getServer().getWorlds().contains(Bukkit.getServer().getWorld(p.getUniqueId().toString()))) {
-				onPlayerJoin.loadWorld(p.getUniqueId().toString());
+				WorldHandler.loadWorld(p.getUniqueId().toString());
 			}
 			Location loc = new Location(Bukkit.getServer().getWorld(p.getUniqueId().toString()), -208, 8, 17);
 			p.teleport(loc);
@@ -152,7 +151,7 @@ public class gs implements CommandExecutor {
 				if ((conn.isMember(p, args[1]) || p.hasPermission("moderator")) && conn.hasOwnPlots(args[1])) {
 					String plotID = conn.getUUID(args[1]);
 					if (!Bukkit.getServer().getWorlds().contains(Bukkit.getServer().getWorld(plotID))) {
-						onPlayerJoin.loadWorld(plotID);
+						WorldHandler.loadWorld(plotID);
 					}
 					Location loc = new Location(Bukkit.getServer().getWorld(plotID), -208, 8, 17);
 					p.teleport(loc);
@@ -167,7 +166,7 @@ public class gs implements CommandExecutor {
 
 					World w;
 					if (!Bukkit.getServer().getWorlds().contains(Bukkit.getServer().getWorld(worldName))) {
-						w = onPlayerJoin.loadWorld(worldName);
+						w = WorldHandler.loadWorld(worldName);
 					} else {
 						w = Bukkit.getServer().getWorld(worldName);
 					}
@@ -177,31 +176,10 @@ public class gs implements CommandExecutor {
 						}
 					}
 
-					Bukkit.getServer().unloadWorld(w, true);
-					Main mains = Main.getPlugin();
-					String path = mains.getCustomConfig().getString("Config.path");
-					if (w.getWorldFolder().exists()) {
-						if (deleteWorld(w.getWorldFolder()) && conn.deleteGs(conn.getUUID(args[1]))) {// &&
-																										// deleteWorld(new
-																										// File(path
-																										// +"/Worlds/"+worldName))
-							File file = new File(path + "/plugins/WorldGuard/worlds/" + conn.getUUID(args[1]));
-							file.delete();
-							p.sendMessage(
-									Main.prefix + StringGetterBau.getString(p, "gsDeleted").replace("%r", args[1]));
-						} else {
-							p.sendMessage(Main.prefix + StringGetterBau.getString(p, "error"));
-						}
+					if (WorldHandler.deleteWorld(w, conn)) {
+						p.sendMessage(Main.prefix + StringGetterBau.getString(p, "gsDeleted").replace("%r", args[1]));
 					} else {
-						if (deleteWorld(new File(path + "/Worlds/" + worldName))
-								&& conn.deleteGs(conn.getUUID(args[1]))) {
-							File file = new File(path + "/plugins/WorldGuard/worlds/" + conn.getUUID(args[1]));
-							file.delete();
-							p.sendMessage(
-									Main.prefix + StringGetterBau.getString(p, "gsDeleted").replace("%r", args[1]));
-						} else {
-							p.sendMessage(Main.prefix + StringGetterBau.getString(p, "error"));
-						}
+						p.sendMessage(Main.prefix + StringGetterBau.getString(p, "error"));
 					}
 
 				} else {
@@ -214,22 +192,23 @@ public class gs implements CommandExecutor {
 			return true;
 
 		} else if (args.length == 3) {
-			if(args[0].equalsIgnoreCase("time")&&args[1].equalsIgnoreCase("set")) {
+			if (args[0].equalsIgnoreCase("time") && args[1].equalsIgnoreCase("set")) {
 				int time = Integer.parseInt(args[1]);
 				if (time > 24000) {
 					p.sendMessage(Main.prefix + StringGetterBau.getString(p, "timeTooHigh").replace("%r", args[1]));
 				} else {
 					p.getWorld().setTime(time);
 					p.sendMessage(Main.prefix + StringGetterBau.getString(p, "time").replace("%r", args[1]));
-				} 
+				}
 				return true;
-			}else if(args[0].equalsIgnoreCase("time")) {
-				p.sendMessage(Main.prefix + StringGetterBau.getString(p, "wrongCommand").replace("%r", "gs time <time>"));
+			} else if (args[0].equalsIgnoreCase("time")) {
+				p.sendMessage(
+						Main.prefix + StringGetterBau.getString(p, "wrongCommand").replace("%r", "gs time <time>"));
 				return true;
 			}
-			
+
 			switch (args[0].toLowerCase()) {
-			
+
 			case "add":
 			case "addtemp":
 			case "tempadd":
@@ -295,20 +274,6 @@ public class gs implements CommandExecutor {
 		conn.closeConn();
 	}
 
-	public boolean deleteWorld(File path) {
-		if (path.exists()) {
-			File files[] = path.listFiles();
-			for (int i = 0; i < files.length; i++) {
-				if (files[i].isDirectory()) {
-					deleteWorld(files[i]);
-				} else {
-					files[i].delete();
-				}
-			}
-		}
-		return (path.delete());
-	}
-
 	public static void startCheckForTempAdd() {
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), new Runnable() {
 
@@ -328,17 +293,16 @@ public class gs implements CommandExecutor {
 							String uuidMember = m;
 							DBConnection conn = new DBConnection();
 							conn.removeMember(uuidOwner, conn.getName(uuidMember));
-							//wg remove member
+							// wg remove member
 							RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-							RegionManager regions = container
-									.get(BukkitAdapter.adapt(Bukkit.getWorld(s)));
+							RegionManager regions = container.get(BukkitAdapter.adapt(Bukkit.getWorld(s)));
 
 							for (Entry<String, ProtectedRegion> rg : regions.getRegions().entrySet()) {
 								DefaultDomain member = rg.getValue().getMembers();
 								member.removePlayer(UUID.fromString(uuidMember));
 								rg.getValue().setMembers(member);
 							}
-							//config remove
+							// config remove
 							config.set(uuidOwner + "." + uuidMember, null);
 							try {
 								config.save(Main.getPlugin().getTempAddConfigFile());
@@ -352,8 +316,9 @@ public class gs implements CommandExecutor {
 										break;
 									}
 								}
-								if(!ownerOn) {
-									conn.addMail("plugin: BAU", uuidOwner, StringGetterBau.getString(uuidOwner, "plotMemberRemoved").replace("%r", memberName));
+								if (!ownerOn) {
+									conn.addMail("plugin: BAU", uuidOwner, StringGetterBau
+											.getString(uuidOwner, "plotMemberRemoved").replace("%r", memberName));
 								}
 							} catch (IOException e) {
 								e.printStackTrace();

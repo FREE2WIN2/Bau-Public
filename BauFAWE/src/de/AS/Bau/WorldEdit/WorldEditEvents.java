@@ -1,4 +1,4 @@
-package de.AS.Bau.Listener;
+package de.AS.Bau.WorldEdit;
 
 import org.bukkit.Bukkit;
 import org.bukkit.block.BlockFace;
