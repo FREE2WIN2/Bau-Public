@@ -23,8 +23,8 @@ import com.sk89q.worldguard.protection.regions.RegionContainer;
 import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
 import de.AS.Bau.Listener.onPlayerMove;
+import de.AS.Bau.Tools.DesignTool;
 import de.AS.Bau.Tools.Stoplag;
-import de.AS.Bau.cmds.dt;
 
 public class ScoreBoardBau {
 
@@ -120,8 +120,8 @@ public class ScoreBoardBau {
 	}
 
 	private static String getDt(Player p) {
-		if (dt.playerHasDtOn.containsKey(p.getUniqueId())) {
-			if (dt.playerHasDtOn.get(p.getUniqueId())) {
+		if (DesignTool.playerHasDtOn.containsKey(p.getUniqueId())) {
+			if (DesignTool.playerHasDtOn.get(p.getUniqueId())) {
 				//System.out.println("dt on");
 				return StringGetterBau.getString(p, "boardOn");
 			} else {

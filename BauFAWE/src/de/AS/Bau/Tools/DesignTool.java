@@ -10,7 +10,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 
 import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
@@ -20,19 +22,31 @@ public class DesignTool implements Listener, CommandExecutor {
 	public static HashMap<UUID, Boolean> playerHasDtOn = new HashMap<>();
 
 	@EventHandler
-	public void placeBlock(BlockPlaceEvent event) {
-		Block again = event.getBlockAgainst();
-		Block placedBlock = event.getBlockPlaced();
+	public void placeBlock(PlayerInteractEvent event) {
+		if(!event.getHand().equals(EquipmentSlot.HAND)) {
+			return;
+		}
+		if(!event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+			return;
+		}
+		
+		Block again = event.getClickedBlock();
+		if (again == null || event.getMaterial() == null) {
+			return;
+		}
+		
+
 		if (playerHasDtOn.get(event.getPlayer().getUniqueId()) == true && again != null) {
 			if ((-65 > again.getX() && again.getX() > -371) || (again.getY() < 69 && again.getY() > 8)
 					|| (again.getZ() < 99 && again.getZ() > -65)) {
 				if (!event.getPlayer().isSneaking()) {
-					again.setBlockData(placedBlock.getBlockData());
+					again.setType(event.getMaterial());
 					event.setCancelled(true);
 				}
 
 			}
 		}
+
 	}
 
 	@Override
@@ -48,10 +62,10 @@ public class DesignTool implements Listener, CommandExecutor {
 			}
 		} else if (args.length == 0) {
 			if (playerHasDtOn.get(p.getUniqueId())) {
-				dton(p);
+				dtoff(p);
 				return true;
 			} else {
-				dtoff(p);
+				dton(p);
 				return true;
 			}
 		}
