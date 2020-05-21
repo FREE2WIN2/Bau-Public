@@ -11,14 +11,7 @@ public class delcon implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String string, String[] args) {
-		if(sender instanceof Player && args.length == 2) {
-			Player p = (Player) sender;
-			if(args[1].equals(p.getUniqueId().toString())) {
-				OnInvClick.resetRegion(args[0], p, true);
-				return true;
-			}
-		}
-		return false;
+
 	}
 
 }

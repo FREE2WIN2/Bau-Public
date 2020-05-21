@@ -25,6 +25,7 @@ import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import de.AS.Bau.Listener.ClickListener;
 import de.AS.Bau.Listener.ExplosioneventListener;
 import de.AS.Bau.Listener.OnInvClick;
+import de.AS.Bau.Listener.SignListener;
 import de.AS.Bau.Listener.SpawnEvent;
 import de.AS.Bau.Listener.chestAndsignListener;
 import de.AS.Bau.Listener.eventsToCancel;
@@ -39,6 +40,7 @@ import de.AS.Bau.Tools.DesignTool;
 import de.AS.Bau.Tools.FernzuenderListener;
 import de.AS.Bau.Tools.Stoplag;
 import de.AS.Bau.Tools.TestBlockSklave;
+import de.AS.Bau.Tools.TntChest;
 import de.AS.Bau.WorldEdit.UndoManager;
 import de.AS.Bau.WorldEdit.WorldEditEvents;
 import de.AS.Bau.WorldEdit.WorldEditPreCommand;
@@ -78,7 +80,7 @@ public class Main extends JavaPlugin {
 
 	private void registerListener() {
 		new onPlayerJoin(this);
-		new chestAndsignListener(this);
+		new SignListener(this);
 		new OnInvClick(this);
 		new WorldEditEvents(this);
 		new ClickListener(this);
@@ -97,6 +99,7 @@ public class Main extends JavaPlugin {
 		pm.registerEvents(new WorldEditPreCommand(), this);
 		pm.registerEvents(new DesignTool(), this);
 		pm.registerEvents(new FernzuenderListener(), this);
+		pm.registerEvents(new TntChest(), this);
 	}
 
 	private void registerCommands() {
@@ -110,7 +113,7 @@ public class Main extends JavaPlugin {
 		getCommand("dt").setExecutor(new DesignTool());
 		getCommand("ds").setExecutor(new ds());
 		getCommand("debugstick").setExecutor(new ds());
-		getCommand("chest").setExecutor(new chest());
+		getCommand("chest").setExecutor(new TntChest());
 		getCommand("stats").setExecutor(new stats());
 		getCommand("delcon").setExecutor(new delcon());
 		getCommand("baureload").setExecutor(new Bau());

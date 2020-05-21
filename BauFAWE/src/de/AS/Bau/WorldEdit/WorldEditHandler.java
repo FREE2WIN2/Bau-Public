@@ -34,7 +34,7 @@ import de.AS.Bau.utils.Scheduler;
 
 public class WorldEditHandler {
 
-	private final static int maxBlockChangePerTick = Main.getPlugin().getCustomConfig()
+	public final static int maxBlockChangePerTick = Main.getPlugin().getCustomConfig()
 			.getInt("worldEdit.maxBlockPerSecond");
 	private final static WorldEdit we = WorldEdit.getInstance();
 

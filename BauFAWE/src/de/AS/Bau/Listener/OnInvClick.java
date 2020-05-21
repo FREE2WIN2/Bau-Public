@@ -42,7 +42,7 @@ import net.minecraft.server.v1_15_R1.PlayerConnection;
 public class OnInvClick implements Listener {
 
 
-	private static HashSet<UUID> playerBlockedDelete = new HashSet<>();
+
 
 	public OnInvClick(JavaPlugin plugin) {
 		Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
@@ -141,81 +141,6 @@ public class OnInvClick implements Listener {
 			p.closeInventory();
 		}
 
-	}
-
-	public static void resetRegion(String rgID, Player p, boolean confirmed) {
-		int rgIDint = Integer.parseInt(rgID.replace("plot", ""));
-		if (!confirmed) {
-			JsonCreater creater1 = new JsonCreater(Main.prefix + 
-					StringGetterBau.getString(p, "delePlotConfirmation").replace("%r", ""+rgIDint));
-			JsonCreater creater2 = new JsonCreater(StringGetterBau.getString(p, "deletePlotHere").replace("%r", ""+rgIDint));
-			creater2.addHoverEvent(StringGetterBau.getString(p, "delePlotHover").replace("%r", ""+rgIDint));
-			creater2.addClickEvent("/delcon " + rgID + " " + p.getUniqueId(), ClickAction.RUN_COMMAND);
-			creater1.addJson(creater2).send(p);
-		} else {
-			if(playerBlockedDelete .contains(p.getUniqueId())) {
-				p.sendMessage(StringGetterBau.getString(p, "deletePlotAntiSpaw"));
-				return;
-			}
-				playerBlockedDelete.add(p.getUniqueId());
-			p.sendMessage(StringGetterBau.getString(p, "delePlot").replace("%r", ""+rgIDint));
-			// für jede Zeile rgid festlegen
-			ProtectedRegion rg = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(p.getWorld())).getRegion(rgID);
-			int xmin = rg.getMinimumPoint().getBlockX();
-			int xmax = rg.getMaximumPoint().getBlockX();
-			
-			
-			int ymax = rg.getMaximumPoint().getBlockY();//ganz oben
-			int ymin2 = rg.getMinimumPoint().getBlockY();//ganz unten
-			int ymin1 = (ymax-ymin2)/2;//mitte
-			int zmin = rg.getMinimumPoint().getBlockZ();
-			int zmax = rg.getMaximumPoint().getBlockZ();
-			Scheduler scheduler = new Scheduler();
-			scheduler.setY(ymax);
-			scheduler.setYmin(ymin1);
-			scheduler.setZ(zmin);
-			World world = p.getWorld();
-			// paste
-			WorldEditHandler.pasten("ground", rgID, p,true,false,false);
-			//TODO paste without saving in undo
-			
-			scheduler.setTask(Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), new Runnable() {
-
-						@Override
-						public void run() {
-							int z = scheduler.getZ();
-							for (int x = xmax; x >= xmin; x--) {
-								for (int y = scheduler.getY(); y >= scheduler.getYMin(); y--) {
-									Block b = world.getBlockAt(x, y, z);
-									if (!b.getType().equals(Material.AIR)) {
-										b.setType(Material.AIR);
-									}
-								}
-							}
-							if (scheduler.getZ() >= zmax&&scheduler.getY()==(ymin1-1)) {
-								scheduler.cancel();
-								return;
-							}else if(scheduler.getZ() == zmax){
-								scheduler.setY(ymin1-1);
-								scheduler.setYmin(ymin2);
-								scheduler.setZ(zmin);
-								return;
-							}
-							z++;
-							scheduler.setZ(z);
-						}
-					}, 1, 1));
-			
-			//spamschutz
-			
-			Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(), new Runnable(	) {
-				
-				@Override
-				public void run() {
-					playerBlockedDelete.remove(p.getUniqueId());
-				}
-			}, 20*60*1);
-		}
 	}
 
 	public static void showMember(Player p) {
