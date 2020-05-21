@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -30,6 +29,7 @@ import de.AS.Bau.DBConnection;
 import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
 import de.AS.Bau.WorldEdit.WorldGuardHandler;
+import de.AS.Bau.utils.CoordGetter;
 import de.AS.Bau.utils.ItemStackCreator;
 import net.minecraft.server.v1_15_R1.PacketPlayOutChat;
 import net.minecraft.server.v1_15_R1.PlayerConnection;
@@ -222,13 +222,13 @@ public class GUI implements CommandExecutor, Listener {
 			PlotResetter.resetRegion(rgID, p, false);
 		} else if (clickedName.equals(tp1)) {
 			p.closeInventory();
-			p.teleport(new Location(p.getWorld(), -100, 8, 17));
+			p.teleport(CoordGetter.getTeleportLocation(p.getWorld(),"plot1"));
 		} else if (clickedName.equals(tp2)) {
 			p.closeInventory();
-			p.teleport(new Location(p.getWorld(), -208, 8, 17));
+			p.teleport(CoordGetter.getTeleportLocation(p.getWorld(),"plot2"));
 		} else if (clickedName.equals(tp3)) {
 			p.closeInventory();
-			p.teleport(new Location(p.getWorld(), -316, 8, 17));
+			p.teleport(CoordGetter.getTeleportLocation(p.getWorld(),"plot3"));
 		} else if (clickedName.equals(memberGUI)) {
 			p.closeInventory();
 			showMember(p);

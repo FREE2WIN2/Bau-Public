@@ -31,7 +31,7 @@ import com.sk89q.worldguard.protection.regions.RegionContainer;
 import de.AS.Bau.DBConnection;
 import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
-import de.AS.Bau.Listener.OnInvClick;
+import de.AS.Bau.Tools.GUI;
 import de.AS.Bau.utils.WorldHandler;
 import net.minecraft.server.v1_15_R1.IChatBaseComponent;
 import net.minecraft.server.v1_15_R1.IChatBaseComponent.ChatSerializer;
@@ -76,7 +76,7 @@ public class gs implements CommandExecutor {
 			if (args[0].equalsIgnoreCase("info")) {
 				// bau info
 				// open gui
-				OnInvClick.showMember(p);
+				GUI.showMember(p);
 				p.sendMessage(StringGetterBau.getString(p, "timeShow") + " §7" + p.getWorld().getTime());
 				conn.closeConn();
 				return true;

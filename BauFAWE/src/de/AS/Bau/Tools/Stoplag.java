@@ -2,7 +2,6 @@ package de.AS.Bau.Tools;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -17,12 +16,6 @@ import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
-
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.RegionContainer;
 
 import de.AS.Bau.Main;
 import de.AS.Bau.WorldEdit.WorldGuardHandler;
@@ -134,22 +127,8 @@ public class Stoplag implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public static void onBlockPhysics(BlockPhysicsEvent e) {
-		// wenn zb unter redstone block abgebrut wird
-
-		Main main = Main.getPlugin();
-		RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-		RegionManager regions = container.get(BukkitAdapter.adapt(e.getBlock().getWorld()));
-		List<String> regionsIDs = regions.getApplicableRegionsIDs(
-				BlockVector3.at(e.getBlock().getLocation().getX(), 10, e.getBlock().getLocation().getZ()));
-		if (!regionsIDs.isEmpty()) {
-			String rgID = regionsIDs.get(0);
-			if (rgID.contains("plot") && !rgID.equals("allplots")) {
-				if (main.getCustomConfig().getString("stoplag." + e.getBlock().getWorld().getName() + "." + rgID)
-						.equals("an")) {
-					e.setCancelled(true);
-				}
-			}
-
+		if (getStatus(e.getBlock().getLocation())) {
+			e.setCancelled(true);
 		}
 	}
 

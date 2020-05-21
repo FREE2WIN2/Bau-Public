@@ -5,12 +5,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
-import com.sk89q.worldedit.EmptyClipboardException;
-import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.bukkit.BukkitPlayer;
-
 import de.AS.Bau.Tools.Stoplag;
 
 public class WorldEditPreCommand implements Listener{
@@ -20,8 +14,8 @@ public class WorldEditPreCommand implements Listener{
 
 		String command = event.getMessage();
 		Player p = event.getPlayer();
-		String[] args = command.split(" ");
 		if (command.startsWith("//paste")) {
+			//	String[] args = command.split(" ");
 //			boolean air = false;
 //			if (command.contains(" -a") && args.length >= 2) {
 //				air = true;

@@ -81,7 +81,7 @@ public class TestBlockSklave implements CommandExecutor, Listener {
 				int x = undo.getOrigin().getBlockX();
 				int y = undo.getOrigin().getBlockY();
 				int z = undo.getOrigin().getBlockZ();
-				WorldEditHandler.pasteAsync(new ClipboardHolder(undo), x, y, z, p, false, 1, false,true);
+				WorldEditHandler.pasteAsync(new ClipboardHolder(undo), BlockVector3.at(x, y, z), p, false, 1, false,true);
 				Main.send(p, "tbs_undo");
 				return true;
 			} else {

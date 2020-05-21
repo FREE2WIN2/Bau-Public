@@ -12,8 +12,6 @@ import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
 import org.bukkit.entity.Player;
 
-import com.sk89q.worldguard.WorldGuard;
-
 import de.AS.Bau.DBConnection;
 import de.AS.Bau.Main;
 

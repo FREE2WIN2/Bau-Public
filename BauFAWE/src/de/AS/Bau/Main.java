@@ -37,6 +37,7 @@ import de.AS.Bau.TabCompleter.tbsTC;
 import de.AS.Bau.Tools.DesignTool;
 import de.AS.Bau.Tools.FernzuenderListener;
 import de.AS.Bau.Tools.GUI;
+import de.AS.Bau.Tools.PlotResetter;
 import de.AS.Bau.Tools.Stoplag;
 import de.AS.Bau.Tools.TestBlockSklave;
 import de.AS.Bau.Tools.TntChest;
@@ -44,7 +45,6 @@ import de.AS.Bau.WorldEdit.UndoManager;
 import de.AS.Bau.WorldEdit.WorldEditEvents;
 import de.AS.Bau.WorldEdit.WorldEditPreCommand;
 import de.AS.Bau.cmds.Bau;
-import de.AS.Bau.cmds.delcon;
 import de.AS.Bau.cmds.ds;
 import de.AS.Bau.cmds.gs;
 import de.AS.Bau.cmds.sl;
@@ -111,7 +111,7 @@ public class Main extends JavaPlugin {
 		getCommand("debugstick").setExecutor(new ds());
 		getCommand("chest").setExecutor(new TntChest());
 		getCommand("stats").setExecutor(new stats());
-		getCommand("delcon").setExecutor(new delcon());
+		getCommand("delcon").setExecutor(new PlotResetter());
 		getCommand("baureload").setExecutor(new Bau());
 
 	}

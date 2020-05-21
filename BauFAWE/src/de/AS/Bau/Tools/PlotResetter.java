@@ -18,7 +18,6 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
-import de.AS.Bau.Listener.OnInvClick;
 import de.AS.Bau.WorldEdit.WorldEditHandler;
 import de.AS.Bau.utils.ClickAction;
 import de.AS.Bau.utils.JsonCreater;
@@ -88,9 +87,9 @@ public class PlotResetter implements CommandExecutor {
 								for (int y = ymins; y<= ymax; y++) {
 									for(int z = zmins;z<=zmax;z++) {
 										Block b = world.getBlockAt(x, y, z);
+										blockcount++;
 										if (!b.getType().equals(Material.AIR)) {
-											b.setType(Material.AIR);
-											blockcount++;
+											b.setType(Material.AIR,false);
 										}
 										if(blockcount == maxBlockChangePerTick) {
 											scheduler.setX(x);
@@ -115,7 +114,7 @@ public class PlotResetter implements CommandExecutor {
 				public void run() {
 					playerBlockedDelete.remove(p.getUniqueId());
 				}
-			}, 20*60*1);
+			}, 20*60*2);
 		}
 	}
 

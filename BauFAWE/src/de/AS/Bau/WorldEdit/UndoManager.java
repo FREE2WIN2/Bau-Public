@@ -43,10 +43,10 @@ public class UndoManager {
 		
 	}
 
-	public void addUndo(Region rg, int x, int y , int z, World world) {
+	public void addUndo(Region rg, BlockVector3 at, World world) {
 		rg.setWorld(world);
 		BlockArrayClipboard board = new BlockArrayClipboard(rg);
-		board.setOrigin(BlockVector3.at(x, y, z));
+		board.setOrigin(at);
 //		board = fillClip(board, rg);
 		ForwardExtentCopy copy = new ForwardExtentCopy(rg.getWorld(), rg, board.getOrigin(), board,
 				board.getOrigin());
