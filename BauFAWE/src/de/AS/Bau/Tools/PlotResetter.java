@@ -85,7 +85,7 @@ public class PlotResetter implements CommandExecutor {
 							int zmins = scheduler.getZ();
 							int blockcount = 0;
 							for (int x = xmins; x <= xmax; x++) {
-								for (int y = ymins; y<= scheduler.getYMin(); y--) {
+								for (int y = ymins; y<= ymax; y++) {
 									for(int z = zmins;z<=zmax;z++) {
 										Block b = world.getBlockAt(x, y, z);
 										if (!b.getType().equals(Material.AIR)) {
