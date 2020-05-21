@@ -58,7 +58,6 @@ public class Main extends JavaPlugin {
 	private static File customConfigFile;
 	private static YamlConfiguration customConfig;
 	public static String prefix = "§8[§6Bau§8] §r";
-
 	private static File tempAddConfigFile;
 	private static YamlConfiguration tempAddConfig;
 
@@ -117,7 +116,6 @@ public class Main extends JavaPlugin {
 
 	}
 
-
 	public void createConfigs() {
 
 		customConfigFile = createConfigFile("config.yml");
@@ -153,7 +151,6 @@ public class Main extends JavaPlugin {
 
 		return config;
 	}
-
 	
 	public static Main getPlugin() {
 		return plugin;
