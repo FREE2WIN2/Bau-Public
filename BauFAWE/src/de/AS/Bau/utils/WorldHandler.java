@@ -8,17 +8,19 @@ import java.nio.file.StandardCopyOption;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.World;
-import org.bukkit.WorldBorder;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
 import org.bukkit.entity.Player;
 
+import com.sk89q.worldguard.WorldGuard;
+
 import de.AS.Bau.DBConnection;
 import de.AS.Bau.Main;
-import de.AS.Bau.StringGetterBau;
 
 public class WorldHandler {
 
+	private static String templateName = Main.getPlugin().getCustomConfig().getString("plottemplate");
+	
 	public static World loadWorld(String worldName) {
 		WorldCreator wc = new WorldCreator(worldName);
 		wc.type(WorldType.NORMAL);
@@ -27,28 +29,29 @@ public class WorldHandler {
 		w.setThundering(false);
 		w.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
 		w.setGameRule(GameRule.DO_MOB_SPAWNING, false);
-		WorldBorder b = w.getWorldBorder();
-		b.setCenter(-208.53, 17.23);
-		b.setSize(400);
+//		WorldBorder b = w.getWorldBorder();
+//		b.setCenter(-208.53, 17.23);
+//		b.setSize(400);
 
 		return w;
 	}
 
 	public static void unloadWorld(String worldName) {
-
+		undloadWorld(Bukkit.getWorld(worldName));
 	}
 
 	public static void undloadWorld(World world) {
-
+		if(world == null) {
+			return;
+		}
+		Bukkit.unloadWorld(world, true);
 	}
 
 	public static void createWorldDir(Player p) {
 		String uuid = p.getUniqueId().toString();
-		Main main = Main.getPlugin();
-		String path = main.getCustomConfig().getString("Config.path");
-		File vorlage = new File(path + "/BauGsVorlage");
+		File vorlage = new File(Bukkit.getWorldContainer(),templateName);
 		// File neu = new File(path + "/Worlds/" + uuid);
-		File neu = new File(path + "/" + uuid);
+		File neu = new File(Bukkit.getWorldContainer(),uuid);
 		neu.mkdirs();
 		neu.setExecutable(true, false);
 		neu.setReadable(true, false);
@@ -61,9 +64,9 @@ public class WorldHandler {
 		}
 		conn.closeConn();
 		// worldguard regionen
-		File worldGuardWorldDir = new File(path + "/plugins/WorldGuard/worlds/" + uuid);
+		File worldGuardWorldDir = new File(Bukkit.getWorldContainer(),"plugins/WorldGuard/worlds/" + uuid);
 		if (!worldGuardWorldDir.exists()) {
-			File vorlageWorldGuardWorldDir = new File(path + "/plugins/WorldGuard/worlds/BauGsVorlage");
+			File vorlageWorldGuardWorldDir = new File(Bukkit.getWorldContainer(), "plugins/WorldGuard/worlds/BauGsVorlage");
 			copyFolder_raw(vorlageWorldGuardWorldDir, worldGuardWorldDir);
 			Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.getPlugin(), new Runnable() {
 
@@ -75,7 +78,6 @@ public class WorldHandler {
 							"rg addowner -w \"" + uuid + "\" plot2 " + p.getUniqueId().toString());
 					Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(),
 							"rg addowner -w \"" + uuid + "\" plot3 " + p.getUniqueId().toString());
-					System.out.println("regionsadd");
 				}
 			}, 20);
 

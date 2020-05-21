@@ -113,7 +113,7 @@ public class Main extends JavaPlugin {
 		getCommand("chest").setExecutor(new chest());
 		getCommand("stats").setExecutor(new stats());
 		getCommand("delcon").setExecutor(new delcon());
-		getCommand("bau").setExecutor(new Bau());
+		getCommand("baureload").setExecutor(new Bau());
 
 	}
 
@@ -236,6 +236,14 @@ public class Main extends JavaPlugin {
 
 	public YamlConfiguration getTempAddConfig() {
 		return tempAddConfig;
+	}
+	
+	public static void send(Player p, String messageKey, String... args) {
+		String message = Main.prefix + StringGetterBau.getString(p, messageKey);
+		for(String rep:args) {
+			message.replaceFirst("%r", rep);
+		}
+		p.sendMessage(message);
 	}
 
 }

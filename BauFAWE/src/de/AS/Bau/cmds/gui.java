@@ -24,6 +24,7 @@ import de.AS.Bau.DBConnection;
 import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
 import de.AS.Bau.Tools.DesignTool;
+import de.AS.Bau.Tools.Stoplag;
 
 public class gui implements CommandExecutor {
 
@@ -119,9 +120,7 @@ public class gui implements CommandExecutor {
 		inv.setItem(42, enderPearl3IS);
 
 		// torch für sl
-		Main main = Main.getPlugin();
-		String info = main.getCustomConfig().getString("stoplag."+p.getWorld().getName()+"."+rgID);
-		if (info.equals("an")) {
+		if (Stoplag.getStatus(p.getLocation())) {
 			ItemStack torchAn = new ItemStack(Material.REDSTONE);
 			ItemMeta torchAnMeta = torchAn.getItemMeta();
 			torchAnMeta.setDisplayName(StringGetterBau.getString(p,"torchOff"));

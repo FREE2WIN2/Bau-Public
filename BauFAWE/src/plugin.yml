@@ -36,5 +36,5 @@ commands:
       aliases: [tntchest]
    delcon:
       description: delete Plot.
-   bau:
+   baureload:
       description: handling

@@ -1,9 +1,20 @@
-Config:
+MySQL:
   database: 'pluginData'
   host: 'localhost'
   user: 'BauPlugin'
   password: 'r0gltuXNFEqKDCy3'
-  path: /root/WargearWorld/bau
 
 worldEdit:
-  maxBlockPerSecond: 10000
+  maxBlockPerSecond: 5000
+coordinates:
+  paste:
+    plot1: x y z
+    plot2: x y z
+    plot3: x y z
+  spawn: x y z
+  teleport:
+    plot1: x y z
+    plot2: x y z
+    plot3: x y z
+plottemplate: BauGsVorlage
+schempath: /root/test/schematics

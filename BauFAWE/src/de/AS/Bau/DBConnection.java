@@ -15,10 +15,10 @@ public class DBConnection {
 
 	public DBConnection() {
 		Main main = Main.getPlugin();
-		String database = main.getCustomConfig().getString("Config.database");
-		String host = main.getCustomConfig().getString("Config.host");
-		String user = main.getCustomConfig().getString("Config.user");
-		String passwd = main.getCustomConfig().getString("Config.password");
+		String database = main.getCustomConfig().getString("MySQL.database");
+		String host = main.getCustomConfig().getString("MySQL.host");
+		String user = main.getCustomConfig().getString("MySQL.user");
+		String passwd = main.getCustomConfig().getString("MySQL.password");
 		try {
 			Class.forName("com.mysql.jdbc.Driver").getConstructor().newInstance();
 			String connectionCommand = "jdbc:mysql://" + host + "/" + database + "?user=" + user + "&password="

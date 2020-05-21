@@ -8,6 +8,7 @@ import java.io.IOException;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -17,6 +18,8 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
+import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.function.operation.RunContext;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.Transform;
@@ -33,7 +36,7 @@ public class WorldEditHandler {
 
 	private final static int maxBlockChangePerTick = Main.getPlugin().getCustomConfig()
 			.getInt("worldEdit.maxBlockPerSecond");
-//	private final static WorldEdit we = WorldEdit.getInstance();
+	private final static WorldEdit we = WorldEdit.getInstance();
 
 	public static void pasten(String fileName, String rgID, Player p, boolean ignoreAir, boolean undo, boolean tbs) {
 		Clipboard board = createClipboard(fileName);
@@ -46,10 +49,7 @@ public class WorldEditHandler {
 	}
 
 	public static Clipboard createClipboard(String filename) {
-		String path = Main.getPlugin().getCustomConfig().getString("Config.path");
-		File pathFile = new File(path);
-		File schem = new File(
-				pathFile.getParentFile().getAbsolutePath() + "/schematics/TestBlockSklave" + "/" + filename + ".schem");
+		File schem = new File(Main.getPlugin().getConfig().getString("schempath") + "/TestBlockSklave" + "/" + filename + ".schem");
 		ClipboardFormat format = ClipboardFormats.findByFile(schem);
 		try {
 			ClipboardReader reader = format.getReader(new FileInputStream(schem));
@@ -62,6 +62,31 @@ public class WorldEditHandler {
 		}
 		return null;
 
+	}
+
+	public static void pasteOperationAsync(ClipboardHolder clipboardHolder, Player p, BlockVector3 to,
+			boolean ignoreAir, boolean saveUndo) {
+		Scheduler asyncScheduler = new Scheduler();
+		EditSession es = we.getEditSessionFactory().getEditSession(BukkitAdapter.adapt(p.getWorld()), -1);
+		Operation op = clipboardHolder.createPaste(es).ignoreAirBlocks(ignoreAir).to(to).build();
+		LocalSession session = we.getSessionManager().get(BukkitAdapter.adapt(p));
+		asyncScheduler.setTask(Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), new Runnable() {
+
+			@Override
+			public void run() {
+				for (int i = 0; i < maxBlockChangePerTick; i++) {
+					if (op == null) {
+						session.remember(es);
+						es.flushSession();
+					}
+					try {
+						op.resume(new RunContext());
+					} catch (WorldEditException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}, 0, 1));
 	}
 
 	/**
@@ -78,41 +103,37 @@ public class WorldEditHandler {
 	 */
 	public static void pasteAsync(ClipboardHolder clipboardHolder, int x, int y, int z, Player p, boolean ignoreAir,
 			int ticksPerPasteInterval, boolean saveUndo, boolean tbs) {
-		
+
 		/* Get Clipboard out of the ClipboardHolder with the transform */
-		
-		FlattenedClipboardTransform result = FlattenedClipboardTransform.transform(clipboardHolder.getClipboard(), clipboardHolder.getTransform());
+
+		FlattenedClipboardTransform result = FlattenedClipboardTransform.transform(clipboardHolder.getClipboard(),
+				clipboardHolder.getTransform());
 		Clipboard clipboard = result.getClip(result.getTransformedRegion());
-		
+
 		/* offset from origin pasteloc and new pasteloc -> have to be added */
-		
+
 		if (clipboard == null) {
 			System.err.println("Clipboard TBS -> null");
 			return;
 		}
-		
-		
+
 		BlockVector3 offset = BlockVector3.at(x, y, z).subtract(clipboard.getOrigin());
 		BlockVector3 min = clipboard.getMinimumPoint();
 		BlockVector3 max = clipboard.getMaximumPoint();
 		World world = BukkitAdapter.adapt(p.getWorld());
-		
+
 		if (saveUndo) {
 			if (tbs) {
 				Region rg = new CuboidRegion(min.add(offset), max.add(offset));
 				createUndo(rg, p, x, y, z);
 			} else {
 				// normal undo
-//				EditSession es = we.getEditSessionFactory().getEditSession(world, -1);
-//				Operation op = clipboardHolder.createPaste(es).ignoreAirBlocks(ignoreAir).to(BlockVector3.at(x, y, z)).build();
-//				we.getSessionManager().get(BukkitAdapter.adapt(p));
-//				es.flushSession();
-				
+				pasteOperationAsync(clipboardHolder, p, BlockVector3.at(x, y, z), ignoreAir, saveUndo);
 			}
 		}
-		
+
 		Stoplag.setStatus(p.getLocation(), true);
-		
+
 		Scheduler animation = new Scheduler();
 		int xmin = min.getX();
 		int xmax = max.getX();
@@ -136,7 +157,7 @@ public class WorldEditHandler {
 				for (int x = xmins; x <= xmax; x++) {
 					for (int y = ymins; y <= ymax; y++) {
 						for (int z = zmins; z <= zmax; z++) {
-							
+
 							if (blockChanged > maxBlockChangePerTick) {
 								animation.setX(x);
 								animation.setY(y);
@@ -164,7 +185,7 @@ public class WorldEditHandler {
 				}
 				/* all loops are over -> pasting is done */
 				animation.cancel();
-				Stoplag.setStatusTemp(p.getLocation(),false,5);
+				Stoplag.setStatusTemp(p.getLocation(), false, 5);
 			}
 
 		}, 0, ticksPerPasteInterval));
@@ -186,21 +207,19 @@ public class WorldEditHandler {
 		manager.addUndo(rg, x, y, z, BukkitAdapter.adapt(p.getWorld()));
 	}
 
-	
-
 	public static void rotateClipboard(Player p) {
 		LocalSession session = WorldEdit.getInstance().getSessionManager().get(BukkitAdapter.adapt(p));
-		
-			ClipboardHolder holder;
-			try {
-				holder = session.getClipboard();
-				AffineTransform transform = new AffineTransform().rotateY(180);
-				holder.setTransform(holder.getTransform().combine((Transform) transform));
-				session.setClipboard(holder);
-				p.sendMessage("§dThe clipboard copy has been rotatet by 180 degrees.");
-			} catch (EmptyClipboardException e) {
-				e.printStackTrace();
-			}	
+
+		ClipboardHolder holder;
+		try {
+			holder = session.getClipboard();
+			AffineTransform transform = new AffineTransform().rotateY(180);
+			holder.setTransform(holder.getTransform().combine((Transform) transform));
+			session.setClipboard(holder);
+			p.sendMessage("§dThe clipboard copy has been rotatet by 180 degrees.");
+		} catch (EmptyClipboardException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

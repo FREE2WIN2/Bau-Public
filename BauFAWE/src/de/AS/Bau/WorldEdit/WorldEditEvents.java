@@ -259,7 +259,6 @@ public class WorldEditEvents implements Listener {
 		}else if(pitch > 67.5) {
 			return BlockFace.DOWN;
 		}
-		System.out.println(yaw);
 		if(yaw<22.5 ||yaw>337.5) {
 			return BlockFace.SOUTH;
 		}else if(yaw>292.5){
