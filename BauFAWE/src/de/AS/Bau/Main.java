@@ -24,10 +24,8 @@ import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 
 import de.AS.Bau.Listener.ClickListener;
 import de.AS.Bau.Listener.ExplosioneventListener;
-import de.AS.Bau.Listener.OnInvClick;
 import de.AS.Bau.Listener.SignListener;
 import de.AS.Bau.Listener.SpawnEvent;
-import de.AS.Bau.Listener.chestAndsignListener;
 import de.AS.Bau.Listener.eventsToCancel;
 import de.AS.Bau.Listener.onPlayerJoin;
 import de.AS.Bau.Listener.onPlayerMove;
@@ -38,6 +36,7 @@ import de.AS.Bau.TabCompleter.gsTC;
 import de.AS.Bau.TabCompleter.tbsTC;
 import de.AS.Bau.Tools.DesignTool;
 import de.AS.Bau.Tools.FernzuenderListener;
+import de.AS.Bau.Tools.GUI;
 import de.AS.Bau.Tools.Stoplag;
 import de.AS.Bau.Tools.TestBlockSklave;
 import de.AS.Bau.Tools.TntChest;
@@ -45,11 +44,9 @@ import de.AS.Bau.WorldEdit.UndoManager;
 import de.AS.Bau.WorldEdit.WorldEditEvents;
 import de.AS.Bau.WorldEdit.WorldEditPreCommand;
 import de.AS.Bau.cmds.Bau;
-import de.AS.Bau.cmds.chest;
 import de.AS.Bau.cmds.delcon;
 import de.AS.Bau.cmds.ds;
 import de.AS.Bau.cmds.gs;
-import de.AS.Bau.cmds.gui;
 import de.AS.Bau.cmds.sl;
 import de.AS.Bau.cmds.stats;
 import de.AS.Bau.cmds.tnt;
@@ -81,7 +78,6 @@ public class Main extends JavaPlugin {
 	private void registerListener() {
 		new onPlayerJoin(this);
 		new SignListener(this);
-		new OnInvClick(this);
 		new WorldEditEvents(this);
 		new ClickListener(this);
 		new onPlayerQuit(this);
@@ -100,13 +96,14 @@ public class Main extends JavaPlugin {
 		pm.registerEvents(new DesignTool(), this);
 		pm.registerEvents(new FernzuenderListener(), this);
 		pm.registerEvents(new TntChest(), this);
+		pm.registerEvents(new GUI(), this);
 	}
 
 	private void registerCommands() {
 		getCommand("gs").setExecutor(new gs());
 		getCommand("gs").setTabCompleter(new gsTC());
 		getCommand("tnt").setExecutor(new tnt());
-		getCommand("gui").setExecutor(new gui());
+		getCommand("gui").setExecutor(new GUI());
 		getCommand("tbs").setExecutor(new TestBlockSklave());
 		getCommand("tbs").setTabCompleter(new tbsTC());
 		getCommand("sl").setExecutor(new sl());
