@@ -68,23 +68,21 @@ public class TestBlockSklave implements CommandExecutor, Listener {
 				/* Undo last TB */
 				UndoManager manager;
 				if (!Main.playersUndoManager.containsKey(p.getUniqueId())) {
-					// TODO noch kein UNDO -> print
-					System.out.println("not containing");
+					Main.send(p, "tbs_noUndo");
 					return true;
 				} else {
 					manager = Main.playersUndoManager.get(p.getUniqueId());
 				}
 				Clipboard undo = manager.getUndo();
 				if (undo == null) {
-					System.out.println("undo == null");
-					// TODO noch kein UNDO -> print
+					Main.send(p, "tbs_noUndo");
 					return true;
 				}
 				int x = undo.getOrigin().getBlockX();
 				int y = undo.getOrigin().getBlockY();
 				int z = undo.getOrigin().getBlockZ();
 				WorldEditHandler.pasteAsync(new ClipboardHolder(undo), x, y, z, p, false, 1, false,true);
-				// TODO chat-Feedback
+				Main.send(p, "tbs_undo");
 				return true;
 			} else {
 				return false;
