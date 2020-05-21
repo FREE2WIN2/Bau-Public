@@ -35,7 +35,6 @@ import de.AS.Bau.Listener.onPlayerTeleport;
 import de.AS.Bau.TabCompleter.gsTC;
 import de.AS.Bau.TabCompleter.tbsTC;
 import de.AS.Bau.Tools.AutoTntReloader;
-import de.AS.Bau.Tools.ClipboardParticles;
 import de.AS.Bau.Tools.DesignTool;
 import de.AS.Bau.Tools.FernzuenderListener;
 import de.AS.Bau.Tools.GUI;
@@ -43,6 +42,7 @@ import de.AS.Bau.Tools.PlotResetter;
 import de.AS.Bau.Tools.Stoplag;
 import de.AS.Bau.Tools.TestBlockSklave;
 import de.AS.Bau.Tools.TntChest;
+import de.AS.Bau.Tools.Particles.ClipboardParticles;
 import de.AS.Bau.WorldEdit.UndoManager;
 import de.AS.Bau.WorldEdit.WorldEditEvents;
 import de.AS.Bau.WorldEdit.WorldEditPreCommand;
@@ -101,6 +101,7 @@ public class Main extends JavaPlugin {
 		pm.registerEvents(new TntChest(), this);
 		pm.registerEvents(new GUI(), this);
 		pm.registerEvents(new AutoTntReloader(), this);
+		pm.registerEvents(new ClipboardParticles(), this);
 	}
 
 	private void registerCommands() {
@@ -131,6 +132,9 @@ public class Main extends JavaPlugin {
 
 		Stoplag.stoplagConfigFile = createConfigFile("stoplag.yml");
 		Stoplag.stoplagConfig = createConfig(Stoplag.stoplagConfigFile);
+		
+		ClipboardParticles.particlesConfigFile = createConfigFile("particles.yml");
+		ClipboardParticles.particleConfig = createConfig(ClipboardParticles.particlesConfigFile);
 
 	}
 

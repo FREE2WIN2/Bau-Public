@@ -19,7 +19,7 @@ public class AutoTntReloader implements Listener {
 
 	public static HashMap<UUID, HashSet<Location>> playersTntLocations = new HashMap<>();
 	public static HashSet<UUID> playerRecord = new HashSet<>();
-	private static Material toolMaterial = Material
+	public static Material toolMaterial = Material
 			.valueOf(Main.getPlugin().getCustomConfig().getString("tntReload.materialType"));
 	private static String prefix = "§8[§6TNTReloader§8] §r";
 	

@@ -34,7 +34,7 @@ public class FernzuenderListener implements Listener {
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		ItemStack is = event.getItem();
 		if (!(is == null)) {
-			if (is.getType().equals(Material.WOODEN_HOE)) {
+			if (is.getType().equals(toolMaterial)) {
 				fernzuender(event);
 
 			}

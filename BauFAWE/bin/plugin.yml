@@ -38,3 +38,7 @@ commands:
       description: delete Plot.
    baureload:
       description: handling
+   particles:
+      description: toggle Particles
+      aliases: [partikel,p]
+      usage: /<command> [on|off]

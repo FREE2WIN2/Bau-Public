@@ -168,7 +168,7 @@ public class GUI implements CommandExecutor, Listener {
 		String invName = p.getOpenInventory().getTitle();
 		ItemStack clicked = event.getCurrentItem();
 		if (clicked != null) {
-			if (clicked.getType().equals(Material.NETHER_STAR) || clicked.getType().equals(Material.WOODEN_HOE)) {
+			if (clicked.getType().equals(Material.NETHER_STAR) || clicked.getType().equals(FernzuenderListener.toolMaterial)||clicked.getType().equals(AutoTntReloader.toolMaterial)) {
 				return;
 			}
 			if (clicked.hasItemMeta()) {

@@ -20,4 +20,5 @@ plottemplate: BauGsVorlage
 schempath: /root/test/schematics
 tntReload:
   maxTnt: 2000
-  materialType: PISTON
+  materialType: TNT_MINECART
+fernzuender: MINECART
