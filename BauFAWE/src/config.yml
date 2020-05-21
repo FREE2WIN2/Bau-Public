@@ -19,6 +19,6 @@ coordinates:
 plottemplate: BauGsVorlage
 schempath: /root/test/schematics
 tntReload:
-  maxTnt: 2000
+  maxTnt: 1000
   materialType: TNT_MINECART
 fernzuender: MINECART
