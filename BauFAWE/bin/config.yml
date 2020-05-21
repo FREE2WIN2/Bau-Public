@@ -18,3 +18,6 @@ coordinates:
     plot3: -316.5 8 17.0
 plottemplate: BauGsVorlage
 schempath: /root/test/schematics
+tntReload:
+  maxTnt: 2000
+  materialType: PISTON

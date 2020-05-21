@@ -23,6 +23,7 @@ import org.bukkit.inventory.ItemStack;
 
 import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
+import de.AS.Bau.WorldEdit.WorldGuardHandler;
 import net.minecraft.server.v1_15_R1.BlockPosition;
 
 public class FernzuenderListener implements Listener {
@@ -43,47 +44,31 @@ public class FernzuenderListener implements Listener {
 	private void fernzuender(PlayerInteractEvent e) {
 		Player p = e.getPlayer();
 		Action a = e.getAction();
-		if (!blockedForFZ.contains(p.getUniqueId())) {
-			if (a.equals(Action.RIGHT_CLICK_AIR) || a.equals(Action.LEFT_CLICK_AIR)) {
-				// zünden
+		if (blockedForFZ.contains(p.getUniqueId())) {
+			p.sendMessage(Main.prefix + StringGetterBau.getString(p, "noSpamFZ"));
+			return;
+		}
+		if (a.equals(Action.RIGHT_CLICK_AIR)||a.equals(Action.LEFT_CLICK_AIR)) {
+			if (playersDetonator.containsKey(p.getUniqueId())) {
+				zuenden(e);
+			} else {
+				p.sendMessage(Main.prefix + StringGetterBau.getString(p, "nothingSaved"));
+			}
+		} else if (a.equals(Action.RIGHT_CLICK_BLOCK) || a.equals(Action.LEFT_CLICK_BLOCK)) {
+			// speichern oder zündeln!
+			Block b = e.getClickedBlock();
+			if (b.getBlockData() instanceof Switch) {
+				playersDetonator.put(p.getUniqueId(), b);
+				p.sendMessage(Main.prefix + StringGetterBau.getString(p, "fzSaved"));
+				e.setCancelled(true);
+			} else {
 				if (playersDetonator.containsKey(p.getUniqueId())) {
 					zuenden(e);
-
-					// spam block
-
-//					blockedForFZ.add(p);
-//					Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.getPlugin(), new Runnable() {
-//
-//						@Override
-//						public void run() {
-//							blockedForFZ.remove(p);
-//
-//						}
-//					}, 20 * 5);
-
-				} else {
-					p.sendMessage(Main.prefix + StringGetterBau.getString(p, "nothingSaved"));
-
-				}
-
-			} else if (a.equals(Action.RIGHT_CLICK_BLOCK) || a.equals(Action.LEFT_CLICK_BLOCK)) {
-				// speichern oder zündeln!
-				Block b = e.getClickedBlock();
-				if (b.getBlockData() instanceof Switch) {
-					playersDetonator.put(p.getUniqueId(), b);
-					p.sendMessage(Main.prefix + StringGetterBau.getString(p, "fzSaved"));
 					e.setCancelled(true);
 				} else {
-					if (playersDetonator.containsKey(p.getUniqueId())) {
-						zuenden(e);
-						e.setCancelled(true);
-					} else {
-						p.sendMessage(Main.prefix + StringGetterBau.getString(p, "nothingSaved"));
-					}
+					p.sendMessage(Main.prefix + StringGetterBau.getString(p, "nothingSaved"));
 				}
 			}
-		} else {
-			p.sendMessage(Main.prefix + StringGetterBau.getString(p, "noSpamFZ"));
 		}
 
 	}
@@ -112,7 +97,7 @@ public class FernzuenderListener implements Listener {
 			}
 			switchData.setPowered(true);
 			b.setBlockData(switchData, true);
-			
+
 			applyPhysics(b);
 			applyPhysics(behind);
 
@@ -125,7 +110,7 @@ public class FernzuenderListener implements Listener {
 				public void run() {
 					switchData.setPowered(false);
 					b.setBlockData(switchData, true);
-					
+
 					applyPhysics(b);
 					applyPhysics(behind);
 
@@ -140,7 +125,7 @@ public class FernzuenderListener implements Listener {
 			b.setBlockData(switchData, true);
 
 			// applyPhysics
-			
+
 			applyPhysics(b);
 			applyPhysics(behind);
 
@@ -154,9 +139,9 @@ public class FernzuenderListener implements Listener {
 		}
 
 	}
-	
+
 	private void applyPhysics(Block block) {
-		((CraftWorld) block.getWorld()).getHandle().applyPhysics(new BlockPosition(block.getX(), block.getY(), block.getZ()),
-				((CraftBlock) block).getNMS().getBlock());
+		((CraftWorld) block.getWorld()).getHandle().applyPhysics(
+				new BlockPosition(block.getX(), block.getY(), block.getZ()), ((CraftBlock) block).getNMS().getBlock());
 	}
 }

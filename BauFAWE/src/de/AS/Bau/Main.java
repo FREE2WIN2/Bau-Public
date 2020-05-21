@@ -34,6 +34,7 @@ import de.AS.Bau.Listener.onPlayerRespawn;
 import de.AS.Bau.Listener.onPlayerTeleport;
 import de.AS.Bau.TabCompleter.gsTC;
 import de.AS.Bau.TabCompleter.tbsTC;
+import de.AS.Bau.Tools.AutoTntReloader;
 import de.AS.Bau.Tools.DesignTool;
 import de.AS.Bau.Tools.FernzuenderListener;
 import de.AS.Bau.Tools.GUI;
@@ -96,6 +97,7 @@ public class Main extends JavaPlugin {
 		pm.registerEvents(new FernzuenderListener(), this);
 		pm.registerEvents(new TntChest(), this);
 		pm.registerEvents(new GUI(), this);
+		pm.registerEvents(new AutoTntReloader(), this);
 	}
 
 	private void registerCommands() {

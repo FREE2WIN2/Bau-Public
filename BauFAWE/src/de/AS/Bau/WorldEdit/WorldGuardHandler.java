@@ -15,6 +15,9 @@ public class WorldGuardHandler {
 
 	public static String getPlotId(BlockVector3 location, World world) {
 		RegionManager regions = container.get(world);
+		if(regions.getApplicableRegionsIDs(location).size() == 0) {
+			return null;
+		}
 		return regions.getApplicableRegionsIDs(location).get(0);
 	}
 
