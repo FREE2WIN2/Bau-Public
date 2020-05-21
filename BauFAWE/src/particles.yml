@@ -1,0 +1,5 @@
+default:
+  active: false
+  clipboard: 155 155 155 #rgb
+  selection: 155 155 155 #rgb
+    

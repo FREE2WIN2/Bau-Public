@@ -154,7 +154,7 @@ public class GUI implements CommandExecutor, Listener {
 		dst.setItemMeta(dtIM);
 		inv.setItem(32, dst);
 		// FZ
-		ItemStack fz = ItemStackCreator.createNewItemStack(Material.WOODEN_HOE, StringGetterBau.getString(p, "fernzuender"));
+		ItemStack fz = ItemStackCreator.createNewItemStack(FernzuenderListener.toolMaterial, StringGetterBau.getString(p, "fernzuender"));
 		inv.setItem(34, fz);
 		// close DBConnection
 		conn.closeConn();

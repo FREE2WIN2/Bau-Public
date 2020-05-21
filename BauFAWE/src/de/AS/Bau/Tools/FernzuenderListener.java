@@ -23,13 +23,13 @@ import org.bukkit.inventory.ItemStack;
 
 import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
-import de.AS.Bau.WorldEdit.WorldGuardHandler;
 import net.minecraft.server.v1_15_R1.BlockPosition;
 
 public class FernzuenderListener implements Listener {
 	public static HashMap<UUID, Block> playersDetonator = new HashMap<>();
 	public static HashSet<UUID> blockedForFZ = new HashSet<>();
-
+	public static Material toolMaterial = Material.valueOf(Main.getPlugin().getCustomConfig().getString("fernzuender"));
+	
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		ItemStack is = event.getItem();

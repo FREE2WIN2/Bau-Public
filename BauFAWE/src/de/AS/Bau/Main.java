@@ -35,6 +35,7 @@ import de.AS.Bau.Listener.onPlayerTeleport;
 import de.AS.Bau.TabCompleter.gsTC;
 import de.AS.Bau.TabCompleter.tbsTC;
 import de.AS.Bau.Tools.AutoTntReloader;
+import de.AS.Bau.Tools.ClipboardParticles;
 import de.AS.Bau.Tools.DesignTool;
 import de.AS.Bau.Tools.FernzuenderListener;
 import de.AS.Bau.Tools.GUI;
@@ -67,10 +68,12 @@ public class Main extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		plugin = this;
+		createConfigs();
+		
 		registerCommands();
 		registerListener();
 
-		createConfigs();
+		
 		gs.startCheckForTempAdd();
 		super.onEnable();
 	}
@@ -115,7 +118,7 @@ public class Main extends JavaPlugin {
 		getCommand("stats").setExecutor(new stats());
 		getCommand("delcon").setExecutor(new PlotResetter());
 		getCommand("baureload").setExecutor(new Bau());
-
+		getCommand("particles").setExecutor(new ClipboardParticles());
 	}
 
 	public void createConfigs() {
@@ -239,6 +242,15 @@ public class Main extends JavaPlugin {
 	
 	public static void send(Player p, String messageKey, String... args) {
 		String message = Main.prefix + StringGetterBau.getString(p, messageKey);
+		for(String rep:args) {
+			message.replaceFirst("%r", rep);
+		}
+		p.sendMessage(message);
+	}
+
+
+	public static void send(Player p, boolean otherPrefix, String prefix, String messageKey, String... args) {
+		String message = prefix + StringGetterBau.getString(p, messageKey);
 		for(String rep:args) {
 			message.replaceFirst("%r", rep);
 		}
