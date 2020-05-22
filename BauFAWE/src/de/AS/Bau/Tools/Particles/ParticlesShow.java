@@ -156,13 +156,13 @@ public class ParticlesShow {
 
 				/* Selection */
 				try {
-					selection = session.getSelection(session.getSelectionWorld());
+					
+					if (session.getSelection(session.getSelectionWorld()) != null) {
+						selection = session.getSelection(session.getSelectionWorld());
+						show(selection.getMinimumPoint(), selection.getMaximumPoint(), selectionColor);
+					}
 				} catch (IncompleteRegionException e) {
 				}
-				if (selection != null) {
-					show(selection.getMinimumPoint(), selection.getMaximumPoint(), selectionColor);
-				}
-
 			}
 		}, 0, 20 * 1));
 	}

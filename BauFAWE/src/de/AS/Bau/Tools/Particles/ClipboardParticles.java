@@ -16,6 +16,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
 import de.AS.Bau.Main;
@@ -128,7 +129,12 @@ public class ClipboardParticles implements CommandExecutor, Listener {
 
 		playersParticlesShow.put(p.getUniqueId(), new ParticlesShow(p));
 	}
-
+	
+	@EventHandler
+	public void onPlayerQuit(PlayerQuitEvent event) {
+		playersParticlesShow.remove(event.getPlayer().getUniqueId());
+	}
+	
 	@EventHandler
 	public void switchHandListener(PlayerItemHeldEvent event) {
 		Player p = event.getPlayer();
@@ -143,6 +149,7 @@ public class ClipboardParticles implements CommandExecutor, Listener {
 				particleShow.stopParticles();
 				return;
 			}
+			return;
 		}
 		if (!newItem.getType().equals(Material.WOODEN_AXE)) {
 			if (old == null) {
@@ -151,6 +158,7 @@ public class ClipboardParticles implements CommandExecutor, Listener {
 				particleShow.stopParticles();
 				return;
 			}
+			return;
 		}
 
 		particleShow.showParticles();
