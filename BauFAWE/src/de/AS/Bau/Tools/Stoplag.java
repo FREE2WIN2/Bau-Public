@@ -5,7 +5,11 @@ import java.io.IOException;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -18,12 +22,60 @@ import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
 
 import de.AS.Bau.Main;
+import de.AS.Bau.StringGetterBau;
+import de.AS.Bau.Scoreboard.ScoreBoardBau;
 import de.AS.Bau.WorldEdit.WorldGuardHandler;
 
-public class Stoplag implements Listener {
+public class Stoplag implements Listener,CommandExecutor {
 	public static File stoplagConfigFile;
 	public static YamlConfiguration stoplagConfig;
 
+
+	@Override
+	public boolean onCommand(CommandSender sender, Command cmd, String string, String[] args) {
+		Player p = (Player) sender;
+
+		if (args.length == 0) {
+			boolean on = Stoplag.getStatus(p.getLocation());
+			setStatus(p.getLocation(), !on);
+
+			if (on) {
+				p.sendMessage(Main.prefix + StringGetterBau.getString(p, "slOff"));
+			} else {
+				p.sendMessage(Main.prefix + StringGetterBau.getString(p, "slOn"));
+			}
+			sendToAll(p);
+			return true;			
+		} else if (args.length == 1) {
+			if (args[0].equalsIgnoreCase("on") || args[0].equalsIgnoreCase("an")) {
+				setStatus(p.getLocation(), true);
+				p.sendMessage(Main.prefix + StringGetterBau.getString(p, "slOn"));
+			} else if (args[0].equalsIgnoreCase("aus") || args[0].equalsIgnoreCase("off")) {
+				setStatus(p.getLocation(), false);
+				p.sendMessage(Main.prefix + StringGetterBau.getString(p, "slOff"));
+			}
+			sendToAll(p);
+			return true;
+		} else {
+			return false;
+		}
+
+	}
+
+	private void sendToAll(Player p) {
+		Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(), new Runnable() {
+
+			@Override
+			public void run() {
+				for (Player b : p.getWorld().getPlayers()) {
+					ScoreBoardBau.cmdUpdate(b);
+				}
+			}
+		}, 5);
+
+	}
+
+	
 	public static boolean setStatus(String worldName, String regionID, boolean on) {
 		if (worldName == null || regionID == null) {
 			return false;

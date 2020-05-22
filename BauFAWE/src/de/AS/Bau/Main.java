@@ -112,7 +112,7 @@ public class Main extends JavaPlugin {
 		getCommand("gui").setExecutor(new GUI());
 		getCommand("tbs").setExecutor(new TestBlockSklave());
 		getCommand("tbs").setTabCompleter(new tbsTC());
-		getCommand("sl").setExecutor(new sl());
+		getCommand("sl").setExecutor(new Stoplag());
 		getCommand("dt").setExecutor(new DesignTool());
 		getCommand("ds").setExecutor(new ds());
 		getCommand("debugstick").setExecutor(new ds());
