@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -19,10 +20,12 @@ public class AutoTntReloader implements Listener {
 
 	public static HashMap<UUID, HashSet<Location>> playersTntLocations = new HashMap<>();
 	public static HashSet<UUID> playerRecord = new HashSet<>();
+	public static HashSet<UUID> playerAntiSpam = new HashSet<>();
+	private static int timeout = 20 * Main.getPlugin().getCustomConfig().getInt("tntReload.timeout");
 	public static Material toolMaterial = Material
 			.valueOf(Main.getPlugin().getCustomConfig().getString("tntReload.materialType"));
 	private static String prefix = "§8[§6TNTReloader§8] §r";
-	
+
 	@EventHandler
 	public void clickListener(PlayerInteractEvent event) {
 		Action a = event.getAction();
@@ -72,27 +75,45 @@ public class AutoTntReloader implements Listener {
 
 	public static void startRecord(Player p) {
 		playerRecord.add(p.getUniqueId());
-		Main.send(p,true, prefix, "tntReloader_startRecord");
+		Main.send(p, true, prefix, "tntReloader_startRecord");
 	}
 
 	public static void endRecord(Player p) {
 		playerRecord.remove(p.getUniqueId());
-		Main.send(p,true, prefix, "tntReloader_endRecord");
+		Main.send(p, true, prefix, "tntReloader_endRecord");
 	}
 
 	public static void deleteRecord(Player p) {
 		playerRecord.remove(p.getUniqueId());
 		if (playersTntLocations.containsKey(p.getUniqueId())) {
 			playersTntLocations.remove(p.getUniqueId());
-			Main.send(p,true, prefix, "tntReloader_deleteRecord");
+			Main.send(p, true, prefix, "tntReloader_deleteRecord");
 		}
 	}
 
 	private void pasteRecord(Player p) {
-		for (Location loc : playersTntLocations.get(p.getUniqueId())) {
+		UUID uuid = p.getUniqueId();
+		if (playerAntiSpam.contains(uuid)) {
+			Main.send(p, true, prefix, "tntReloader_antispam", String.valueOf(timeout));
+			return;
+		}
+
+		for (Location loc : playersTntLocations.get(uuid)) {
 			loc.getBlock().setType(Material.TNT);
 		}
-		Main.send(p,true, prefix, "tntReloader_pasteRecord");
+		Main.send(p, true, prefix, "tntReloader_pasteRecord");
+		antispam(uuid);
+	}
+
+	private void antispam(UUID uuid) {
+		playerAntiSpam.add(uuid);
+		Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(), new Runnable() {
+
+			@Override
+			public void run() {
+				playerAntiSpam.remove(uuid);
+			}
+		}, timeout);
 	}
 
 }
