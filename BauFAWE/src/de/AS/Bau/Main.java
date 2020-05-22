@@ -32,6 +32,7 @@ import de.AS.Bau.Listener.onPlayerMove;
 import de.AS.Bau.Listener.onPlayerQuit;
 import de.AS.Bau.Listener.onPlayerRespawn;
 import de.AS.Bau.Listener.onPlayerTeleport;
+import de.AS.Bau.TabCompleter.TntReloaderTC;
 import de.AS.Bau.TabCompleter.gsTC;
 import de.AS.Bau.TabCompleter.particlesTC;
 import de.AS.Bau.TabCompleter.tbsTC;
@@ -74,7 +75,6 @@ public class Main extends JavaPlugin {
 		registerCommands();
 		registerListener();
 
-		
 		gs.startCheckForTempAdd();
 		WorldHandler.checkForWorldsToUnload();
 		super.onEnable();
@@ -101,7 +101,7 @@ public class Main extends JavaPlugin {
 		pm.registerEvents(new FernzuenderListener(), this);
 		pm.registerEvents(new TntChest(), this);
 		pm.registerEvents(new GUI(), this);
-		pm.registerEvents(new AutoTntReloader(), this);
+		pm.registerEvents(AutoTntReloader.getInstance(), this);
 		pm.registerEvents(ClipboardParticles.getInstance(), this);
 	}
 
@@ -122,6 +122,8 @@ public class Main extends JavaPlugin {
 		getCommand("baureload").setExecutor(new Bau());
 		getCommand("particles").setExecutor(ClipboardParticles.getInstance());
 		getCommand("particles").setTabCompleter(new particlesTC());
+		getCommand("tr").setExecutor(AutoTntReloader.getInstance());
+		getCommand("tr").setTabCompleter(new TntReloaderTC());
 	}
 
 	public void createConfigs() {

@@ -156,7 +156,9 @@ public class ParticlesShow {
 
 				/* Selection */
 				try {
-					
+					if(session.getSelectionWorld() == null){
+						return;
+					}
 					if (session.getSelection(session.getSelectionWorld()) != null) {
 						selection = session.getSelection(session.getSelectionWorld());
 						show(selection.getMinimumPoint(), selection.getMaximumPoint(), selectionColor);

@@ -7,16 +7,20 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import de.AS.Bau.Main;
 
-public class AutoTntReloader implements Listener {
+public class AutoTntReloader implements Listener, CommandExecutor {
 
 	public static HashMap<UUID, HashSet<Location>> playersTntLocations = new HashMap<>();
 	public static HashSet<UUID> playerRecord = new HashSet<>();
@@ -26,6 +30,56 @@ public class AutoTntReloader implements Listener {
 	public static Material toolMaterial = Material
 			.valueOf(Main.getPlugin().getCustomConfig().getString("tntReload.materialType"));
 	private static String prefix = "§8[§6TNTReloader§8] §r";
+	private static AutoTntReloader instance;
+	
+	public static AutoTntReloader getInstance() {
+		if(instance == null) {
+			return new AutoTntReloader();
+		}
+		return instance;
+	}
+	
+
+	@Override
+	public boolean onCommand(CommandSender sender, Command cmd, String string, String[] args) {
+		/*
+		 * tr|tntReload|cannonReload|cr start , stop , paste , reset , help
+		 * 
+		 */
+		if(!(sender instanceof Player)) {
+			return false;
+		}
+		Player p = (Player) sender;
+		if(args.length == 0) {
+			showHelp(p);
+			return true;
+		}
+		if(args.length == 1) {
+			switch(args[0].toLowerCase()) {
+			case "start":
+				startRecord(p);
+				return true;
+			case "stop":
+				endRecord(p);
+				return true;
+			case "paste":
+			case "reload":
+				pasteRecord(p);
+				return true;
+			case "help":
+				showHelp(p);
+				return true;
+			case "reset":
+				return true;	
+			}
+		}
+		
+		Main.send(p, true, prefix, "tntReloader_wrongCommand");
+		return true;
+	}
+
+	
+
 
 	@EventHandler
 	public void clickListener(PlayerInteractEvent event) {
@@ -82,6 +136,29 @@ public class AutoTntReloader implements Listener {
 		playersTntLocations.put(uuid, set);
 	}
 
+	@EventHandler
+	public void unregister(BlockBreakEvent event) {
+		if (!event.getBlock().getType().equals(Material.TNT)) {
+			return;
+		}
+		Player p = event.getPlayer();
+		UUID uuid = p.getUniqueId();
+		if (!playerRecord.contains(uuid)) {
+			return;
+		}
+
+		if (!playersTntLocations.containsKey(uuid)) {
+			return;
+		}
+		HashSet<Location> set = playersTntLocations.get(uuid);
+		if(set.contains(event.getBlock().getLocation())) {
+			set.remove(event.getBlock().getLocation());
+			playersTntLocations.put(uuid, set);
+		}
+		
+		
+	}
+	
 	public static void startRecord(Player p) {
 		playerRecord.add(p.getUniqueId());
 		Main.send(p, true, prefix, "tntReloader_startRecord");
@@ -103,7 +180,7 @@ public class AutoTntReloader implements Listener {
 	private void pasteRecord(Player p) {
 		UUID uuid = p.getUniqueId();
 		if (playerAntiSpam.contains(uuid)) {
-			Main.send(p, true, prefix, "tntReloader_antispam", String.valueOf(timeout));
+			Main.send(p, true, prefix, "tntReloader_antispam", String.valueOf(timeout/20));
 			return;
 		}
 
@@ -125,4 +202,12 @@ public class AutoTntReloader implements Listener {
 		}, timeout);
 	}
 
+
+	private void showHelp(Player p) {
+		Main.send(p, true, prefix, "tntReloader_help1");
+		Main.send(p, true, prefix, "tntReloader_help2");
+		Main.send(p, true, prefix, "tntReloader_help3");
+		Main.send(p, true, prefix, "tntReloader_help4");
+		Main.send(p, true, prefix, "tntReloader_help5");
+	}
 }

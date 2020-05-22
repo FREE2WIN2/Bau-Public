@@ -42,3 +42,7 @@ commands:
       description: toggle Particles
       aliases: [partikel,p]
       usage: /<command> [on|off]
+   tr:
+     description: tntReload command
+     aliases: [tntReload,cannonReload,cr]
+     usage: /<command>
