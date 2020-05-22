@@ -76,6 +76,10 @@ public class FernzuenderListener implements Listener {
 	private void zuenden(PlayerInteractEvent e) {
 		Player p = e.getPlayer();
 		Block b = playersDetonator.get(p.getUniqueId());
+		if(!(b.getBlockData() instanceof Switch)) {
+			//TODO button weg
+			return;
+		}
 		BlockData bd = b.getState().getBlockData();
 		Switch switchData = (Switch) bd;
 		Switch.Face face = switchData.getFace();

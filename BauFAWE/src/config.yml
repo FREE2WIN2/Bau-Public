@@ -17,6 +17,12 @@ coordinates:
     plot2: -208.5 8 17.0
     plot3: -316.5 8 17.0
 plottemplate: BauGsVorlage
+plotreset:
+  pasteGround: true
+  schemfiles:
+    plot1: ground
+    plot2: ground
+    plot3: ground
 schempath: /root/test/schematics
 tntReload:
   maxTnt: 1000

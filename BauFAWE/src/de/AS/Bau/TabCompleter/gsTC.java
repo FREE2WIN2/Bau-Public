@@ -12,6 +12,7 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
 import de.AS.Bau.DBConnection;
+import de.AS.Bau.utils.HelperMethods;
 
 public class gsTC implements TabCompleter {
 
@@ -28,12 +29,20 @@ public class gsTC implements TabCompleter {
 				out.add("addtemp");
 				out.add("time");
 				out.add("remove");
-				out.add("time");
-				return out;
+				if(p.hasPermission("admin")) {
+					out.add("delete");
+				}
+				return HelperMethods.checkFortiped(args[0], out);
 			} else if (args.length == 2) {
 				DBConnection conn = new DBConnection();
 				ResultSet rs;
 				switch (args[0]) {
+				case "delete":
+					if(!p.hasPermission("admin")) {
+						return out;
+					}
+					out.addAll(conn.getAllWorlds());
+					return HelperMethods.checkFortiped(args[1], out);
 				case "tp":
 					rs = conn.getMemberedPlots(p);
 					try {
@@ -41,9 +50,8 @@ public class gsTC implements TabCompleter {
 							out.add(conn.getName(rs.getString(1)));
 						}
 						conn.closeConn();
-						return out;
+						return HelperMethods.checkFortiped(args[1], out);
 					} catch (SQLException e) {
-						
 						e.printStackTrace();
 					}
 					break;
@@ -55,7 +63,7 @@ public class gsTC implements TabCompleter {
 					}
 					out.remove(p.getName());
 					conn.closeConn();
-					return out;
+					return HelperMethods.checkFortiped(args[1], out);
 				case "remove":
 					rs = conn.getMember(p.getUniqueId().toString());
 					try {
@@ -66,7 +74,7 @@ public class gsTC implements TabCompleter {
 						e.printStackTrace();
 					}
 					conn.closeConn();
-					return out;
+					return HelperMethods.checkFortiped(args[1], out);
 				}
 				conn.closeConn();
 			}
@@ -74,6 +82,5 @@ public class gsTC implements TabCompleter {
 		}
 		return out;
 	}
-
 
 }

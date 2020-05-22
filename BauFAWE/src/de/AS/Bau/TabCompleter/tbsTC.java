@@ -7,6 +7,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 
+import de.AS.Bau.utils.HelperMethods;
+
 public class tbsTC implements TabCompleter {
 
 	@Override
@@ -27,7 +29,7 @@ public class tbsTC implements TabCompleter {
 			out.add("R");
 			out.add("F");
 		}
-		return out;
+		return HelperMethods.checkFortiped(args[args.length-1], out);
 	}
 
 }

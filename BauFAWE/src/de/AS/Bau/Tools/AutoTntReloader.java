@@ -22,6 +22,7 @@ public class AutoTntReloader implements Listener {
 	public static HashSet<UUID> playerRecord = new HashSet<>();
 	public static HashSet<UUID> playerAntiSpam = new HashSet<>();
 	private static int timeout = 20 * Main.getPlugin().getCustomConfig().getInt("tntReload.timeout");
+	private static int maxTnt = Main.getPlugin().getCustomConfig().getInt("tntReload.maxTnt");
 	public static Material toolMaterial = Material
 			.valueOf(Main.getPlugin().getCustomConfig().getString("tntReload.materialType"));
 	private static String prefix = "§8[§6TNTReloader§8] §r";
@@ -69,7 +70,15 @@ public class AutoTntReloader implements Listener {
 			playersTntLocations.put(uuid, set);
 		}
 		set = playersTntLocations.get(uuid);
+		if (set.size() >= maxTnt) {
+			Main.send(p, true, prefix, "tntReloader_maxTntOverload", String.valueOf(maxTnt));
+			return;
+		}
+
 		set.add(event.getBlockPlaced().getLocation());
+		if (set.size() == maxTnt) {
+			Main.send(p, true, prefix, "tntReloader_maxTnt", String.valueOf(maxTnt));
+		}
 		playersTntLocations.put(uuid, set);
 	}
 

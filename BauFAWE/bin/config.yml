@@ -17,8 +17,15 @@ coordinates:
     plot2: -208.5 8 17.0
     plot3: -316.5 8 17.0
 plottemplate: BauGsVorlage
+plotreset:
+  pasteGround: true
+  schemfiles:
+    plot1: ground
+    plot2: ground
+    plot3: ground
 schempath: /root/test/schematics
 tntReload:
-  maxTnt: 2000
+  maxTnt: 1000
   materialType: TNT_MINECART
+  timeout: 5                 #antispam
 fernzuender: MINECART

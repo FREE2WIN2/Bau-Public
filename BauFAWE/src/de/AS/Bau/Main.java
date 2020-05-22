@@ -33,6 +33,7 @@ import de.AS.Bau.Listener.onPlayerQuit;
 import de.AS.Bau.Listener.onPlayerRespawn;
 import de.AS.Bau.Listener.onPlayerTeleport;
 import de.AS.Bau.TabCompleter.gsTC;
+import de.AS.Bau.TabCompleter.particlesTC;
 import de.AS.Bau.TabCompleter.tbsTC;
 import de.AS.Bau.Tools.AutoTntReloader;
 import de.AS.Bau.Tools.DesignTool;
@@ -52,7 +53,7 @@ import de.AS.Bau.cmds.gs;
 import de.AS.Bau.cmds.sl;
 import de.AS.Bau.cmds.stats;
 import de.AS.Bau.cmds.tnt;
-import de.AS.Bau.utils.worldCheck;
+import de.AS.Bau.utils.WorldHandler;
 
 public class Main extends JavaPlugin {
 	private static Main plugin;
@@ -75,6 +76,7 @@ public class Main extends JavaPlugin {
 
 		
 		gs.startCheckForTempAdd();
+		WorldHandler.checkForWorldsToUnload();
 		super.onEnable();
 	}
 
@@ -89,7 +91,6 @@ public class Main extends JavaPlugin {
 		new ExplosioneventListener(this);
 		new SpawnEvent(this);
 		new onPlayerRespawn(this);
-		new worldCheck();
 
 		PluginManager pm = Bukkit.getPluginManager();
 		pm.registerEvents(new TestBlockSklave(), this);
@@ -101,7 +102,7 @@ public class Main extends JavaPlugin {
 		pm.registerEvents(new TntChest(), this);
 		pm.registerEvents(new GUI(), this);
 		pm.registerEvents(new AutoTntReloader(), this);
-		pm.registerEvents(new ClipboardParticles(), this);
+		pm.registerEvents(ClipboardParticles.getInstance(), this);
 	}
 
 	private void registerCommands() {
@@ -119,7 +120,8 @@ public class Main extends JavaPlugin {
 		getCommand("stats").setExecutor(new stats());
 		getCommand("delcon").setExecutor(new PlotResetter());
 		getCommand("baureload").setExecutor(new Bau());
-		getCommand("particles").setExecutor(new ClipboardParticles());
+		getCommand("particles").setExecutor(ClipboardParticles.getInstance());
+		getCommand("particles").setTabCompleter(new particlesTC());
 	}
 
 	public void createConfigs() {

@@ -64,7 +64,7 @@ public class WorldHandler {
 		// worldguard regionen
 		File worldGuardWorldDir = new File(Bukkit.getWorldContainer(),"plugins/WorldGuard/worlds/" + uuid);
 		if (!worldGuardWorldDir.exists()) {
-			File vorlageWorldGuardWorldDir = new File(Bukkit.getWorldContainer(), "plugins/WorldGuard/worlds/BauGsVorlage");
+			File vorlageWorldGuardWorldDir = new File(Bukkit.getWorldContainer(), "plugins/WorldGuard/worlds/"+templateName);
 			copyFolder_raw(vorlageWorldGuardWorldDir, worldGuardWorldDir);
 			Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.getPlugin(), new Runnable() {
 
@@ -84,14 +84,9 @@ public class WorldHandler {
 
 	public static boolean deleteWorld(World w, DBConnection conn) {
 		Bukkit.getServer().unloadWorld(w, true);
-		Main mains = Main.getPlugin();
-		String path = mains.getCustomConfig().getString("Config.path");
 		if (w.getWorldFolder().exists()) {
-			if (deleteDir(w.getWorldFolder()) && conn.deleteGs(w.getName())) {// &&
-																				// deleteWorld(new
-																				// File(path
-																				// +"/Worlds/"+worldName))
-				File file = new File(path + "/plugins/WorldGuard/worlds/" + w.getName());
+			if (deleteDir(w.getWorldFolder()) && conn.deleteGs(w.getName())) {
+				File file = new File(Bukkit.getWorldContainer(),"plugins/WorldGuard/worlds/" + w.getName());
 				file.delete();
 				return true;
 			}
@@ -143,4 +138,19 @@ public class WorldHandler {
 		return (path.delete());
 	}
 
+	
+	public static void checkForWorldsToUnload() {
+	Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), new Runnable() {
+			
+			@Override
+			public void run() {
+				for(World w:Bukkit.getServer().getWorlds()) {
+					if(w.getPlayers().size() == 0&&!w.getName().equals("world")) {
+						undloadWorld(w);
+					}
+				}
+				
+			}
+		}, 20*60, 20*60);
+	}
 }

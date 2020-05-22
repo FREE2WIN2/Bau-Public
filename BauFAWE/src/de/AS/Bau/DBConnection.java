@@ -6,6 +6,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.bukkit.entity.Player;
 
@@ -259,7 +262,6 @@ public class DBConnection {
 		
 	}
 	
-	
 	public boolean addMail(String sender, String uuidReciever, String message) {
 		try {
 			PreparedStatement statement = connection.prepareStatement("INSERT INTO Mail(`PlayerUUID`,`sender`,`message`) VALUES(?,?,?)");
@@ -274,6 +276,20 @@ public class DBConnection {
 
 	}
 
+	public Set<String>getAllWorlds(){
+		SortedSet<String> out = new TreeSet<>();
+		try {
+			PreparedStatement statement = connection.prepareStatement("SELECT Player.name FROM Player,Plot WHERE Plot.PlotID = Player.UUID");
+			ResultSet rs = statement.executeQuery();
+			while(rs.next()) {
+				out.add(rs.getString(1));
+			}
+			return out;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return out;
+		}
+	}
 	
 public void closeConn() {
 	try {
