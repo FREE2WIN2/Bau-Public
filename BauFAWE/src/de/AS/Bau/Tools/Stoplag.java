@@ -90,16 +90,12 @@ public class Stoplag implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public static void pistonextend(BlockPistonExtendEvent e) {
-		if (getStatus(e.getBlock().getLocation())) {
-			e.setCancelled(true);
-		}
+		e.setCancelled(getStatus(e.getBlock().getLocation()));
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public static void pistonRetract(BlockPistonRetractEvent e) {
-		if (getStatus(e.getBlock().getLocation())) {
-			e.setCancelled(true);
-		}
+		e.setCancelled(getStatus(e.getBlock().getLocation()));
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
@@ -113,29 +109,21 @@ public class Stoplag implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public static void onBlockFade(BlockFadeEvent e) {
-		if (getStatus(e.getBlock().getLocation())) {
-			e.setCancelled(true);
-		}
+		e.setCancelled(getStatus(e.getBlock().getLocation()));
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public static void onBlockForm(BlockFormEvent e) {
-		if (getStatus(e.getBlock().getLocation())) {
-			e.setCancelled(true);
-		}
+		e.setCancelled(getStatus(e.getBlock().getLocation()));
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public static void onBlockPhysics(BlockPhysicsEvent e) {
-		if (getStatus(e.getBlock().getLocation())) {
-			e.setCancelled(true);
-		}
+		e.setCancelled(getStatus(e.getBlock().getLocation()));
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public static void onBlockFromTo(BlockFromToEvent e) {
-		if (getStatus(e.getBlock().getLocation())) {
-			e.setCancelled(true);
-		}
+		e.setCancelled(getStatus(e.getBlock().getLocation()));
 	}
 }
