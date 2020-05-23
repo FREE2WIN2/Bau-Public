@@ -37,32 +37,32 @@ public class ParticlesShow {
 		player = p;
 		scheduler = new Scheduler();
 		particle = Particle.REDSTONE;
-		if (!ClipboardParticles.particleConfig.contains(uuid)) {
-			clipboardColor = ClipboardParticles.defaultClipboardColor;
-			selectionColor = ClipboardParticles.defaultSelectionColor;
-			active = ClipboardParticles.defaultState;
+		if (!Particles.particleConfig.contains(uuid)) {
+			clipboardColor = Particles.defaultClipboardColor;
+			selectionColor = Particles.defaultSelectionColor;
+			active = Particles.defaultState;
 			saveClipboardColor();
 			saveSelectionColor();
 			saveActive();
 		} else {
-			clipboardColor = ClipboardParticles.readColor(uuid + ".clipboard");
-			selectionColor = ClipboardParticles.readColor(uuid + ".selection");
-			active = ClipboardParticles.particleConfig.getBoolean(uuid + ".active");
+			clipboardColor = Particles.readColor(uuid + ".clipboard");
+			selectionColor = Particles.readColor(uuid + ".selection");
+			active = Particles.particleConfig.getBoolean(uuid + ".active");
 		}
 
 	}
 
 	private void saveActive() {
-		ClipboardParticles.particleConfig.set(player.getUniqueId().toString() + ".active", active);
-		ClipboardParticles.saveConfig();
+		Particles.particleConfig.set(player.getUniqueId().toString() + ".active", active);
+		Particles.saveConfig();
 	}
 
 	private void saveSelectionColor() {
 		int r = selectionColor.getRed();
 		int g = selectionColor.getGreen();
 		int b = selectionColor.getBlue();
-		ClipboardParticles.particleConfig.set(player.getUniqueId().toString() + ".selection", r + " " + g + " " + b);
-		ClipboardParticles.saveConfig();
+		Particles.particleConfig.set(player.getUniqueId().toString() + ".selection", r + " " + g + " " + b);
+		Particles.saveConfig();
 
 	}
 
@@ -70,8 +70,8 @@ public class ParticlesShow {
 		int r = clipboardColor.getRed();
 		int g = clipboardColor.getGreen();
 		int b = clipboardColor.getBlue();
-		ClipboardParticles.particleConfig.set(player.getUniqueId().toString() + ".clipboard", r + " " + g + " " + b);
-		ClipboardParticles.saveConfig();
+		Particles.particleConfig.set(player.getUniqueId().toString() + ".clipboard", r + " " + g + " " + b);
+		Particles.saveConfig();
 	}
 
 	/* setter */

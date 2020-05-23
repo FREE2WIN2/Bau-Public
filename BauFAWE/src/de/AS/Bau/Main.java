@@ -44,7 +44,6 @@ import de.AS.Bau.Tools.PlotResetter;
 import de.AS.Bau.Tools.Stoplag;
 import de.AS.Bau.Tools.TestBlockSklave;
 import de.AS.Bau.Tools.TntChest;
-import de.AS.Bau.Tools.Particles.ClipboardParticles;
 import de.AS.Bau.Tools.Particles.Particles;
 import de.AS.Bau.Tools.Particles.ParticlesGUI;
 import de.AS.Bau.WorldEdit.UndoManager;

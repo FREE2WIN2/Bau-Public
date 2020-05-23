@@ -35,8 +35,8 @@ public class ParticlesGUI implements Listener {
 		} else {
 			inv.setItem(2, toggleOn);
 		}
-		inv.setItem(5, colorSel);
-		inv.setItem(7, colorClip);
+		inv.setItem(4, colorSel);
+		inv.setItem(6, colorClip);
 		return inv;
 	}
 
