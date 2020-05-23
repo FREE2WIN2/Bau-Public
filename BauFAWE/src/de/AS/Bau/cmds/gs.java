@@ -7,12 +7,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Map.Entry;
 import java.util.TimeZone;
-import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -20,13 +17,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.protection.regions.RegionContainer;
 
 import de.AS.Bau.DBConnection;
 import de.AS.Bau.Main;

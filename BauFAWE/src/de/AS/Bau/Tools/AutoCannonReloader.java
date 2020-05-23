@@ -19,8 +19,9 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import de.AS.Bau.Main;
+import de.AS.Bau.StringGetterBau;
 
-public class AutoTntReloader implements Listener, CommandExecutor {
+public class AutoCannonReloader implements Listener, CommandExecutor {
 
 	public static HashMap<UUID, HashSet<Location>> playersTntLocations = new HashMap<>();
 	public static HashSet<UUID> playerRecord = new HashSet<>();
@@ -29,12 +30,11 @@ public class AutoTntReloader implements Listener, CommandExecutor {
 	private static int maxTnt = Main.getPlugin().getCustomConfig().getInt("tntReload.maxTnt");
 	public static Material toolMaterial = Material
 			.valueOf(Main.getPlugin().getCustomConfig().getString("tntReload.materialType"));
-	private static String prefix = "§8[§6TNTReloader§8] §r";
-	private static AutoTntReloader instance;
+	private static AutoCannonReloader instance;
 	
-	public static AutoTntReloader getInstance() {
+	public static AutoCannonReloader getInstance() {
 		if(instance == null) {
-			return new AutoTntReloader();
+			return new AutoCannonReloader();
 		}
 		return instance;
 	}
@@ -74,7 +74,7 @@ public class AutoTntReloader implements Listener, CommandExecutor {
 			}
 		}
 		
-		Main.send(p, true, prefix, "tntReloader_wrongCommand");
+		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "tntReloader_wrongCommand");
 		return true;
 	}
 
@@ -125,13 +125,13 @@ public class AutoTntReloader implements Listener, CommandExecutor {
 		}
 		set = playersTntLocations.get(uuid);
 		if (set.size() >= maxTnt) {
-			Main.send(p, true, prefix, "tntReloader_maxTntOverload", String.valueOf(maxTnt));
+			Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "tntReloader_maxTntOverload", String.valueOf(maxTnt));
 			return;
 		}
 
 		set.add(event.getBlockPlaced().getLocation());
 		if (set.size() == maxTnt) {
-			Main.send(p, true, prefix, "tntReloader_maxTnt", String.valueOf(maxTnt));
+			Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "tntReloader_maxTnt", String.valueOf(maxTnt));
 		}
 		playersTntLocations.put(uuid, set);
 	}
@@ -161,33 +161,33 @@ public class AutoTntReloader implements Listener, CommandExecutor {
 	
 	public static void startRecord(Player p) {
 		playerRecord.add(p.getUniqueId());
-		Main.send(p, true, prefix, "tntReloader_startRecord");
+		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "tntReloader_startRecord");
 	}
 
 	public static void endRecord(Player p) {
 		playerRecord.remove(p.getUniqueId());
-		Main.send(p, true, prefix, "tntReloader_endRecord");
+		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "tntReloader_endRecord");
 	}
 
 	public static void deleteRecord(Player p) {
 		playerRecord.remove(p.getUniqueId());
 		if (playersTntLocations.containsKey(p.getUniqueId())) {
 			playersTntLocations.remove(p.getUniqueId());
-			Main.send(p, true, prefix, "tntReloader_deleteRecord");
+			Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "tntReloader_deleteRecord");
 		}
 	}
 
 	private void pasteRecord(Player p) {
 		UUID uuid = p.getUniqueId();
 		if (playerAntiSpam.contains(uuid)) {
-			Main.send(p, true, prefix, "tntReloader_antispam", String.valueOf(timeout/20));
+			Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "tntReloader_antispam", String.valueOf(timeout/20));
 			return;
 		}
 
 		for (Location loc : playersTntLocations.get(uuid)) {
 			loc.getBlock().setType(Material.TNT);
 		}
-		Main.send(p, true, prefix, "tntReloader_pasteRecord");
+		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "tntReloader_pasteRecord");
 		antispam(uuid);
 	}
 
@@ -204,10 +204,10 @@ public class AutoTntReloader implements Listener, CommandExecutor {
 
 
 	private void showHelp(Player p) {
-		Main.send(p, true, prefix, "tntReloader_help1");
-		Main.send(p, true, prefix, "tntReloader_help2");
-		Main.send(p, true, prefix, "tntReloader_help3");
-		Main.send(p, true, prefix, "tntReloader_help4");
-		Main.send(p, true, prefix, "tntReloader_help5");
+		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "tntReloader_help1");
+		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "tntReloader_help2");
+		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "tntReloader_help3");
+		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "tntReloader_help4");
+		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "tntReloader_help5");
 	}
 }

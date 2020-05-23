@@ -36,7 +36,7 @@ import de.AS.Bau.TabCompleter.TntReloaderTC;
 import de.AS.Bau.TabCompleter.gsTC;
 import de.AS.Bau.TabCompleter.particlesTC;
 import de.AS.Bau.TabCompleter.tbsTC;
-import de.AS.Bau.Tools.AutoTntReloader;
+import de.AS.Bau.Tools.AutoCannonReloader;
 import de.AS.Bau.Tools.DesignTool;
 import de.AS.Bau.Tools.FernzuenderListener;
 import de.AS.Bau.Tools.GUI;
@@ -51,7 +51,6 @@ import de.AS.Bau.WorldEdit.WorldEditPreCommand;
 import de.AS.Bau.cmds.Bau;
 import de.AS.Bau.cmds.ds;
 import de.AS.Bau.cmds.gs;
-import de.AS.Bau.cmds.sl;
 import de.AS.Bau.cmds.stats;
 import de.AS.Bau.cmds.tnt;
 import de.AS.Bau.utils.WorldHandler;
@@ -101,7 +100,7 @@ public class Main extends JavaPlugin {
 		pm.registerEvents(new FernzuenderListener(), this);
 		pm.registerEvents(new TntChest(), this);
 		pm.registerEvents(new GUI(), this);
-		pm.registerEvents(AutoTntReloader.getInstance(), this);
+		pm.registerEvents(AutoCannonReloader.getInstance(), this);
 		pm.registerEvents(ClipboardParticles.getInstance(), this);
 	}
 
@@ -122,7 +121,7 @@ public class Main extends JavaPlugin {
 		getCommand("baureload").setExecutor(new Bau());
 		getCommand("particles").setExecutor(ClipboardParticles.getInstance());
 		getCommand("particles").setTabCompleter(new particlesTC());
-		getCommand("tr").setExecutor(AutoTntReloader.getInstance());
+		getCommand("tr").setExecutor(AutoCannonReloader.getInstance());
 		getCommand("tr").setTabCompleter(new TntReloaderTC());
 	}
 

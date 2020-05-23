@@ -74,70 +74,65 @@ public class GUI implements CommandExecutor, Listener {
 			tntIM.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 		}
 		tntIS.setItemMeta(tntIM);
-		inv.setItem(20, tntIS);
+
 //barriers
 		// playerHead
+		ItemStack playerHeadItem = new ItemStack(Material.AIR);
+		ItemStack Barrier1IS = new ItemStack(Material.AIR);
 		if (rg.getOwners().contains(p.getUniqueId()) || p.getUniqueId().toString().equals(p.getWorld().getName())) {
-			ItemStack playerHeadItem = new ItemStack(Material.PLAYER_HEAD);
+			playerHeadItem = new ItemStack(Material.PLAYER_HEAD);
 			SkullMeta sm = (SkullMeta) playerHeadItem.getItemMeta();
 			sm.setOwner(p.getName());
 			sm.setDisplayName(StringGetterBau.getString(p, "guiMember"));
 			playerHeadItem.setItemMeta(sm);
-			inv.setItem(22, playerHeadItem);
 
 			// delete
-			ItemStack Barrier1IS = ItemStackCreator.createNewItemStack(Material.BARRIER,
+			Barrier1IS = ItemStackCreator.createNewItemStack(Material.BARRIER,
 					StringGetterBau.getString(p, "deletePlot"));
-			inv.setItem(4, Barrier1IS);
+
 		}
 		// TestBlockSklave->Wolle
 
 		// enderpearls
 		ItemStack enderPearl1IS = ItemStackCreator.createNewItemStack(Material.ENDER_PEARL,
 				StringGetterBau.getString(p, "teleportPlotOne"));
-		inv.setItem(38, enderPearl1IS);
+
 		// 2pearls
 		ItemStack enderPearl2IS = ItemStackCreator.createNewItemStack(Material.ENDER_PEARL,
 				StringGetterBau.getString(p, "teleportPlotTwo"));
 		enderPearl2IS.setAmount(2);
-		inv.setItem(40, enderPearl2IS);
+
 		// 3pearls
 		ItemStack enderPearl3IS = ItemStackCreator.createNewItemStack(Material.ENDER_PEARL,
 				StringGetterBau.getString(p, "teleportPlotThree"));
 		enderPearl3IS.setAmount(3);
-		inv.setItem(42, enderPearl3IS);
 
 		// torch für sl
+		ItemStack stoplagIS;
 		if (Stoplag.getStatus(p.getLocation())) {
-			ItemStack torchAn = ItemStackCreator.createNewItemStack(Material.REDSTONE,
+			stoplagIS = ItemStackCreator.createNewItemStack(Material.REDSTONE,
 					StringGetterBau.getString(p, "torchOff"));
-			inv.setItem(24, torchAn);
 		} else {
-			ItemStack torchAus = ItemStackCreator.createNewItemStack(Material.GUNPOWDER,
+			stoplagIS = ItemStackCreator.createNewItemStack(Material.GUNPOWDER,
 					StringGetterBau.getString(p, "torchOn"));
-			inv.setItem(24, torchAus);
 		}
 
 		ItemStack rocket = ItemStackCreator.createNewItemStack(Material.FIREWORK_ROCKET,
 				StringGetterBau.getString(p, "track"));
-		inv.setItem(12, rocket);
 
 		ItemStack observer = ItemStackCreator.createNewItemStack(Material.OBSERVER,
-				StringGetterBau.getString(p, "show"));
-		inv.setItem(14, observer);
+				StringGetterBau.getString(p, "show")); // TODO oöffne tail GUI
 
 		// NetherStar
 		ItemStack guiItem = ItemStackCreator.createNewItemStack(Material.NETHER_STAR, "§6GUI");
-		inv.setItem(0, guiItem);
-		inv.setItem(8, guiItem);
-		inv.setItem(36, guiItem);
-		inv.setItem(44, guiItem);
+
 		// DS
 		ItemStack ds = new ItemStack(Material.DEBUG_STICK);
-		inv.setItem(28, ds);
+
 		// TBS
-		ItemStack TestMaterialIS = ItemStackCreator.createNewItemStack(Material.WHITE_WOOL, StringGetterBau.getString(p, "testBlockSklaveGui"));
-		inv.setItem(30, TestMaterialIS);
+		ItemStack TestMaterialIS = ItemStackCreator.createNewItemStack(Material.WHITE_WOOL,
+				StringGetterBau.getString(p, "testBlockSklaveGui"));
+
 		// DT
 		String dtName;
 		ItemStack dst = new ItemStack(Material.WOODEN_SHOVEL);
@@ -151,10 +146,39 @@ public class GUI implements CommandExecutor, Listener {
 		}
 		dtIM.setDisplayName(dtName);
 		dst.setItemMeta(dtIM);
-		inv.setItem(32, dst);
+
 		// FZ
-		ItemStack fz = ItemStackCreator.createNewItemStack(FernzuenderListener.toolMaterial, StringGetterBau.getString(p, "fernzuender"));
-		inv.setItem(34, fz);
+		ItemStack fz = ItemStackCreator.createNewItemStack(FernzuenderListener.toolMaterial,
+				StringGetterBau.getString(p, "fernzuender"));
+
+		ItemStack CannonReloader = ItemStackCreator.createNewItemStack(AutoCannonReloader.toolMaterial,
+				StringGetterBau.getString(p, "cannonReloader_guiName"));
+
+		/* setItems */
+		inv.setItem(0, guiItem);
+		inv.setItem(8, guiItem);
+		inv.setItem(36, guiItem);
+		inv.setItem(44, guiItem);
+
+		inv.setItem(4, Barrier1IS);
+		inv.setItem(11, fz);
+		// inv.setItem(12, rocket);
+		inv.setItem(13, observer);
+		inv.setItem(15, CannonReloader);
+		inv.setItem(19, tntIS);
+		inv.setItem(22, playerHeadItem);
+		inv.setItem(25, stoplagIS);
+		inv.setItem(29, ds);
+		inv.setItem(31, TestMaterialIS);
+		inv.setItem(33, dst);
+		inv.setItem(37, enderPearl1IS);
+		inv.setItem(38, enderPearl2IS);
+		inv.setItem(39, enderPearl3IS);
+
+		//TODO TestGrundstücke
+		inv.setItem(41, enderPearl1IS);
+		inv.setItem(42, enderPearl2IS);
+		inv.setItem(43, enderPearl3IS);
 		// close DBConnection
 		conn.closeConn();
 		return inv;
@@ -167,22 +191,22 @@ public class GUI implements CommandExecutor, Listener {
 		String invName = p.getOpenInventory().getTitle();
 		ItemStack clicked = event.getCurrentItem();
 		if (clicked != null) {
-			if (clicked.getType().equals(Material.NETHER_STAR) || clicked.getType().equals(FernzuenderListener.toolMaterial)||clicked.getType().equals(AutoTntReloader.toolMaterial)) {
+			if (clicked.getType().equals(Material.NETHER_STAR)
+					|| clicked.getType().equals(FernzuenderListener.toolMaterial)
+					|| clicked.getType().equals(AutoCannonReloader.toolMaterial)) {
 				return;
 			}
 			if (clicked.hasItemMeta()) {
 				if (!pInv.getType().equals(InventoryType.CREATIVE)) {
 					String worldname;
-					if(p.getWorld().getName().contains("test")) {
+					if (p.getWorld().getName().contains("test")) {
 						worldname = p.getWorld().getName();
-					}else {
+					} else {
 						DBConnection conn = new DBConnection();
 						worldname = conn.getName(p.getWorld().getName());
 						conn.closeConn();
 					}
-					if (invName
-							.equals(StringGetterBau.getString(p, "inventoryName").replace("%r",
-									worldname))
+					if (invName.equals(StringGetterBau.getString(p, "inventoryName").replace("%r", worldname))
 							&& event.getClickedInventory().equals(pInv)) {
 						event.setCancelled(true);
 						inventoryGUI(p, pInv, clicked);
@@ -215,19 +239,19 @@ public class GUI implements CommandExecutor, Listener {
 			p.closeInventory();
 			p.performCommand("tnt");
 			p.sendMessage(Main.prefix + StringGetterBau.getString(p, "tntAllowedMessage"));
-		}else if(clickedName.equals(reset)){
+		} else if (clickedName.equals(reset)) {
 			p.closeInventory();
 			String rgID = WorldGuardHandler.getPlotId(p.getLocation());
 			PlotResetter.resetRegion(rgID, p, false);
 		} else if (clickedName.equals(tp1)) {
 			p.closeInventory();
-			p.teleport(CoordGetter.getTeleportLocation(p.getWorld(),"plot1"));
+			p.teleport(CoordGetter.getTeleportLocation(p.getWorld(), "plot1"));
 		} else if (clickedName.equals(tp2)) {
 			p.closeInventory();
-			p.teleport(CoordGetter.getTeleportLocation(p.getWorld(),"plot2"));
+			p.teleport(CoordGetter.getTeleportLocation(p.getWorld(), "plot2"));
 		} else if (clickedName.equals(tp3)) {
 			p.closeInventory();
-			p.teleport(CoordGetter.getTeleportLocation(p.getWorld(),"plot3"));
+			p.teleport(CoordGetter.getTeleportLocation(p.getWorld(), "plot3"));
 		} else if (clickedName.equals(memberGUI)) {
 			p.closeInventory();
 			showMember(p);
