@@ -117,7 +117,7 @@ public class gs implements CommandExecutor {
 				break;
 			case "delete":
 				if (p.hasPermission("admin")) {
-					deletePlot(p, args[1], conn);
+					deletePlot(p, args[1], conn,false);
 				} else {
 					conn.closeConn();
 					return false;
@@ -167,10 +167,13 @@ public class gs implements CommandExecutor {
 		UUID uuid = p.getUniqueId();
 		if (secondWarnNewPlot.contains(uuid) && argsLength == 3) {
 			Main.send(p, "gs_newPlotGenerating");
+			DBConnection conn = new DBConnection();
+			deletePlot(p, p.getName(), conn,true);
+			conn.closeConn();
 			secondWarnNewPlot.remove(uuid);
 			firstWarnNewPlot.remove(uuid);
 		} else if (firstWarnNewPlot.contains(uuid)&& argsLength == 2) {
-			JsonCreater jsonMsg = new JsonCreater(StringGetterBau.getString(p, "gs_newPlot_secondWarn"));
+			JsonCreater jsonMsg = new JsonCreater(Main.prefix + StringGetterBau.getString(p, "gs_newPlot_secondWarn"));
 			JsonCreater jsonMsgClick = new JsonCreater(StringGetterBau.getString(p, "gs_newPlot_secondWarn_click"));
 			jsonMsgClick.addHoverEvent(StringGetterBau.getString(p, "gs_newPlot_secondWarn_clickHover"));
 			jsonMsg.addJson(jsonMsgClick.addClickEvent("/gs new " + uuid.toString() + " " + uuid.toString(),
@@ -178,7 +181,7 @@ public class gs implements CommandExecutor {
 
 			secondWarnNewPlot.add(uuid);
 		} else if(argsLength == 1) {
-			JsonCreater jsonMsg = new JsonCreater(StringGetterBau.getString(p, "gs_newPlot_firstWarn"));
+			JsonCreater jsonMsg = new JsonCreater(Main.prefix + StringGetterBau.getString(p, "gs_newPlot_firstWarn"));
 			JsonCreater jsonMsgClick = new JsonCreater(StringGetterBau.getString(p, "gs_newPlot_firstWarn_click"));
 			jsonMsgClick.addHoverEvent(StringGetterBau.getString(p, "gs_newPlot_firstWarn_clickHover"));
 			jsonMsg.addJson(jsonMsgClick.addClickEvent("/gs new " + uuid.toString(), ClickAction.RUN_COMMAND)).send(p);
@@ -272,13 +275,13 @@ public class gs implements CommandExecutor {
 		conn.closeConn();
 	}
 
-	public void deletePlot(Player p, String playerName, DBConnection conn) {
+	public void deletePlot(Player p, String playerName, DBConnection conn,boolean mute) {
 		String worldName = conn.getUUID(playerName);
 		World w = WorldHandler.loadWorld(worldName);
 		for (Player a : w.getPlayers()) {
 			a.kickPlayer("GS DELETE");
 		}
-		if (WorldHandler.deleteWorld(w, conn)) {
+		if (WorldHandler.deleteWorld(w, conn)&&!mute) {
 			Main.send(p, "gsDeleted", playerName);
 		} else {
 			Main.send(p, "error");

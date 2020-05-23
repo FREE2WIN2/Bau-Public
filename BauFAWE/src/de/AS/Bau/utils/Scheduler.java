@@ -16,7 +16,6 @@ public class Scheduler {
 
 	public void cancel() {
 		Bukkit.getScheduler().cancelTask(id);
-		id = -1;
 	}
 
 	public void setX(int x) {
@@ -52,9 +51,7 @@ public class Scheduler {
 	}
 
 	public void setTask(int task) {
-
-		Bukkit.getScheduler().cancelTask(task);
-
+		id = task;
 	}
 
 	public int getTask() {

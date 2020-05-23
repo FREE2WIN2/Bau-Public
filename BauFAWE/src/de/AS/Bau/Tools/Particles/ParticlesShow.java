@@ -124,7 +124,7 @@ public class ParticlesShow {
 		if (!active) {
 			return;
 		}
-		if (scheduler.getTask() == -1) {
+		if (scheduler.getTask() >= 0) {
 			return;
 		}
 
