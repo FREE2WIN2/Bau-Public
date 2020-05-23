@@ -24,4 +24,20 @@ public class CoordGetter {
 		int z = Integer.parseInt(coords[2]);
 		return BlockVector3.at(x, y, z);
 	}
+
+	public static BlockVector3 getMaxWorldVector() {
+		String[] coords = Main.getPlugin().getConfig().getString("coordinates.worldBorder.max").split(" ");
+		int x = Integer.parseInt(coords[0]);
+		int y = Integer.parseInt(coords[1]);
+		int z = Integer.parseInt(coords[2]);
+		return BlockVector3.at(x, y, z);
+	}
+	
+	public static BlockVector3 getMinWorldVector() {
+		String[] coords = Main.getPlugin().getConfig().getString("coordinates.worldBorder.min").split(" ");
+		int x = Integer.parseInt(coords[0]);
+		int y = Integer.parseInt(coords[1]);
+		int z = Integer.parseInt(coords[2]);
+		return BlockVector3.at(x, y, z);
+	}
 }

@@ -12,10 +12,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 
 import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
+import de.AS.Bau.utils.CoordGetter;
 
 public class WorldEditEvents implements Listener {
 	public WorldEditEvents(JavaPlugin plugin) {
@@ -31,6 +33,7 @@ public class WorldEditEvents implements Listener {
 
 
 		if (command.startsWith("//stack")) {
+			
 			if(args.length==2) {
 				WorldEditPlugin wep = (WorldEditPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
 				int multiplier = Integer.parseInt(args[1]);
@@ -46,36 +49,39 @@ public class WorldEditEvents implements Listener {
 					
 					int xmin=sel.getMinimumPoint().getBlockX();
 					int xmax=sel.getMaximumPoint().getBlockX();
-					
+						
 					int ydur = ymax - ymin+1;
 					int xdur = xmax - xmin+1;
 					int zdur = zmax - zmin+1;
+					
+					BlockVector3 min = CoordGetter.getMinWorldVector();
+					BlockVector3 max = CoordGetter.getMaxWorldVector();
 					switch(bF){
 					case NORTH:
 						//-z
 						int beruehrpktN=-(zdur*multiplier)+zmin;
-						if(beruehrpktN<=-66) {
+						if(beruehrpktN<min.getZ()) {
 							e.setCancelled(true);
 						}
 						break;
 					case EAST:
 						//+x
 						int beruehrpktE=(xdur*multiplier)+xmax;
-						if(beruehrpktE>=-65) {
+						if(beruehrpktE>max.getX()) {
 							e.setCancelled(true);
 						}
 						break;
 					case SOUTH:
 						//+z
 						int beruehrpktS=(zdur*multiplier)+zmax;
-						if(beruehrpktS>=99) {
+						if(beruehrpktS>max.getZ()) {
 							e.setCancelled(true);
 						}
 						break;
 					case WEST:
 						//-x
 						int beruehrpktW=-(xdur*multiplier)+xmin;
-						if(beruehrpktW<=-371) {
+						if(beruehrpktW<min.getX()) {
 							e.setCancelled(true);
 						}
 						break;
@@ -83,7 +89,7 @@ public class WorldEditEvents implements Listener {
 						//-z+x
 						int beruehrpktNEX=(xdur*multiplier)+xmax;
 						int beruehrpktNEZ=-(zdur*multiplier)+zmin;
-						if(beruehrpktNEX>=-65||beruehrpktNEZ<=-66) {
+						if(beruehrpktNEX>=max.getX()||beruehrpktNEZ<min.getZ()) {
 							e.setCancelled(true);
 						}
 						break;
@@ -91,7 +97,7 @@ public class WorldEditEvents implements Listener {
 						//-z-x
 						int beruehrpktNWX=-(xdur*multiplier)+xmin;
 						int beruehrpktNWZ=-(zdur*multiplier)+zmin;
-						if(beruehrpktNWX<=-371||beruehrpktNWZ<=-66) {
+						if(beruehrpktNWX<min.getX()||beruehrpktNWZ<min.getBlockZ()) {
 							e.setCancelled(true);
 						}
 						break;
@@ -99,7 +105,7 @@ public class WorldEditEvents implements Listener {
 						//+z+x
 						int beruehrpktSEX=(xdur*multiplier)+xmax;
 						int beruehrpktSEZ=(zdur*multiplier)+zmax;
-						if(beruehrpktSEX>=-65||beruehrpktSEZ>=99) {
+						if(beruehrpktSEX>max.getX()||beruehrpktSEZ>max.getZ()) {
 							e.setCancelled(true);
 						}
 						break;
@@ -107,21 +113,21 @@ public class WorldEditEvents implements Listener {
 						//+z-x
 						int beruehrpktSWX=-(xdur*multiplier)+xmin;
 						int beruehrpktSWZ=(zdur*multiplier)+zmax;
-						if(beruehrpktSWX<=-371||beruehrpktSWZ>=99) {
+						if(beruehrpktSWX>max.getX()||beruehrpktSWZ>max.getZ()) {
 							e.setCancelled(true);
 						}
 						break;
 					case DOWN:
 						//-y
 						int beruehrpktD=-(ydur*multiplier)+ymin;
-						if(beruehrpktD<=7) {
+						if(beruehrpktD<min.getY()) {
 							e.setCancelled(true);
 						}
 						break;
 					case UP:
 						//+y
 						int beruehrpktU=(ydur*multiplier)+ymax;
-						if(beruehrpktU>=69) {
+						if(beruehrpktU>max.getY()) {
 							e.setCancelled(true);
 						}
 						break;
@@ -156,32 +162,36 @@ public class WorldEditEvents implements Listener {
 					int ydur = ymax - ymin;
 					int xdur = xmax - xmin;
 					int zdur = zmax - zmin;
+					
+					
+					BlockVector3 min = CoordGetter.getMinWorldVector();
+					BlockVector3 max = CoordGetter.getMaxWorldVector();
 					switch(bF){
 					case NORTH:
 						//-z
 						int beruehrpktN=-(zdur-multiplier)+zmin;
-						if(beruehrpktN<=-66) {
+						if(beruehrpktN<min.getZ()) {
 							e.setCancelled(true);
 						}
 						break;
 					case EAST:
 						//+x
 						int beruehrpktE=(xdur+multiplier)+xmax;
-						if(beruehrpktE>=-65) {
+						if(beruehrpktE>max.getX()) {
 							e.setCancelled(true);
 						}
 						break;
 					case SOUTH:
 						//+z
 						int beruehrpktS=(zdur+multiplier)+zmax;
-						if(beruehrpktS>=99) {
+						if(beruehrpktS>max.getZ()) {
 							e.setCancelled(true);
 						}
 						break;
 					case WEST:
 						//-x
 						int beruehrpktW=-(xdur-multiplier)+xmin;
-						if(beruehrpktW<=-371) {
+						if(beruehrpktW<min.getX()) {
 							e.setCancelled(true);
 						}
 						break;
@@ -189,7 +199,7 @@ public class WorldEditEvents implements Listener {
 						//-z+x
 						int beruehrpktNEX=(xdur+multiplier)+xmax;
 						int beruehrpktNEZ=-(zdur-multiplier)+zmin;
-						if(beruehrpktNEX>=-65||beruehrpktNEZ<=-66) {
+						if(beruehrpktNEX>max.getX()||beruehrpktNEZ<min.getZ()) {
 							e.setCancelled(true);
 						}
 						break;
@@ -197,7 +207,7 @@ public class WorldEditEvents implements Listener {
 						//-z-x
 						int beruehrpktNWX=-(xdur-multiplier)+xmin;
 						int beruehrpktNWZ=-(zdur-multiplier)+zmin;
-						if(beruehrpktNWX<=-371||beruehrpktNWZ<=-66) {
+						if(beruehrpktNWX<min.getX()||beruehrpktNWZ<min.getZ()) {
 							e.setCancelled(true);
 						}
 						break;
@@ -205,29 +215,29 @@ public class WorldEditEvents implements Listener {
 						//+z+x
 						int beruehrpktSEX=(xdur+multiplier)+xmax;
 						int beruehrpktSEZ=(zdur+multiplier)+zmax;
-						if(beruehrpktSEX>=-65||beruehrpktSEZ>=99) {
+						if(beruehrpktSEX>max.getX()||beruehrpktSEZ>max.getZ()) {
 							e.setCancelled(true);
 						}
 						break;
 					case SOUTH_WEST:
 						//+z-x
-						int beruehrpktSWX=-(xdur-multiplier)+xmin;
+						int beruehrpktSWX=(xdur+multiplier)+xmax;
 						int beruehrpktSWZ=(zdur+multiplier)+zmax;
-						if(beruehrpktSWX<=-371||beruehrpktSWZ>=99) {
+						if(beruehrpktSWX>max.getX()||beruehrpktSWZ>max.getZ()) {
 							e.setCancelled(true);
 						}
 						break;
 					case DOWN:
 						//-y
 						int beruehrpktD=-(ydur-multiplier)+ymin;
-						if(beruehrpktD<=7) {
+						if(beruehrpktD<min.getY()) {
 							e.setCancelled(true);
 						}
 						break;
 					case UP:
 						//+y
 						int beruehrpktU=(ydur+multiplier)+ymax;
-						if(beruehrpktU>=69) {
+						if(beruehrpktU>max.getY()) {
 							e.setCancelled(true);
 						}
 						break;
