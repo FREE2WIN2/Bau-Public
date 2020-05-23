@@ -81,12 +81,12 @@ public class ParticlesGUI implements Listener {
 				p.openInventory(
 						createColorGUI(StringGetterBau.getString(p, "particles_gui_changeColorClipboardTitle")));
 			} else if (clickedName
-					.equalsIgnoreCase(StringGetterBau.getString(p, "particles_gui_changeColorClipboardSelection"))) {
+					.equalsIgnoreCase(StringGetterBau.getString(p, "particles_gui_changeColorSelection"))) {
 				p.openInventory(
 						createColorGUI(StringGetterBau.getString(p, "particles_gui_changeColorSelectionTitle")));
 			}
 			event.setCancelled(true);
-		} else if (event.getView().getTitle().equals(StringGetterBau.getString(p, "particles_gui_changeColorClipboardSelection"))) {
+		} else if (event.getView().getTitle().equals(StringGetterBau.getString(p, "particles_gui_changeColorClipboardTitle"))) {
 			Colorable colorable = (Colorable) clicked.getData();
 			Color color = colorable.getColor().getColor();
 			Colors colors = Colors.getByColor(color);
