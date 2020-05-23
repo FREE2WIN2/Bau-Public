@@ -256,7 +256,6 @@ public class Main extends JavaPlugin {
 		p.sendMessage(message);
 	}
 
-
 	public static void send(Player p, boolean otherPrefix, String prefix, String messageKey, String... args) {
 		String message = prefix + StringGetterBau.getString(p, messageKey);
 		for(String rep:args) {

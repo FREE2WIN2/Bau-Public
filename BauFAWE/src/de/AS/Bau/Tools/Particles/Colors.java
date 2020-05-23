@@ -4,10 +4,11 @@ import org.bukkit.Color;
 
 public enum Colors {
 
-	AQUA, BLACK, BLUE, FUCHSIA, GRAY, GREEN, LIME, MAROON, NAVY, OLIVE, ORANGE, PURPLE, RED, SILVER, TEAL, WHITE, YELLOW;
-	
+	AQUA, BLACK, BLUE, FUCHSIA, GRAY, GREEN, LIME, MAROON, NAVY, OLIVE, ORANGE, PURPLE, RED, SILVER, TEAL, WHITE,
+	YELLOW;
+
 	public Color getColor() {
-		switch(this) {
+		switch (this) {
 		case AQUA:
 			return Color.AQUA;
 		case BLACK:
@@ -45,43 +46,43 @@ public enum Colors {
 		}
 		return null;
 	}
-	
+
 	public static Colors getByColor(Color color) {
-		if(color.equals(Color.AQUA)) {
-			return AQUA;
-		}else if(color.equals(Color.BLACK)) {
-			return BLACK;
-		}else if(color.equals(Color.BLUE)) {
-			return BLUE;
-		}else if(color.equals(Color.FUCHSIA)) {
-			return FUCHSIA;
-		}else if(color.equals(Color.GRAY)) {
-			return GRAY;
-		}else if(color.equals(Color.GREEN)) {
-			return GREEN;
-		}else if(color.equals(Color.LIME)) {
-			return LIME;
-		}else if(color.equals(Color.MAROON)) {
-			return MAROON;
-		}else if(color.equals(Color.NAVY)) {
-			return NAVY;
-		}else if(color.equals(Color.OLIVE)) {
-			return OLIVE;
-		}else if(color.equals(Color.ORANGE)) {
-			return ORANGE;
-		}else if(color.equals(Color.PURPLE)) {
-			return PURPLE;
-		}else if(color.equals(Color.RED)) {
-			return RED;
-		}else if(color.equals(Color.SILVER)) {
-			return SILVER;
-		}else if(color.equals(Color.TEAL)) {
-			return TEAL;
-		}else if(color.equals(Color.WHITE)) {
-			return WHITE;
-		}else if(color.equals(Color.YELLOW)) {
-			return YELLOW;
+		if (color.asRGB() == Color.AQUA.asRGB()) {
+			return Colors.AQUA;
+		} else if (color.asRGB() == Colors.BLACK.getColor().asRGB()) {
+			return Colors.BLACK;
+		} else if (color.asRGB() == Color.BLUE.asRGB()) {
+			return Colors.BLUE;
+		} else if (color.asRGB() == Color.FUCHSIA.asRGB()) {
+			return Colors.FUCHSIA;
+		} else if (color.asRGB() == Color.GRAY.asRGB()) {
+			return Colors.GRAY;
+		} else if (color.asRGB() == Color.GREEN.asRGB()) {
+			return Colors.GREEN;
+		} else if (color.asRGB() == Color.LIME.asRGB()) {
+			return Colors.LIME;
+		} else if (color.asRGB() == Color.MAROON.asRGB()) {
+			return Colors.MAROON;
+		} else if (color.asRGB() == Color.NAVY.asRGB()) {
+			return Colors.NAVY;
+		} else if (color.asRGB() == Color.OLIVE.asRGB()) {
+			return Colors.OLIVE;
+		} else if (color.asRGB() == Color.ORANGE.asRGB()) {
+			return Colors.ORANGE;
+		} else if (color.asRGB() == Color.PURPLE.asRGB()) {
+			return Colors.PURPLE;
+		} else if (color.asRGB() == Color.RED.asRGB()) {
+			return Colors.RED;
+		} else if (color.asRGB() == Color.SILVER.asRGB()) {
+			return Colors.SILVER;
+		} else if (color.asRGB() == Color.TEAL.asRGB()) {
+			return Colors.TEAL;
+		} else if (color.asRGB() == Color.WHITE.asRGB()) {
+			return Colors.WHITE;
+		} else if (color.asRGB() == Color.YELLOW.asRGB()) {
+			return Colors.YELLOW;
 		}
-		return null;
+		return Colors.YELLOW;
 	}
 }

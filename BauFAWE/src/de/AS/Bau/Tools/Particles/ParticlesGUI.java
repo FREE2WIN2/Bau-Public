@@ -1,7 +1,7 @@
 package de.AS.Bau.Tools.Particles;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -9,7 +9,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.Colorable;
 
 import de.AS.Bau.StringGetterBau;
 import de.AS.Bau.utils.ItemStackCreator;
@@ -60,7 +59,7 @@ public class ParticlesGUI implements Listener {
 		inv.addItem(new ItemStack(Material.YELLOW_DYE));
 		return inv;
 	}
-
+	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onClickInInventory(InventoryClickEvent event) {
 		ItemStack clicked = event.getCurrentItem();
@@ -87,19 +86,16 @@ public class ParticlesGUI implements Listener {
 			}
 			event.setCancelled(true);
 		} else if (event.getView().getTitle().equals(StringGetterBau.getString(p, "particles_gui_changeColorClipboardTitle"))) {
-			Colorable colorable = (Colorable) clicked.getData();
-			Color color = colorable.getColor().getColor();
-			Colors colors = Colors.getByColor(color);
+			DyeColor color = DyeColor.getByDyeData(clicked.getData().getData());
 			event.setCancelled(true);
 			p.closeInventory();
-			p.performCommand("particles clipboard " + colors.name());
+			p.performCommand("particles clipboard " + color.getColor().getRed() + " " + color.getColor().getGreen() + " " + color.getColor().getBlue() + " " + color.name());
+		
 		} else if (event.getView().getTitle().equals(StringGetterBau.getString(p, "particles_gui_changeColorSelectionTitle"))) {
-			Colorable colorable = (Colorable) clicked.getData();
-			Color color = colorable.getColor().getColor();
-			Colors colors = Colors.getByColor(color);
+			DyeColor color = DyeColor.getByDyeData(clicked.getData().getData());
 			event.setCancelled(true);
 			p.closeInventory();
-			p.performCommand("particles selection " + colors.name());
+			p.performCommand("particles selection " + color.getColor().getRed() + " " + color.getColor().getGreen() + " " + color.getColor().getBlue() + " " + color.name());
 		}
 
 	}

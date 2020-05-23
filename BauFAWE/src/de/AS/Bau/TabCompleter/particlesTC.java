@@ -35,6 +35,7 @@ public class particlesTC implements TabCompleter {
 			}
 			out.add("clipboard");
 			out.add("selection");
+			out.add("gui");
 			return HelperMethods.checkFortiped(args[0], out);
 		}
 		if(args.length == 2) {

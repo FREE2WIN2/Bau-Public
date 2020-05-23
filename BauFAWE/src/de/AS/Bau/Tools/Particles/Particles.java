@@ -72,8 +72,9 @@ public class Particles implements CommandExecutor, Listener {
 			} else if (args[0].equalsIgnoreCase("hilfe") || args[0].equalsIgnoreCase("help")) {
 				showHelp(p);
 				return true;
-			}else if(args[0].equalsIgnoreCase("gui")) {
+			} else if (args[0].equalsIgnoreCase("gui")) {
 				ParticlesGUI.open(p);
+				return true;
 			}
 		}
 		if (args.length == 2) {
@@ -115,6 +116,32 @@ public class Particles implements CommandExecutor, Listener {
 			} else {
 				Main.send(p, "particles_wrongCommand");
 			}
+
+		}
+		if (args.length == 5) {
+			if (!HelperMethods.argsAreInt(args, 1, 3)) {
+				Main.send(p, "particles_expectedInt", args[0]);
+				return true;
+			}
+			if (!HelperMethods.argsArepositiveInt(args, 1, 3)) {
+				Main.send(p, "particles_onlyPositiveInt");
+				return true;
+			}
+
+			if (args[0].equalsIgnoreCase("selection") || args[0].equalsIgnoreCase("sel")) {
+				particleShow.setSelectionColor(Integer.parseInt(args[1]), Integer.parseInt(args[2]),
+						Integer.parseInt(args[3]));
+				Main.send(p, "particles_selection_colorset", args[4]);
+				return true;
+			} else if (args[0].equalsIgnoreCase("clipboard") || args[0].equalsIgnoreCase("clip")) {
+				particleShow.setClipboardColor(Integer.parseInt(args[1]), Integer.parseInt(args[2]),
+						Integer.parseInt(args[3]));
+				Main.send(p, "particles_clipboard_colorset", args[4]);
+				return true;
+			} else {
+				Main.send(p, "particles_wrongCommand");
+			}
+
 		}
 		Main.send(p, "particles_wrongCommand");
 		return true;
