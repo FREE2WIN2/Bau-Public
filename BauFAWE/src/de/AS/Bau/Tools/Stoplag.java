@@ -140,17 +140,17 @@ public class Stoplag implements Listener,CommandExecutor {
 
 	/* Events for Stoplag */
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public static void pistonextend(BlockPistonExtendEvent e) {
 		e.setCancelled(getStatus(e.getBlock().getLocation()));
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public static void pistonRetract(BlockPistonRetractEvent e) {
 		e.setCancelled(getStatus(e.getBlock().getLocation()));
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public static void redstone(BlockRedstoneEvent e) {
 		if (getStatus(e.getBlock().getLocation())) {
 			if (e.getNewCurrent() >= 1 && e.getOldCurrent() < 1) {
@@ -159,22 +159,22 @@ public class Stoplag implements Listener,CommandExecutor {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public static void onBlockFade(BlockFadeEvent e) {
 		e.setCancelled(getStatus(e.getBlock().getLocation()));
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public static void onBlockForm(BlockFormEvent e) {
 		e.setCancelled(getStatus(e.getBlock().getLocation()));
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public static void onBlockPhysics(BlockPhysicsEvent e) {
 		e.setCancelled(getStatus(e.getBlock().getLocation()));
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public static void onBlockFromTo(BlockFromToEvent e) {
 		e.setCancelled(getStatus(e.getBlock().getLocation()));
 	}
