@@ -88,7 +88,7 @@ public class AutoTntReloader implements Listener, CommandExecutor {
 		if (!event.getMaterial().equals(toolMaterial)) {
 			return;
 		}
-		if (a.equals(Action.RIGHT_CLICK_AIR)) {
+		if (a.equals(Action.RIGHT_CLICK_AIR)||a.equals(Action.RIGHT_CLICK_BLOCK)) {
 			if (playersTntLocations.containsKey(p.getUniqueId())) {
 				if (playerRecord.contains(p.getUniqueId())) {
 					/* stop */
@@ -102,7 +102,7 @@ public class AutoTntReloader implements Listener, CommandExecutor {
 				/* start */
 				startRecord(p);
 			}
-		} else if (a.equals(Action.LEFT_CLICK_AIR)) {
+		} else if (a.equals(Action.LEFT_CLICK_AIR)||a.equals(Action.LEFT_CLICK_BLOCK)) {
 			/* delete */
 			deleteRecord(p);
 		}

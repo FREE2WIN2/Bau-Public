@@ -28,4 +28,4 @@ tntReload:
   maxTnt: 1000
   materialType: TNT_MINECART
   timeout: 5                 #antispam
-fernzuender: MINECART
+fernzuender: WOODEN_HOE

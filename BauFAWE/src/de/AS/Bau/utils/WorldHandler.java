@@ -18,20 +18,20 @@ import de.AS.Bau.Main;
 public class WorldHandler {
 
 	private static String templateName = Main.getPlugin().getCustomConfig().getString("plottemplate");
-	
-	public static World loadWorld(String worldName) {
-		WorldCreator wc = new WorldCreator(worldName);
-		wc.type(WorldType.NORMAL);
-		World w = Bukkit.getServer().createWorld(wc);
-		w.setStorm(false);
-		w.setThundering(false);
-		w.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
-		w.setGameRule(GameRule.DO_MOB_SPAWNING, false);
-//		WorldBorder b = w.getWorldBorder();
-//		b.setCenter(-208.53, 17.23);
-//		b.setSize(400);
 
-		return w;
+	public static World loadWorld(String worldName) {
+		if (Bukkit.getWorld(worldName) == null) {
+			WorldCreator wc = new WorldCreator(worldName);
+			wc.type(WorldType.NORMAL);
+			World w = Bukkit.getServer().createWorld(wc);
+			w.setStorm(false);
+			w.setThundering(false);
+			w.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
+			w.setGameRule(GameRule.DO_MOB_SPAWNING, false);
+			return w;
+		} else {
+			return Bukkit.getWorld(worldName);
+		}
 	}
 
 	public static void unloadWorld(String worldName) {
@@ -39,7 +39,7 @@ public class WorldHandler {
 	}
 
 	public static void undloadWorld(World world) {
-		if(world == null) {
+		if (world == null) {
 			return;
 		}
 		Bukkit.unloadWorld(world, true);
@@ -47,9 +47,9 @@ public class WorldHandler {
 
 	public static void createWorldDir(Player p) {
 		String uuid = p.getUniqueId().toString();
-		File vorlage = new File(Bukkit.getWorldContainer(),templateName);
+		File vorlage = new File(Bukkit.getWorldContainer(), templateName);
 		// File neu = new File(path + "/Worlds/" + uuid);
-		File neu = new File(Bukkit.getWorldContainer(),uuid);
+		File neu = new File(Bukkit.getWorldContainer(), uuid);
 		neu.mkdirs();
 		neu.setExecutable(true, false);
 		neu.setReadable(true, false);
@@ -62,9 +62,10 @@ public class WorldHandler {
 		}
 		conn.closeConn();
 		// worldguard regionen
-		File worldGuardWorldDir = new File(Bukkit.getWorldContainer(),"plugins/WorldGuard/worlds/" + uuid);
+		File worldGuardWorldDir = new File(Bukkit.getWorldContainer(), "plugins/WorldGuard/worlds/" + uuid);
 		if (!worldGuardWorldDir.exists()) {
-			File vorlageWorldGuardWorldDir = new File(Bukkit.getWorldContainer(), "plugins/WorldGuard/worlds/"+templateName);
+			File vorlageWorldGuardWorldDir = new File(Bukkit.getWorldContainer(),
+					"plugins/WorldGuard/worlds/" + templateName);
 			copyFolder_raw(vorlageWorldGuardWorldDir, worldGuardWorldDir);
 			Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.getPlugin(), new Runnable() {
 
@@ -86,7 +87,7 @@ public class WorldHandler {
 		Bukkit.getServer().unloadWorld(w, true);
 		if (w.getWorldFolder().exists()) {
 			if (deleteDir(w.getWorldFolder()) && conn.deleteGs(w.getName())) {
-				File file = new File(Bukkit.getWorldContainer(),"plugins/WorldGuard/worlds/" + w.getName());
+				File file = new File(Bukkit.getWorldContainer(), "plugins/WorldGuard/worlds/" + w.getName());
 				file.delete();
 				return true;
 			}
@@ -138,19 +139,18 @@ public class WorldHandler {
 		return (path.delete());
 	}
 
-	
 	public static void checkForWorldsToUnload() {
-	Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), new Runnable() {
-			
+		Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), new Runnable() {
+
 			@Override
 			public void run() {
-				for(World w:Bukkit.getServer().getWorlds()) {
-					if(w.getPlayers().size() == 0&&!w.getName().equals("world")) {
+				for (World w : Bukkit.getServer().getWorlds()) {
+					if (w.getPlayers().size() == 0 && !w.getName().equals("world")) {
 						undloadWorld(w);
 					}
 				}
-				
+
 			}
-		}, 20*60, 20*60);
+		}, 20 * 60, 20 * 60);
 	}
 }

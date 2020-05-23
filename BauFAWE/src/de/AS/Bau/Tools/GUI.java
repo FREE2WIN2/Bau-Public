@@ -118,7 +118,6 @@ public class GUI implements CommandExecutor, Listener {
 			inv.setItem(24, torchAus);
 		}
 
-		// rakete für track
 		ItemStack rocket = ItemStackCreator.createNewItemStack(Material.FIREWORK_ROCKET,
 				StringGetterBau.getString(p, "track"));
 		inv.setItem(12, rocket);

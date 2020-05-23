@@ -32,6 +32,8 @@ import de.AS.Bau.DBConnection;
 import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
 import de.AS.Bau.Tools.GUI;
+import de.AS.Bau.WorldEdit.WorldGuardHandler;
+import de.AS.Bau.utils.CoordGetter;
 import de.AS.Bau.utils.WorldHandler;
 import net.minecraft.server.v1_15_R1.IChatBaseComponent;
 import net.minecraft.server.v1_15_R1.IChatBaseComponent.ChatSerializer;
@@ -40,6 +42,8 @@ import net.minecraft.server.v1_15_R1.PlayerConnection;
 
 public class gs implements CommandExecutor {
 
+	public static String joinPLot = Main.getPlugin().getCustomConfig().getString("coordinates.spawn");
+	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String string, String[] args) {
 
@@ -47,11 +51,7 @@ public class gs implements CommandExecutor {
 		Player p = (Player) sender;
 		if (args.length == 0) {
 			// gs -> tp zum own gs
-			if (!Bukkit.getServer().getWorlds().contains(Bukkit.getServer().getWorld(p.getUniqueId().toString()))) {
-				WorldHandler.loadWorld(p.getUniqueId().toString());
-			}
-			Location loc = new Location(Bukkit.getServer().getWorld(p.getUniqueId().toString()), -208, 8, 17);
-			p.teleport(loc);
+			p.teleport(CoordGetter.getTeleportLocation(WorldHandler.loadWorld(p.getUniqueId().toString()), joinPLot));
 			conn.closeConn();
 			return true;
 		} else if (args.length == 1) {
@@ -77,7 +77,7 @@ public class gs implements CommandExecutor {
 				// bau info
 				// open gui
 				GUI.showMember(p);
-				p.sendMessage(StringGetterBau.getString(p, "timeShow") + " §7" + p.getWorld().getTime());
+				Main.send(p, "timeShow", p.getWorld().getTime()+"");
 				conn.closeConn();
 				return true;
 
@@ -85,13 +85,7 @@ public class gs implements CommandExecutor {
 		} else if (args.length == 2) {
 			switch (args[0].toLowerCase()) {
 			case "time":
-				int time = Integer.parseInt(args[1]);
-				if (time > 24000) {
-					p.sendMessage(Main.prefix + StringGetterBau.getString(p, "timeTooHigh").replace("%r", args[1]));
-				} else {
-					p.getWorld().setTime(time);
-					p.sendMessage(Main.prefix + StringGetterBau.getString(p, "time").replace("%r", args[1]));
-				}
+				setTime(p, Integer.parseInt(args[1]));
 				break;
 			case "addtemp":
 				p.sendMessage(Main.prefix
@@ -102,59 +96,18 @@ public class gs implements CommandExecutor {
 						+ StringGetterBau.getString(p, "wrongCommand").replace("%r", "gs tempadd <Spieler> <Zeit(h)>"));
 				break;
 			case "remove":
-				if (!p.getName().equalsIgnoreCase(args[1])) {
-					if (conn.removeMember(p.getUniqueId().toString(), args[1])) {
-						p.sendMessage(
-								Main.prefix + StringGetterBau.getString(p, "plotMemberRemoved").replace("%r", args[1]));
-						RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-						RegionManager regions = container
-								.get(BukkitAdapter.adapt(Bukkit.getWorld(p.getUniqueId().toString())));
-						for (Entry<String, ProtectedRegion> rg : regions.getRegions().entrySet()) {
-							DefaultDomain member = rg.getValue().getMembers();
-							member.removePlayer(args[1]);
-							member.removePlayer(UUID.fromString(conn.getUUID(args[1])));
-							rg.getValue().setMembers(member);
-						}
-
-					} else {
-						p.sendMessage(Main.prefix + StringGetterBau.getString(p, "error"));
-					}
-				} else {
-					p.sendMessage(Main.prefix + StringGetterBau.getString(p, "YouCantRemoveYourself"));
-				}
+				removeMember(p, args[1], conn);
 				// bau remove [PlayerName]
 				break;
 			case "add":
-				if (conn.isMemberNames(args[1], p)) {
-					p.sendMessage(Main.prefix + StringGetterBau.getString(p, "alreadyMember").replace("%r", args[1]));
-				} else {
-					if (conn.addMember(p, args[1])) {
-						p.sendMessage(
-								Main.prefix + StringGetterBau.getString(p, "plotMemberAdded").replace("%r", args[1]));
-						RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-						RegionManager regions = container
-								.get(BukkitAdapter.adapt(Bukkit.getWorld(p.getUniqueId().toString())));
 
-						for (Entry<String, ProtectedRegion> rg : regions.getRegions().entrySet()) {
-							DefaultDomain member = rg.getValue().getMembers();
-							member.addPlayer(UUID.fromString(conn.getUUID(args[1])));
-							rg.getValue().setMembers(member);
-						}
-					} else {
-						p.sendMessage(Main.prefix + StringGetterBau.getString(p, "error"));
-					}
-				}
 				// Befehle: /bau add [PlayerName]
 				break;
 			case "tp":
 				// if (conn.isMember(p, args[1]) || p.hasPermission("moderator")) {
 				if ((conn.isMember(p, args[1]) || p.hasPermission("moderator")) && conn.hasOwnPlots(args[1])) {
 					String plotID = conn.getUUID(args[1]);
-					if (!Bukkit.getServer().getWorlds().contains(Bukkit.getServer().getWorld(plotID))) {
-						WorldHandler.loadWorld(plotID);
-					}
-					Location loc = new Location(Bukkit.getServer().getWorld(plotID), -208, 8, 17);
-					p.teleport(loc);
+					p.teleport(CoordGetter.getTeleportLocation(WorldHandler.loadWorld(plotID),joinPLot));
 				} else {
 					p.sendMessage(Main.prefix + StringGetterBau.getString(p, "noPlotMember"));
 				}
@@ -162,25 +115,6 @@ public class gs implements CommandExecutor {
 				break;
 			case "delete":
 				if (p.hasPermission("admin")) {
-					String worldName = conn.getUUID(args[1]);
-
-					World w;
-					if (!Bukkit.getServer().getWorlds().contains(Bukkit.getServer().getWorld(worldName))) {
-						w = WorldHandler.loadWorld(worldName);
-					} else {
-						w = Bukkit.getServer().getWorld(worldName);
-					}
-					if (!w.getPlayers().isEmpty()) {
-						for (Player a : w.getPlayers()) {
-							a.kickPlayer("GS DELETE");
-						}
-					}
-
-					if (WorldHandler.deleteWorld(w, conn)) {
-						p.sendMessage(Main.prefix + StringGetterBau.getString(p, "gsDeleted").replace("%r", args[1]));
-					} else {
-						p.sendMessage(Main.prefix + StringGetterBau.getString(p, "error"));
-					}
 
 				} else {
 					conn.closeConn();
@@ -192,60 +126,20 @@ public class gs implements CommandExecutor {
 			return true;
 
 		} else if (args.length == 3) {
-			if (args[0].equalsIgnoreCase("time") && args[1].equalsIgnoreCase("set")) {
-				int time = Integer.parseInt(args[1]);
-				if (time > 24000) {
-					p.sendMessage(Main.prefix + StringGetterBau.getString(p, "timeTooHigh").replace("%r", args[1]));
-				} else {
-					p.getWorld().setTime(time);
-					p.sendMessage(Main.prefix + StringGetterBau.getString(p, "time").replace("%r", args[1]));
-				}
-				return true;
-			} else if (args[0].equalsIgnoreCase("time")) {
-				p.sendMessage(
-						Main.prefix + StringGetterBau.getString(p, "wrongCommand").replace("%r", "gs time <time>"));
-				return true;
-			}
-
 			switch (args[0].toLowerCase()) {
-
+			case "time":
+			case "zeit":
+				if (args[1].equalsIgnoreCase("set")) {
+					setTime(p, Integer.parseInt(args[2]));
+					return true;
+				} else {
+					Main.send(p, "wrongCommand", "gs time set <time>");
+					return true;
+				}
 			case "add":
 			case "addtemp":
 			case "tempadd":
-				if (conn.isMemberNames(args[1], p)) {
-					p.sendMessage(Main.prefix + StringGetterBau.getString(p, "alreadyMember").replace("%r", args[1]));
-				} else {
-					if (conn.addMember(p, args[1])) {
-						String uuidMember = conn.getUUID(args[1]);
-						int time = Integer.parseInt(args[2]);
-						p.sendMessage(Main.prefix + StringGetterBau.getString(p, "memberTempAdded")
-								.replace("%r", args[1]).replace("%t", String.valueOf(time)));
-						RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-						RegionManager regions = container
-								.get(BukkitAdapter.adapt(Bukkit.getWorld(p.getUniqueId().toString())));
-
-						for (Entry<String, ProtectedRegion> rg : regions.getRegions().entrySet()) {
-							DefaultDomain member = rg.getValue().getMembers();
-							member.addPlayer(UUID.fromString(uuidMember));
-							rg.getValue().setMembers(member);
-						}
-						FileConfiguration config = Main.getPlugin().getTempAddConfig();
-						Long Time;
-						SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmm");
-						Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Europe/Berlin"));
-						calendar.add(Calendar.HOUR_OF_DAY, time);
-						Date date = calendar.getTime();
-						Time = Long.parseLong(formatter.format(date));
-						config.set(p.getUniqueId().toString() + "." + uuidMember, Time);
-						try {
-							config.save(Main.getPlugin().getTempAddConfigFile());
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					} else {
-						p.sendMessage(Main.prefix + StringGetterBau.getString(p, "error"));
-					}
-				}
+				addMemberTemp(p, args[1], Integer.parseInt(args[2]), conn);
 			}
 			conn.closeConn();
 			return true;
@@ -255,6 +149,73 @@ public class gs implements CommandExecutor {
 		}
 		conn.closeConn();
 		return false;
+	}
+
+	private void setTime(Player p, int time) {
+		if (time > 24000) {
+			Main.send(p, "timeTooHigh", "" + time);
+		} else {
+			p.getWorld().setTime(time);
+			Main.send(p, "time", "" + time);
+		}
+
+	}
+
+	public void removeMember(Player p, String playerNameToRemove, DBConnection conn) {
+		if (!p.getName().equalsIgnoreCase(playerNameToRemove)) {
+			if (conn.removeMember(p.getUniqueId().toString(), playerNameToRemove)) {
+				p.sendMessage(Main.prefix
+						+ StringGetterBau.getString(p, "plotMemberRemoved").replace("%r", playerNameToRemove));
+				WorldGuardHandler.removeMemberFromAllRegions(p.getUniqueId().toString(),
+						conn.getUUID(playerNameToRemove), playerNameToRemove);
+
+			} else {
+				Main.send(p, "error");
+			}
+		} else {
+			Main.send(p, "YouCantRemoveYourself");
+		}
+	}
+
+	public void addMember(Player p, String playerName, DBConnection conn) {
+		if (conn.isMemberNames(playerName, p)) {
+			p.sendMessage(Main.prefix + StringGetterBau.getString(p, "alreadyMember").replace("%r", playerName));
+		} else {
+			if (conn.addMember(p, playerName)) {
+				p.sendMessage(Main.prefix + StringGetterBau.getString(p, "plotMemberAdded").replace("%r", playerName));
+				WorldGuardHandler.addPlayerToAllRegions(p.getUniqueId().toString(), conn.getUUID(playerName));
+			} else {
+				p.sendMessage(Main.prefix + StringGetterBau.getString(p, "error"));
+			}
+		}
+	}
+
+	public void addMemberTemp(Player p, String playerName, int time, DBConnection conn) {
+		if (conn.isMemberNames(playerName, p)) {
+			Main.send(p, "alreadyMember", playerName);
+		} else {
+			if (conn.addMember(p, playerName)) {
+				String uuidMember = conn.getUUID(playerName);
+				Main.send(p, "memberTempAdded", playerName, "" + time);
+				WorldGuardHandler.addPlayerToAllRegions(p.getUniqueId().toString(), uuidMember);
+
+				FileConfiguration config = Main.getPlugin().getTempAddConfig();
+				Long Time;
+				SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmm");
+				Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Europe/Berlin"));
+				calendar.add(Calendar.HOUR_OF_DAY, time);
+				Date date = calendar.getTime();
+				Time = Long.parseLong(formatter.format(date));
+				config.set(p.getUniqueId().toString() + "." + uuidMember, Time);
+				try {
+					config.save(Main.getPlugin().getTempAddConfigFile());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			} else {
+				p.sendMessage(Main.prefix + StringGetterBau.getString(p, "error"));
+			}
+		}
 	}
 
 	public void sendMemberedGs(Player p, ArrayList<String> memberedPlots, DBConnection conn) {
@@ -274,6 +235,24 @@ public class gs implements CommandExecutor {
 		conn.closeConn();
 	}
 
+	public void deletePlot(Player p, String playerName, DBConnection conn) {
+		String worldName = conn.getUUID(playerName);
+		World w = WorldHandler.loadWorld(worldName);
+		for (Player a : w.getPlayers()) {
+			a.kickPlayer("GS DELETE");
+		}
+		if (WorldHandler.deleteWorld(w, conn)) {
+			Main.send(p, "gsDeleted", playerName);
+		} else {
+			Main.send(p, "error");
+			p.sendMessage(Main.prefix + StringGetterBau.getString(p, "error"));
+		}
+	}
+
+	public void makeNewPlot() {
+		
+	}
+	
 	public static void startCheckForTempAdd() {
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), new Runnable() {
 
@@ -292,37 +271,37 @@ public class gs implements CommandExecutor {
 						if (time < Time) {
 							String uuidMember = m;
 							DBConnection conn = new DBConnection();
-							conn.removeMember(uuidOwner, conn.getName(uuidMember));
-							// wg remove member
-							RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-							RegionManager regions = container.get(BukkitAdapter.adapt(Bukkit.getWorld(s)));
-
-							for (Entry<String, ProtectedRegion> rg : regions.getRegions().entrySet()) {
-								DefaultDomain member = rg.getValue().getMembers();
-								member.removePlayer(UUID.fromString(uuidMember));
-								rg.getValue().setMembers(member);
+							if (conn.removeMember(uuidOwner, conn.getName(uuidMember))) {
+								// wg remove member
+								WorldGuardHandler.removeMemberFromAllRegions(uuidOwner, uuidMember, null);
+							} else {
+								System.err.println("Member konnte nicht entfernt werden : MeberUUID: " + uuidMember
+										+ " | OwnerUUID: ");
 							}
 							// config remove
 							config.set(uuidOwner + "." + uuidMember, null);
 							try {
 								config.save(Main.getPlugin().getTempAddConfigFile());
-								boolean ownerOn = false;
-								String memberName = conn.getName(uuidMember);
-								for (Player owner : Bukkit.getServer().getOnlinePlayers()) {
-									if (owner.getUniqueId().toString().equals(uuidOwner)) {
-										owner.sendMessage(Main.prefix + StringGetterBau
-												.getString(owner, "plotMemberRemoved").replace("%r", memberName));
-										ownerOn = true;
-										break;
-									}
-								}
-								if (!ownerOn) {
-									conn.addMail("plugin: BAU", uuidOwner, StringGetterBau
-											.getString(uuidOwner, "plotMemberRemoved").replace("%r", memberName));
-								}
 							} catch (IOException e) {
 								e.printStackTrace();
 							}
+
+							/* Message to Owner */
+							boolean ownerOn = false;
+							String memberName = conn.getName(uuidMember);
+							for (Player owner : Bukkit.getServer().getOnlinePlayers()) {
+								if (owner.getUniqueId().toString().equals(uuidOwner)) {
+									owner.sendMessage(Main.prefix + StringGetterBau
+											.getString(owner, "plotMemberRemoved").replace("%r", memberName));
+									ownerOn = true;
+									break;
+								}
+							}
+							if (!ownerOn) {
+								conn.addMail("plugin: BAU", uuidOwner, StringGetterBau
+										.getString(uuidOwner, "plotMemberRemoved").replace("%r", memberName));
+							}
+
 							// output?
 							conn.closeConn();
 						}
