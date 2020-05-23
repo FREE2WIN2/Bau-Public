@@ -138,7 +138,6 @@ public class Main extends JavaPlugin {
 		
 		ClipboardParticles.particlesConfigFile = createConfigFile("particles.yml");
 		ClipboardParticles.particleConfig = createConfig(ClipboardParticles.particlesConfigFile);
-
 	}
 
 	private File createConfigFile(String string) {

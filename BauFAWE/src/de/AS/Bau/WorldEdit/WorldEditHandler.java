@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import com.sk89q.worldedit.EditSession;
@@ -38,8 +39,10 @@ public class WorldEditHandler {
 	public final static int maxBlockChangePerTick = Main.getPlugin().getCustomConfig()
 			.getInt("worldEdit.maxBlockPerSecond");
 	private final static WorldEdit we = WorldEdit.getInstance();
+	
 
-	public static void pasten(String fileName, String rgID, Player p, boolean ignoreAir, boolean undo, boolean tbs) {
+	
+ 	public static void pasten(String fileName, String rgID, Player p, boolean ignoreAir, boolean undo, boolean tbs) {
 		Clipboard board = createClipboard(fileName);
 		BlockVector3 at = CoordGetter.getPastePosition(rgID);
 

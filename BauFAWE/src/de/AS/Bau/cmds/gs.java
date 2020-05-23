@@ -7,7 +7,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.TimeZone;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -23,7 +25,9 @@ import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
 import de.AS.Bau.Tools.GUI;
 import de.AS.Bau.WorldEdit.WorldGuardHandler;
+import de.AS.Bau.utils.ClickAction;
 import de.AS.Bau.utils.CoordGetter;
+import de.AS.Bau.utils.JsonCreater;
 import de.AS.Bau.utils.WorldHandler;
 import net.minecraft.server.v1_15_R1.IChatBaseComponent;
 import net.minecraft.server.v1_15_R1.IChatBaseComponent.ChatSerializer;
@@ -33,7 +37,9 @@ import net.minecraft.server.v1_15_R1.PlayerConnection;
 public class gs implements CommandExecutor {
 
 	public static String joinPLot = Main.getPlugin().getCustomConfig().getString("coordinates.spawn");
-	
+	private HashSet<UUID> firstWarnNewPlot = new HashSet<>();
+	private HashSet<UUID> secondWarnNewPlot = new HashSet<>();
+
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String string, String[] args) {
 
@@ -67,10 +73,16 @@ public class gs implements CommandExecutor {
 				// bau info
 				// open gui
 				GUI.showMember(p);
-				Main.send(p, "timeShow", p.getWorld().getTime()+"");
+				Main.send(p, "timeShow", p.getWorld().getTime() + "");
 				conn.closeConn();
 				return true;
 
+			}
+			if (args[0].equalsIgnoreCase("new")) {
+				/* erste WArnung, dass GS gelöscht wird -> einschreiben in Liste */
+				newPlot(p,1);
+				conn.closeConn();
+				return true;
 			}
 		} else if (args.length == 2) {
 			switch (args[0].toLowerCase()) {
@@ -90,14 +102,14 @@ public class gs implements CommandExecutor {
 				// bau remove [PlayerName]
 				break;
 			case "add":
-
+				addMember(p, args[1], conn);
 				// Befehle: /bau add [PlayerName]
 				break;
 			case "tp":
 				// if (conn.isMember(p, args[1]) || p.hasPermission("moderator")) {
 				if ((conn.isMember(p, args[1]) || p.hasPermission("moderator")) && conn.hasOwnPlots(args[1])) {
 					String plotID = conn.getUUID(args[1]);
-					p.teleport(CoordGetter.getTeleportLocation(WorldHandler.loadWorld(plotID),joinPLot));
+					p.teleport(CoordGetter.getTeleportLocation(WorldHandler.loadWorld(plotID), joinPLot));
 				} else {
 					p.sendMessage(Main.prefix + StringGetterBau.getString(p, "noPlotMember"));
 				}
@@ -105,10 +117,15 @@ public class gs implements CommandExecutor {
 				break;
 			case "delete":
 				if (p.hasPermission("admin")) {
-
+					deletePlot(p, args[1], conn);
 				} else {
 					conn.closeConn();
 					return false;
+				}
+				break;
+			case "new":
+				if (args[1].equals(p.getUniqueId().toString())) {
+					newPlot(p,2);
 				}
 				break;
 			}
@@ -121,15 +138,20 @@ public class gs implements CommandExecutor {
 			case "zeit":
 				if (args[1].equalsIgnoreCase("set")) {
 					setTime(p, Integer.parseInt(args[2]));
-					return true;
 				} else {
 					Main.send(p, "wrongCommand", "gs time set <time>");
-					return true;
 				}
+				break;
 			case "add":
 			case "addtemp":
 			case "tempadd":
 				addMemberTemp(p, args[1], Integer.parseInt(args[2]), conn);
+				break;
+			case "new":
+				if (args[1].equals(p.getUniqueId().toString()) && args[2].equals(p.getUniqueId().toString())) {
+					newPlot(p,3);
+				}
+				break;
 			}
 			conn.closeConn();
 			return true;
@@ -139,6 +161,31 @@ public class gs implements CommandExecutor {
 		}
 		conn.closeConn();
 		return false;
+	}
+
+	private void newPlot(Player p, int argsLength) {
+		UUID uuid = p.getUniqueId();
+		if (secondWarnNewPlot.contains(uuid) && argsLength == 3) {
+			Main.send(p, "gs_newPlotGenerating");
+			secondWarnNewPlot.remove(uuid);
+			firstWarnNewPlot.remove(uuid);
+		} else if (firstWarnNewPlot.contains(uuid)&& argsLength == 2) {
+			JsonCreater jsonMsg = new JsonCreater(StringGetterBau.getString(p, "gs_newPlot_secondWarn"));
+			JsonCreater jsonMsgClick = new JsonCreater(StringGetterBau.getString(p, "gs_newPlot_secondWarn_click"));
+			jsonMsgClick.addHoverEvent(StringGetterBau.getString(p, "gs_newPlot_secondWarn_clickHover"));
+			jsonMsg.addJson(jsonMsgClick.addClickEvent("/gs new " + uuid.toString() + " " + uuid.toString(),
+					ClickAction.RUN_COMMAND)).send(p);
+
+			secondWarnNewPlot.add(uuid);
+		} else if(argsLength == 1) {
+			JsonCreater jsonMsg = new JsonCreater(StringGetterBau.getString(p, "gs_newPlot_firstWarn"));
+			JsonCreater jsonMsgClick = new JsonCreater(StringGetterBau.getString(p, "gs_newPlot_firstWarn_click"));
+			jsonMsgClick.addHoverEvent(StringGetterBau.getString(p, "gs_newPlot_firstWarn_clickHover"));
+			jsonMsg.addJson(jsonMsgClick.addClickEvent("/gs new " + uuid.toString(), ClickAction.RUN_COMMAND)).send(p);
+
+			firstWarnNewPlot.add(uuid);
+		}
+
 	}
 
 	private void setTime(Player p, int time) {
@@ -240,9 +287,9 @@ public class gs implements CommandExecutor {
 	}
 
 	public void makeNewPlot() {
-		
+
 	}
-	
+
 	public static void startCheckForTempAdd() {
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), new Runnable() {
 

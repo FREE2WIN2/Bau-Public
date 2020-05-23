@@ -17,7 +17,7 @@ import de.AS.Bau.Main;
 
 public class WorldHandler {
 
-	private static String templateName = Main.getPlugin().getCustomConfig().getString("plottemplate");
+	public static String templateName = Main.getPlugin().getCustomConfig().getString("plottemplate");
 
 	public static World loadWorld(String worldName) {
 		if (Bukkit.getWorld(worldName) == null) {
@@ -153,4 +153,5 @@ public class WorldHandler {
 			}
 		}, 20 * 60, 20 * 60);
 	}
+
 }
