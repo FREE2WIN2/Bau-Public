@@ -85,7 +85,7 @@ public class ParticlesShow {
 		selectionColor = color;
 		saveSelectionColor();
 	}
-	
+
 	public void setClipboardColor(int r, int g, int b) {
 		clipboardColor = Color.fromRGB(r, g, b);
 		saveClipboardColor();
@@ -95,11 +95,11 @@ public class ParticlesShow {
 		clipboardColor = color;
 		saveClipboardColor();
 	}
-	
+
 	public void setactive(boolean active) {
 		this.active = active;
 		saveActive();
-		if(active&&player.getEquipment().getItemInMainHand().getType().equals(Material.WOODEN_AXE)) {
+		if (active && player.getEquipment().getItemInMainHand().getType().equals(Material.WOODEN_AXE)) {
 			showParticles();
 		}
 	}
@@ -124,7 +124,10 @@ public class ParticlesShow {
 		if (!active) {
 			return;
 		}
-		
+		if (scheduler.getTask() == -1) {
+			return;
+		}
+
 		BukkitPlayer p = BukkitAdapter.adapt(player);
 		LocalSession session = WorldEdit.getInstance().getSessionManager().get(p);
 
@@ -132,15 +135,15 @@ public class ParticlesShow {
 
 			@Override
 			public void run() {
-				if(!active) {
+				if (!active) {
 					stopParticles();
 					return;
 				}
 				ClipboardHolder clipboardHolder = null;
 				Region selection = null;
-				
+
 				/* Clipboard */
-				
+
 				try {
 					clipboardHolder = session.getClipboard();
 					FlattenedClipboardTransform transformed = FlattenedClipboardTransform
@@ -156,7 +159,7 @@ public class ParticlesShow {
 
 				/* Selection */
 				try {
-					if(session.getSelectionWorld() == null){
+					if (session.getSelectionWorld() == null) {
 						return;
 					}
 					if (session.getSelection(session.getSelectionWorld()) != null) {
@@ -201,8 +204,8 @@ public class ParticlesShow {
 	/* stop show particles */
 
 	public void stopParticles() {
-			scheduler.cancel();
+		scheduler.cancel();
+		scheduler.setTask(-1);
 	}
 
-	
 }

@@ -52,11 +52,9 @@ public class Scheduler {
 	}
 
 	public void setTask(int task) {
-		if(id == -1) {
-			id = task;
-		}else {
-			Bukkit.getScheduler().cancelTask(task);
-		}
+
+		Bukkit.getScheduler().cancelTask(task);
+
 	}
 
 	public int getTask() {

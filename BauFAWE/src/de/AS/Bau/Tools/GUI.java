@@ -117,8 +117,8 @@ public class GUI implements CommandExecutor, Listener {
 					StringGetterBau.getString(p, "torchOn"));
 		}
 
-		ItemStack rocket = ItemStackCreator.createNewItemStack(Material.FIREWORK_ROCKET,
-				StringGetterBau.getString(p, "track"));
+//		ItemStack rocket = ItemStackCreator.createNewItemStack(Material.FIREWORK_ROCKET,
+//				StringGetterBau.getString(p, "track"));
 
 		ItemStack observer = ItemStackCreator.createNewItemStack(Material.OBSERVER,
 				StringGetterBau.getString(p, "show")); // TODO oöffne tail GUI
