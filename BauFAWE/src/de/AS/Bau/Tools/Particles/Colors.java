@@ -46,43 +46,4 @@ public enum Colors {
 		}
 		return null;
 	}
-
-	public static Colors getByColor(Color color) {
-		if (color.asRGB() == Color.AQUA.asRGB()) {
-			return Colors.AQUA;
-		} else if (color.asRGB() == Colors.BLACK.getColor().asRGB()) {
-			return Colors.BLACK;
-		} else if (color.asRGB() == Color.BLUE.asRGB()) {
-			return Colors.BLUE;
-		} else if (color.asRGB() == Color.FUCHSIA.asRGB()) {
-			return Colors.FUCHSIA;
-		} else if (color.asRGB() == Color.GRAY.asRGB()) {
-			return Colors.GRAY;
-		} else if (color.asRGB() == Color.GREEN.asRGB()) {
-			return Colors.GREEN;
-		} else if (color.asRGB() == Color.LIME.asRGB()) {
-			return Colors.LIME;
-		} else if (color.asRGB() == Color.MAROON.asRGB()) {
-			return Colors.MAROON;
-		} else if (color.asRGB() == Color.NAVY.asRGB()) {
-			return Colors.NAVY;
-		} else if (color.asRGB() == Color.OLIVE.asRGB()) {
-			return Colors.OLIVE;
-		} else if (color.asRGB() == Color.ORANGE.asRGB()) {
-			return Colors.ORANGE;
-		} else if (color.asRGB() == Color.PURPLE.asRGB()) {
-			return Colors.PURPLE;
-		} else if (color.asRGB() == Color.RED.asRGB()) {
-			return Colors.RED;
-		} else if (color.asRGB() == Color.SILVER.asRGB()) {
-			return Colors.SILVER;
-		} else if (color.asRGB() == Color.TEAL.asRGB()) {
-			return Colors.TEAL;
-		} else if (color.asRGB() == Color.WHITE.asRGB()) {
-			return Colors.WHITE;
-		} else if (color.asRGB() == Color.YELLOW.asRGB()) {
-			return Colors.YELLOW;
-		}
-		return Colors.YELLOW;
-	}
 }
