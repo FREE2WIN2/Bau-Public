@@ -39,7 +39,7 @@ public class gs implements CommandExecutor {
 	public static String joinPLot = Main.getPlugin().getCustomConfig().getString("coordinates.spawn");
 	private HashSet<UUID> firstWarnNewPlot = new HashSet<>();
 	private HashSet<UUID> secondWarnNewPlot = new HashSet<>();
-
+	private HashSet<UUID> blocked = new HashSet<>();
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String string, String[] args) {
 
@@ -165,6 +165,10 @@ public class gs implements CommandExecutor {
 
 	private void newPlot(Player p, int argsLength) {
 		UUID uuid = p.getUniqueId();
+		if(blocked.contains(uuid)) {
+			Main.send(p, "gs_newPlotGeneration_antiSpam");
+			return;
+		}
 		if (secondWarnNewPlot.contains(uuid) && argsLength == 3) {
 			Main.send(p, "gs_newPlotGenerating");
 			DBConnection conn = new DBConnection();
@@ -172,6 +176,7 @@ public class gs implements CommandExecutor {
 			conn.closeConn();
 			secondWarnNewPlot.remove(uuid);
 			firstWarnNewPlot.remove(uuid);
+			blocked.add(uuid);
 		} else if (firstWarnNewPlot.contains(uuid)&& argsLength == 2) {
 			JsonCreater jsonMsg = new JsonCreater(Main.prefix + StringGetterBau.getString(p, "gs_newPlot_secondWarn"));
 			JsonCreater jsonMsgClick = new JsonCreater(StringGetterBau.getString(p, "gs_newPlot_secondWarn_click"));
