@@ -22,16 +22,16 @@ import org.bukkit.inventory.ItemStack;
 import de.AS.Bau.Main;
 import de.AS.Bau.utils.HelperMethods;
 
-public class ClipboardParticles implements CommandExecutor, Listener {
+public class Particles implements CommandExecutor, Listener {
 	public static File particlesConfigFile;
 	public static YamlConfiguration particleConfig;
 	public static HashMap<UUID, ParticlesShow> playersParticlesShow = new HashMap<>();
 	public static boolean defaultState;
 	public static Color defaultClipboardColor;
 	public static Color defaultSelectionColor;
-	private static ClipboardParticles instance;
-	
-	public ClipboardParticles() {
+	private static Particles instance;
+
+	public Particles() {
 		defaultState = particleConfig.getBoolean("default.active");
 		defaultClipboardColor = readColor("default.clipboard");
 		defaultSelectionColor = readColor("default.selection");
@@ -40,9 +40,8 @@ public class ClipboardParticles implements CommandExecutor, Listener {
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String string, String[] args) {
 		/*
-		 * particles
-		 * particles on|off
-		 * particles clipboard 155 155 155 | clip particles selection 155 155 155 | sel
+		 * particles particles on|off particles clipboard 155 155 155 | clip particles
+		 * selection 155 155 155 | sel
 		 */
 		if (!(sender instanceof Player)) {
 			return false;
@@ -50,66 +49,70 @@ public class ClipboardParticles implements CommandExecutor, Listener {
 		Player p = (Player) sender;
 		ParticlesShow particleShow = playersParticlesShow.get(p.getUniqueId());
 		if (args.length == 0) {
-			
+
 			/* Toggle particles */
-			if(particleShow.isActive()) {
+			if (particleShow.isActive()) {
 				Main.send(p, "particles_toggledOff");
-			}else {
+			} else {
 				Main.send(p, "particles_toggledOn");
 			}
 			particleShow.setactive(!particleShow.isActive());
-			
+
 			return true;
 		}
-		if(args.length == 1) {
-			if(args[0].equalsIgnoreCase("on")||args[0].equalsIgnoreCase("an")) {
-				particleShow.setactive(true);//und start?
+		if (args.length == 1) {
+			if (args[0].equalsIgnoreCase("on") || args[0].equalsIgnoreCase("an")) {
+				particleShow.setactive(true);// und start?
 				Main.send(p, "particles_toggledOn");
 				return true;
-			}else if(args[0].equalsIgnoreCase("off")||args[0].equalsIgnoreCase("aus")) {
+			} else if (args[0].equalsIgnoreCase("off") || args[0].equalsIgnoreCase("aus")) {
 				particleShow.setactive(false);
 				Main.send(p, "particles_toggledOff");
 				return true;
-			}else if(args[0].equalsIgnoreCase("hilfe")||args[0].equalsIgnoreCase("help")){
+			} else if (args[0].equalsIgnoreCase("hilfe") || args[0].equalsIgnoreCase("help")) {
 				showHelp(p);
 				return true;
+			}else if(args[0].equalsIgnoreCase("gui")) {
+				ParticlesGUI.open(p);
 			}
 		}
-		if(args.length == 2) {
-			if(Colors.valueOf(args[1].toUpperCase())==null) {
+		if (args.length == 2) {
+			if (Colors.valueOf(args[1].toUpperCase()) == null) {
 				Main.send(p, "particles_wrongColor");
 			}
-			if(args[0].equalsIgnoreCase("selection")||args[0].equalsIgnoreCase("sel")) {
+			if (args[0].equalsIgnoreCase("selection") || args[0].equalsIgnoreCase("sel")) {
 				particleShow.setSelectionColor(Colors.valueOf(args[1].toUpperCase()).getColor());
 				Main.send(p, "particles_selection_colorset", args[1]);
 				return true;
-			}else if(args[0].equalsIgnoreCase("clipboard")||args[0].equalsIgnoreCase("clip")) {
+			} else if (args[0].equalsIgnoreCase("clipboard") || args[0].equalsIgnoreCase("clip")) {
 				particleShow.setClipboardColor(Colors.valueOf(args[1].toUpperCase()).getColor());
 				Main.send(p, "particles_clipboard_colorset", args[1]);
 				return true;
-			}else {
+			} else {
 				Main.send(p, "particles_wrongCommand");
 			}
 		}
-		if(args.length == 4) {
-			if(!HelperMethods.argsAreInt(args, 1, 3)) {
-				Main.send(p, "particles_expectedInt",args[0]);
+		if (args.length == 4) {
+			if (!HelperMethods.argsAreInt(args, 1, 3)) {
+				Main.send(p, "particles_expectedInt", args[0]);
 				return true;
 			}
-			if(!HelperMethods.argsArepositiveInt(args, 1, 3)) {
+			if (!HelperMethods.argsArepositiveInt(args, 1, 3)) {
 				Main.send(p, "particles_onlyPositiveInt");
 				return true;
 			}
-			
-			if(args[0].equalsIgnoreCase("selection")||args[0].equalsIgnoreCase("sel")) {
-				particleShow.setSelectionColor(Integer.parseInt(args[1]), Integer.parseInt(args[2]), Integer.parseInt(args[3]));
-				Main.send(p, "particles_selection_colorsetRGB",args[1],args[2],args[3]);
+
+			if (args[0].equalsIgnoreCase("selection") || args[0].equalsIgnoreCase("sel")) {
+				particleShow.setSelectionColor(Integer.parseInt(args[1]), Integer.parseInt(args[2]),
+						Integer.parseInt(args[3]));
+				Main.send(p, "particles_selection_colorsetRGB", args[1], args[2], args[3]);
 				return true;
-			}else if(args[0].equalsIgnoreCase("clipboard")||args[0].equalsIgnoreCase("clip")) {
-				particleShow.setClipboardColor(Integer.parseInt(args[1]), Integer.parseInt(args[2]), Integer.parseInt(args[3]));
-				Main.send(p, "particles_clipboard_colorsetRGB",args[1],args[2],args[3]);
+			} else if (args[0].equalsIgnoreCase("clipboard") || args[0].equalsIgnoreCase("clip")) {
+				particleShow.setClipboardColor(Integer.parseInt(args[1]), Integer.parseInt(args[2]),
+						Integer.parseInt(args[3]));
+				Main.send(p, "particles_clipboard_colorsetRGB", args[1], args[2], args[3]);
 				return true;
-			}else {
+			} else {
 				Main.send(p, "particles_wrongCommand");
 			}
 		}
@@ -118,7 +121,7 @@ public class ClipboardParticles implements CommandExecutor, Listener {
 	}
 
 	private void showHelp(Player p) {
-			
+
 	}
 
 	@EventHandler
@@ -129,12 +132,12 @@ public class ClipboardParticles implements CommandExecutor, Listener {
 
 		playersParticlesShow.put(p.getUniqueId(), new ParticlesShow(p));
 	}
-	
+
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		playersParticlesShow.remove(event.getPlayer().getUniqueId());
 	}
-	
+
 	@EventHandler
 	public void switchHandListener(PlayerItemHeldEvent event) {
 		Player p = event.getPlayer();
@@ -182,9 +185,9 @@ public class ClipboardParticles implements CommandExecutor, Listener {
 
 	}
 
-	public static ClipboardParticles getInstance() {
-		if(instance == null) {
-			return new ClipboardParticles();
+	public static Particles getInstance() {
+		if (instance == null) {
+			return new Particles();
 		}
 		return instance;
 	}

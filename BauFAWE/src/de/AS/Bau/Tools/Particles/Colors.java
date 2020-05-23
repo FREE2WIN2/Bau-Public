@@ -45,4 +45,43 @@ public enum Colors {
 		}
 		return null;
 	}
+	
+	public static Colors getByColor(Color color) {
+		if(color.equals(Color.AQUA)) {
+			return AQUA;
+		}else if(color.equals(Color.BLACK)) {
+			return BLACK;
+		}else if(color.equals(Color.BLUE)) {
+			return BLUE;
+		}else if(color.equals(Color.FUCHSIA)) {
+			return FUCHSIA;
+		}else if(color.equals(Color.GRAY)) {
+			return GRAY;
+		}else if(color.equals(Color.GREEN)) {
+			return GREEN;
+		}else if(color.equals(Color.LIME)) {
+			return LIME;
+		}else if(color.equals(Color.MAROON)) {
+			return MAROON;
+		}else if(color.equals(Color.NAVY)) {
+			return NAVY;
+		}else if(color.equals(Color.OLIVE)) {
+			return OLIVE;
+		}else if(color.equals(Color.ORANGE)) {
+			return ORANGE;
+		}else if(color.equals(Color.PURPLE)) {
+			return PURPLE;
+		}else if(color.equals(Color.RED)) {
+			return RED;
+		}else if(color.equals(Color.SILVER)) {
+			return SILVER;
+		}else if(color.equals(Color.TEAL)) {
+			return TEAL;
+		}else if(color.equals(Color.WHITE)) {
+			return WHITE;
+		}else if(color.equals(Color.YELLOW)) {
+			return YELLOW;
+		}
+		return null;
+	}
 }

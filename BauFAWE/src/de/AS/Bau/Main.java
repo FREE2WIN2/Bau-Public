@@ -45,6 +45,8 @@ import de.AS.Bau.Tools.Stoplag;
 import de.AS.Bau.Tools.TestBlockSklave;
 import de.AS.Bau.Tools.TntChest;
 import de.AS.Bau.Tools.Particles.ClipboardParticles;
+import de.AS.Bau.Tools.Particles.Particles;
+import de.AS.Bau.Tools.Particles.ParticlesGUI;
 import de.AS.Bau.WorldEdit.UndoManager;
 import de.AS.Bau.WorldEdit.WorldEditEvents;
 import de.AS.Bau.WorldEdit.WorldEditPreCommand;
@@ -101,7 +103,8 @@ public class Main extends JavaPlugin {
 		pm.registerEvents(new TntChest(), this);
 		pm.registerEvents(new GUI(), this);
 		pm.registerEvents(AutoCannonReloader.getInstance(), this);
-		pm.registerEvents(ClipboardParticles.getInstance(), this);
+		pm.registerEvents(Particles.getInstance(), this);
+		pm.registerEvents(new ParticlesGUI(), this);
 	}
 
 	private void registerCommands() {
@@ -119,7 +122,7 @@ public class Main extends JavaPlugin {
 		getCommand("stats").setExecutor(new stats());
 		getCommand("delcon").setExecutor(new PlotResetter());
 		getCommand("baureload").setExecutor(new Bau());
-		getCommand("particles").setExecutor(ClipboardParticles.getInstance());
+		getCommand("particles").setExecutor(Particles.getInstance());
 		getCommand("particles").setTabCompleter(new particlesTC());
 		getCommand("tr").setExecutor(AutoCannonReloader.getInstance());
 		getCommand("tr").setTabCompleter(new TntReloaderTC());
@@ -136,8 +139,8 @@ public class Main extends JavaPlugin {
 		Stoplag.stoplagConfigFile = createConfigFile("stoplag.yml");
 		Stoplag.stoplagConfig = createConfig(Stoplag.stoplagConfigFile);
 		
-		ClipboardParticles.particlesConfigFile = createConfigFile("particles.yml");
-		ClipboardParticles.particleConfig = createConfig(ClipboardParticles.particlesConfigFile);
+		Particles.particlesConfigFile = createConfigFile("particles.yml");
+		Particles.particleConfig = createConfig(Particles.particlesConfigFile);
 	}
 
 	private File createConfigFile(String string) {
