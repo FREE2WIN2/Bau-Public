@@ -74,7 +74,7 @@ public class AutoCannonReloader implements Listener, CommandExecutor {
 			}
 		}
 		
-		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "tntReloader_wrongCommand");
+		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "cannonReloader_wrongCommand");
 		return true;
 	}
 
@@ -125,13 +125,13 @@ public class AutoCannonReloader implements Listener, CommandExecutor {
 		}
 		set = playersTntLocations.get(uuid);
 		if (set.size() >= maxTnt) {
-			Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "tntReloader_maxTntOverload", String.valueOf(maxTnt));
+			Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "cannonReloader_maxTntOverload", String.valueOf(maxTnt));
 			return;
 		}
 
 		set.add(event.getBlockPlaced().getLocation());
 		if (set.size() == maxTnt) {
-			Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "tntReloader_maxTnt", String.valueOf(maxTnt));
+			Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "cannonReloader_maxTnt", String.valueOf(maxTnt));
 		}
 		playersTntLocations.put(uuid, set);
 	}
@@ -161,33 +161,33 @@ public class AutoCannonReloader implements Listener, CommandExecutor {
 	
 	public static void startRecord(Player p) {
 		playerRecord.add(p.getUniqueId());
-		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "tntReloader_startRecord");
+		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "cannonReloader_startRecord");
 	}
 
 	public static void endRecord(Player p) {
 		playerRecord.remove(p.getUniqueId());
-		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "tntReloader_endRecord");
+		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "cannonReloader_endRecord");
 	}
 
 	public static void deleteRecord(Player p) {
 		playerRecord.remove(p.getUniqueId());
 		if (playersTntLocations.containsKey(p.getUniqueId())) {
 			playersTntLocations.remove(p.getUniqueId());
-			Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "tntReloader_deleteRecord");
+			Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "cannonReloader_deleteRecord");
 		}
 	}
 
 	private void pasteRecord(Player p) {
 		UUID uuid = p.getUniqueId();
 		if (playerAntiSpam.contains(uuid)) {
-			Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "tntReloader_antispam", String.valueOf(timeout/20));
+			Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "cannonReloader_antispam", String.valueOf(timeout/20));
 			return;
 		}
 
 		for (Location loc : playersTntLocations.get(uuid)) {
 			loc.getBlock().setType(Material.TNT);
 		}
-		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "tntReloader_pasteRecord");
+		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "cannonReloader_pasteRecord");
 		antispam(uuid);
 	}
 
@@ -204,10 +204,10 @@ public class AutoCannonReloader implements Listener, CommandExecutor {
 
 
 	private void showHelp(Player p) {
-		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "tntReloader_help1");
-		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "tntReloader_help2");
-		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "tntReloader_help3");
-		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "tntReloader_help4");
-		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "tntReloader_help5");
+		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "cannonReloader_help1");
+		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "cannonReloader_help2");
+		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "cannonReloader_help3");
+		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "cannonReloader_help4");
+		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "cannonReloader_help5");
 	}
 }
