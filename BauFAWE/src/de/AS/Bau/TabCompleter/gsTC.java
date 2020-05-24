@@ -11,7 +11,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
-import de.AS.Bau.DBConnection;
+import de.AS.Bau.HikariCP.DBConnection;
 import de.AS.Bau.utils.HelperMethods;
 
 public class gsTC implements TabCompleter {

@@ -1,0 +1,26 @@
+default:
+   path: /TestBlockSklave #relative to schempath in config.yml
+   #Tier 1 in NORTH
+   T1_NORTH_NORMAL: T1_N_N.schem
+   T1_NORTH_SHIELD: T1_N_S.schem 
+   T1_NORTH_FRAME: T1_N_F.schem
+   #Tier 1 in SOUTH
+   T1_SOUTH_NORMAL: T1_S_N.schem
+   T1_SOUTH_SHIELD: T1_S_S.schem
+   T1_SOUTH_FRAME: T1_S_F.schem
+   #Tier 2 in NORTH
+   T2_NORTH_NORMAL: T2_N_N.schem
+   T2_NORTH_SHIELD: T2_N_S.schem 
+   T2_NORTH_FRAME: T2_N_F.schem
+   #Tier 2 in SOUTH
+   T2_SOUTH_NORMAL: T2_S_N.schem
+   T2_SOUTH_SHIELD: T2_S_S.schem
+   T2_SOUTH_FRAME: T2_S_F.schem
+   #Tier 3 in NORTH
+   T3_NORTH_NORMAL: T3_N_N.schem
+   T3_NORTH_SHIELD: T3_N_S.schem 
+   T3_NORTH_FRAME: T3_N_F.schem
+   #Tier 3 in SOUTH
+   T3_SOUTH_NORMAL: T3_S_N.schem
+   T3_SOUTH_SHIELD: T3_S_S.schem
+   T3_SOUTH_FRAME: T3_S_F.schem

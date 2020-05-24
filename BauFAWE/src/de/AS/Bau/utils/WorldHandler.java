@@ -12,8 +12,8 @@ import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
 import org.bukkit.entity.Player;
 
-import de.AS.Bau.DBConnection;
 import de.AS.Bau.Main;
+import de.AS.Bau.HikariCP.DBConnection;
 
 public class WorldHandler {
 

@@ -15,9 +15,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import de.AS.Bau.DBConnection;
 import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
+import de.AS.Bau.HikariCP.DBConnection;
 import de.AS.Bau.Scoreboard.ScoreBoardBau;
 import de.AS.Bau.Tools.DesignTool;
 import de.AS.Bau.utils.WorldHandler;

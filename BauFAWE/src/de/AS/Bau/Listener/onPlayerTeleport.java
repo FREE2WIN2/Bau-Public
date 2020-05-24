@@ -8,10 +8,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-
-import de.AS.Bau.DBConnection;
 import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
+import de.AS.Bau.HikariCP.DBConnection;
 
 public class onPlayerTeleport implements Listener {
 	public onPlayerTeleport(JavaPlugin plugin) {

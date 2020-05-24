@@ -1,4 +1,4 @@
-package de.AS.Bau.Tools;
+package de.AS.Bau.Tools.TestBlockSlave;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,7 +34,7 @@ import de.AS.Bau.WorldEdit.WorldEditHandler;
 import de.AS.Bau.WorldEdit.WorldGuardHandler;
 import de.AS.Bau.utils.Banner;
 
-public class TestBlockSklave implements CommandExecutor, Listener {
+public class TestBlockSklaveCore implements CommandExecutor, Listener {
 
 	public static HashMap<UUID, String> playerLastPaste = new HashMap<>();
 	public static HashSet<Player> playerBlockedDelete = new HashSet<>();

@@ -42,10 +42,10 @@ import de.AS.Bau.Tools.FernzuenderListener;
 import de.AS.Bau.Tools.GUI;
 import de.AS.Bau.Tools.PlotResetter;
 import de.AS.Bau.Tools.Stoplag;
-import de.AS.Bau.Tools.TestBlockSklave;
 import de.AS.Bau.Tools.TntChest;
 import de.AS.Bau.Tools.Particles.Particles;
 import de.AS.Bau.Tools.Particles.ParticlesGUI;
+import de.AS.Bau.Tools.TestBlockSlave.TestBlockSklaveCore;
 import de.AS.Bau.WorldEdit.UndoManager;
 import de.AS.Bau.WorldEdit.WorldEditEvents;
 import de.AS.Bau.WorldEdit.WorldEditPreCommand;
@@ -93,7 +93,7 @@ public class Main extends JavaPlugin {
 		new onPlayerRespawn(this);
 
 		PluginManager pm = Bukkit.getPluginManager();
-		pm.registerEvents(new TestBlockSklave(), this);
+		pm.registerEvents(new TestBlockSklaveCore(), this);
 		pm.registerEvents(new eventsToCancel(), this);
 		pm.registerEvents(new Stoplag(), this);
 		pm.registerEvents(new WorldEditPreCommand(), this);
@@ -111,7 +111,7 @@ public class Main extends JavaPlugin {
 		getCommand("gs").setTabCompleter(new gsTC());
 		getCommand("tnt").setExecutor(new tnt());
 		getCommand("gui").setExecutor(new GUI());
-		getCommand("tbs").setExecutor(new TestBlockSklave());
+		getCommand("tbs").setExecutor(new TestBlockSklaveCore());
 		getCommand("tbs").setTabCompleter(new tbsTC());
 		getCommand("sl").setExecutor(new Stoplag());
 		getCommand("dt").setExecutor(new DesignTool());

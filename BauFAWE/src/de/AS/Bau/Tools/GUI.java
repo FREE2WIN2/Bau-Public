@@ -25,9 +25,9 @@ import org.bukkit.inventory.meta.SkullMeta;
 import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
-import de.AS.Bau.DBConnection;
 import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
+import de.AS.Bau.HikariCP.DBConnection;
 import de.AS.Bau.WorldEdit.WorldGuardHandler;
 import de.AS.Bau.utils.CoordGetter;
 import de.AS.Bau.utils.ItemStackCreator;
