@@ -27,13 +27,11 @@ public class onPlayerTeleport implements Listener {
 		if (!p.hasPermission("moderator")) {
 			if (!e.getTo().getWorld().getName().equals(p.getUniqueId().toString())&&!p.getWorld().getName().equals("world")) {
 				// wenn er nicht owner ist
-				DBConnection conn = new DBConnection();
-				if (!conn.isMember(p, conn.getName(e.getTo().getWorld().getName()))) {
+				if (!DBConnection.isMember(p.getUniqueId(), DBConnection.getName(e.getTo().getWorld().getName()))) {
 					// wenn er nicht owner und nicht Member ist
 					e.setCancelled(true);
 					p.sendMessage(Main.prefix +StringGetterBau.getString(p,"noPlotMember"));
 				}
-				conn.closeConn();
 			}
 		}
 	}

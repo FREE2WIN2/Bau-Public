@@ -43,29 +43,26 @@ public class gs implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String string, String[] args) {
 
-		DBConnection conn = new DBConnection();
 		Player p = (Player) sender;
 		if (args.length == 0) {
 			// gs -> tp zum own gs
 			p.teleport(CoordGetter.getTeleportLocation(WorldHandler.loadWorld(p.getUniqueId().toString()), joinPLot));
-			conn.closeConn();
 			return true;
 		} else if (args.length == 1) {
 			if (args[0].equalsIgnoreCase("list")) {
 				// gs list
 				ArrayList<String> memberedPlots = new ArrayList<>();
 				memberedPlots.add(p.getName());
-				ResultSet rs = conn.getMemberedPlots(p);
+				ResultSet rs = DBConnection.getMemberedPlots(p.getUniqueId());
 				try {
 					while (rs.next()) {
-						memberedPlots.add(conn.getName(rs.getString(1)));
+						memberedPlots.add(DBConnection.getName(rs.getString(1)));
 					}
-					sendMemberedGs(p, memberedPlots, conn);
+					sendMemberedGs(p, memberedPlots);
 				} catch (SQLException e) {
 					e.printStackTrace();
 					p.sendMessage(Main.prefix + StringGetterBau.getString(p, "error"));
 				}
-				conn.closeConn();
 				return true;
 
 			}
@@ -74,14 +71,12 @@ public class gs implements CommandExecutor {
 				// open gui
 				GUI.showMember(p);
 				Main.send(p, "timeShow", p.getWorld().getTime() + "");
-				conn.closeConn();
 				return true;
 
 			}
 			if (args[0].equalsIgnoreCase("new")) {
 				/* erste WArnung, dass GS gelöscht wird -> einschreiben in Liste */
 				newPlot(p,1);
-				conn.closeConn();
 				return true;
 			}
 		} else if (args.length == 2) {
@@ -98,17 +93,17 @@ public class gs implements CommandExecutor {
 						+ StringGetterBau.getString(p, "wrongCommand").replace("%r", "gs tempadd <Spieler> <Zeit(h)>"));
 				break;
 			case "remove":
-				removeMember(p, args[1], conn);
+				removeMember(p, args[1]);
 				// bau remove [PlayerName]
 				break;
 			case "add":
-				addMember(p, args[1], conn);
+				addMember(p, args[1]);
 				// Befehle: /bau add [PlayerName]
 				break;
 			case "tp":
 				// if (conn.isMember(p, args[1]) || p.hasPermission("moderator")) {
-				if ((conn.isMember(p, args[1]) || p.hasPermission("moderator")) && conn.hasOwnPlots(args[1])) {
-					String plotID = conn.getUUID(args[1]);
+				if ((DBConnection.isMember(p.getUniqueId(), args[1]) || p.hasPermission("moderator")) && DBConnection.hasOwnPlots(args[1])) {
+					String plotID = DBConnection.getUUID(args[1]);
 					p.teleport(CoordGetter.getTeleportLocation(WorldHandler.loadWorld(plotID), joinPLot));
 				} else {
 					p.sendMessage(Main.prefix + StringGetterBau.getString(p, "noPlotMember"));
@@ -117,9 +112,8 @@ public class gs implements CommandExecutor {
 				break;
 			case "delete":
 				if (p.hasPermission("admin")) {
-					deletePlot(p, args[1], conn,false);
+					deletePlot(p, args[1], false);
 				} else {
-					conn.closeConn();
 					return false;
 				}
 				break;
@@ -129,7 +123,6 @@ public class gs implements CommandExecutor {
 				}
 				break;
 			}
-			conn.closeConn();
 			return true;
 
 		} else if (args.length == 3) {
@@ -145,7 +138,7 @@ public class gs implements CommandExecutor {
 			case "add":
 			case "addtemp":
 			case "tempadd":
-				addMemberTemp(p, args[1], Integer.parseInt(args[2]), conn);
+				addMemberTemp(p, args[1], Integer.parseInt(args[2]));
 				break;
 			case "new":
 				if (args[1].equals(p.getUniqueId().toString()) && args[2].equals(p.getUniqueId().toString())) {
@@ -153,13 +146,10 @@ public class gs implements CommandExecutor {
 				}
 				break;
 			}
-			conn.closeConn();
 			return true;
 		} else {
-			conn.closeConn();
 			return false;
 		}
-		conn.closeConn();
 		return false;
 	}
 
@@ -171,9 +161,7 @@ public class gs implements CommandExecutor {
 		}
 		if (secondWarnNewPlot.contains(uuid) && argsLength == 3) {
 			Main.send(p, "gs_newPlotGenerating");
-			DBConnection conn = new DBConnection();
-			deletePlot(p, p.getName(), conn,true);
-			conn.closeConn();
+			deletePlot(p, p.getName(), true);
 			secondWarnNewPlot.remove(uuid);
 			firstWarnNewPlot.remove(uuid);
 			blocked.add(uuid);
@@ -206,13 +194,13 @@ public class gs implements CommandExecutor {
 
 	}
 
-	public void removeMember(Player p, String playerNameToRemove, DBConnection conn) {
+	public void removeMember(Player p, String playerNameToRemove) {
 		if (!p.getName().equalsIgnoreCase(playerNameToRemove)) {
-			if (conn.removeMember(p.getUniqueId().toString(), playerNameToRemove)) {
+			if (DBConnection.removeMember(p.getUniqueId().toString(), playerNameToRemove)) {
 				p.sendMessage(Main.prefix
 						+ StringGetterBau.getString(p, "plotMemberRemoved").replace("%r", playerNameToRemove));
 				WorldGuardHandler.removeMemberFromAllRegions(p.getUniqueId().toString(),
-						conn.getUUID(playerNameToRemove), playerNameToRemove);
+						DBConnection.getUUID(playerNameToRemove), playerNameToRemove);
 
 			} else {
 				Main.send(p, "error");
@@ -222,25 +210,25 @@ public class gs implements CommandExecutor {
 		}
 	}
 
-	public void addMember(Player p, String playerName, DBConnection conn) {
-		if (conn.isMemberNames(playerName, p)) {
+	public void addMember(Player p, String playerName) {
+		if (DBConnection.isMember(UUID.fromString(DBConnection.getUUID(playerName)),p.getName())) {
 			p.sendMessage(Main.prefix + StringGetterBau.getString(p, "alreadyMember").replace("%r", playerName));
 		} else {
-			if (conn.addMember(p, playerName)) {
+			if (DBConnection.addMember(p.getUniqueId(), playerName)) {
 				p.sendMessage(Main.prefix + StringGetterBau.getString(p, "plotMemberAdded").replace("%r", playerName));
-				WorldGuardHandler.addPlayerToAllRegions(p.getUniqueId().toString(), conn.getUUID(playerName));
+				WorldGuardHandler.addPlayerToAllRegions(p.getUniqueId().toString(), DBConnection.getUUID(playerName));
 			} else {
 				p.sendMessage(Main.prefix + StringGetterBau.getString(p, "error"));
 			}
 		}
 	}
 
-	public void addMemberTemp(Player p, String playerName, int time, DBConnection conn) {
-		if (conn.isMemberNames(playerName, p)) {
+	public void addMemberTemp(Player p, String playerName, int time) {
+		if (DBConnection.isMember(UUID.fromString(DBConnection.getUUID(playerName)), p.getName())) {
 			Main.send(p, "alreadyMember", playerName);
 		} else {
-			if (conn.addMember(p, playerName)) {
-				String uuidMember = conn.getUUID(playerName);
+			if (DBConnection.addMember(p.getUniqueId(), playerName)) {
+				String uuidMember = DBConnection.getUUID(playerName);
 				Main.send(p, "memberTempAdded", playerName, "" + time);
 				WorldGuardHandler.addPlayerToAllRegions(p.getUniqueId().toString(), uuidMember);
 
@@ -263,7 +251,7 @@ public class gs implements CommandExecutor {
 		}
 	}
 
-	public void sendMemberedGs(Player p, ArrayList<String> memberedPlots, DBConnection conn) {
+	public void sendMemberedGs(Player p, ArrayList<String> memberedPlots) {
 		PlayerConnection pConn = ((CraftPlayer) p).getHandle().playerConnection;
 		p.sendMessage(StringGetterBau.getString(p, "listGsHeading"));
 		for (String s : memberedPlots) {
@@ -277,16 +265,15 @@ public class gs implements CommandExecutor {
 			pConn.sendPacket(txtp);
 		}
 		p.sendMessage("§7----------------------------");
-		conn.closeConn();
 	}
 
-	public void deletePlot(Player p, String playerName, DBConnection conn,boolean mute) {
-		String worldName = conn.getUUID(playerName);
+	public void deletePlot(Player p, String playerName,boolean mute) {
+		String worldName = DBConnection.getUUID(playerName);
 		World w = WorldHandler.loadWorld(worldName);
 		for (Player a : w.getPlayers()) {
 			a.kickPlayer("GS DELETE");
 		}
-		if (WorldHandler.deleteWorld(w, conn)&&!mute) {
+		if (WorldHandler.deleteWorld(w)&&!mute) {
 			Main.send(p, "gsDeleted", playerName);
 		} else {
 			Main.send(p, "error");
@@ -315,8 +302,7 @@ public class gs implements CommandExecutor {
 						Long time = config.getLong(s + "." + m);
 						if (time < Time) {
 							String uuidMember = m;
-							DBConnection conn = new DBConnection();
-							if (conn.removeMember(uuidOwner, conn.getName(uuidMember))) {
+							if (DBConnection.removeMember(uuidOwner, DBConnection.getName(uuidMember))) {
 								// wg remove member
 								WorldGuardHandler.removeMemberFromAllRegions(uuidOwner, uuidMember, null);
 							} else {
@@ -333,7 +319,7 @@ public class gs implements CommandExecutor {
 
 							/* Message to Owner */
 							boolean ownerOn = false;
-							String memberName = conn.getName(uuidMember);
+							String memberName = DBConnection.getName(uuidMember);
 							for (Player owner : Bukkit.getServer().getOnlinePlayers()) {
 								if (owner.getUniqueId().toString().equals(uuidOwner)) {
 									owner.sendMessage(Main.prefix + StringGetterBau
@@ -343,12 +329,11 @@ public class gs implements CommandExecutor {
 								}
 							}
 							if (!ownerOn) {
-								conn.addMail("plugin: BAU", uuidOwner, StringGetterBau
+								DBConnection.addMail("plugin: BAU", uuidOwner, StringGetterBau
 										.getString(uuidOwner, "plotMemberRemoved").replace("%r", memberName));
 							}
 
 							// output?
-							conn.closeConn();
 						}
 
 					}

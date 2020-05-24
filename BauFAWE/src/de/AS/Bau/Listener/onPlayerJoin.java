@@ -21,8 +21,8 @@ import de.AS.Bau.HikariCP.DBConnection;
 import de.AS.Bau.Scoreboard.ScoreBoardBau;
 import de.AS.Bau.Tools.DesignTool;
 import de.AS.Bau.utils.WorldHandler;
-public class onPlayerJoin implements Listener {
 
+public class onPlayerJoin implements Listener {
 
 	public onPlayerJoin(JavaPlugin plugin) {
 		Bukkit.getPluginManager().registerEvents(this, plugin);
@@ -33,19 +33,18 @@ public class onPlayerJoin implements Listener {
 		// sprache
 		Player p = e.getPlayer();
 		p.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
-		//p.teleport(new Location(Bukkit.getWorld("world"), 0, 30, 0));
-		DBConnection conn = new DBConnection();
-		String lang = conn.getLanguage(p);
+		// p.teleport(new Location(Bukkit.getWorld("world"), 0, 30, 0));
+		String lang = DBConnection.getLanguage(p);
 		StringGetterBau.playersLanguage.put(p.getUniqueId(), lang);
 		Main main = Main.getPlugin();
 		// has own gs?
 		String path = main.getCustomConfig().getString("Config.path");
-		File gs =new File(path + "/" + p.getUniqueId().toString());
-		if (!conn.hasOwnPlots(p)&&!gs.exists()) {
+		File gs = new File(path + "/" + p.getUniqueId().toString());
+		if (!DBConnection.hasOwnPlots(p.getName()) && !gs.exists()) {
 			// Bukkit.createWorld((WorldCreator) WorldCreator.name("test").createWorld());
 			// wenn nicht-> erstellen und hinteleportieren
 			WorldHandler.createWorldDir(p);
-			p.sendMessage(Main.prefix + StringGetterBau.getString(p,"plotGenerating"));
+			p.sendMessage(Main.prefix + StringGetterBau.getString(p, "plotGenerating"));
 		}
 		World world = WorldHandler.loadWorld(p.getUniqueId().toString());
 
@@ -61,7 +60,6 @@ public class onPlayerJoin implements Listener {
 		guiItem.setItemMeta(guiMeta);
 		p.getInventory().setItem(0, guiItem);
 		new ScoreBoardBau(p);
-		conn.closeConn();
 
 	}
 

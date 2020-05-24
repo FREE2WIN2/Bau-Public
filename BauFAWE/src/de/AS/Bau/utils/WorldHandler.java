@@ -56,11 +56,9 @@ public class WorldHandler {
 		neu.setWritable(true, false);
 		copyFolder_raw(vorlage, neu);
 
-		DBConnection conn = new DBConnection();
-		if (!conn.hasOwnPlots(p)) {
-			conn.registerNewPlot(p);
+		if (!DBConnection.hasOwnPlots(p.getName())) {
+			DBConnection.registerNewPlot(p.getUniqueId());
 		}
-		conn.closeConn();
 		// worldguard regionen
 		File worldGuardWorldDir = new File(Bukkit.getWorldContainer(), "plugins/WorldGuard/worlds/" + uuid);
 		if (!worldGuardWorldDir.exists()) {
@@ -83,10 +81,10 @@ public class WorldHandler {
 		}
 	}
 
-	public static boolean deleteWorld(World w, DBConnection conn) {
+	public static boolean deleteWorld(World w) {
 		Bukkit.getServer().unloadWorld(w, true);
 		if (w.getWorldFolder().exists()) {
-			if (deleteDir(w.getWorldFolder()) && conn.deleteGs(w.getName())) {
+			if (deleteDir(w.getWorldFolder()) && DBConnection.deleteGs(w.getName())) {
 				File file = new File(Bukkit.getWorldContainer(), "plugins/WorldGuard/worlds/" + w.getName());
 				file.delete();
 				return true;

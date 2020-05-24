@@ -106,11 +106,9 @@ private void logeintrag(World world, int size) {
 		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy' 'HH:mm:ss");
 		Date date = new Date();
 		time = "["+formatter.format(date)+"]";
-		DBConnection conn = new DBConnection();
-		fw.write(time + " " + world.getName() + " " + size + "Entities Entfernt! ->"+conn.getName(world.getName())+"\n");
+		fw.write(time + " " + world.getName() + " " + size + "Entities Entfernt! ->"+DBConnection.getName(world.getName())+"\n");
 		fw.flush();
 		fw.close();
-		conn.closeConn();
 	} catch (IOException e) {
 		e.printStackTrace();
 	}

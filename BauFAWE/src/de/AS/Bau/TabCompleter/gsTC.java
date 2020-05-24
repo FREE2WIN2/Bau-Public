@@ -34,22 +34,20 @@ public class gsTC implements TabCompleter {
 				}
 				return HelperMethods.checkFortiped(args[0], out);
 			} else if (args.length == 2) {
-				DBConnection conn = new DBConnection();
 				ResultSet rs;
 				switch (args[0]) {
 				case "delete":
 					if(!p.hasPermission("admin")) {
 						return out;
 					}
-					out.addAll(conn.getAllWorlds());
+					out.addAll(DBConnection.getAllWorlds());
 					return HelperMethods.checkFortiped(args[1], out);
 				case "tp":
-					rs = conn.getMemberedPlots(p);
+					rs = DBConnection.getMemberedPlots(p.getUniqueId());
 					try {
 						while (rs.next()) {
-							out.add(conn.getName(rs.getString(1)));
+							out.add(DBConnection.getName(rs.getString(1)));
 						}
-						conn.closeConn();
 						return HelperMethods.checkFortiped(args[1], out);
 					} catch (SQLException e) {
 						e.printStackTrace();
@@ -62,21 +60,18 @@ public class gsTC implements TabCompleter {
 						
 					}
 					out.remove(p.getName());
-					conn.closeConn();
 					return HelperMethods.checkFortiped(args[1], out);
 				case "remove":
-					rs = conn.getMember(p.getUniqueId().toString());
+					rs = DBConnection.getMember(p.getUniqueId().toString());
 					try {
 						while (rs.next()) {
-							out.add(conn.getName(rs.getString(1)));
+							out.add(DBConnection.getName(rs.getString(1)));
 						}
 					} catch (SQLException e) {
 						e.printStackTrace();
 					}
-					conn.closeConn();
 					return HelperMethods.checkFortiped(args[1], out);
 				}
-				conn.closeConn();
 			}
 
 		}

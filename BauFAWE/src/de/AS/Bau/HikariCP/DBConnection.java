@@ -14,7 +14,7 @@ public class DBConnection {
 	public DBConnection() {
 	}
 
-	public ResultSet getMemberedPlots(UUID uuidPlayer) {
+	public static ResultSet getMemberedPlots(UUID uuidPlayer) {
 		String uuid = uuidPlayer.toString();
 		try {
 			PreparedStatement statement = DataSource.getConnection()
@@ -28,7 +28,7 @@ public class DBConnection {
 		}
 	}
 
-	public boolean hasOwnPlots(String playerName) {
+	public static  boolean hasOwnPlots(String playerName) {
 		String uuid = getUUID(playerName);
 		try {
 			PreparedStatement statement = DataSource.getConnection()
@@ -46,7 +46,7 @@ public class DBConnection {
 		}
 	}
 
-	public boolean registerNewPlot(UUID owner) {
+	public static boolean registerNewPlot(UUID owner) {
 		String uuid = owner.toString();
 		try {
 			PreparedStatement statement = DataSource.getConnection()
@@ -59,7 +59,7 @@ public class DBConnection {
 		}
 	}
 
-	public boolean addMember(UUID owner, String memberName) {
+	public static boolean addMember(UUID owner, String memberName) {
 		String ownerUUID = owner.toString();
 		String memberUUID = getUUID(memberName);
 		try {
@@ -74,7 +74,7 @@ public class DBConnection {
 		}
 	}
 
-	public boolean removeMember(String uuidOwner, String memberName) {
+	public static boolean removeMember(String uuidOwner, String memberName) {
 		String memberUUID = getUUID(memberName);
 		try {
 			PreparedStatement statement = DataSource.getConnection()
@@ -88,7 +88,7 @@ public class DBConnection {
 		}
 	}
 
-	public boolean isMember(UUID member, String ownerName) {
+	public static boolean isMember(UUID member, String ownerName) {
 		String memberUUID = member.toString();
 		String ownerUUID = getUUID(ownerName);
 		if (memberUUID.equals(ownerUUID)) {
@@ -108,7 +108,7 @@ public class DBConnection {
 		}
 	}
 
-	public String getUUID(String name) {
+	public static String getUUID(String name) {
 		try {
 			PreparedStatement statement = DataSource.getConnection()
 					.prepareStatement("SELECT `uuid` FROM `Player` WHERE `name` = ?");
@@ -125,7 +125,7 @@ public class DBConnection {
 		}
 	}
 
-	public String getName(String UUID) {
+	public static String getName(String UUID) {
 		try {
 			PreparedStatement statement = DataSource.getConnection()
 					.prepareStatement("SELECT `name` FROM `Player` WHERE `UUID` = ?");
@@ -142,11 +142,11 @@ public class DBConnection {
 		}
 	}
 
-	public String getLanguage(Player p) {
+	public static String getLanguage(Player p) {
 		return getLanguage(p.getUniqueId().toString());
 	}
 
-	public String getLanguage(String uuid) {
+	public static String getLanguage(String uuid) {
 		try {
 			PreparedStatement statement = DataSource.getConnection()
 					.prepareStatement("SELECT `countrycode` FROM `Player` WHERE `UUID`= ?");
@@ -163,7 +163,7 @@ public class DBConnection {
 		}
 	}
 
-	public ResultSet getMember(String plotName) {
+	public static ResultSet getMember(String plotName) {
 		try {
 			PreparedStatement statement = DataSource.getConnection()
 					.prepareStatement("SELECT Player_UUID FROM `Player_has_Plot` WHERE `Plot_PlotID` = ?");
@@ -176,7 +176,7 @@ public class DBConnection {
 		}
 	}
 
-	public boolean deleteGs(String uuid) {
+	public static boolean deleteGs(String uuid) {
 		try {
 			PreparedStatement statement = DataSource.getConnection()
 					.prepareStatement("DELETE FROM `Player_has_Plot` WHERE `Plot_PlotID` = ?");
@@ -196,7 +196,7 @@ public class DBConnection {
 
 	}
 
-	public boolean addMail(String sender, String uuidReciever, String message) {
+	public static boolean addMail(String sender, String uuidReciever, String message) {
 		try {
 			PreparedStatement statement = DataSource.getConnection()
 					.prepareStatement("INSERT INTO Mail(`PlayerUUID`,`sender`,`message`) VALUES(?,?,?)");
@@ -211,7 +211,7 @@ public class DBConnection {
 
 	}
 
-	public Set<String> getAllWorlds() {
+	public static Set<String> getAllWorlds() {
 		SortedSet<String> out = new TreeSet<>();
 		try {
 			PreparedStatement statement = DataSource.getConnection()

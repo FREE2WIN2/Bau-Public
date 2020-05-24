@@ -22,6 +22,7 @@ import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 
+import de.AS.Bau.HikariCP.DataSource;
 import de.AS.Bau.Listener.ClickListener;
 import de.AS.Bau.Listener.ExplosioneventListener;
 import de.AS.Bau.Listener.SignListener;
@@ -77,6 +78,7 @@ public class Main extends JavaPlugin {
 
 		gs.startCheckForTempAdd();
 		WorldHandler.checkForWorldsToUnload();
+		new DataSource();
 		super.onEnable();
 	}
 

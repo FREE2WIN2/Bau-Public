@@ -51,12 +51,11 @@ public class GUI implements CommandExecutor, Listener {
 
 	@SuppressWarnings("deprecation")
 	public Inventory inventarErstellen(Player p) {
-		DBConnection conn = new DBConnection();
 		String worldname;
 		if (p.getWorld().getName().contains("test")) {
 			worldname = p.getWorld().getName();
 		} else {
-			worldname = conn.getName(p.getWorld().getName());
+			worldname = DBConnection.getName(p.getWorld().getName());
 		}
 
 		String inventoryName = StringGetterBau.getString(p, "inventoryName").replace("%r", worldname);
@@ -180,7 +179,6 @@ public class GUI implements CommandExecutor, Listener {
 		inv.setItem(42, enderPearl2IS);
 		inv.setItem(43, enderPearl3IS);
 		// close DBConnection
-		conn.closeConn();
 		return inv;
 	}
 
@@ -202,9 +200,7 @@ public class GUI implements CommandExecutor, Listener {
 					if (p.getWorld().getName().contains("test")) {
 						worldname = p.getWorld().getName();
 					} else {
-						DBConnection conn = new DBConnection();
-						worldname = conn.getName(p.getWorld().getName());
-						conn.closeConn();
+						worldname = DBConnection.getName(p.getWorld().getName());
 					}
 					if (invName.equals(StringGetterBau.getString(p, "inventoryName").replace("%r", worldname))
 							&& event.getClickedInventory().equals(pInv)) {
@@ -278,13 +274,12 @@ public class GUI implements CommandExecutor, Listener {
 
 	public static void showMember(Player p) {
 		PlayerConnection pConn = ((CraftPlayer) p).getHandle().playerConnection;
-		DBConnection conn = new DBConnection();
-		ResultSet rs = conn.getMember(p.getUniqueId().toString());
+		ResultSet rs = DBConnection.getMember(p.getUniqueId().toString());
 		ArrayList<String> memberlist = new ArrayList<>();
 		try {
 
 			while (rs.next()) {
-				memberlist.add(conn.getName(rs.getString(1)));
+				memberlist.add(DBConnection.getName(rs.getString(1)));
 			}
 			p.sendMessage(StringGetterBau.getString(p, "memberListHeader").replace("%r", p.getName()));
 			for (String memberName : memberlist) {
@@ -301,10 +296,8 @@ public class GUI implements CommandExecutor, Listener {
 					+ StringGetterBau.getString(p, "addMemberHover") + "\"}}}";
 			PacketPlayOutChat addMemberp = new PacketPlayOutChat(ChatSerializer.a(addMember));
 			pConn.sendPacket(addMemberp);
-			conn.closeConn();
 		} catch (SQLException e) {
 			e.printStackTrace();
-			conn.closeConn();
 		}
 	}
 
