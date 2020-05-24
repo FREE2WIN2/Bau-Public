@@ -25,6 +25,7 @@ import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
 import net.minecraft.server.v1_15_R1.BlockPosition;
 
+@SuppressWarnings("deprecation")
 public class FernzuenderListener implements Listener {
 	public static HashMap<UUID, Block> playersDetonator = new HashMap<>();
 	public static HashSet<UUID> blockedForFZ = new HashSet<>();
@@ -82,6 +83,7 @@ public class FernzuenderListener implements Listener {
 		}
 		BlockData bd = b.getState().getBlockData();
 		Switch switchData = (Switch) bd;
+		
 		Switch.Face face = switchData.getFace();
 		Block behind;
 		if (face.equals(Face.CEILING)) {

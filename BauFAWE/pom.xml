@@ -1,91 +1,112 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>de.AS</groupId>
-  <artifactId>Bau-FAWE</artifactId>
-  <version>2.0SNAPSHOT</version>
-  <name>Bau-FAWE</name>
-  <description>Bau-Plugin for MC Server WargearWorld.net</description>
-  
-  <scm>
-    <connection>scm:git@github.com:WargearWorld/Bau.git</connection>
-    <url>https://github.com/WargearWorld/Bau</url>
-    <developerConnection>scm:git:git@github.com:WargearWorld/Bau.git</developerConnection>
-    <tag>HEAD</tag>
-  </scm>
-    
-  <repositories>
-    <!-- This adds the Spigot Maven repository to the build -->
-    <repository>
-        <id>spigot-repo</id>
-        <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-    </repository>
-    <repository>
-       <id>enginehub-maven</id>
-       <url>http://maven.enginehub.org/repo/</url>
-    </repository>
-    <repository>
-        <id>sk89q-repo</id>
-        <url>https://maven.enginehub.org/repo/</url>
-    </repository>
-  </repositories>
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>de.AS</groupId>
+	<artifactId>Bau-FAWE</artifactId>
+	<version>2.0-SNAPSHOT</version>
+	<name>Bau-FAWE</name>
+	<description>Bau-Plugin for MC Server WargearWorld.net</description>
 
-  <dependencies>
-    <!--This adds the Spigot API artifact to the build -->
-    <dependency>
-           <groupId>org.spigotmc</groupId>
-           <artifactId>spigot-api</artifactId>
-           <version>1.15.2-R0.1-SNAPSHOT</version>
-           <scope>provided</scope>
-    </dependency>
+	<scm>
+		<connection>scm:git@github.com:WargearWorld/Bau.git</connection>
+		<url>https://github.com/WargearWorld/Bau</url>
+		<developerConnection>scm:git:git@github.com:WargearWorld/Bau.git</developerConnection>
+		<tag>HEAD</tag>
+	</scm>
 
-    <!--This adds the Bukkit API artifact to the build -->
-    <!-- Do not include this in the pom.xml file if the Spigot API is already added -->
-    <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>bukkit</artifactId>
-            <version>1.15.2-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-    </dependency>
-        
-    <dependency>
-       <groupId>com.sk89q.worldedit</groupId>
-       <artifactId>worldedit-bukkit</artifactId>
-       <version>7.1.0</version>
-    </dependency>
-    <dependency>
-        <groupId>com.sk89q.worldguard</groupId>
-        <artifactId>worldguard-bukkit</artifactId>
-        <version>7.0.1</version>
-        <scope>provided</scope>
-    </dependency>
-    
-    <dependency>
-        <groupId>com.zaxxer</groupId>
-        <artifactId>HikariCP</artifactId>
-        <version>3.4.5</version>
-    </dependency>
- 
-  </dependencies>
-  
-  <build>
-    <sourceDirectory>src</sourceDirectory>
-    <resources>
-      <resource>
-        <directory>src</directory>
-        <excludes>
-          <exclude>**/*.java</exclude>
-        </excludes>
-      </resource>
-    </resources>
-    <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.0</version>
-        <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+	<properties>
+        <!-- Dependency Versions -->
+        <version.spigot-api>1.14.4-R0.1-SNAPSHOT</version.spigot-api>
+        <version.worldedit>7.1.0</version.worldedit>
+        <version.worldguard>7.0.2</version.worldguard>
+
+        <!-- Plugin Versions -->
+        <version.maven-shade-plugin>3.2.3</version.maven-shade-plugin>
+
+        <!-- Settings -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.build.directory>C:\Users\timwe\Desktop\Server\Test 1.15\plugins</project.build.directory>
+        <project.build.finalName>${artifactId}-${version}</project.build.finalName>
+    </properties>
+
+	<repositories>
+		<!-- This adds the Spigot Maven repository to the build -->
+		<repository>
+			<id>spigot-repo</id>
+			<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+		</repository>
+		<repository>
+			<id>enginehub-maven</id>
+			<url>http://maven.enginehub.org/repo/</url>
+		</repository>
+		<repository>
+			<id>sk89q-repo</id>
+			<url>https://maven.enginehub.org/repo/</url>
+		</repository>
+
+	</repositories>
+
+	<dependencies>
+		<!--This adds the Spigot API artifact to the build -->
+		<dependency>
+			<groupId>org.spigotmc</groupId>
+			<artifactId>spigot-api</artifactId>
+			<version>1.15.2-R0.1-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+
+
+
+		<!--This adds the Bukkit API artifact to the build -->
+		<!-- Do not include this in the pom.xml file if the Spigot API is already 
+			added -->
+		<dependency>
+			<groupId>org.bukkit</groupId>
+			<artifactId>bukkit</artifactId>
+			<version>1.15.2-R0.1-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.sk89q.worldedit</groupId>
+			<artifactId>worldedit-bukkit</artifactId>
+			<version>7.1.0</version>
+		    <scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.sk89q.worldguard</groupId>
+			<artifactId>worldguard-bukkit</artifactId>
+			<version>7.0.1</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.zaxxer</groupId>
+			<artifactId>HikariCP</artifactId>
+			<version>3.4.5</version>
+			<scope>compile</scope>
+		</dependency>
+
+	</dependencies>
+
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>${version.maven-shade-plugin}</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+      			     </execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>

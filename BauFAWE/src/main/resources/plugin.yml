@@ -4,9 +4,10 @@ author: FREE2WIN
 main: de.AS.Bau.Main
 api-version: 1.15
 depend: [WorldEdit,WorldGuard]
+description: Bauplugin
 commands:
    stats:
-      description:
+      description: aab
    gs:
      usage: /<command> [list, info , tp, add, addtemp, remove] [PlayerName] [TempTime]
    tnt:

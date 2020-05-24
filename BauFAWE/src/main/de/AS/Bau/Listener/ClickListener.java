@@ -18,10 +18,11 @@ public class ClickListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onclick(PlayerInteractEvent e) {
+		
 		Player p = (Player) e.getPlayer();
 		ItemStack is = e.getItem();
 		if (!(is == null)) {
-			if (is.getItemMeta().getDisplayName().equals("§6GUI") && (e.getAction().equals(Action.RIGHT_CLICK_AIR)
+			if (is.getItemMeta().getDisplayName().equals("ï¿½6GUI") && (e.getAction().equals(Action.RIGHT_CLICK_AIR)
 					|| e.getAction().equals(Action.RIGHT_CLICK_BLOCK))) {
 				p.performCommand("gui");
 			} else if (is.getType().equals(Material.SPAWNER)) {

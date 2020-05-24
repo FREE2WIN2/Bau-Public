@@ -27,6 +27,7 @@ public class DataSource {
 		config.setUsername(user);
 		config.setPassword(passwd);
 		config.setSchema(database);
+		//config.setDataSourceClassName("org.mariadb.jdbc.MariaDbDataSource");
 		config.addDataSourceProperty("cachePrepStmts", "true");
 		config.addDataSourceProperty("prepStmtCacheSize", "250");
 		config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
