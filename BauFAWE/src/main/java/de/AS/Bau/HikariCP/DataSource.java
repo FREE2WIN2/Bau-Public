@@ -23,11 +23,14 @@ public class DataSource {
 		String host = main.getCustomConfig().getString("MySQL.host");
 		String user = main.getCustomConfig().getString("MySQL.user");
 		String passwd = main.getCustomConfig().getString("MySQL.password");
-		config.setJdbcUrl(host);
+		String connectionCommand = "jdbc:mysql://" + host + "/" + database + "?user=" + user + "&password="
+				+ passwd;
+		System.out.println(connectionCommand); 
+		config.setJdbcUrl(connectionCommand);
 		config.setUsername(user);
 		config.setPassword(passwd);
 		config.setSchema(database);
-		//config.setDataSourceClassName("org.mariadb.jdbc.MariaDbDataSource");
+//		config.setDataSourceClassName("com.mysql.jdbc.jdbc2.optional.MysqlDataSource");
 		config.addDataSourceProperty("cachePrepStmts", "true");
 		config.addDataSourceProperty("prepStmtCacheSize", "250");
 		config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");

@@ -106,7 +106,7 @@ public class GUI implements CommandExecutor, Listener {
 				StringGetterBau.getString(p, "teleportPlotThree"));
 		enderPearl3IS.setAmount(3);
 
-		// torch für sl
+		// torch fï¿½r sl
 		ItemStack stoplagIS;
 		if (Stoplag.getStatus(p.getLocation())) {
 			stoplagIS = ItemStackCreator.createNewItemStack(Material.REDSTONE,
@@ -120,10 +120,10 @@ public class GUI implements CommandExecutor, Listener {
 //				StringGetterBau.getString(p, "track"));
 
 		ItemStack observer = ItemStackCreator.createNewItemStack(Material.OBSERVER,
-				StringGetterBau.getString(p, "show")); // TODO oöffne tail GUI
+				StringGetterBau.getString(p, "show")); // TODO Ã¶ffne tail GUI
 
 		// NetherStar
-		ItemStack guiItem = ItemStackCreator.createNewItemStack(Material.NETHER_STAR, "§6GUI");
+		ItemStack guiItem = ItemStackCreator.createNewItemStack(Material.NETHER_STAR, "Â§6GUI");
 
 		// DS
 		ItemStack ds = new ItemStack(Material.DEBUG_STICK);
@@ -174,7 +174,7 @@ public class GUI implements CommandExecutor, Listener {
 		inv.setItem(38, enderPearl2IS);
 		inv.setItem(39, enderPearl3IS);
 
-		//TODO TestGrundstücke
+		//TODO TestGrundstÃ¼cke
 		inv.setItem(41, enderPearl1IS);
 		inv.setItem(42, enderPearl2IS);
 		inv.setItem(43, enderPearl3IS);
@@ -285,14 +285,14 @@ public class GUI implements CommandExecutor, Listener {
 			for (String memberName : memberlist) {
 				String hover = StringGetterBau.getString(p, "memberHoverRemove").replace("%r", memberName);
 				String add;
-				add = "{\"text\":\"§7[§6" + memberName
-						+ "§7] \",\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"/gs remove " + memberName
+				add = "{\"text\":\"Â§7[Â§6" + memberName
+						+ "Â§7] \",\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"/gs remove " + memberName
 						+ "\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"" + hover + "\"}}}";
 
 				PacketPlayOutChat listp = new PacketPlayOutChat(ChatSerializer.a(add));
 				pConn.sendPacket(listp);
 			}
-			String addMember = "{\"text\":\"§a[+]§r  \",\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"/gs add \"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\""
+			String addMember = "{\"text\":\"ï¿½a[+]ï¿½r  \",\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"/gs add \"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\""
 					+ StringGetterBau.getString(p, "addMemberHover") + "\"}}}";
 			PacketPlayOutChat addMemberp = new PacketPlayOutChat(ChatSerializer.a(addMember));
 			pConn.sendPacket(addMemberp);

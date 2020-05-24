@@ -27,8 +27,8 @@
 
         <!-- Settings -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.build.directory>C:\Users\timwe\Desktop\Server\Test 1.15\plugins</project.build.directory>
-        <project.build.finalName>${artifactId}-${version}</project.build.finalName>
+        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
     </properties>
 
 	<repositories>
@@ -45,26 +45,22 @@
 			<id>sk89q-repo</id>
 			<url>https://maven.enginehub.org/repo/</url>
 		</repository>
-
+		
 	</repositories>
 
 	<dependencies>
+		<dependency>
+      		<artifactId>spigotaa</artifactId>
+      		<groupId>spigotbb</groupId>
+      		<version>LATEST</version>
+    		<scope>system</scope>
+    		<systemPath>C:/WGArena/spigot-1.15.2.jar</systemPath>
+ 		</dependency>
+	
 		<!--This adds the Spigot API artifact to the build -->
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
-			<version>1.15.2-R0.1-SNAPSHOT</version>
-			<scope>provided</scope>
-		</dependency>
-
-
-
-		<!--This adds the Bukkit API artifact to the build -->
-		<!-- Do not include this in the pom.xml file if the Spigot API is already 
-			added -->
-		<dependency>
-			<groupId>org.bukkit</groupId>
-			<artifactId>bukkit</artifactId>
 			<version>1.15.2-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>

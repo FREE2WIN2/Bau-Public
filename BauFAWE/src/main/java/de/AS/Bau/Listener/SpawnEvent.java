@@ -65,7 +65,7 @@ public void onEntitSpawn(EntitySpawnEvent e) {
 			}
 		}
 	}else if(etype.equals(EntityType.PRIMED_TNT)||etype.equals(Material.FIRE_CHARGE)){
-		//gucken ob in dern Nähe ungezündetes TNT ist
+		//gucken ob in dern NÃ¤he ungezÃ¼ndetes TNT ist
 		if(e.getLocation().getWorld().getEntities().size() > 1000) {
 			
 			logeintrag(e.getLocation().getWorld(),e.getLocation().getWorld().getEntities().size());

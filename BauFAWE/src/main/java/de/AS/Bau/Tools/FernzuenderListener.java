@@ -56,7 +56,7 @@ public class FernzuenderListener implements Listener {
 				p.sendMessage(Main.prefix + StringGetterBau.getString(p, "nothingSaved"));
 			}
 		} else if (a.equals(Action.RIGHT_CLICK_BLOCK) || a.equals(Action.LEFT_CLICK_BLOCK)) {
-			// speichern oder zündeln!
+			// speichern oder zÃ¼ndeln!
 			Block b = e.getClickedBlock();
 			if (b.getBlockData() instanceof Switch) {
 				playersDetonator.put(p.getUniqueId(), b);

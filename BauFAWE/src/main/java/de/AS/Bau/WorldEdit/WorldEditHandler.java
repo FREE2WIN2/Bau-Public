@@ -218,7 +218,7 @@ public class WorldEditHandler {
 			AffineTransform transform = new AffineTransform().rotateY(180);
 			holder.setTransform(holder.getTransform().combine((Transform) transform));
 			session.setClipboard(holder);
-			p.sendMessage("§dThe clipboard copy has been rotatet by 180 degrees.");
+			p.sendMessage("Â§dThe clipboard copy has been rotatet by 180 degrees.");
 		} catch (EmptyClipboardException e) {
 			e.printStackTrace();
 		}

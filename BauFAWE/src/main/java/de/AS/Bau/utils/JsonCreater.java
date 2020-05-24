@@ -47,11 +47,5 @@ public class JsonCreater {
  public void send(Player p) {
 	 ((CraftPlayer)p).getHandle().playerConnection.sendPacket(new PacketPlayOutChat(ChatSerializer.a(create())));
  }
- public void kill() {
-	 try {
-		this.finalize();
-	} catch (Throwable e) {
-		e.printStackTrace();
-	}
- }
+
 }

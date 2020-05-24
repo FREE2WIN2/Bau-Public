@@ -147,12 +147,12 @@ public class TestBlockSklaveCore implements CommandExecutor, Listener {
 
 //4. Tier 1
 
-		inv.setItem(3, Banner.ONE.setName("§rTier I"));
+		inv.setItem(3, Banner.ONE.setName("Â§rTier I"));
 //5. Tier 2
-		inv.setItem(4, Banner.TWO.setName("§rTier II"));
+		inv.setItem(4, Banner.TWO.setName("Â§rTier II"));
 //6. Tier 3/Tier 4
-		inv.setItem(5, Banner.THREE.setName("§rTier III/IV"));
-		// inv.setItem(6, Banner.FOUR.setName("§rTier IV"));
+		inv.setItem(5, Banner.THREE.setName("Â§rTier III/IV"));
+		// inv.setItem(6, Banner.FOUR.setName("Â§rTier IV"));
 		// 9. gui/close
 		ItemStack close = new ItemStack(Material.BARRIER);
 		ItemMeta closeim = close.getItemMeta();
@@ -207,16 +207,16 @@ public class TestBlockSklaveCore implements CommandExecutor, Listener {
 		String rgID = regions.getApplicableRegionsIDs(
 				BlockVector3.at(p.getLocation().getX(), p.getLocation().getY(), p.getLocation().getZ())).get(0);
 		switch (clickedName) {
-		case "§rTier I":
+		case "Â§rTier I":
 			playersCurrentSelection.put(p.getUniqueId(), "T1_");
 			p.openInventory(richtungsInventory(p));
 			break;
-		case "§rTier II":
+		case "Â§rTier II":
 			playersCurrentSelection.put(p.getUniqueId(), "T2_");
 			p.openInventory(richtungsInventory(p));
 			break;
-		case "§rTier III/IV":
-		case "§rTier IV":
+		case "Â§rTier III/IV":
+		case "Â§rTier IV":
 			playersCurrentSelection.put(p.getUniqueId(), "T3_");
 			p.openInventory(richtungsInventory(p));
 			break;
@@ -251,7 +251,7 @@ public class TestBlockSklaveCore implements CommandExecutor, Listener {
 	}
 
 	private void typeInv(Player p, Inventory pInv, ItemStack clicked) {
-		String normal = "§rNormal";
+		String normal = "Â§rNormal";
 		String frame = StringGetterBau.getString(p, "frame");
 		String shield = StringGetterBau.getString(p, "shield");
 		String clickedName = clicked.getItemMeta().getDisplayName();
@@ -273,7 +273,7 @@ public class TestBlockSklaveCore implements CommandExecutor, Listener {
 		// norden
 
 		ItemStack isN = Banner.N.setName(StringGetterBau.getString(p, "facingNorth"));
-		// süden
+		// sï¿½den
 		ItemStack isS = Banner.S.setName(StringGetterBau.getString(p, "facingSouth"));
 		// setzen
 		Inventory inv = Bukkit.createInventory(null, 9, StringGetterBau.getString(p, "testBlockSklaveFacingInv"));
@@ -296,7 +296,7 @@ public class TestBlockSklaveCore implements CommandExecutor, Listener {
 		// normal
 		ItemStack isNormal = new ItemStack(Material.WHITE_WOOL);
 		ItemMeta imNormal = isNormal.getItemMeta();
-		imNormal.setDisplayName("§rNormal");
+		imNormal.setDisplayName("ï¿½rNormal");
 		isNormal.setItemMeta(imNormal);
 		// setzen
 		Inventory inv = Bukkit.createInventory(null, 9, StringGetterBau.getString(p, "testBlockSklaveTypeInv"));

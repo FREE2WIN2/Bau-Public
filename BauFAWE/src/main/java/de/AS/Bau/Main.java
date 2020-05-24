@@ -62,7 +62,7 @@ public class Main extends JavaPlugin {
 	public static StateFlag TntExplosion;
 	private static File customConfigFile;
 	private static YamlConfiguration customConfig;
-	public static String prefix = "§8[§6Bau§8] §r";
+	public static String prefix = "Â§8[Â§6BauÂ§8] Â§r";
 	private static File tempAddConfigFile;
 	private static YamlConfiguration tempAddConfig;
 

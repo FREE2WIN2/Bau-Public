@@ -56,7 +56,7 @@ public class onPlayerJoin implements Listener {
 		// item
 		ItemStack guiItem = new ItemStack(Material.NETHER_STAR);
 		ItemMeta guiMeta = guiItem.getItemMeta();
-		guiMeta.setDisplayName("ง6GUI");
+		guiMeta.setDisplayName("ยง6GUI");
 		guiItem.setItemMeta(guiMeta);
 		p.getInventory().setItem(0, guiItem);
 		new ScoreBoardBau(p);

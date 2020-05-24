@@ -55,7 +55,7 @@ public class PlotResetter implements CommandExecutor {
 			}
 				playerBlockedDelete.add(p.getUniqueId());
 			p.sendMessage(StringGetterBau.getString(p, "delePlot").replace("%r", ""+rgIDint));
-			// für jede Zeile rgid festlegen
+			// fÃ¼r jede Zeile rgid festlegen
 			ProtectedRegion rg = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(p.getWorld())).getRegion(rgID);
 			
 			int xmin = rg.getMinimumPoint().getBlockX();

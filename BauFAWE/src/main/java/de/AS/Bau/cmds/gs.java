@@ -75,7 +75,7 @@ public class gs implements CommandExecutor {
 
 			}
 			if (args[0].equalsIgnoreCase("new")) {
-				/* erste WArnung, dass GS gelöscht wird -> einschreiben in Liste */
+				/* erste WArnung, dass GS gelÃ¶scht wird -> einschreiben in Liste */
 				newPlot(p,1);
 				return true;
 			}
@@ -257,14 +257,14 @@ public class gs implements CommandExecutor {
 		for (String s : memberedPlots) {
 			String hover = StringGetterBau.getString(p, "listGsHover").replace("%r", s);
 			String name = s;
-			String txt = "{\"text\":\"§7[§6" + name
-					+ "§7]\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/gs tp " + name
+			String txt = "{\"text\":\"Â§7[Â§6" + name
+					+ "Â§7]\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/gs tp " + name
 					+ "\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"" + hover + "\"}}}";
 			IChatBaseComponent txtc = ChatSerializer.a(txt);
 			PacketPlayOutChat txtp = new PacketPlayOutChat(txtc);
 			pConn.sendPacket(txtp);
 		}
-		p.sendMessage("§7----------------------------");
+		p.sendMessage("ï¿½7----------------------------");
 	}
 
 	public void deletePlot(Player p, String playerName,boolean mute) {

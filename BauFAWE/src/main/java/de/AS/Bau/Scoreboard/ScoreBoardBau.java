@@ -107,15 +107,15 @@ public class ScoreBoardBau {
 			obj.unregister();
 		}
 		obj= board.registerNewObjective(p.getName(), p.getName() +"bbbb", p.getName() + "cccc");
-		obj.setDisplayName("§6Time: §c" + getTime());
+		obj.setDisplayName("Â§6Time: Â§c" + getTime());
 		obj.setDisplaySlot(DisplaySlot.SIDEBAR);
-		obj.getScore("§6Plot: §c" + getPlotNumber(p)).setScore(7);
-		obj.getScore("§8§l§m             §r  ").setScore(6);
-		obj.getScore("§6TNT: " + getTNT(p)).setScore(5);
-		obj.getScore("§8§l§m             §r ").setScore(4);
-		obj.getScore("§6Stoplag: " + getSl(p)).setScore(3);
-		obj.getScore("§8§l§m             §r").setScore(2);
-		obj.getScore("§6DesignTool: " + getDt(p)).setScore(1);
+		obj.getScore("Â§6Plot: Â§c" + getPlotNumber(p)).setScore(7);
+		obj.getScore("Â§8Â§lÂ§m             Â§r  ").setScore(6);
+		obj.getScore("Â§6TNT: " + getTNT(p)).setScore(5);
+		obj.getScore("Â§8Â§lÂ§m             Â§r ").setScore(4);
+		obj.getScore("Â§6Stoplag: " + getSl(p)).setScore(3);
+		obj.getScore("Â§8Â§lÂ§m             Â§r").setScore(2);
+		obj.getScore("Â§6DesignTool: " + getDt(p)).setScore(1);
 		p.setScoreboard(board);
 	}
 
@@ -129,7 +129,7 @@ public class ScoreBoardBau {
 				return StringGetterBau.getString(p, "boardOff");
 			}
 		} else {
-			return "§cError ";
+			return "Â§cError ";
 		}
 
 	}
@@ -150,7 +150,7 @@ public class ScoreBoardBau {
 //					.get(0).replace("plot", "");
 		
 //		} else {
-//			return "§cError";
+//			return "Â§cError";
 //		}
 	///	System.out.println(onPlayerMove.playersLastPlot.get(p).replace("plot", ""));
 		return onPlayerMove.playersLastPlot.get(p).replace("plot", "");

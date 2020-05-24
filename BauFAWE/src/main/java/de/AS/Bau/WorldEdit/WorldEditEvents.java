@@ -260,7 +260,7 @@ public class WorldEditEvents implements Listener {
 
 	private BlockFace getFacing(float pitch, float yaw) {
 		//Pitch: oben/Unten
-		//Yaw: nord, ost, süd, west..
+		//Yaw: nord, ost, sÃ¼d, west..
 		if(yaw < 0) {
 			yaw = (yaw * (-1));
 		}
