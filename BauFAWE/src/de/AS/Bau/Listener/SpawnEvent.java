@@ -53,7 +53,6 @@ public void onEntitSpawn(EntitySpawnEvent e) {
 				}
 				for(Player p:e.getLocation().getWorld().getPlayers()) {
 					p.sendMessage(Main.prefix +StringGetterBau.getString(p,"tooManyEntities"));
-					//Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kick "+ p.getName());
 				}
 				worldSpawnEntitiesBlocked.add(e.getLocation().getWorld().getUID());
 				Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.getPlugin(), new Runnable() {
