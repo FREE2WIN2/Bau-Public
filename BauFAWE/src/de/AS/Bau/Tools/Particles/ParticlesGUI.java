@@ -89,13 +89,13 @@ public class ParticlesGUI implements Listener {
 			DyeColor color = DyeColor.getByDyeData(clicked.getData().getData());
 			event.setCancelled(true);
 			p.closeInventory();
-			p.performCommand("particles clipboard " + color.getColor().getRed() + " " + color.getColor().getGreen() + " " + color.getColor().getBlue() + " " + color.name());
+			p.performCommand("particles clipboard " + color.name());
 		
 		} else if (event.getView().getTitle().equals(StringGetterBau.getString(p, "particles_gui_changeColorSelectionTitle"))) {
 			DyeColor color = DyeColor.getByDyeData(clicked.getData().getData());
 			event.setCancelled(true);
 			p.closeInventory();
-			p.performCommand("particles selection " + color.getColor().getRed() + " " + color.getColor().getGreen() + " " + color.getColor().getBlue() + " " + color.name());
+			p.performCommand("particles selection " + color.name());
 		}
 
 	}
