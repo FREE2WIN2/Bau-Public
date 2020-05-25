@@ -33,6 +33,7 @@ import de.AS.Bau.WorldEdit.UndoManager;
 import de.AS.Bau.WorldEdit.WorldEditHandler;
 import de.AS.Bau.WorldEdit.WorldGuardHandler;
 import de.AS.Bau.utils.Banner;
+import de.AS.Bau.utils.ItemStackCreator;
 
 public class TestBlockSklaveCore implements CommandExecutor, Listener {
 
@@ -134,35 +135,33 @@ public class TestBlockSklaveCore implements CommandExecutor, Listener {
 	public Inventory tbsStartInv(Player p) {
 		String inventoryName = StringGetterBau.getString(p, "testBlockSklaveTierInv");
 		Inventory inv = Bukkit.createInventory(null, 9, inventoryName);
-
-//erstes item: letzter Block
-
+		
+		/*erstes item: letzter Block*/
+		
 		ItemStack is2 = new ItemStack(Material.PLAYER_HEAD, 1, (byte) 3);
-
 		SkullMeta meta = (SkullMeta) is2.getItemMeta();
 		meta.setDisplayName(StringGetterBau.getString(p, "lastPaste"));
 		meta.setOwner(p.getName());
 		is2.setItemMeta(meta);
 		inv.addItem(is2);
 
-//4. Tier 1
-
+		/* 4. Tier 1 */
+		
 		inv.setItem(3, Banner.ONE.setName("§rTier I"));
-//5. Tier 2
+		
+		/* 5. Tier 2 */
+		
 		inv.setItem(4, Banner.TWO.setName("§rTier II"));
-//6. Tier 3/Tier 4
+
+		/* 6. Tier 3/Tier 4 */
+		
 		inv.setItem(5, Banner.THREE.setName("§rTier III/IV"));
-		// inv.setItem(6, Banner.FOUR.setName("§rTier IV"));
 		// 9. gui/close
-		ItemStack close = new ItemStack(Material.BARRIER);
-		ItemMeta closeim = close.getItemMeta();
-		closeim.setDisplayName(StringGetterBau.getString(p, "close"));
-		close.setItemMeta(closeim);
+		ItemStack close = ItemStackCreator.createNewItemStack(Material.BARRIER,StringGetterBau.getString(p, "close"));
 		inv.setItem(8, close);
-//bei den tieren kommt danach die Richtung und danach ob mit Schuld oder ohne. das wir dann in der 2 gespeichert(letzter Block..)
 		return inv;
 	}
-
+	
 	@EventHandler
 	public void onInventoryclick(InventoryClickEvent event) {
 		Player p = (Player) event.getWhoClicked();

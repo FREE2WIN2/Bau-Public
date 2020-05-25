@@ -1,10 +1,5 @@
 package de.AS.Bau.WorldEdit;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -15,9 +10,6 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.RunContext;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -40,7 +32,9 @@ public class WorldEditHandler {
 	private final static WorldEdit we = WorldEdit.getInstance();
 	
 
-	
+	/**
+	 * paste async at the specific pastepostion of a region(get coords out of coords.ymls)
+	 */
  	public static void pasten(String fileName, String rgID, Player p, boolean ignoreAir, boolean undo, boolean tbs) {
 		Clipboard board = createClipboard(fileName);
 		BlockVector3 at = CoordGetter.getPastePosition(rgID);
@@ -49,19 +43,8 @@ public class WorldEditHandler {
 	}
 
 	public static Clipboard createClipboard(String filename) {
-		File schem = new File(Main.getPlugin().getConfig().getString("schempath") + "/TestBlockSklave" + "/" + filename + ".schem");
-		ClipboardFormat format = ClipboardFormats.findByFile(schem);
-		try {
-			ClipboardReader reader = format.getReader(new FileInputStream(schem));
-			Clipboard clipboard = reader.read();
-			return clipboard;
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
-
+		Schematic schem = new Schematic("TestBlockSklave",filename + ".schem");
+		return schem.getClip();
 	}
 
 	public static void pasteOperationAsync(ClipboardHolder clipboardHolder, Player p, BlockVector3 to,
