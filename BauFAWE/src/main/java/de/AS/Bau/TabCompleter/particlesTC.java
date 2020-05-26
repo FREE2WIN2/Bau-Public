@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import de.AS.Bau.StringGetterBau;
 import de.AS.Bau.Tools.Particles.Colors;
 import de.AS.Bau.utils.HelperMethods;
+import de.AS.Bau.utils.Language;
 
 public class particlesTC implements TabCompleter {
 
@@ -20,13 +21,13 @@ public class particlesTC implements TabCompleter {
 			return null;
 		}
 		Player p = (Player) sender;
-		String lang = "en";
+		Language lang = Language.DE;
 		if (StringGetterBau.playersLanguage.containsKey(p.getUniqueId())) {
 			lang = StringGetterBau.playersLanguage.get(p.getUniqueId());
 		}
 		List<String> out = new LinkedList<>();
 		if (args.length == 1) {
-			if (lang.equalsIgnoreCase("en")) {
+			if (lang == Language.EN) {
 				out.add("on");
 				out.add("off");
 			} else {

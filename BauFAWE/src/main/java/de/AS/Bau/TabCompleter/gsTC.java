@@ -1,7 +1,5 @@
 package de.AS.Bau.TabCompleter;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +32,6 @@ public class gsTC implements TabCompleter {
 				}
 				return HelperMethods.checkFortiped(args[0], out);
 			} else if (args.length == 2) {
-				ResultSet rs;
 				switch (args[0]) {
 				case "delete":
 					if(!p.hasPermission("admin")) {
@@ -43,15 +40,7 @@ public class gsTC implements TabCompleter {
 					out.addAll(DBConnection.getAllWorlds());
 					return HelperMethods.checkFortiped(args[1], out);
 				case "tp":
-					rs = DBConnection.getMemberedPlots(p.getUniqueId());
-					try {
-						while (rs.next()) {
-							out.add(DBConnection.getName(rs.getString(1)));
-						}
-						return HelperMethods.checkFortiped(args[1], out);
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
+					out.addAll(DBConnection.getMemberedPlots(p.getUniqueId()));
 					break;
 				case "add":
 				//case "addtemp":
@@ -62,14 +51,7 @@ public class gsTC implements TabCompleter {
 					out.remove(p.getName());
 					return HelperMethods.checkFortiped(args[1], out);
 				case "remove":
-					rs = DBConnection.getMember(p.getUniqueId().toString());
-					try {
-						while (rs.next()) {
-							out.add(DBConnection.getName(rs.getString(1)));
-						}
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
+					out.addAll(DBConnection.getMember(p.getUniqueId().toString()));
 					return HelperMethods.checkFortiped(args[1], out);
 				}
 			}

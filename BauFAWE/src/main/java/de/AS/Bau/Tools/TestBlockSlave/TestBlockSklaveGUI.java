@@ -42,7 +42,7 @@ public class TestBlockSklaveGUI implements Listener{
 
 	public static Inventory tbsStartInv(Player p, Set<TestBlock> favorites) {
 		String inventoryName = StringGetterBau.getString(p, "testBlockSklaveTierInv");
-		Inventory inv = Bukkit.createInventory(null, 45*2, inventoryName);
+		Inventory inv = Bukkit.createInventory(null, 45, inventoryName);
 		
 		inv.setItem(2, ItemStackCreator.createNewItemStack(Material.WHITE_WOOL, "§6Editor"));
 		inv.setItem(4, ItemStackCreator.createNewItemStack(Material.WOODEN_AXE, StringGetterBau.getString(p, "tbs_gui_newTB")));

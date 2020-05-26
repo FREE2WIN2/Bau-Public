@@ -23,9 +23,7 @@ public class DataSource {
 		String host = main.getCustomConfig().getString("MySQL.host");
 		String user = main.getCustomConfig().getString("MySQL.user");
 		String passwd = main.getCustomConfig().getString("MySQL.password");
-		String connectionCommand = "jdbc:mysql://" + host + "/" + database + "?user=" + user + "&password="
-				+ passwd;
-		System.out.println(connectionCommand); 
+		String connectionCommand = "jdbc:mysql://" + host + "/" + database;
 		config.setJdbcUrl(connectionCommand);
 		config.setUsername(user);
 		config.setPassword(passwd);

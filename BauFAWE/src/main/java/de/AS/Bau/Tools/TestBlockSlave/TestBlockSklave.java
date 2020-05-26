@@ -1,5 +1,6 @@
 package de.AS.Bau.Tools.TestBlockSlave;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -31,8 +32,8 @@ public class TestBlockSklave {
 
 	private HashSet<TestBlock> readTestBlocks(int tier) {
 		HashSet<TestBlock> outSet = new HashSet<>();
-		try {
-			PreparedStatement statement = DataSource.getConnection().prepareStatement(
+		try(Connection conn = DataSource.getConnection()) {
+			PreparedStatement statement = conn.prepareStatement(
 					"SELECT * FROM TestBlock,Player WHERE Player.UUID = ? AND TestBlock.tier = ? AND Player.UUID = TestBlock.owner");
 			statement.setString(1, owner.toString());
 			statement.setInt(1, tier);
@@ -49,7 +50,6 @@ public class TestBlockSklave {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
 		return outSet;
 	}
 

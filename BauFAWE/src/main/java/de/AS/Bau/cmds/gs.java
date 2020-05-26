@@ -1,8 +1,6 @@
 package de.AS.Bau.cmds;
 
 import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -40,6 +38,7 @@ public class gs implements CommandExecutor {
 	private HashSet<UUID> firstWarnNewPlot = new HashSet<>();
 	private HashSet<UUID> secondWarnNewPlot = new HashSet<>();
 	private HashSet<UUID> blocked = new HashSet<>();
+
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String string, String[] args) {
 
@@ -53,16 +52,8 @@ public class gs implements CommandExecutor {
 				// gs list
 				ArrayList<String> memberedPlots = new ArrayList<>();
 				memberedPlots.add(p.getName());
-				ResultSet rs = DBConnection.getMemberedPlots(p.getUniqueId());
-				try {
-					while (rs.next()) {
-						memberedPlots.add(DBConnection.getName(rs.getString(1)));
-					}
-					sendMemberedGs(p, memberedPlots);
-				} catch (SQLException e) {
-					e.printStackTrace();
-					p.sendMessage(Main.prefix + StringGetterBau.getString(p, "error"));
-				}
+				memberedPlots.addAll(DBConnection.getMemberedPlots(p.getUniqueId()));
+				sendMemberedGs(p, memberedPlots);
 				return true;
 
 			}
@@ -76,7 +67,7 @@ public class gs implements CommandExecutor {
 			}
 			if (args[0].equalsIgnoreCase("new")) {
 				/* erste WArnung, dass GS gelöscht wird -> einschreiben in Liste */
-				newPlot(p,1);
+				newPlot(p, 1);
 				return true;
 			}
 		} else if (args.length == 2) {
@@ -102,7 +93,8 @@ public class gs implements CommandExecutor {
 				break;
 			case "tp":
 				// if (conn.isMember(p, args[1]) || p.hasPermission("moderator")) {
-				if ((DBConnection.isMember(p.getUniqueId(), args[1]) || p.hasPermission("moderator")) && DBConnection.hasOwnPlots(args[1])) {
+				if ((DBConnection.isMember(p.getUniqueId(), args[1]) || p.hasPermission("moderator"))
+						&& DBConnection.hasOwnPlots(args[1])) {
 					String plotID = DBConnection.getUUID(args[1]);
 					p.teleport(CoordGetter.getTeleportLocation(WorldHandler.loadWorld(plotID), joinPLot));
 				} else {
@@ -119,7 +111,7 @@ public class gs implements CommandExecutor {
 				break;
 			case "new":
 				if (args[1].equals(p.getUniqueId().toString())) {
-					newPlot(p,2);
+					newPlot(p, 2);
 				}
 				break;
 			}
@@ -142,7 +134,7 @@ public class gs implements CommandExecutor {
 				break;
 			case "new":
 				if (args[1].equals(p.getUniqueId().toString()) && args[2].equals(p.getUniqueId().toString())) {
-					newPlot(p,3);
+					newPlot(p, 3);
 				}
 				break;
 			}
@@ -155,7 +147,7 @@ public class gs implements CommandExecutor {
 
 	private void newPlot(Player p, int argsLength) {
 		UUID uuid = p.getUniqueId();
-		if(blocked.contains(uuid)) {
+		if (blocked.contains(uuid)) {
 			Main.send(p, "gs_newPlotGeneration_antiSpam");
 			return;
 		}
@@ -165,7 +157,7 @@ public class gs implements CommandExecutor {
 			secondWarnNewPlot.remove(uuid);
 			firstWarnNewPlot.remove(uuid);
 			blocked.add(uuid);
-		} else if (firstWarnNewPlot.contains(uuid)&& argsLength == 2) {
+		} else if (firstWarnNewPlot.contains(uuid) && argsLength == 2) {
 			JsonCreater jsonMsg = new JsonCreater(Main.prefix + StringGetterBau.getString(p, "gs_newPlot_secondWarn"));
 			JsonCreater jsonMsgClick = new JsonCreater(StringGetterBau.getString(p, "gs_newPlot_secondWarn_click"));
 			jsonMsgClick.addHoverEvent(StringGetterBau.getString(p, "gs_newPlot_secondWarn_clickHover"));
@@ -173,7 +165,7 @@ public class gs implements CommandExecutor {
 					ClickAction.RUN_COMMAND)).send(p);
 
 			secondWarnNewPlot.add(uuid);
-		} else if(argsLength == 1) {
+		} else if (argsLength == 1) {
 			JsonCreater jsonMsg = new JsonCreater(Main.prefix + StringGetterBau.getString(p, "gs_newPlot_firstWarn"));
 			JsonCreater jsonMsgClick = new JsonCreater(StringGetterBau.getString(p, "gs_newPlot_firstWarn_click"));
 			jsonMsgClick.addHoverEvent(StringGetterBau.getString(p, "gs_newPlot_firstWarn_clickHover"));
@@ -211,7 +203,7 @@ public class gs implements CommandExecutor {
 	}
 
 	public void addMember(Player p, String playerName) {
-		if (DBConnection.isMember(UUID.fromString(DBConnection.getUUID(playerName)),p.getName())) {
+		if (DBConnection.isMember(UUID.fromString(DBConnection.getUUID(playerName)), p.getName())) {
 			p.sendMessage(Main.prefix + StringGetterBau.getString(p, "alreadyMember").replace("%r", playerName));
 		} else {
 			if (DBConnection.addMember(p.getUniqueId(), playerName)) {
@@ -267,13 +259,13 @@ public class gs implements CommandExecutor {
 		p.sendMessage("�7----------------------------");
 	}
 
-	public void deletePlot(Player p, String playerName,boolean mute) {
+	public void deletePlot(Player p, String playerName, boolean mute) {
 		String worldName = DBConnection.getUUID(playerName);
 		World w = WorldHandler.loadWorld(worldName);
 		for (Player a : w.getPlayers()) {
 			a.kickPlayer("GS DELETE");
 		}
-		if (WorldHandler.deleteWorld(w)&&!mute) {
+		if (WorldHandler.deleteWorld(w) && !mute) {
 			Main.send(p, "gsDeleted", playerName);
 		} else {
 			Main.send(p, "error");

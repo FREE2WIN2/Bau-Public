@@ -18,7 +18,6 @@
 
 	<properties>
         <!-- Dependency Versions -->
-        <version.spigot-api>1.14.4-R0.1-SNAPSHOT</version.spigot-api>
         <version.worldedit>7.1.0</version.worldedit>
         <version.worldguard>7.0.2</version.worldguard>
 

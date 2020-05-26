@@ -73,7 +73,6 @@
     <version.worldguard>7.0.2</version.worldguard>
     <version.maven-shade-plugin>3.2.3</version.maven-shade-plugin>
     <maven.compiler.source>11</maven.compiler.source>
-    <version.spigot-api>1.14.4-R0.1-SNAPSHOT</version.spigot-api>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <version.worldedit>7.1.0</version.worldedit>
   </properties>

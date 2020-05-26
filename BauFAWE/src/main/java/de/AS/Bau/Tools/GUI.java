@@ -3,6 +3,7 @@ package de.AS.Bau.Tools;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -274,13 +275,8 @@ public class GUI implements CommandExecutor, Listener {
 
 	public static void showMember(Player p) {
 		PlayerConnection pConn = ((CraftPlayer) p).getHandle().playerConnection;
-		ResultSet rs = DBConnection.getMember(p.getUniqueId().toString());
-		ArrayList<String> memberlist = new ArrayList<>();
-		try {
+		Set<String> memberlist = DBConnection.getMember(p.getUniqueId().toString());
 
-			while (rs.next()) {
-				memberlist.add(DBConnection.getName(rs.getString(1)));
-			}
 			p.sendMessage(StringGetterBau.getString(p, "memberListHeader").replace("%r", p.getName()));
 			for (String memberName : memberlist) {
 				String hover = StringGetterBau.getString(p, "memberHoverRemove").replace("%r", memberName);
@@ -296,9 +292,6 @@ public class GUI implements CommandExecutor, Listener {
 					+ StringGetterBau.getString(p, "addMemberHover") + "\"}}}";
 			PacketPlayOutChat addMemberp = new PacketPlayOutChat(ChatSerializer.a(addMember));
 			pConn.sendPacket(addMemberp);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
 	}
 
 }

@@ -267,7 +267,7 @@ public class TestBlockSklaveCore implements CommandExecutor, Listener {
 		// normal
 		ItemStack isNormal = new ItemStack(Material.WHITE_WOOL);
 		ItemMeta imNormal = isNormal.getItemMeta();
-		imNormal.setDisplayName("�rNormal");
+		imNormal.setDisplayName("§rNormal");
 		isNormal.setItemMeta(imNormal);
 		// setzen
 		Inventory inv = Bukkit.createInventory(null, 9, StringGetterBau.getString(p, "testBlockSklaveTypeInv"));
