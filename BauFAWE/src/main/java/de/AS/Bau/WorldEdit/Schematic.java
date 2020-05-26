@@ -11,11 +11,12 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 
 import de.AS.Bau.Main;
+import de.AS.Bau.utils.Facing;
 
 public class Schematic {
 
 	private File schemFile;
-	
+	private Facing facing;
 	/**
 	 * creates a new Schematic out of the owner-File of the Schem-System
 	 * 
@@ -23,7 +24,7 @@ public class Schematic {
 	 *              null: file directly in the schempath-dir
 	 * @param name: the name of the Schematic(WITH ENDING!)
 	 */ 
-	public Schematic(String dir, String name) {
+ 	public Schematic(String dir, String name) {
 		if(dir == null) {
 			schemFile = new File(Main.getPlugin().getCustomConfig().getString("schempath") + "/" + name);
 		}else {
@@ -35,7 +36,14 @@ public class Schematic {
 		}
 	}
 	
+	public void setFacing(Facing facing) {
+		this.facing = facing;
+	}
 	
+	public Facing getFacing() {
+		return facing;
+	}
+ 	
 	/**
 	 * @return returns the Clipboard out of this schematic
 	 *  if schematic not exists it returns null.

@@ -9,7 +9,8 @@ import org.bukkit.entity.Player;
 
 public class StringGetterBau {
 	public static HashMap<UUID, String> playersLanguage = new HashMap<>();
-
+	public
+	
 	public static String getString(Player p, String name) {
 		return getString(p.getUniqueId(), name);
 	}

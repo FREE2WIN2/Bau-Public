@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -45,7 +46,7 @@ public class TestBlockSklaveCore implements CommandExecutor, Listener {
 	public boolean onCommand(CommandSender sender, Command cmds, String string, String[] args) {
 		Player p = (Player) sender;
 		if (args.length == 0) {
-			p.openInventory(tbsStartInv(p));
+			p.openInventory(TestBlockSklaveGUI.tbsStartInv(p, new HashSet<TestBlock>()));
 			return true;
 		} else if (args.length == 1) {
 			if (args[0].equalsIgnoreCase("last")) {
@@ -131,36 +132,7 @@ public class TestBlockSklaveCore implements CommandExecutor, Listener {
 		return false;
 	}
 
-	@SuppressWarnings("deprecation")
-	public Inventory tbsStartInv(Player p) {
-		String inventoryName = StringGetterBau.getString(p, "testBlockSklaveTierInv");
-		Inventory inv = Bukkit.createInventory(null, 9, inventoryName);
-		
-		/*erstes item: letzter Block*/
-		
-		ItemStack is2 = new ItemStack(Material.PLAYER_HEAD, 1, (byte) 3);
-		SkullMeta meta = (SkullMeta) is2.getItemMeta();
-		meta.setDisplayName(StringGetterBau.getString(p, "lastPaste"));
-		meta.setOwner(p.getName());
-		is2.setItemMeta(meta);
-		inv.addItem(is2);
 
-		/* 4. Tier 1 */
-		
-		inv.setItem(3, Banner.ONE.setName("§rTier I"));
-		
-		/* 5. Tier 2 */
-		
-		inv.setItem(4, Banner.TWO.setName("§rTier II"));
-
-		/* 6. Tier 3/Tier 4 */
-		
-		inv.setItem(5, Banner.THREE.setName("§rTier III/IV"));
-		// 9. gui/close
-		ItemStack close = ItemStackCreator.createNewItemStack(Material.BARRIER,StringGetterBau.getString(p, "close"));
-		inv.setItem(8, close);
-		return inv;
-	}
 	
 	@EventHandler
 	public void onInventoryclick(InventoryClickEvent event) {
@@ -271,9 +243,9 @@ public class TestBlockSklaveCore implements CommandExecutor, Listener {
 	public Inventory richtungsInventory(Player p) {
 		// norden
 
-		ItemStack isN = Banner.N.setName(StringGetterBau.getString(p, "facingNorth"));
+		ItemStack isN = Banner.N.create(DyeColor.WHITE, DyeColor.BLACK,StringGetterBau.getString(p, "facingNorth"));
 		// s�den
-		ItemStack isS = Banner.S.setName(StringGetterBau.getString(p, "facingSouth"));
+		ItemStack isS = Banner.S.create(DyeColor.WHITE, DyeColor.BLACK,StringGetterBau.getString(p, "facingSouth"));
 		// setzen
 		Inventory inv = Bukkit.createInventory(null, 9, StringGetterBau.getString(p, "testBlockSklaveFacingInv"));
 		inv.setItem(2, isN);
