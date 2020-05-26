@@ -46,7 +46,7 @@ import de.AS.Bau.Tools.Stoplag;
 import de.AS.Bau.Tools.TntChest;
 import de.AS.Bau.Tools.Particles.Particles;
 import de.AS.Bau.Tools.Particles.ParticlesGUI;
-import de.AS.Bau.Tools.TestBlockSlave.TestBlockSklaveCore;
+import de.AS.Bau.Tools.TestBlockSlave.TestBlockSlaveCore;
 import de.AS.Bau.WorldEdit.UndoManager;
 import de.AS.Bau.WorldEdit.WorldEditEvents;
 import de.AS.Bau.WorldEdit.WorldEditPreCommand;
@@ -72,7 +72,7 @@ public class Main extends JavaPlugin {
 	public void onEnable() {
 		plugin = this;
 		createConfigs();
-		
+
 		registerCommands();
 		registerListener();
 
@@ -80,6 +80,7 @@ public class Main extends JavaPlugin {
 		WorldHandler.checkForWorldsToUnload();
 		new DataSource();
 		new StringGetterBau();
+		TestBlockSlaveCore.generateDefaultTestBlocks();
 		super.onEnable();
 	}
 
@@ -96,7 +97,7 @@ public class Main extends JavaPlugin {
 		new onPlayerRespawn(this);
 
 		PluginManager pm = Bukkit.getPluginManager();
-		pm.registerEvents(new TestBlockSklaveCore(), this);
+		pm.registerEvents(TestBlockSlaveCore.getInstance(), this);
 		pm.registerEvents(new eventsToCancel(), this);
 		pm.registerEvents(new Stoplag(), this);
 		pm.registerEvents(new WorldEditPreCommand(), this);
@@ -114,7 +115,7 @@ public class Main extends JavaPlugin {
 		getCommand("gs").setTabCompleter(new gsTC());
 		getCommand("tnt").setExecutor(new tnt());
 		getCommand("gui").setExecutor(new GUI());
-		getCommand("tbs").setExecutor(new TestBlockSklaveCore());
+		getCommand("tbs").setExecutor(TestBlockSlaveCore.getInstance());
 		getCommand("tbs").setTabCompleter(new tbsTC());
 		getCommand("sl").setExecutor(new Stoplag());
 		getCommand("dt").setExecutor(new DesignTool());
@@ -140,7 +141,7 @@ public class Main extends JavaPlugin {
 
 		Stoplag.stoplagConfigFile = createConfigFile("stoplag.yml");
 		Stoplag.stoplagConfig = createConfig(Stoplag.stoplagConfigFile);
-		
+
 		Particles.particlesConfigFile = createConfigFile("particles.yml");
 		Particles.particleConfig = createConfig(Particles.particlesConfigFile);
 	}
@@ -167,7 +168,7 @@ public class Main extends JavaPlugin {
 
 		return config;
 	}
-	
+
 	public static Main getPlugin() {
 		return plugin;
 	}
@@ -250,10 +251,10 @@ public class Main extends JavaPlugin {
 	public YamlConfiguration getTempAddConfig() {
 		return tempAddConfig;
 	}
-	
+
 	public static void send(Player p, String messageKey, String... args) {
 		String message = Main.prefix + StringGetterBau.getString(p, messageKey);
-		for(String rep:args) {
+		for (String rep : args) {
 			message = message.replaceFirst("%r", rep);
 		}
 		p.sendMessage(message);
@@ -261,7 +262,7 @@ public class Main extends JavaPlugin {
 
 	public static void send(Player p, boolean otherPrefix, String prefix, String messageKey, String... args) {
 		String message = prefix + StringGetterBau.getString(p, messageKey);
-		for(String rep:args) {
+		for (String rep : args) {
 			message = message.replaceFirst("%r", rep);
 		}
 		p.sendMessage(message);

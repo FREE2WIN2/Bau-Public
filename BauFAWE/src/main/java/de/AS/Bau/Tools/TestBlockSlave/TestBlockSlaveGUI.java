@@ -9,13 +9,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import de.AS.Bau.StringGetterBau;
+import de.AS.Bau.Tools.TestBlockSlave.TestBlock.CustomTestBlock;
 import de.AS.Bau.utils.Banner;
 import de.AS.Bau.utils.ItemStackCreator;
 
-public class TestBlockSklaveGUI implements Listener{
+public class TestBlockSlaveGUI implements Listener{
 
 	/* Main gui: 
 	 *  save Block as own TestBlock
@@ -40,7 +42,7 @@ public class TestBlockSklaveGUI implements Listener{
 	 */
 	
 
-	public static Inventory tbsStartInv(Player p, Set<TestBlock> favorites) {
+	public static Inventory tbsStartInv(Player p, Set<CustomTestBlock> favorites) {
 		String inventoryName = StringGetterBau.getString(p, "testBlockSklaveTierInv");
 		Inventory inv = Bukkit.createInventory(null, 45, inventoryName);
 		
@@ -61,7 +63,7 @@ public class TestBlockSklaveGUI implements Listener{
 		inv.setItem(26, ItemStackCreator.createNewItemStack(Material.BARRIER,StringGetterBau.getString(p, "tbs_gui_close")));
 		
 		int favIndex = 36;
-		for(TestBlock tb:favorites) {
+		for(CustomTestBlock tb:favorites) {
 			if(favIndex>=45) {
 				System.err.println("§c[TBS] §6TOO MANY FAVORITES: " + p.getName());
 				break;
@@ -76,4 +78,37 @@ public class TestBlockSklaveGUI implements Listener{
 	}
 
 
+	public static Inventory richtungsInventory(Player p) {
+		// norden
+
+		ItemStack isN = Banner.N.create(DyeColor.WHITE, DyeColor.BLACK,StringGetterBau.getString(p, "facingNorth"));
+		// s�den
+		ItemStack isS = Banner.S.create(DyeColor.WHITE, DyeColor.BLACK,StringGetterBau.getString(p, "facingSouth"));
+		// setzen
+		Inventory inv = Bukkit.createInventory(null, 9, StringGetterBau.getString(p, "testBlockSklaveFacingInv"));
+		inv.setItem(2, isN);
+		inv.setItem(6, isS);
+		return inv;
+	}
+
+	public static Inventory schildRahmenNormalInventory(Player p) {
+		// Rahmen
+		ItemStack isRahmen = new ItemStack(Material.SCAFFOLDING);
+		ItemMeta imRahmen = isRahmen.getItemMeta();
+		imRahmen.setDisplayName(StringGetterBau.getString(p, "frame"));
+		isRahmen.setItemMeta(imRahmen);
+		// normal
+		ItemStack isNormal = new ItemStack(Material.WHITE_WOOL);
+		ItemMeta imNormal = isNormal.getItemMeta();
+		imNormal.setDisplayName("§rNormal");
+		isNormal.setItemMeta(imNormal);
+		// setzen
+		Inventory inv = Bukkit.createInventory(null, 9, StringGetterBau.getString(p, "testBlockSklaveTypeInv"));
+		inv.setItem(1, ItemStackCreator.createNewItemStack(Material.SHIELD,StringGetterBau.getString(p, "shield")));
+		inv.setItem(4, isNormal);
+		inv.setItem(7, isRahmen);
+		return inv;
+	}
+	
+	
 }

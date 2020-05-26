@@ -1,5 +1,6 @@
 package de.AS.Bau.Tools;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.UUID;
 
@@ -18,8 +19,10 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
+import de.AS.Bau.WorldEdit.Schematic;
 import de.AS.Bau.WorldEdit.WorldEditHandler;
 import de.AS.Bau.utils.ClickAction;
+import de.AS.Bau.utils.Facing;
 import de.AS.Bau.utils.JsonCreater;
 import de.AS.Bau.utils.Scheduler;
 
@@ -72,7 +75,7 @@ public class PlotResetter implements CommandExecutor {
 			
 			World world = p.getWorld();
 			// paste
-			WorldEditHandler.pasten("ground", rgID, p,true,false,false);
+			WorldEditHandler.pasten(new Schematic("TestBlockSklave", "ground.schem", Facing.NORTH), rgID, p,true);
 			
 			int maxBlockChangePerTick = WorldEditHandler.maxBlockChangePerTick;
 			scheduler.setTask(Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), new Runnable() {

@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
-import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -17,74 +15,33 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.SkullMeta;
 
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.extent.clipboard.Clipboard;
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.session.ClipboardHolder;
-import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.RegionContainer;
-
-import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
-import de.AS.Bau.WorldEdit.UndoManager;
-import de.AS.Bau.WorldEdit.WorldEditHandler;
-import de.AS.Bau.WorldEdit.WorldGuardHandler;
-import de.AS.Bau.utils.Banner;
-import de.AS.Bau.utils.ItemStackCreator;
+import de.AS.Bau.Tools.TestBlockSlave.TestBlock.DefaultTestBlock;
+import de.AS.Bau.Tools.TestBlockSlave.TestBlock.TestBlock;
+import de.AS.Bau.utils.Facing;
 
-public class TestBlockSklaveCore implements CommandExecutor, Listener {
+public class TestBlockSlaveCore implements CommandExecutor, Listener {
 
-	public static HashMap<UUID, String> playerLastPaste = new HashMap<>();
 	public static HashSet<Player> playerBlockedDelete = new HashSet<>();
 	public HashMap<UUID, String> playersCurrentSelection = new HashMap<>();
+	public HashMap<UUID, TestBlockSlave> playersTestBlockSlave = new HashMap<>();
+	public static HashMap<String, DefaultTestBlock> defaultTestBlocks = new HashMap<>();
+	private static TestBlockSlaveCore instance;
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmds, String string, String[] args) {
 		Player p = (Player) sender;
 		if (args.length == 0) {
-			p.openInventory(TestBlockSklaveGUI.tbsStartInv(p, new HashSet<TestBlock>()));
+			getSlave(p).openGUI();
 			return true;
 		} else if (args.length == 1) {
 			if (args[0].equalsIgnoreCase("last")) {
-
-				if (playerLastPaste.containsKey(p.getUniqueId())) {
-					RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-					RegionManager regions = container.get(BukkitAdapter.adapt(p.getWorld()));
-					String rgID = regions.getApplicableRegionsIDs(
-							BlockVector3.at(p.getLocation().getX(), p.getLocation().getY(), p.getLocation().getZ()))
-							.get(0);
-
-					/* paste */
-
-					WorldEditHandler.pasten(playerLastPaste.get(p.getUniqueId()), rgID, p, true, true,true);
-					return true;
-				} else {
-					p.sendMessage(Main.prefix + StringGetterBau.getString(p, "noLastPaste"));
-					return true;
-				}
+				TestBlockSlave slave = getSlave(p);
+				slave.pasteBlock(slave.getlastTestBlock(), slave.getLastFacing());
+				return true;
 			} else if (args[0].equalsIgnoreCase("undo")) {
-				/* Undo last TB */
-				UndoManager manager;
-				if (!Main.playersUndoManager.containsKey(p.getUniqueId())) {
-					Main.send(p, "tbs_noUndo");
-					return true;
-				} else {
-					manager = Main.playersUndoManager.get(p.getUniqueId());
-				}
-				Clipboard undo = manager.getUndo();
-				if (undo == null) {
-					Main.send(p, "tbs_noUndo");
-					return true;
-				}
-				int x = undo.getOrigin().getBlockX();
-				int y = undo.getOrigin().getBlockY();
-				int z = undo.getOrigin().getBlockZ();
-				WorldEditHandler.pasteAsync(new ClipboardHolder(undo), BlockVector3.at(x, y, z), p, false, 1, false,true);
-				Main.send(p, "tbs_undo");
+				getSlave(p).undo();
 				return true;
 			} else {
 				return false;
@@ -117,12 +74,9 @@ public class TestBlockSklaveCore implements CommandExecutor, Listener {
 					return false;
 				}
 				String auswahl = tier + "_" + Richtung + "_" + typ;
-				String rgID = WorldGuardHandler.getPlotId(p.getLocation());
-
+				getSlave(p).pasteBlock(getDefaultBlock(auswahl), getFacing(auswahl));
 				/* paste */
 
-				WorldEditHandler.pasten(auswahl, rgID, p, true, true,true);
-				playerLastPaste.put(p.getUniqueId(), auswahl);
 				return true;
 			} else {
 				return false;
@@ -132,8 +86,13 @@ public class TestBlockSklaveCore implements CommandExecutor, Listener {
 		return false;
 	}
 
+	private TestBlockSlave getSlave(Player p) {
+		if (!playersTestBlockSlave.containsKey(p.getUniqueId())) {
+			playersTestBlockSlave.put(p.getUniqueId(), new TestBlockSlave(p));
+		}
+		return playersTestBlockSlave.get(p.getUniqueId());
+	}
 
-	
 	@EventHandler
 	public void onInventoryclick(InventoryClickEvent event) {
 		Player p = (Player) event.getWhoClicked();
@@ -173,36 +132,26 @@ public class TestBlockSklaveCore implements CommandExecutor, Listener {
 		String close = StringGetterBau.getString(p, "close");
 		String lastPaste = StringGetterBau.getString(p, "lastPaste");
 		String clickedName = clicked.getItemMeta().getDisplayName();
-		RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-		RegionManager regions = container.get(BukkitAdapter.adapt(p.getWorld()));
-		String rgID = regions.getApplicableRegionsIDs(
-				BlockVector3.at(p.getLocation().getX(), p.getLocation().getY(), p.getLocation().getZ())).get(0);
 		switch (clickedName) {
 		case "§rTier I":
 			playersCurrentSelection.put(p.getUniqueId(), "T1_");
-			p.openInventory(richtungsInventory(p));
+			p.openInventory(TestBlockSlaveGUI.richtungsInventory(p));
 			break;
 		case "§rTier II":
 			playersCurrentSelection.put(p.getUniqueId(), "T2_");
-			p.openInventory(richtungsInventory(p));
+			p.openInventory(TestBlockSlaveGUI.richtungsInventory(p));
 			break;
 		case "§rTier III/IV":
 		case "§rTier IV":
 			playersCurrentSelection.put(p.getUniqueId(), "T3_");
-			p.openInventory(richtungsInventory(p));
+			p.openInventory(TestBlockSlaveGUI.richtungsInventory(p));
 			break;
 		}
 		if (clickedName.equals(close)) {
 			p.closeInventory();
 		} else if (clickedName.equals(lastPaste)) {
-			if (playerLastPaste.containsKey(p.getUniqueId())) {
-
-				WorldEditHandler.pasten(playerLastPaste.get(p.getUniqueId()), rgID, p, true, true,true);
-				p.closeInventory();
-			} else {
-				p.closeInventory();
-				p.sendMessage(Main.prefix + StringGetterBau.getString(p, "noLastPaste"));
-			}
+			TestBlockSlave slave = getSlave(p);
+			slave.pasteBlock(slave.getlastTestBlock(), slave.getLastFacing());
 		}
 
 	}
@@ -218,7 +167,7 @@ public class TestBlockSklaveCore implements CommandExecutor, Listener {
 			current += "S_";
 		}
 		playersCurrentSelection.put(p.getUniqueId(), current);
-		p.openInventory(schildRahmenNormalInventory(p));
+		p.openInventory(TestBlockSlaveGUI.schildRahmenNormalInventory(p));
 	}
 
 	private void typeInv(Player p, Inventory pInv, ItemStack clicked) {
@@ -235,46 +184,48 @@ public class TestBlockSklaveCore implements CommandExecutor, Listener {
 			current += "S";
 		}
 		p.closeInventory();
-		String rgID = WorldGuardHandler.getPlotId(p.getLocation());
-		WorldEditHandler.pasten(current, rgID, p, true, true,true);
-		playerLastPaste.put(p.getUniqueId(), current);
+		getSlave(p).pasteBlock(getDefaultBlock(current), getFacing(current));
 	}
 
-	public Inventory richtungsInventory(Player p) {
-		// norden
-
-		ItemStack isN = Banner.N.create(DyeColor.WHITE, DyeColor.BLACK,StringGetterBau.getString(p, "facingNorth"));
-		// s�den
-		ItemStack isS = Banner.S.create(DyeColor.WHITE, DyeColor.BLACK,StringGetterBau.getString(p, "facingSouth"));
-		// setzen
-		Inventory inv = Bukkit.createInventory(null, 9, StringGetterBau.getString(p, "testBlockSklaveFacingInv"));
-		inv.setItem(2, isN);
-		inv.setItem(6, isS);
-		return inv;
+	private static Facing getFacing(String current) {
+		String face = current.split("_")[1];
+		if (face.equalsIgnoreCase("N")) {
+			return Facing.NORTH;
+		} else {
+			return Facing.SOUTH;
+		}
 	}
 
-	public Inventory schildRahmenNormalInventory(Player p) {
-		// Schild
-		ItemStack isSchild = new ItemStack(Material.SHIELD);
-		ItemMeta imSchild = isSchild.getItemMeta();
-		imSchild.setDisplayName(StringGetterBau.getString(p, "shield"));
-		isSchild.setItemMeta(imSchild);
-		// Rahmen
-		ItemStack isRahmen = new ItemStack(Material.SCAFFOLDING);
-		ItemMeta imRahmen = isRahmen.getItemMeta();
-		imRahmen.setDisplayName(StringGetterBau.getString(p, "frame"));
-		isRahmen.setItemMeta(imRahmen);
-		// normal
-		ItemStack isNormal = new ItemStack(Material.WHITE_WOOL);
-		ItemMeta imNormal = isNormal.getItemMeta();
-		imNormal.setDisplayName("§rNormal");
-		isNormal.setItemMeta(imNormal);
-		// setzen
-		Inventory inv = Bukkit.createInventory(null, 9, StringGetterBau.getString(p, "testBlockSklaveTypeInv"));
-		inv.setItem(1, isSchild);
-		inv.setItem(4, isNormal);
-		inv.setItem(7, isRahmen);
-		return inv;
+	private TestBlock getDefaultBlock(String current) {
+		return defaultTestBlocks.get(current);
 	}
 
+	public static void generateDefaultTestBlocks() {
+		// TODO mit DB?
+
+		String[] tiers = new String[3];
+		String[] types = new String[3];
+		tiers[0] = "T1";
+		tiers[1] = "T2";
+		tiers[2] = "T3";
+
+		types[0] = "S";
+		types[1] = "N";
+		types[2] = "F";
+		for (String tier : tiers) {
+			for (String type : types) {
+				String name = tier + "_N_" + type;
+				defaultTestBlocks.put(name, new DefaultTestBlock(name));
+			}
+
+		}
+		System.out.println("Default TB loaded");
+	}
+
+	public static TestBlockSlaveCore getInstance() {
+		if (instance == null) {
+			instance = new TestBlockSlaveCore();
+		}
+		return instance;
+	}
 }

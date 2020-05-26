@@ -1,5 +1,10 @@
 package de.AS.Bau.WorldEdit;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -10,6 +15,9 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.RunContext;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -23,6 +31,7 @@ import com.sk89q.worldedit.world.World;
 import de.AS.Bau.Main;
 import de.AS.Bau.Tools.Stoplag;
 import de.AS.Bau.utils.CoordGetter;
+import de.AS.Bau.utils.Facing;
 import de.AS.Bau.utils.Scheduler;
 
 public class WorldEditHandler {
@@ -30,21 +39,24 @@ public class WorldEditHandler {
 	public final static int maxBlockChangePerTick = Main.getPlugin().getCustomConfig()
 			.getInt("worldEdit.maxBlockPerSecond");
 	private final static WorldEdit we = WorldEdit.getInstance();
-	
 
 	/**
-	 * paste async at the specific pastepostion of a region(get coords out of coords.ymls)
+	 * paste async at the specific pastepostion of a region(get coords out of
+	 * coords.ymls)
 	 */
- 	public static void pasten(String fileName, String rgID, Player p, boolean ignoreAir, boolean undo, boolean tbs) {
-		Clipboard board = createClipboard(fileName);
-		BlockVector3 at = CoordGetter.getPastePosition(rgID);
 
-		pasteAsync(new ClipboardHolder(board), at, p, ignoreAir, 1, undo, tbs);
-	}
-
-	public static Clipboard createClipboard(String filename) {
-		Schematic schem = new Schematic("TestBlockSklave",filename + ".schem");
-		return schem.getClip();
+	public static Clipboard createClipboard(File file) {
+		ClipboardFormat format = ClipboardFormats.findByFile(file);
+		try {
+			ClipboardReader reader = format.getReader(new FileInputStream(file));
+			Clipboard clipboard = reader.read();
+			return clipboard;
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public static void pasteOperationAsync(ClipboardHolder clipboardHolder, Player p, BlockVector3 to,
@@ -117,7 +129,7 @@ public class WorldEditHandler {
 
 		boolean stoplagBefore = Stoplag.getStatus(p.getLocation());
 		Stoplag.setStatus(p.getLocation(), true);
-		
+
 		Scheduler animation = new Scheduler();
 		int xmin = min.getX();
 		int xmax = max.getX();
@@ -176,12 +188,6 @@ public class WorldEditHandler {
 		}, 0, ticksPerPasteInterval));
 	}
 
-	public static void pasteAsync(String fileName, BlockVector3 at, Player p, boolean ignoreAir,
-			int ticksPerPasteInterval, boolean saveUndo, boolean tbs) {
-		Clipboard board = createClipboard(fileName);
-		pasteAsync(new ClipboardHolder(board), at, p, ignoreAir, ticksPerPasteInterval, saveUndo, tbs);
-	}
-
 	public static void createUndo(Region rg, Player p, BlockVector3 at) {
 		UndoManager manager;
 		if (Main.playersUndoManager.containsKey(p.getUniqueId())) {
@@ -205,6 +211,30 @@ public class WorldEditHandler {
 		} catch (EmptyClipboardException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static Clipboard rotateSchem(Schematic schem) {
+		AffineTransform transform = new AffineTransform().rotateY(180);
+		FlattenedClipboardTransform transformClip = FlattenedClipboardTransform.transform(schem.getClip(), transform);
+		return transformClip.getClip(transformClip.getTransformedRegion());
+	}
+
+	public static void pasten(Schematic schem, String rgID, Player p, boolean ignoreAir) {
+		BlockVector3 at = CoordGetter.getPastePosition(rgID);
+
+		pasteAsync(new ClipboardHolder(schem.getClip()), at, p, ignoreAir, 1, false, false);
+
+	}
+
+	public static void pasteTestBlock(Schematic schem, Facing facingto, String rgID, Player p) {
+		BlockVector3 at = CoordGetter.getPastePosition(rgID);
+		if (schem.getFacing() != facingto) {
+			schem.setClipboard(rotateSchem(schem));
+			at.add(0, 0, -1);
+		}
+
+		pasteAsync(new ClipboardHolder(schem.getClip()), at, p, true, 1, true, true);
+
 	}
 
 }
