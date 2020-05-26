@@ -213,9 +213,9 @@ public class WorldEditHandler {
 		}
 	}
 
-	public static Clipboard rotateSchem(Schematic schem) {
+	public static Clipboard rotateClipboard(Clipboard board) {
 		AffineTransform transform = new AffineTransform().rotateY(180);
-		FlattenedClipboardTransform transformClip = FlattenedClipboardTransform.transform(schem.getClip(), transform);
+		FlattenedClipboardTransform transformClip = FlattenedClipboardTransform.transform(board, transform);
 		return transformClip.getClip(transformClip.getTransformedRegion());
 	}
 
@@ -228,12 +228,13 @@ public class WorldEditHandler {
 
 	public static void pasteTestBlock(Schematic schem, Facing facingto, String rgID, Player p) {
 		BlockVector3 at = CoordGetter.getPastePosition(rgID);
+		Clipboard board = schem.getClip();
 		if (schem.getFacing() != facingto) {
-			schem.setClipboard(rotateSchem(schem));
+			board = rotateClipboard(board);
 			at.add(0, 0, -1);
 		}
 
-		pasteAsync(new ClipboardHolder(schem.getClip()), at, p, true, 1, true, true);
+		pasteAsync(new ClipboardHolder(board), at, p, true, 1, true, true);
 
 	}
 

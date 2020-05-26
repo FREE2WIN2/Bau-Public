@@ -39,6 +39,7 @@ public class TestBlockSlave {
 	private UndoManager undoManager;
 
 	public TestBlockSlave(Player owner) {
+		this.owner = owner;
 		favorites = new HashSet<>();
 		tier1 = readTestBlocks(1);
 		tier2 = readTestBlocks(2);
@@ -52,8 +53,8 @@ public class TestBlockSlave {
 		try (Connection conn = DataSource.getConnection()) {
 			PreparedStatement statement = conn.prepareStatement(
 					"SELECT * FROM TestBlock,Player WHERE Player.UUID = ? AND TestBlock.tier = ? AND Player.UUID = TestBlock.owner");
-			statement.setString(1, owner.toString());
-			statement.setInt(1, tier);
+			statement.setString(1, owner.getUniqueId().toString());
+			statement.setInt(2, tier);
 			ResultSet rs = statement.executeQuery();
 			while (rs.next()) {
 				if (rs.getBoolean("favorite")) {
@@ -82,11 +83,6 @@ public class TestBlockSlave {
 	}
 
 	public void pasteBlock(TestBlock block, Facing facing) {
-
-		if (last == null) {
-			owner.sendMessage(Main.prefix + StringGetterBau.getString(owner, "noLastPaste"));
-			return;
-		}
 		String rgID = WorldGuardHandler.getPlotId(owner.getLocation());
 
 		/* paste */
