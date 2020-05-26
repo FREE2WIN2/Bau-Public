@@ -1,5 +1,6 @@
 package de.AS.Bau;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Properties;
@@ -7,10 +8,27 @@ import java.util.UUID;
 
 import org.bukkit.entity.Player;
 
+import de.AS.Bau.utils.Language;
+
 public class StringGetterBau {
-	public static HashMap<UUID, String> playersLanguage = new HashMap<>();
-	public
+	public static HashMap<UUID, Language> playersLanguage = new HashMap<>();
+	private static Properties english;
+	private static Properties german;
 	
+	public StringGetterBau(){
+		try {
+			english = new Properties();
+			InputStream in = StringGetterBau.class.getResourceAsStream("/language_en.properties");
+			english.load(in);
+			in.close();
+			german = new Properties();
+			in = StringGetterBau.class.getResourceAsStream("/language_de.properties");
+			german.load(in);
+			in.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 	public static String getString(Player p, String name) {
 		return getString(p.getUniqueId(), name);
 	}
@@ -20,27 +38,12 @@ public class StringGetterBau {
 	}
 	
 	public static String getString(UUID uuid, String name) {
-		InputStream in;
 		if (playersLanguage.containsKey(uuid)) {
-			if (playersLanguage.get(uuid).equalsIgnoreCase("en")) {
-				in = StringGetterBau.class.getResourceAsStream("/language_en.properties");
-			} else {
-				in = StringGetterBau.class.getResourceAsStream("/language_de.properties");
+			if (playersLanguage.get(uuid).equals(Language.EN)) {
+				return english.getProperty(name);
 			}
-		} else {
-			in = StringGetterBau.class.getResourceAsStream("/language_de.properties");
 		}
-
-		Properties languagePropertie = new Properties();
-		try {
-			languagePropertie.load(in);
-			String message = languagePropertie.getProperty(name);
-			in.close();
-			return message;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return null;
+		//standard
+		return german.getProperty(name);
 	}
 }

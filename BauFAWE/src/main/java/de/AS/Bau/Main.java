@@ -79,6 +79,7 @@ public class Main extends JavaPlugin {
 		gs.startCheckForTempAdd();
 		WorldHandler.checkForWorldsToUnload();
 		new DataSource();
+		new StringGetterBau();
 		super.onEnable();
 	}
 

@@ -20,6 +20,7 @@ import de.AS.Bau.StringGetterBau;
 import de.AS.Bau.HikariCP.DBConnection;
 import de.AS.Bau.Scoreboard.ScoreBoardBau;
 import de.AS.Bau.Tools.DesignTool;
+import de.AS.Bau.utils.Language;
 import de.AS.Bau.utils.WorldHandler;
 
 public class onPlayerJoin implements Listener {
@@ -35,7 +36,7 @@ public class onPlayerJoin implements Listener {
 		p.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
 		// p.teleport(new Location(Bukkit.getWorld("world"), 0, 30, 0));
 		String lang = DBConnection.getLanguage(p);
-		StringGetterBau.playersLanguage.put(p.getUniqueId(), lang);
+		StringGetterBau.playersLanguage.put(p.getUniqueId(), Language.getLanguageByString(lang));
 		Main main = Main.getPlugin();
 		// has own gs?
 		String path = main.getCustomConfig().getString("Config.path");

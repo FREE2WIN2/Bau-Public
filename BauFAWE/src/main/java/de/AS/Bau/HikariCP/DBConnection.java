@@ -159,7 +159,7 @@ public class DBConnection {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-			return null;
+			return "de";
 		}
 	}
 
