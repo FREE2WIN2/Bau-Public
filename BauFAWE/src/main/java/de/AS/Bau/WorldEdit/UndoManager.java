@@ -21,7 +21,6 @@ public class UndoManager {
 	
 	public UndoManager(Player p) {
 		undos = new Stack<>();
-		Main.playersUndoManager.put(p.getUniqueId(),this);
 	}
 	
 	private void addUndo(Clipboard undoClipboard) {
@@ -47,7 +46,6 @@ public class UndoManager {
 		rg.setWorld(world);
 		BlockArrayClipboard board = new BlockArrayClipboard(rg);
 		board.setOrigin(at);
-//		board = fillClip(board, rg);
 		ForwardExtentCopy copy = new ForwardExtentCopy(rg.getWorld(), rg, board.getOrigin(), board,
 				board.getOrigin());
 		try {
@@ -59,6 +57,9 @@ public class UndoManager {
 	}
 	
 	public Clipboard getUndo() {
+		if(undos.size() == 0) {
+			return null;
+		}
 		return undos.pop();
 	}
 }

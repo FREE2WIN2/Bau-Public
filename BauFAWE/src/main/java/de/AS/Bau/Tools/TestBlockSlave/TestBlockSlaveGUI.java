@@ -40,10 +40,9 @@ public class TestBlockSlaveGUI implements Listener{
 	 *   -> Name into anvil Inventory(Name banner?)
 	 *   -> then saving
 	 */
-	
 
 	public static Inventory tbsStartInv(Player p, Set<CustomTestBlock> favorites) {
-		String inventoryName = StringGetterBau.getString(p, "testBlockSklaveTierInv");
+		String inventoryName = StringGetterBau.getString(p, "testBlockSklaveMainInv");
 		Inventory inv = Bukkit.createInventory(null, 45, inventoryName);
 		
 		inv.setItem(2, ItemStackCreator.createNewItemStack(Material.WHITE_WOOL, "§6Editor"));
@@ -77,7 +76,6 @@ public class TestBlockSlaveGUI implements Listener{
 		return inv;
 	}
 
-
 	public static Inventory richtungsInventory(Player p) {
 		// norden
 
@@ -109,6 +107,5 @@ public class TestBlockSlaveGUI implements Listener{
 		inv.setItem(7, isRahmen);
 		return inv;
 	}
-	
 	
 }

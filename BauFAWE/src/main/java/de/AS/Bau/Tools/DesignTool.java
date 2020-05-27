@@ -3,6 +3,7 @@ package de.AS.Bau.Tools;
 import java.util.HashMap;
 import java.util.UUID;
 
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -23,22 +24,20 @@ public class DesignTool implements Listener, CommandExecutor {
 
 	@EventHandler
 	public void placeBlock(PlayerInteractEvent event) {
-		if(!event.getHand().equals(EquipmentSlot.HAND)) {
+		if (!event.getHand().equals(EquipmentSlot.HAND)) {
 			return;
 		}
-		if(!event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+		if (!event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
 			return;
 		}
-		
+
 		Block again = event.getClickedBlock();
 		if (again == null || event.getMaterial() == null) {
 			return;
 		}
-		
 
 		if (playerHasDtOn.get(event.getPlayer().getUniqueId()) == true && again != null) {
-			if ((-65 > again.getX() && again.getX() > -371) || (again.getY() < 69 && again.getY() > 8)
-					|| (again.getZ() < 99 && again.getZ() > -65)) {
+			if ((again.getY() < 69 && again.getY() > 8) || again.getType().equals(Material.BARRIER)) {
 				if (!event.getPlayer().isSneaking()) {
 					again.setType(event.getMaterial());
 					event.setCancelled(true);

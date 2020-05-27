@@ -1,8 +1,5 @@
 package de.AS.Bau.Tools;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
@@ -32,9 +29,9 @@ import de.AS.Bau.HikariCP.DBConnection;
 import de.AS.Bau.WorldEdit.WorldGuardHandler;
 import de.AS.Bau.utils.CoordGetter;
 import de.AS.Bau.utils.ItemStackCreator;
+import net.minecraft.server.v1_15_R1.IChatBaseComponent.ChatSerializer;
 import net.minecraft.server.v1_15_R1.PacketPlayOutChat;
 import net.minecraft.server.v1_15_R1.PlayerConnection;
-import net.minecraft.server.v1_15_R1.IChatBaseComponent.ChatSerializer;
 
 public class GUI implements CommandExecutor, Listener {
 

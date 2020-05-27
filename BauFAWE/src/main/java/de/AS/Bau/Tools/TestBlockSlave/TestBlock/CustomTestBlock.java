@@ -1,6 +1,7 @@
 package de.AS.Bau.Tools.TestBlockSlave.TestBlock;
 
 import org.bukkit.DyeColor;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import de.AS.Bau.WorldEdit.Schematic;
@@ -36,8 +37,15 @@ public class CustomTestBlock implements TestBlock {
 		this.tier = tier;
 		this.favorite = favorite;
 	}
+	public CustomTestBlock(Player owner, String name, Facing facing, int tier) {
+		this.owner = owner.getUniqueId().toString();
+		this.Name = name;
+		this.tier = tier;
+		this.schematic = new Schematic(owner + "/TestBlockSklave", name, facing);
+		this.favorite = false;
+	}
 
-	public int getTier() {
+ 	public int getTier() {
 		return tier;
 	}
 

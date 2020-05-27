@@ -3,6 +3,7 @@ package de.AS.Bau.WorldEdit;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.bukkit.Bukkit;
@@ -14,11 +15,17 @@ import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
+import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.operation.RunContext;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
@@ -30,9 +37,12 @@ import com.sk89q.worldedit.world.World;
 
 import de.AS.Bau.Main;
 import de.AS.Bau.Tools.Stoplag;
+import de.AS.Bau.Tools.TestBlockSlave.TestBlockSlaveCore;
 import de.AS.Bau.utils.CoordGetter;
 import de.AS.Bau.utils.Facing;
 import de.AS.Bau.utils.Scheduler;
+import de.AS.SchemOrganizer.utils.DBConnection;
+import de.AS.SchemOrganizer.utils.StringGetter;
 
 public class WorldEditHandler {
 
@@ -40,10 +50,7 @@ public class WorldEditHandler {
 			.getInt("worldEdit.maxBlockPerSecond");
 	private final static WorldEdit we = WorldEdit.getInstance();
 
-	/**
-	 * paste async at the specific pastepostion of a region(get coords out of
-	 * coords.ymls)
-	 */
+	/* all Clipboard creator */
 
 	public static Clipboard createClipboard(File file) {
 		ClipboardFormat format = ClipboardFormats.findByFile(file);
@@ -59,29 +66,89 @@ public class WorldEditHandler {
 		return null;
 	}
 
-	public static void pasteOperationAsync(ClipboardHolder clipboardHolder, Player p, BlockVector3 to,
-			boolean ignoreAir, boolean saveUndo) {
-		Scheduler asyncScheduler = new Scheduler();
-		EditSession es = we.getEditSessionFactory().getEditSession(BukkitAdapter.adapt(p.getWorld()), -1);
-		Operation op = clipboardHolder.createPaste(es).ignoreAirBlocks(ignoreAir).to(to).build();
-		LocalSession session = we.getSessionManager().get(BukkitAdapter.adapt(p));
-		asyncScheduler.setTask(Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), new Runnable() {
+	public static Clipboard createClipboardOutOfRegion(Region rg, BlockVector3 origin, World world) {
+		rg.setWorld(world);
+		BlockArrayClipboard board = new BlockArrayClipboard(rg);
+		board.setOrigin(origin);
+		ForwardExtentCopy copy = new ForwardExtentCopy(rg.getWorld(), rg, board.getOrigin(), board, board.getOrigin());
+		try {
+			Operations.completeLegacy(copy);
+		} catch (WorldEditException e) {
+			e.printStackTrace();
+		}
+		return board;
+	}
 
-			@Override
-			public void run() {
-				for (int i = 0; i < maxBlockChangePerTick; i++) {
-					if (op == null) {
-						session.remember(es);
-						es.flushSession();
-					}
-					try {
-						op.resume(new RunContext());
-					} catch (WorldEditException e) {
-						e.printStackTrace();
-					}
-				}
+	/* saving .schem files */
+
+	public static void saveClipboardAsSchematic(String path, String name, Clipboard board) {
+		File folder = new File(path);
+		if (!folder.exists()) {
+			try {
+				folder.mkdirs();
+				folder.setExecutable(true, false);
+				folder.setReadable(true, false);
+				folder.setWritable(true, false);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-		}, 0, 1));
+		}
+		File file = new File(folder, name + ".schem");
+		try (ClipboardWriter writer = BuiltInClipboardFormat.SPONGE_SCHEMATIC.getWriter(new FileOutputStream(file))) {
+			writer.write(board);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	/* undo */
+
+	public static void createUndo(Region rg, Player p, BlockVector3 at) {
+		TestBlockSlaveCore.getSlave(p).getUndoManager().addUndo(rg, at, BukkitAdapter.adapt(p.getWorld()));
+	}
+
+	/* Clipboard manipulation */
+
+	public static void rotateClipboard(Player p) {
+		LocalSession session = WorldEdit.getInstance().getSessionManager().get(BukkitAdapter.adapt(p));
+
+		ClipboardHolder holder;
+		try {
+			holder = session.getClipboard();
+			AffineTransform transform = new AffineTransform().rotateY(180);
+			holder.setTransform(holder.getTransform().combine((Transform) transform));
+			session.setClipboard(holder);
+			p.sendMessage("§dThe clipboard copy has been rotatet by 180 degrees.");
+		} catch (EmptyClipboardException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static Clipboard rotateClipboard(Clipboard board) {
+		AffineTransform transform = new AffineTransform().rotateY(180);
+		FlattenedClipboardTransform transformClip = FlattenedClipboardTransform.transform(board, transform);
+		return transformClip.getClip(transformClip.getTransformedRegion());
+	}
+
+	/* all paste Methods */
+
+	public static void pasten(Schematic schem, String rgID, Player p, boolean ignoreAir) {
+		BlockVector3 at = CoordGetter.getTBSPastePosition(rgID,Facing.NORTH);
+
+		pasteAsync(new ClipboardHolder(schem.getClip()), at, p, ignoreAir, 1, false, false);
+
+	}
+
+	public static void pasteTestBlock(Schematic schem, Facing facingto, String rgID, Player p) {
+		BlockVector3 at = CoordGetter.getTBSPastePosition(rgID, facingto);
+		Clipboard board = schem.getClip();
+		if (schem.getFacing() != facingto) {
+			board = rotateClipboard(board);
+		}
+
+		pasteAsync(new ClipboardHolder(board), at, p, true, 1, true, true);
+
 	}
 
 	/**
@@ -121,9 +188,6 @@ public class WorldEditHandler {
 			if (tbs) {
 				Region rg = new CuboidRegion(min.add(offset), max.add(offset));
 				createUndo(rg, p, at);
-			} else {
-				// normal undo
-				pasteOperationAsync(clipboardHolder, p, at, ignoreAir, saveUndo);
 			}
 		}
 
@@ -186,56 +250,6 @@ public class WorldEditHandler {
 			}
 
 		}, 0, ticksPerPasteInterval));
-	}
-
-	public static void createUndo(Region rg, Player p, BlockVector3 at) {
-		UndoManager manager;
-		if (Main.playersUndoManager.containsKey(p.getUniqueId())) {
-			manager = Main.playersUndoManager.get(p.getUniqueId());
-		} else {
-			manager = new UndoManager(p);
-		}
-		manager.addUndo(rg, at, BukkitAdapter.adapt(p.getWorld()));
-	}
-
-	public static void rotateClipboard(Player p) {
-		LocalSession session = WorldEdit.getInstance().getSessionManager().get(BukkitAdapter.adapt(p));
-
-		ClipboardHolder holder;
-		try {
-			holder = session.getClipboard();
-			AffineTransform transform = new AffineTransform().rotateY(180);
-			holder.setTransform(holder.getTransform().combine((Transform) transform));
-			session.setClipboard(holder);
-			p.sendMessage("§dThe clipboard copy has been rotatet by 180 degrees.");
-		} catch (EmptyClipboardException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public static Clipboard rotateClipboard(Clipboard board) {
-		AffineTransform transform = new AffineTransform().rotateY(180);
-		FlattenedClipboardTransform transformClip = FlattenedClipboardTransform.transform(board, transform);
-		return transformClip.getClip(transformClip.getTransformedRegion());
-	}
-
-	public static void pasten(Schematic schem, String rgID, Player p, boolean ignoreAir) {
-		BlockVector3 at = CoordGetter.getPastePosition(rgID);
-
-		pasteAsync(new ClipboardHolder(schem.getClip()), at, p, ignoreAir, 1, false, false);
-
-	}
-
-	public static void pasteTestBlock(Schematic schem, Facing facingto, String rgID, Player p) {
-		BlockVector3 at = CoordGetter.getPastePosition(rgID);
-		Clipboard board = schem.getClip();
-		if (schem.getFacing() != facingto) {
-			board = rotateClipboard(board);
-			at.add(0, 0, -1);
-		}
-
-		pasteAsync(new ClipboardHolder(board), at, p, true, 1, true, true);
-
 	}
 
 }

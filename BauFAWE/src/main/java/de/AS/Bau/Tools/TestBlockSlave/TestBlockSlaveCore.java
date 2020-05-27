@@ -25,7 +25,7 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 
 	public static HashSet<Player> playerBlockedDelete = new HashSet<>();
 	public HashMap<UUID, String> playersCurrentSelection = new HashMap<>();
-	public HashMap<UUID, TestBlockSlave> playersTestBlockSlave = new HashMap<>();
+	public static HashMap<UUID, TestBlockSlave> playersTestBlockSlave = new HashMap<>();
 	public static HashMap<String, DefaultTestBlock> defaultTestBlocks = new HashMap<>();
 	private static TestBlockSlaveCore instance;
 
@@ -73,24 +73,28 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 				} else {
 					return false;
 				}
-				String auswahl = tier + "_" + Richtung + "_" + typ;
-				getSlave(p).pasteBlock(getDefaultBlock(auswahl), getFacing(auswahl));
+				String auswahl = tier + "_N_" + typ;
+				getSlave(p).pasteBlock(getDefaultBlock(auswahl), Facing.valueOf(Richtung));
 				/* paste */
 
 				return true;
 			} else {
+				
 				return false;
 			}
 
+		}else if(args.length == 4) {
+			if(!args[0].equalsIgnoreCase("save")) {
+				return false;
+			}
+			// tbs save <name> <tier> <facing>
+			String name = args[1];
+			Integer tier = Integer.parseInt(args[2]);
+			Facing facing = Facing.valueOf(args[3].toUpperCase());
+			getSlave(p).addNewCustomTestBlock(tier, name, facing);//missing tier!
+			return true;
 		}
 		return false;
-	}
-
-	private TestBlockSlave getSlave(Player p) {
-		if (!playersTestBlockSlave.containsKey(p.getUniqueId())) {
-			playersTestBlockSlave.put(p.getUniqueId(), new TestBlockSlave(p));
-		}
-		return playersTestBlockSlave.get(p.getUniqueId());
 	}
 
 	@EventHandler
@@ -105,11 +109,11 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 			}
 			if (clicked.hasItemMeta()) {
 				if (!pInv.getType().equals(InventoryType.CREATIVE)) {
-					if (invName.equals(StringGetterBau.getString(p, "testBlockSklaveTierInv"))
+					if (invName.equals(StringGetterBau.getString(p, "testBlockSklaveMainInv"))
 							&& event.getClickedInventory().equals(pInv)) {
 
 						event.setCancelled(true);
-						tierINventory(p, pInv, clicked);
+						MainInventory(p, pInv, clicked);
 					} else if (invName.equals(StringGetterBau.getString(p, "testBlockSklaveFacingInv"))
 							&& event.getClickedInventory().equals(pInv)) {
 						event.setCancelled(true);
@@ -128,9 +132,9 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 
 	}
 
-	private void tierINventory(Player p, Inventory pInv, ItemStack clicked) {
-		String close = StringGetterBau.getString(p, "close");
-		String lastPaste = StringGetterBau.getString(p, "lastPaste");
+	private void MainInventory(Player p, Inventory pInv, ItemStack clicked) {
+		String close = StringGetterBau.getString(p, "tbs_gui_close");
+		String lastPaste = StringGetterBau.getString(p, "tbs_gui_lastPaste");
 		String clickedName = clicked.getItemMeta().getDisplayName();
 		switch (clickedName) {
 		case "§rTier I":
@@ -184,16 +188,20 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 			current += "S";
 		}
 		p.closeInventory();
-		getSlave(p).pasteBlock(getDefaultBlock(current), getFacing(current));
-	}
-
-	private static Facing getFacing(String current) {
-		String face = current.split("_")[1];
-		if (face.equalsIgnoreCase("N")) {
-			return Facing.NORTH;
-		} else {
-			return Facing.SOUTH;
+		
+		if(current.contains("_S_")) {
+			getSlave(p).pasteBlock(getDefaultBlock(current.replace("_S_", "_N_")), Facing.SOUTH);
+		}else {
+			getSlave(p).pasteBlock(getDefaultBlock(current), Facing.NORTH);
 		}
+		
+	}
+	
+	public static TestBlockSlave getSlave(Player p) {
+		if (!playersTestBlockSlave.containsKey(p.getUniqueId())) {
+			playersTestBlockSlave.put(p.getUniqueId(), new TestBlockSlave(p));
+		}
+		return playersTestBlockSlave.get(p.getUniqueId());
 	}
 
 	private TestBlock getDefaultBlock(String current) {
@@ -228,4 +236,6 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 		}
 		return instance;
 	}
+
+	
 }

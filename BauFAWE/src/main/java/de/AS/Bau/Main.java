@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -47,7 +45,6 @@ import de.AS.Bau.Tools.TntChest;
 import de.AS.Bau.Tools.Particles.Particles;
 import de.AS.Bau.Tools.Particles.ParticlesGUI;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlockSlaveCore;
-import de.AS.Bau.WorldEdit.UndoManager;
 import de.AS.Bau.WorldEdit.WorldEditEvents;
 import de.AS.Bau.WorldEdit.WorldEditPreCommand;
 import de.AS.Bau.cmds.Bau;
@@ -60,14 +57,15 @@ import de.AS.Bau.utils.WorldHandler;
 public class Main extends JavaPlugin {
 	private static Main plugin;
 	public static StateFlag TntExplosion;
+	public static String schempath;
+	
 	private static File customConfigFile;
 	private static YamlConfiguration customConfig;
 	public static String prefix = "§8[§6Bau§8] §r";
 	private static File tempAddConfigFile;
 	private static YamlConfiguration tempAddConfig;
-
-	public static HashMap<UUID, UndoManager> playersUndoManager = new HashMap<>();
-
+	
+	
 	@Override
 	public void onEnable() {
 		plugin = this;
@@ -81,6 +79,7 @@ public class Main extends JavaPlugin {
 		new DataSource();
 		new StringGetterBau();
 		TestBlockSlaveCore.generateDefaultTestBlocks();
+		schempath = customConfig.getString("schempath");
 		super.onEnable();
 	}
 
