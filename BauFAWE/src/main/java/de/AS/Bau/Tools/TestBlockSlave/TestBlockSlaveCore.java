@@ -87,7 +87,9 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 			if(!args[0].equalsIgnoreCase("save")) {
 				return false;
 			}
-			// tbs save <name> <tier> <facing>
+			
+			/* tbs save <name> <tier> <facing> */
+			
 			String name = args[1];
 			Integer tier = Integer.parseInt(args[2]);
 			Facing facing = Facing.valueOf(args[3].toUpperCase());
@@ -111,19 +113,25 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 				if (!pInv.getType().equals(InventoryType.CREATIVE)) {
 					if (invName.equals(StringGetterBau.getString(p, "testBlockSklaveMainInv"))
 							&& event.getClickedInventory().equals(pInv)) {
-
+						if(event.getCursor()!=null) {
+							System.out.println("cursor fired");
+							event.setCancelled(true);
+						}
 						event.setCancelled(true);
-						MainInventory(p, pInv, clicked);
+						MainInventory(p,  clicked);
 					} else if (invName.equals(StringGetterBau.getString(p, "testBlockSklaveFacingInv"))
 							&& event.getClickedInventory().equals(pInv)) {
 						event.setCancelled(true);
-						facingInv(p, pInv, clicked);
+						facingInv(p, clicked);
 
 					} else if (invName.equals(StringGetterBau.getString(p, "testBlockSklaveTypeInv"))
 							&& event.getClickedInventory().equals(pInv)) {
 						event.setCancelled(true);
-						typeInv(p, pInv, clicked);
+						typeInv(p, clicked);
 
+					}else if(invName.equals(StringGetterBau.getString(p, "tbs_tbManagerInv").replace("%r", p.getName()))){
+						event.setCancelled(true);
+						tbManagerInv(p,clicked);
 					}
 
 				}
@@ -132,7 +140,15 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 
 	}
 
-	private void MainInventory(Player p, Inventory pInv, ItemStack clicked) {
+	private void tbManagerInv(Player p, ItemStack clicked) {
+		//-> open Richtungsinv und dann pasten!
+		//oder löschen?
+		p.sendMessage("clicked");
+		p.closeInventory();
+		
+	}
+
+	private void MainInventory(Player p, ItemStack clicked) {
 		String close = StringGetterBau.getString(p, "tbs_gui_close");
 		String lastPaste = StringGetterBau.getString(p, "tbs_gui_lastPaste");
 		String clickedName = clicked.getItemMeta().getDisplayName();
@@ -160,7 +176,7 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 
 	}
 
-	private void facingInv(Player p, Inventory pInv, ItemStack clicked) {
+	private void facingInv(Player p, ItemStack clicked) {
 		String south = StringGetterBau.getString(p, "facingSouth");
 		String north = StringGetterBau.getString(p, "facingNorth");
 		String clickedName = clicked.getItemMeta().getDisplayName();
@@ -174,7 +190,7 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 		p.openInventory(TestBlockSlaveGUI.schildRahmenNormalInventory(p));
 	}
 
-	private void typeInv(Player p, Inventory pInv, ItemStack clicked) {
+	private void typeInv(Player p, ItemStack clicked) {
 		String normal = "§rNormal";
 		String frame = StringGetterBau.getString(p, "frame");
 		String shield = StringGetterBau.getString(p, "shield");

@@ -1,5 +1,8 @@
 package de.AS.Bau.Tools.TestBlockSlave;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
@@ -9,7 +12,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import de.AS.Bau.StringGetterBau;
@@ -90,22 +92,35 @@ public class TestBlockSlaveGUI implements Listener{
 	}
 
 	public static Inventory schildRahmenNormalInventory(Player p) {
-		// Rahmen
-		ItemStack isRahmen = new ItemStack(Material.SCAFFOLDING);
-		ItemMeta imRahmen = isRahmen.getItemMeta();
-		imRahmen.setDisplayName(StringGetterBau.getString(p, "frame"));
-		isRahmen.setItemMeta(imRahmen);
-		// normal
-		ItemStack isNormal = new ItemStack(Material.WHITE_WOOL);
-		ItemMeta imNormal = isNormal.getItemMeta();
-		imNormal.setDisplayName("§rNormal");
-		isNormal.setItemMeta(imNormal);
 		// setzen
 		Inventory inv = Bukkit.createInventory(null, 9, StringGetterBau.getString(p, "testBlockSklaveTypeInv"));
 		inv.setItem(1, ItemStackCreator.createNewItemStack(Material.SHIELD,StringGetterBau.getString(p, "shield")));
-		inv.setItem(4, isNormal);
-		inv.setItem(7, isRahmen);
+		inv.setItem(4, ItemStackCreator.createNewItemStack(Material.WHITE_WOOL, "§rNormal"));
+		inv.setItem(7, ItemStackCreator.createNewItemStack(Material.SCAFFOLDING, StringGetterBau.getString(p, "frame")));
 		return inv;
 	}
 	
+	public static Inventory tbManager(HashMap<Integer,HashSet<CustomTestBlock>> tbs,Player p) {
+		
+		Inventory inv = Bukkit.createInventory(null, 45, StringGetterBau.getString(p, "tbs_tbManagerInv").replace("%r", p.getName()));
+		inv.setItem(1, ItemStackCreator.createNewItemStack(Material.BARRIER,StringGetterBau.getString(p, "shield")));
+		inv.setItem(4, Banner.PLUS.create(DyeColor.WHITE, DyeColor.BLACK,StringGetterBau.getString(p, "tbs_deleteTB") ));
+		ItemStack whiteBanner = ItemStackCreator.createNewItemStack(Material.WHITE_BANNER, "");
+		
+		for(Entry<Integer, HashSet<CustomTestBlock>> entry:tbs.entrySet()) {
+			int index = (entry.getKey() * 18) -9;
+			
+			for(CustomTestBlock block: entry.getValue()) {
+				inv.setItem(index, block.getBanner());
+				index++;
+			}
+			for(int i = index; i<18;i++) {
+				inv.setItem(i, whiteBanner);
+			}
+		}
+		
+		
+		
+		return inv;	
+	}
 }

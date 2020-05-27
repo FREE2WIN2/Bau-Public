@@ -147,10 +147,28 @@ public class TestBlockSlave {
 		saveRegionAsBlock(tier, facing, plotID, name);
 
 		HashSet<CustomTestBlock> adding = testblocks.get(tier);
-		adding.add(new CustomTestBlock(owner, name, facing, tier));
+		CustomTestBlock block = new CustomTestBlock(owner, name, facing, tier);
+		adding.add(block);
 		testblocks.put(tier, adding);
-		//TODO add in database
+		putTestBlockToDatabase(block);
 		return true;
+	}
+
+	private void putTestBlockToDatabase(CustomTestBlock block) {
+		try (Connection conn = DataSource.getConnection()) {
+			PreparedStatement statement = conn.prepareStatement(
+					"INSERT INTO `TestBlock`(`owner`, `schemName`, `name`, `tier`, `richtung`, `favorite`) VALUES (?,?,?,?,?,?)");
+			statement.setString(1, owner.getUniqueId().toString());
+			statement.setString(2, block.getName() + ".schem");
+			statement.setString(3, block.getName());
+			statement.setInt(4, block.getTier());
+			statement.setString(5, block.getSchematic().getFacing().getFace());
+			statement.setBoolean(6, block.isFavorite());
+			statement.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		//TODO Fehlerbehandlung
 	}
 
 	private void saveRegionAsBlock(int tier, Facing facing, String plotID, String name) {
@@ -163,16 +181,17 @@ public class TestBlockSlave {
 		BlockVector3 max;
 		if (facing == Facing.NORTH) {
 			min = middle.subtract(sizes.divide(2).getX(), 0, 1);
-			max = middle.add(sizes.divide(2).getX(), sizes.getY()-1, sizes.getZ());
+			max = middle.add(sizes.divide(2).getX(), sizes.getY() - 1, sizes.getZ());
 		} else {
 			min = middle.subtract(sizes.divide(2).getX(), 0, sizes.getZ());
-			max = middle.add(sizes.divide(2).getX(), sizes.getY()-1, -1);
+			max = middle.add(sizes.divide(2).getX(), sizes.getY() - 1, -1);
 		}
 		Region rg = new CuboidRegion(min, max);
 		Clipboard board = WorldEditHandler.createClipboardOutOfRegion(rg,
 				CoordGetter.getTBSPastePosition(plotID, facing), BukkitAdapter.adapt(owner.getWorld()));
-		WorldEditHandler.saveClipboardAsSchematic(Main.schempath + "/" + owner.getUniqueId().toString() + "/TestBlockSklave", name + ".schem", board);
-		
+		WorldEditHandler.saveClipboardAsSchematic(
+				Main.schempath + "/" + owner.getUniqueId().toString() + "/TestBlockSklave", name + ".schem", board);
+
 	}
 
 	public boolean setTestBlockToFavorite(ItemStack itemStack) {
@@ -210,4 +229,11 @@ public class TestBlockSlave {
 		}
 		return null;
 	}
+
+	/* Show ManageMent Inventory */
+
+	public void showTBManager() {
+		owner.openInventory(TestBlockSlaveGUI.tbManager(testblocks, owner));
+	}
+
 }
