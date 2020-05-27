@@ -106,17 +106,10 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 		String invName = p.getOpenInventory().getTitle();
 		ItemStack clicked = event.getCurrentItem();
 		if (clicked != null) {
-			if (clicked.getType().equals(Material.NETHER_STAR) || clicked.getType().equals(Material.WOODEN_HOE)) {
-				return;
-			}
 			if (clicked.hasItemMeta()) {
 				if (!pInv.getType().equals(InventoryType.CREATIVE)) {
 					if (invName.equals(StringGetterBau.getString(p, "testBlockSklaveMainInv"))
 							&& event.getClickedInventory().equals(pInv)) {
-						if(event.getCursor()!=null) {
-							System.out.println("cursor fired");
-							event.setCancelled(true);
-						}
 						event.setCancelled(true);
 						MainInventory(p,  clicked);
 					} else if (invName.equals(StringGetterBau.getString(p, "testBlockSklaveFacingInv"))
@@ -162,7 +155,6 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 			p.openInventory(TestBlockSlaveGUI.richtungsInventory(p));
 			break;
 		case "§rTier III/IV":
-		case "§rTier IV":
 			playersCurrentSelection.put(p.getUniqueId(), "T3_");
 			p.openInventory(TestBlockSlaveGUI.richtungsInventory(p));
 			break;
@@ -175,7 +167,6 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 		}else if(clickedName.equals(StringGetterBau.getString(p, "tbs_gui_tbManager"))) {
 			getSlave(p).showTBManager();
 		}
-
 	}
 
 	private void facingInv(Player p, ItemStack clicked) {
