@@ -27,8 +27,6 @@ import de.AS.Bau.WorldEdit.WorldEditHandler;
 import de.AS.Bau.WorldEdit.WorldGuardHandler;
 import de.AS.Bau.utils.CoordGetter;
 import de.AS.Bau.utils.Facing;
-import it.unimi.dsi.fastutil.booleans.BooleanSets.EmptySet;
-import net.minecraft.server.v1_15_R1.WorldBorder;
 
 public class TestBlockSlave {
 
@@ -163,11 +161,11 @@ public class TestBlockSlave {
 		BlockVector3 min;
 		BlockVector3 max;
 		if (facing == Facing.NORTH) {
-			min = middle.subtract(sizes.divide(2).getX(), 0, 0);
-			max = middle.add(sizes.divide(2).getX(), sizes.getY(), sizes.getZ());
+			min = middle.subtract(sizes.divide(2).getX(), 0, 1);
+			max = middle.add(sizes.divide(2).getX(), sizes.getY()-1, sizes.getZ());
 		} else {
 			min = middle.subtract(sizes.divide(2).getX(), 0, sizes.getZ());
-			max = middle.add(sizes.divide(2).getX(), sizes.getY(), 0);
+			max = middle.add(sizes.divide(2).getX(), sizes.getY()-1, -1);
 		}
 		System.out.println("Region min:" + min);
 		System.out.println("Region max:" + max);

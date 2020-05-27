@@ -7,7 +7,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import com.sk89q.worldedit.math.BlockVector3;
 
 import de.AS.Bau.Main;
-import de.AS.Bau.Tools.TestBlockSlave.TestBlockSlaveCore;
 
 public class CoordGetter {
 
@@ -21,7 +20,7 @@ public class CoordGetter {
 
 	public static BlockVector3 getTBSPastePosition(String plotID, Facing facing) {
 		String[] coords = Main.getPlugin().getConfig()
-				.getString("coordinates.tbs.paste." + facing.name() + "." + plotID).split(" ");
+				.getString("coordinates.tbs.paste." + facing.getFace() + "." + plotID).split(" ");
 		int x = Integer.parseInt(coords[0]);
 		int y = Integer.parseInt(coords[1]);
 		int z = Integer.parseInt(coords[2]);
@@ -46,7 +45,7 @@ public class CoordGetter {
 
 	public static BlockVector3 getMiddleRegionTB(String plotID, Facing facing) {
 		String[] coords = Main.getPlugin().getConfig()
-				.getString("coordinates.tbs.front." + facing.name() + "." + plotID).split(" ");
+				.getString("coordinates.tbs.front." + facing.getFace() + "." + plotID).split(" ");
 		int x = Integer.parseInt(coords[0]);
 		int y = Integer.parseInt(coords[1]);
 		int z = Integer.parseInt(coords[2]);

@@ -41,7 +41,7 @@ public class CustomTestBlock implements TestBlock {
 		this.owner = owner.getUniqueId().toString();
 		this.Name = name;
 		this.tier = tier;
-		this.schematic = new Schematic(owner + "/TestBlockSklave", name, facing);
+		this.schematic = new Schematic(this.owner + "/TestBlockSklave", name, facing);
 		this.favorite = false;
 	}
 

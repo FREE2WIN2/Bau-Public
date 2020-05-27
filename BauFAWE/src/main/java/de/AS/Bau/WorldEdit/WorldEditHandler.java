@@ -9,13 +9,11 @@ import java.io.IOException;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
@@ -24,9 +22,7 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
-import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
-import com.sk89q.worldedit.function.operation.RunContext;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.Transform;
@@ -41,14 +37,11 @@ import de.AS.Bau.Tools.TestBlockSlave.TestBlockSlaveCore;
 import de.AS.Bau.utils.CoordGetter;
 import de.AS.Bau.utils.Facing;
 import de.AS.Bau.utils.Scheduler;
-import de.AS.SchemOrganizer.utils.DBConnection;
-import de.AS.SchemOrganizer.utils.StringGetter;
 
 public class WorldEditHandler {
 
 	public final static int maxBlockChangePerTick = Main.getPlugin().getCustomConfig()
 			.getInt("worldEdit.maxBlockPerSecond");
-	private final static WorldEdit we = WorldEdit.getInstance();
 
 	/* all Clipboard creator */
 
@@ -134,7 +127,7 @@ public class WorldEditHandler {
 	/* all paste Methods */
 
 	public static void pasten(Schematic schem, String rgID, Player p, boolean ignoreAir) {
-		BlockVector3 at = CoordGetter.getTBSPastePosition(rgID,Facing.NORTH);
+		BlockVector3 at = CoordGetter.getTBSPastePosition(rgID,schem.getFacing());
 
 		pasteAsync(new ClipboardHolder(schem.getClip()), at, p, ignoreAir, 1, false, false);
 
