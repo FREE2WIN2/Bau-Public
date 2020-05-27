@@ -32,7 +32,7 @@ public class CustomTestBlock implements TestBlock {
 	 */
 	public CustomTestBlock(String owner, String schemName, String Name, String face, int tier, boolean favorite) {
 		this.owner = owner;
-		this.schematic = new Schematic(owner + "/TestBlockSklave", schemName, Facing.valueOf(face.toUpperCase()));
+		this.schematic = new Schematic(owner + "/TestBlockSklave", schemName + ".schems", Facing.valueOf(face.toUpperCase()));
 		this.Name = Name;
 		this.tier = tier;
 		this.favorite = favorite;
@@ -41,7 +41,7 @@ public class CustomTestBlock implements TestBlock {
 		this.owner = owner.getUniqueId().toString();
 		this.Name = name;
 		this.tier = tier;
-		this.schematic = new Schematic(this.owner + "/TestBlockSklave", name, facing);
+		this.schematic = new Schematic(this.owner + "/TestBlockSklave", name + ".schem", facing);
 		this.favorite = false;
 	}
 

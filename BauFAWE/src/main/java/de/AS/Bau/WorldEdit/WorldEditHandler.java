@@ -86,7 +86,7 @@ public class WorldEditHandler {
 				e.printStackTrace();
 			}
 		}
-		File file = new File(folder, name + ".schem");
+		File file = new File(folder, name);
 		try (ClipboardWriter writer = BuiltInClipboardFormat.SPONGE_SCHEMATIC.getWriter(new FileOutputStream(file))) {
 			writer.write(board);
 		} catch (IOException e) {

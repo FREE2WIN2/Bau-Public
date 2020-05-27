@@ -149,6 +149,7 @@ public class TestBlockSlave {
 		HashSet<CustomTestBlock> adding = testblocks.get(tier);
 		adding.add(new CustomTestBlock(owner, name, facing, tier));
 		testblocks.put(tier, adding);
+		//TODO add in database
 		return true;
 	}
 
@@ -167,13 +168,11 @@ public class TestBlockSlave {
 			min = middle.subtract(sizes.divide(2).getX(), 0, sizes.getZ());
 			max = middle.add(sizes.divide(2).getX(), sizes.getY()-1, -1);
 		}
-		System.out.println("Region min:" + min);
-		System.out.println("Region max:" + max);
 		Region rg = new CuboidRegion(min, max);
 		Clipboard board = WorldEditHandler.createClipboardOutOfRegion(rg,
 				CoordGetter.getTBSPastePosition(plotID, facing), BukkitAdapter.adapt(owner.getWorld()));
-		WorldEditHandler.saveClipboardAsSchematic(Main.schempath + "/" + owner.getUniqueId().toString(), name, board);
-
+		WorldEditHandler.saveClipboardAsSchematic(Main.schempath + "/" + owner.getUniqueId().toString() + "/TestBlockSklave", name + ".schem", board);
+		
 	}
 
 	public boolean setTestBlockToFavorite(ItemStack itemStack) {
