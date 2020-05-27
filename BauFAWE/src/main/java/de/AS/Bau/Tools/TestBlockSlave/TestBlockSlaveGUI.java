@@ -49,7 +49,7 @@ public class TestBlockSlaveGUI implements Listener{
 		
 		inv.setItem(2, ItemStackCreator.createNewItemStack(Material.WHITE_WOOL, "§6Editor"));
 		inv.setItem(4, ItemStackCreator.createNewItemStack(Material.WOODEN_AXE, StringGetterBau.getString(p, "tbs_gui_newTB")));
-		inv.setItem(6, ItemStackCreator.createNewItemStack(Material.NETHER_STAR, StringGetterBau.getString(p, "tbs_gui_favorites")));
+		inv.setItem(6, ItemStackCreator.createNewItemStack(Material.NETHER_STAR, StringGetterBau.getString(p, "tbs_gui_tbManager")));
 		
 		ItemStack head = ItemStackCreator.createNewItemStack(Material.PLAYER_HEAD, StringGetterBau.getString(p, "tbs_gui_lastPaste"));
 		SkullMeta headmeta = (SkullMeta) head.getItemMeta();

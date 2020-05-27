@@ -172,6 +172,8 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 		} else if (clickedName.equals(lastPaste)) {
 			TestBlockSlave slave = getSlave(p);
 			slave.pasteBlock(slave.getlastTestBlock(), slave.getLastFacing());
+		}else if(clickedName.equals(StringGetterBau.getString(p, "tbs_gui_tbManager"))) {
+			getSlave(p).showTBManager();
 		}
 
 	}
