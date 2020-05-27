@@ -103,9 +103,9 @@ public class TestBlockSlaveGUI implements Listener{
 	public static Inventory tbManager(HashMap<Integer,HashSet<CustomTestBlock>> tbs,Player p) {
 		
 		Inventory inv = Bukkit.createInventory(null, 45, StringGetterBau.getString(p, "tbs_tbManagerInv").replace("%r", p.getName()));
-		inv.setItem(1, ItemStackCreator.createNewItemStack(Material.BARRIER,StringGetterBau.getString(p, "shield")));
-		inv.setItem(4, Banner.PLUS.create(DyeColor.WHITE, DyeColor.BLACK,StringGetterBau.getString(p, "tbs_deleteTB") ));
-		ItemStack whiteBanner = ItemStackCreator.createNewItemStack(Material.WHITE_BANNER, "");
+		inv.setItem(2, ItemStackCreator.createNewItemStack(Material.BARRIER,StringGetterBau.getString(p, "shield")));
+		inv.setItem(6, Banner.PLUS.create(DyeColor.WHITE, DyeColor.BLACK,StringGetterBau.getString(p, "tbs_deleteTB") ));
+		ItemStack whiteBanner = ItemStackCreator.createNewItemStack(Material.WHITE_BANNER, " ");
 		
 		for(Entry<Integer, HashSet<CustomTestBlock>> entry:tbs.entrySet()) {
 			int index = (entry.getKey() * 18) -9;
@@ -114,7 +114,7 @@ public class TestBlockSlaveGUI implements Listener{
 				inv.setItem(index, block.getBanner());
 				index++;
 			}
-			for(int i = index; i<18;i++) {
+			for(int i = index; i<(entry.getKey() * 18);i++) {
 				inv.setItem(i, whiteBanner);
 			}
 		}
