@@ -119,8 +119,8 @@ public class TestBlockSlave {
 
 	}
 
-	public void pasteBlock(ItemStack block, String facing) {
-		pasteBlock(getBlockOutOfBanner(block), Facing.valueOf(facing));
+	public void pasteBlock(String name, Facing facing) {
+		pasteBlock(getBlockOutOfName(name), facing);
 	}
 
 	public void undo() {
@@ -141,6 +141,10 @@ public class TestBlockSlave {
 
 		if (testblocks.get(tier).size() == 9) {
 			Main.send(owner, "tbs_tooManyBlocks", "" + tier);
+			return false;
+		}
+		if(nameExists(tier, name)) {
+			Main.send(owner, "tbs_nameNotFree", ""+tier,name);
 			return false;
 		}
 		String plotID = WorldGuardHandler.getPlotId(owner.getLocation());
@@ -168,7 +172,6 @@ public class TestBlockSlave {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		//TODO Fehlerbehandlung
 	}
 
 	private void saveRegionAsBlock(int tier, Facing facing, String plotID, String name) {
@@ -198,7 +201,11 @@ public class TestBlockSlave {
 		if (favs.size() == 9) {
 			Main.send(owner, "tbs_tooManyFavorites", "fa");
 		}
-		favs.add(getBlockOutOfBanner(itemStack));
+		CustomTestBlock block = getBlockOutOfBanner(itemStack);
+		block.setFavorite(true);
+		favs.add(block);
+		updateFavToDataBase(true, block.getTier(), block.getName());
+		Main.send(owner, "tbs_favAdded", block.getName());
 		return true;
 	}
 
@@ -211,15 +218,41 @@ public class TestBlockSlave {
 			return false;
 		}
 		favs.remove(block);
-		HashSet<CustomTestBlock> removing = testblocks.get(block.getTier());
-		removing.remove(block);
+		block.setFavorite(false);
+		updateFavToDataBase(false, block.getTier(), block.getName());
+		Main.send(owner, "tbs_favRemoved", block.getName());
 		return true;
 
 	}
 
+	public boolean deleteTestBlock(int tier, String name) {
+		HashSet<CustomTestBlock> blocks = testblocks.get(tier);
+		if(!deleteTestBlockFromDatabase(tier, name)) {
+			return false;
+		}
+		if(!blocks.remove(getBlockOutOfName(name))) {
+			return false;
+		}
+		Main.send(owner, "tbs_tbDeleted", ""+tier,name);
+		return true;
+	}
+
+	private boolean deleteTestBlockFromDatabase(int tier, String name) {
+		try(Connection conn = DataSource.getConnection()) {
+			PreparedStatement statement = conn.prepareStatement("DELETE FROM TestBlock WHERE owner = ? AND tier = ? AND name = ?");
+			statement.setString(1, owner.getUniqueId().toString());
+			statement.setInt(2, tier);
+			statement.setString(3, name);
+			return statement.executeUpdate() == 1;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
 	/* Helper Methods */
 
-	private CustomTestBlock getBlockOutOfBanner(ItemStack itemStack) {
+	public CustomTestBlock getBlockOutOfBanner(ItemStack itemStack) {
 		for (Entry<Integer, HashSet<CustomTestBlock>> testBlockEntries : testblocks.entrySet()) {
 			for (CustomTestBlock block : testBlockEntries.getValue()) {
 				if (block.getBanner().equals(itemStack)) {
@@ -230,6 +263,39 @@ public class TestBlockSlave {
 		return null;
 	}
 
+	private TestBlock getBlockOutOfName(String name) {
+		for (Entry<Integer, HashSet<CustomTestBlock>> testBlockEntries : testblocks.entrySet()) {
+			for (CustomTestBlock block : testBlockEntries.getValue()) {
+				if (block.getName().equals(name)) {
+					return block;
+				}
+			}
+		}
+		return null;
+	}
+
+	private boolean nameExists(int tier, String name) {
+		for (CustomTestBlock block : testblocks.get(tier)) {
+			if (block.getName().equals(name)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private boolean updateFavToDataBase(boolean fav, int tier, String name) {
+		try (Connection conn = DataSource.getConnection()){
+			PreparedStatement statement = conn.prepareStatement("UPDATE TestBlock(favorite) SET (?) WHERE owner = ? AND tier = ? AND name = ?");
+			statement.setBoolean(1, fav);
+			statement.setString(2, owner.getUniqueId().toString());
+			statement.setInt(3, tier);
+			statement.setString(4, name);
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
 	/* Show ManageMent Inventory */
 
 	public void showTBManager() {

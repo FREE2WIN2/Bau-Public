@@ -82,7 +82,7 @@ public class TestBlockSlaveGUI implements Listener{
 		// norden
 
 		ItemStack isN = Banner.N.create(DyeColor.WHITE, DyeColor.BLACK,StringGetterBau.getString(p, "facingNorth"));
-		// s�den
+		// süden
 		ItemStack isS = Banner.S.create(DyeColor.WHITE, DyeColor.BLACK,StringGetterBau.getString(p, "facingSouth"));
 		// setzen
 		Inventory inv = Bukkit.createInventory(null, 9, StringGetterBau.getString(p, "testBlockSklaveFacingInv"));
@@ -102,9 +102,12 @@ public class TestBlockSlaveGUI implements Listener{
 	
 	public static Inventory tbManager(HashMap<Integer,HashSet<CustomTestBlock>> tbs,Player p) {
 		
-		Inventory inv = Bukkit.createInventory(null, 45, StringGetterBau.getString(p, "tbs_tbManagerInv").replace("%r", p.getName()));
-		inv.setItem(2, ItemStackCreator.createNewItemStack(Material.BARRIER,StringGetterBau.getString(p, "shield")));
-		inv.setItem(6, Banner.PLUS.create(DyeColor.WHITE, DyeColor.BLACK,StringGetterBau.getString(p, "tbs_deleteTB") ));
+		Inventory inv = Bukkit.createInventory(null, 54, StringGetterBau.getString(p, "tbs_tbManagerInv").replace("%r", p.getName()));
+		inv.setItem(1, ItemStackCreator.createNewItemStack(Material.BARRIER,StringGetterBau.getString(p, "tbs_gui_tbManagerDelete")));
+		inv.setItem(3, ItemStackCreator.createNewItemStack(Material.WHITE_WOOL,StringGetterBau.getString(p, "tbs_gui_tbManagerPaste")));
+		inv.setItem(5, Banner.PLUS.create(DyeColor.WHITE, DyeColor.BLACK,StringGetterBau.getString(p, "tbs_gui_tbManagerFavorite") ));
+		inv.setItem(7, Banner.MINUS.create(DyeColor.WHITE, DyeColor.BLACK,StringGetterBau.getString(p, "tbs_gui_tbManagerFavoriteRemove") ));
+		
 		ItemStack whiteBanner = ItemStackCreator.createNewItemStack(Material.WHITE_BANNER, " ");
 		
 		for(Entry<Integer, HashSet<CustomTestBlock>> entry:tbs.entrySet()) {

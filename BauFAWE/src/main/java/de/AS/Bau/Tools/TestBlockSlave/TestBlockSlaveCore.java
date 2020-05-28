@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.UUID;
 
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -19,12 +20,15 @@ import org.bukkit.inventory.ItemStack;
 import de.AS.Bau.StringGetterBau;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlock.DefaultTestBlock;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlock.TestBlock;
+import de.AS.Bau.utils.Banner;
+import de.AS.Bau.utils.ClickAction;
 import de.AS.Bau.utils.Facing;
+import de.AS.Bau.utils.JsonCreater;
 
 public class TestBlockSlaveCore implements CommandExecutor, Listener {
 
 	public static HashSet<Player> playerBlockedDelete = new HashSet<>();
-	public HashMap<UUID, String> playersCurrentSelection = new HashMap<>();
+	public static HashMap<UUID, String> playersCurrentSelection = new HashMap<>();
 	public static HashMap<UUID, TestBlockSlave> playersTestBlockSlave = new HashMap<>();
 	public static HashMap<String, DefaultTestBlock> defaultTestBlocks = new HashMap<>();
 	private static TestBlockSlaveCore instance;
@@ -46,6 +50,19 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 			} else {
 				return false;
 			}
+		} else if (args.length == 2) {
+			if (args[0].equalsIgnoreCase("confirmdelete")) {
+				String[] args1 = args[1].split("_");
+				if (args1.length != 3) {
+					return false;
+				}
+				if (!args1[0].equals(p.getUniqueId().toString())) {
+					return false;
+				}
+				getSlave(p).deleteTestBlock(Integer.parseInt(args1[1]), args1[2]);
+				return true;
+			}
+			return false;
 		} else if (args.length == 3) {
 			// /tbs <Tier> <Richtung> <normal?>
 			// /tbs 1 n n
@@ -79,21 +96,21 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 
 				return true;
 			} else {
-				
+
 				return false;
 			}
 
-		}else if(args.length == 4) {
-			if(!args[0].equalsIgnoreCase("save")) {
+		} else if (args.length == 4) {
+			if (!args[0].equalsIgnoreCase("save")) {
 				return false;
 			}
-			
+
 			/* tbs save <name> <tier> <facing> */
-			
+
 			String name = args[1];
 			Integer tier = Integer.parseInt(args[2]);
 			Facing facing = Facing.valueOf(args[3].toUpperCase());
-			getSlave(p).addNewCustomTestBlock(tier, name, facing);//missing tier!
+			getSlave(p).addNewCustomTestBlock(tier, name, facing);// missing tier!
 			return true;
 		}
 		return false;
@@ -111,7 +128,7 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 					if (invName.equals(StringGetterBau.getString(p, "testBlockSklaveMainInv"))
 							&& event.getClickedInventory().equals(pInv)) {
 						event.setCancelled(true);
-						MainInventory(p,  clicked);
+						MainInventory(p, clicked);
 					} else if (invName.equals(StringGetterBau.getString(p, "testBlockSklaveFacingInv"))
 							&& event.getClickedInventory().equals(pInv)) {
 						event.setCancelled(true);
@@ -122,23 +139,69 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 						event.setCancelled(true);
 						typeInv(p, clicked);
 
-					}else if(invName.equals(StringGetterBau.getString(p, "tbs_tbManagerInv").replace("%r", p.getName()))){
-						event.setCancelled(true);
-						tbManagerInv(p,clicked);
+					} else if (invName
+							.equals(StringGetterBau.getString(p, "tbs_tbManagerInv").replace("%r", p.getName()))) {
+						if (clicked.getItemMeta().getDisplayName().equals(" ")) {
+							/* empty Banner */
+							event.setCancelled(true);
+							return;
+						}
+						if (event.getCursor().getType() != Material.AIR) {
+							event.setCancelled(true);
+							tbManagerInv(p, clicked, event.getCursor());
+						}
 					}
 
 				}
+			}
+		} else {
+			if (event.getClickedInventory().equals(pInv)) {
+				event.setCancelled(true);
 			}
 		}
 
 	}
 
-	private void tbManagerInv(Player p, ItemStack clicked) {
-		//-> open Richtungsinv und dann pasten!
-		//oder löschen?
-		p.sendMessage("clicked");
-		p.closeInventory();
-		
+	private void tbManagerInv(Player p, ItemStack clicked, ItemStack cursor) {
+		// -> open Richtungsinv und dann pasten!
+		// oder löschen?
+
+		/* TestBlock? oder anderes */
+		if (clicked.getType().equals(Material.WHITE_WOOL)) {
+			/* init paste */
+			playersCurrentSelection.put(p.getUniqueId(), cursor.getItemMeta().getDisplayName()); // Displayname ==
+																									// TestBlockName
+			p.openInventory(TestBlockSlaveGUI.richtungsInventory(p));
+		} else if (clicked.getType().equals(Material.BARRIER)) {
+			/* Delete */
+			TestBlock tb = getSlave(p).getBlockOutOfBanner(cursor);
+			String name = tb.getName();
+			JsonCreater deleteBegin = new JsonCreater(StringGetterBau.getString(p, "tbs_deleteCustomBlock")
+					.replaceFirst("%r", tb.getTier() + "").replaceFirst("%r", name));
+			JsonCreater deleteClickConfirm = new JsonCreater(
+					StringGetterBau.getString(p, "tbs_deleteCustomBlockConfirm"));
+			deleteClickConfirm.addClickEvent("/tbs confirmdelete " + p.getUniqueId() + "_" + tb.getTier() + "_" + name,
+					ClickAction.RUN_COMMAND);
+			deleteClickConfirm.addHoverEvent(
+					StringGetterBau.getString(p, "tbs_deleteCustomBlockConfirm_hover").replace("%r", name));
+			deleteBegin.addJson(deleteClickConfirm).send(p);
+		} else if (clicked.equals(Banner.PLUS.create(DyeColor.WHITE, DyeColor.BLACK,
+				StringGetterBau.getString(p, "tbs_gui_tbManagerFavorite")))) {
+			/* Add to Favorite */
+			if (getSlave(p).setTestBlockToFavorite(cursor)) {
+				getSlave(p).showTBManager();// aktualisieren
+			}
+			p.closeInventory();
+		}else if (clicked.equals(Banner.MINUS.create(DyeColor.WHITE, DyeColor.BLACK,
+				StringGetterBau.getString(p, "tbs_gui_tbManagerFavoriteRemove")))) {
+			/* Remove from Favorites */
+			if (getSlave(p).removeFavorite(cursor)) {
+				getSlave(p).showTBManager();// aktualisieren
+			}
+			p.closeInventory();
+
+		}
+
 	}
 
 	private void MainInventory(Player p, ItemStack clicked) {
@@ -147,15 +210,15 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 		String clickedName = clicked.getItemMeta().getDisplayName();
 		switch (clickedName) {
 		case "§rTier I":
-			playersCurrentSelection.put(p.getUniqueId(), "T1_");
+			playersCurrentSelection.put(p.getUniqueId(), "Default_T1_");
 			p.openInventory(TestBlockSlaveGUI.richtungsInventory(p));
 			break;
 		case "§rTier II":
-			playersCurrentSelection.put(p.getUniqueId(), "T2_");
+			playersCurrentSelection.put(p.getUniqueId(), "Default_T2_");
 			p.openInventory(TestBlockSlaveGUI.richtungsInventory(p));
 			break;
 		case "§rTier III/IV":
-			playersCurrentSelection.put(p.getUniqueId(), "T3_");
+			playersCurrentSelection.put(p.getUniqueId(), "Default_T3_");
 			p.openInventory(TestBlockSlaveGUI.richtungsInventory(p));
 			break;
 		}
@@ -164,7 +227,7 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 		} else if (clickedName.equals(lastPaste)) {
 			TestBlockSlave slave = getSlave(p);
 			slave.pasteBlock(slave.getlastTestBlock(), slave.getLastFacing());
-		}else if(clickedName.equals(StringGetterBau.getString(p, "tbs_gui_tbManager"))) {
+		} else if (clickedName.equals(StringGetterBau.getString(p, "tbs_gui_tbManager"))) {
 			getSlave(p).showTBManager();
 		}
 	}
@@ -174,13 +237,26 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 		String north = StringGetterBau.getString(p, "facingNorth");
 		String clickedName = clicked.getItemMeta().getDisplayName();
 		String current = playersCurrentSelection.get(p.getUniqueId());
-		if (north.equals(clickedName)) {
-			current += "N_";
-		} else if (south.equals(clickedName)) {
-			current += "S_";
+		if (current.startsWith("Default_T")) {
+			if (north.equals(clickedName)) {
+				current += "N_";
+			} else if (south.equals(clickedName)) {
+				current += "S_";
+			}
+			playersCurrentSelection.put(p.getUniqueId(), current);
+			p.openInventory(TestBlockSlaveGUI.schildRahmenNormalInventory(p));
+		} else {
+			Facing facing;
+			if (north.equals(clickedName)) {
+				facing = Facing.NORTH;
+			} else {
+				facing = Facing.SOUTH;
+			}
+			getSlave(p).pasteBlock(current, facing);
+			playersCurrentSelection.put(p.getUniqueId(), "");
+			p.closeInventory();
 		}
-		playersCurrentSelection.put(p.getUniqueId(), current);
-		p.openInventory(TestBlockSlaveGUI.schildRahmenNormalInventory(p));
+
 	}
 
 	private void typeInv(Player p, ItemStack clicked) {
@@ -197,15 +273,15 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 			current += "S";
 		}
 		p.closeInventory();
-		
-		if(current.contains("_S_")) {
+
+		if (current.contains("_S_")) {
 			getSlave(p).pasteBlock(getDefaultBlock(current.replace("_S_", "_N_")), Facing.SOUTH);
-		}else {
+		} else {
 			getSlave(p).pasteBlock(getDefaultBlock(current), Facing.NORTH);
 		}
-		
+
 	}
-	
+
 	public static TestBlockSlave getSlave(Player p) {
 		if (!playersTestBlockSlave.containsKey(p.getUniqueId())) {
 			playersTestBlockSlave.put(p.getUniqueId(), new TestBlockSlave(p));
@@ -214,12 +290,10 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 	}
 
 	private TestBlock getDefaultBlock(String current) {
-		return defaultTestBlocks.get(current);
+		return defaultTestBlocks.get(current.replace("Default_", ""));
 	}
 
 	public static void generateDefaultTestBlocks() {
-		// TODO mit DB?
-
 		String[] tiers = new String[3];
 		String[] types = new String[3];
 		tiers[0] = "T1";
@@ -246,5 +320,4 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 		return instance;
 	}
 
-	
 }

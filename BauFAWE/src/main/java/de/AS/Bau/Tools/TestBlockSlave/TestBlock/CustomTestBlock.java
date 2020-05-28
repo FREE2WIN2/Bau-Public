@@ -20,7 +20,6 @@ public class CustomTestBlock implements TestBlock {
 	private String Name;
 	private int tier;
 	private boolean favorite;
-
 	/**
 	 * Creates a new TestBlock
 	 * 
@@ -32,7 +31,7 @@ public class CustomTestBlock implements TestBlock {
 	 */
 	public CustomTestBlock(String owner, String schemName, String Name, String face, int tier, boolean favorite) {
 		this.owner = owner;
-		this.schematic = new Schematic(owner + "/TestBlockSklave", schemName + ".schems", Facing.valueOf(face.toUpperCase()));
+		this.schematic = new Schematic(owner + "/TestBlockSklave", schemName, Facing.getByShort(face.toUpperCase()));
 		this.Name = Name;
 		this.tier = tier;
 		this.favorite = favorite;
@@ -61,6 +60,10 @@ public class CustomTestBlock implements TestBlock {
 		return favorite;
 	}
 
+	public void setFavorite(boolean fav) {
+		favorite = fav;
+	}
+	
 	@Override
 	public Schematic getSchematic() {
 		return schematic;
@@ -71,7 +74,7 @@ public class CustomTestBlock implements TestBlock {
 		if (favorite) {
 			groundColor = DyeColor.LIME;
 		} else {
-			groundColor = DyeColor.WHITE;
+			groundColor = DyeColor.ORANGE;
 		}
 		switch (tier) {
 		case 1:

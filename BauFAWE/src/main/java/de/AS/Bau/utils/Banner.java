@@ -11,7 +11,7 @@ import org.bukkit.inventory.meta.BannerMeta;
 
 public enum Banner {
 
-	ONE, TWO, THREE, FOUR, N, S, PLUS;
+	ONE, TWO, THREE, FOUR, N, S, PLUS, MINUS;
 
 	public ItemStack create(DyeColor groundColor,DyeColor pictureColor , String name) {
 		ItemStack banneris = new ItemStack(Material.WHITE_BANNER);
@@ -68,6 +68,9 @@ public enum Banner {
 			bm.addPattern(new Pattern(pictureColor, PatternType.STRAIGHT_CROSS));
 			bm.addPattern(new Pattern(groundColor, PatternType.STRIPE_TOP));
 			bm.addPattern(new Pattern(groundColor, PatternType.STRIPE_BOTTOM));
+			bm.addPattern(new Pattern(groundColor, PatternType.BORDER));
+		case MINUS:
+			bm.addPattern(new Pattern(pictureColor, PatternType.STRIPE_MIDDLE));
 			bm.addPattern(new Pattern(groundColor, PatternType.BORDER));
 		}
 		bm.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
