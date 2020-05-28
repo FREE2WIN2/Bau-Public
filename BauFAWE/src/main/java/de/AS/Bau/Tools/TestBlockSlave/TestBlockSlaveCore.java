@@ -17,6 +17,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlock.DefaultTestBlock;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlock.TestBlock;
@@ -150,6 +151,11 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 							event.setCancelled(true);
 							tbManagerInv(p, clicked, event.getCursor());
 						}
+					}else if(invName
+							.equals(StringGetterBau.getString(p, "tbs_gui_addFavoriteInv"))) {
+						getSlave(p).setTestBlockToFavorite(clicked);
+						p.closeInventory();
+						event.setCancelled(true);
 					}
 
 				}
@@ -179,12 +185,13 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 			JsonCreater deleteBegin = new JsonCreater(StringGetterBau.getString(p, "tbs_deleteCustomBlock")
 					.replaceFirst("%r", tb.getTier() + "").replaceFirst("%r", name));
 			JsonCreater deleteClickConfirm = new JsonCreater(
-					StringGetterBau.getString(p, "tbs_deleteCustomBlockConfirm"));
+					Main.prefix + StringGetterBau.getString(p, "tbs_deleteCustomBlockConfirm"));
 			deleteClickConfirm.addClickEvent("/tbs confirmdelete " + p.getUniqueId() + "_" + tb.getTier() + "_" + name,
 					ClickAction.RUN_COMMAND);
 			deleteClickConfirm.addHoverEvent(
 					StringGetterBau.getString(p, "tbs_deleteCustomBlockConfirm_hover").replace("%r", name));
 			deleteBegin.addJson(deleteClickConfirm).send(p);
+			p.closeInventory();
 		} else if (clicked.equals(Banner.PLUS.create(DyeColor.WHITE, DyeColor.BLACK,
 				StringGetterBau.getString(p, "tbs_gui_tbManagerFavorite")))) {
 			/* Add to Favorite */
@@ -192,7 +199,7 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 				getSlave(p).showTBManager();// aktualisieren
 			}
 			p.closeInventory();
-		}else if (clicked.equals(Banner.MINUS.create(DyeColor.WHITE, DyeColor.BLACK,
+		} else if (clicked.equals(Banner.MINUS.create(DyeColor.WHITE, DyeColor.BLACK,
 				StringGetterBau.getString(p, "tbs_gui_tbManagerFavoriteRemove")))) {
 			/* Remove from Favorites */
 			if (getSlave(p).removeFavorite(cursor)) {
@@ -227,8 +234,21 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 		} else if (clickedName.equals(lastPaste)) {
 			TestBlockSlave slave = getSlave(p);
 			slave.pasteBlock(slave.getlastTestBlock(), slave.getLastFacing());
+			p.closeInventory();
 		} else if (clickedName.equals(StringGetterBau.getString(p, "tbs_gui_tbManager"))) {
 			getSlave(p).showTBManager();
+		} else if (clicked.getType().equals(Material.WHITE_BANNER)) {
+			/* All Banner are White banner! */
+
+			if (clickedName.equalsIgnoreCase(StringGetterBau.getString(p, "tbs_gui_addFavorites"))) {
+				/* Add Favorites */
+				getSlave(p).openAddFavoriteInv();
+			} else {
+				/* Paste Favorite */
+				playersCurrentSelection.put(p.getUniqueId(), clickedName);
+				p.openInventory(TestBlockSlaveGUI.richtungsInventory(p));
+			}
+
 		}
 	}
 
@@ -252,9 +272,9 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 			} else {
 				facing = Facing.SOUTH;
 			}
+			p.closeInventory();
 			getSlave(p).pasteBlock(current, facing);
 			playersCurrentSelection.put(p.getUniqueId(), "");
-			p.closeInventory();
 		}
 
 	}

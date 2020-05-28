@@ -302,4 +302,9 @@ public class TestBlockSlave {
 		owner.openInventory(TestBlockSlaveGUI.tbManager(testblocks, owner));
 	}
 
+	
+	public void openAddFavoriteInv() {
+		owner.openInventory(TestBlockSlaveGUI.showAllNonFavorites(testblocks, owner));
+	}
+
 }

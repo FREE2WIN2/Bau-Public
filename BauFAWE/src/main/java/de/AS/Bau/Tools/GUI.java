@@ -285,7 +285,7 @@ public class GUI implements CommandExecutor, Listener {
 				PacketPlayOutChat listp = new PacketPlayOutChat(ChatSerializer.a(add));
 				pConn.sendPacket(listp);
 			}
-			String addMember = "{\"text\":\"�a[+]�r  \",\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"/gs add \"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\""
+			String addMember = "{\"text\":\"§a[+]§r  \",\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"/gs add \"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\""
 					+ StringGetterBau.getString(p, "addMemberHover") + "\"}}}";
 			PacketPlayOutChat addMemberp = new PacketPlayOutChat(ChatSerializer.a(addMember));
 			pConn.sendPacket(addMemberp);
