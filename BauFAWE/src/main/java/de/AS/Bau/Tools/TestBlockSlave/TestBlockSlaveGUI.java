@@ -140,7 +140,7 @@ public class TestBlockSlaveGUI implements Listener {
 					index++;
 				}
 			}
-			for (int i = index; i < (entry.getKey() * 18); i++) {
+			for (int i = index; i < (entry.getKey() * 9); i++) {
 				inv.setItem(i, whiteBanner);
 			}
 		}

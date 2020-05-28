@@ -219,15 +219,15 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 		case "§rTier I":
 			playersCurrentSelection.put(p.getUniqueId(), "Default_T1_");
 			p.openInventory(TestBlockSlaveGUI.richtungsInventory(p));
-			break;
+			return;
 		case "§rTier II":
 			playersCurrentSelection.put(p.getUniqueId(), "Default_T2_");
 			p.openInventory(TestBlockSlaveGUI.richtungsInventory(p));
-			break;
+			return;
 		case "§rTier III/IV":
 			playersCurrentSelection.put(p.getUniqueId(), "Default_T3_");
 			p.openInventory(TestBlockSlaveGUI.richtungsInventory(p));
-			break;
+			return;
 		}
 		if (clickedName.equals(close)) {
 			p.closeInventory();
@@ -257,6 +257,7 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 		String north = StringGetterBau.getString(p, "facingNorth");
 		String clickedName = clicked.getItemMeta().getDisplayName();
 		String current = playersCurrentSelection.get(p.getUniqueId());
+		System.out.println(current);
 		if (current.startsWith("Default_T")) {
 			if (north.equals(clickedName)) {
 				current += "N_";

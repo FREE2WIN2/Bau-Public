@@ -37,7 +37,6 @@ public class TestBlockSlave {
 	 */
 	private Player owner;
 	private HashMap<Integer, HashSet<CustomTestBlock>> testblocks;
-	private HashSet<CustomTestBlock> favs;
 	private TestBlock last;
 	private Facing lastFacing;
 	private UndoManager undoManager;
@@ -50,8 +49,6 @@ public class TestBlockSlave {
 		testblocks.put(1, readTestBlocks(1));
 		testblocks.put(2, readTestBlocks(2));
 		testblocks.put(3, readTestBlocks(3));
-		favs = readFavs();
-
 		last = null;
 		undoManager = new UndoManager(owner);
 	}
@@ -89,8 +86,9 @@ public class TestBlockSlave {
 	}
 
 	public void openGUI() {
-		owner.openInventory(TestBlockSlaveGUI.tbsStartInv(owner, favs));
+		owner.openInventory(TestBlockSlaveGUI.tbsStartInv(owner, readFavs()));
 	}
+
 
 	/* Getter */
 
@@ -198,12 +196,11 @@ public class TestBlockSlave {
 	}
 
 	public boolean setTestBlockToFavorite(ItemStack itemStack) {
-		if (favs.size() == 9) {
+		if (readFavs().size() == 9) {
 			Main.send(owner, "tbs_tooManyFavorites", "fa");
 		}
 		CustomTestBlock block = getBlockOutOfBanner(itemStack);
 		block.setFavorite(true);
-		favs.add(block);
 		updateFavToDataBase(true, block.getTier(), block.getName());
 		Main.send(owner, "tbs_favAdded", block.getName());
 		return true;
@@ -217,7 +214,6 @@ public class TestBlockSlave {
 			Main.send(owner, "tbs_blockIsNoFavorite");
 			return false;
 		}
-		favs.remove(block);
 		block.setFavorite(false);
 		updateFavToDataBase(false, block.getTier(), block.getName());
 		Main.send(owner, "tbs_favRemoved", block.getName());
@@ -285,7 +281,7 @@ public class TestBlockSlave {
 	
 	private boolean updateFavToDataBase(boolean fav, int tier, String name) {
 		try (Connection conn = DataSource.getConnection()){
-			PreparedStatement statement = conn.prepareStatement("UPDATE TestBlock(favorite) SET (?) WHERE owner = ? AND tier = ? AND name = ?");
+			PreparedStatement statement = conn.prepareStatement("UPDATE TestBlock SET favorite = [?] WHERE owner = ? AND tier = ? AND name = ?");
 			statement.setBoolean(1, fav);
 			statement.setString(2, owner.getUniqueId().toString());
 			statement.setInt(3, tier);

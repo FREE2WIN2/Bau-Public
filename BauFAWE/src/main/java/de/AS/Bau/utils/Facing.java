@@ -15,8 +15,8 @@ public enum Facing {
 	
 	public static Facing getByShort(String shortName) {
 		switch(shortName.toLowerCase()) {
-		case "N": return NORTH;
-		case "S": return SOUTH;
+		case "n": return NORTH;
+		case "s": return SOUTH;
 		}
 		return null;
 	}
