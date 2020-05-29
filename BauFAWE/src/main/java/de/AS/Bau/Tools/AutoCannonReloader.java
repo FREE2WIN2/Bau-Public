@@ -31,14 +31,13 @@ public class AutoCannonReloader implements Listener, CommandExecutor {
 	public static Material toolMaterial = Material
 			.valueOf(Main.getPlugin().getCustomConfig().getString("tntReload.materialType"));
 	private static AutoCannonReloader instance;
-	
+
 	public static AutoCannonReloader getInstance() {
-		if(instance == null) {
+		if (instance == null) {
 			return new AutoCannonReloader();
 		}
 		return instance;
 	}
-	
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String string, String[] args) {
@@ -46,16 +45,16 @@ public class AutoCannonReloader implements Listener, CommandExecutor {
 		 * tr|tntReload|cannonReload|cr start , stop , paste , reset , help
 		 * 
 		 */
-		if(!(sender instanceof Player)) {
+		if (!(sender instanceof Player)) {
 			return false;
 		}
 		Player p = (Player) sender;
-		if(args.length == 0) {
+		if (args.length == 0) {
 			showHelp(p);
 			return true;
 		}
-		if(args.length == 1) {
-			switch(args[0].toLowerCase()) {
+		if (args.length == 1) {
+			switch (args[0].toLowerCase()) {
 			case "start":
 				startRecord(p);
 				return true;
@@ -70,16 +69,13 @@ public class AutoCannonReloader implements Listener, CommandExecutor {
 				showHelp(p);
 				return true;
 			case "reset":
-				return true;	
+				return true;
 			}
 		}
-		
+
 		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "cannonReloader_wrongCommand");
 		return true;
 	}
-
-	
-
 
 	@EventHandler
 	public void clickListener(PlayerInteractEvent event) {
@@ -88,21 +84,26 @@ public class AutoCannonReloader implements Listener, CommandExecutor {
 		if (!event.getMaterial().equals(toolMaterial)) {
 			return;
 		}
-		if (a.equals(Action.RIGHT_CLICK_AIR)||a.equals(Action.RIGHT_CLICK_BLOCK)) {
+		if (a.equals(Action.RIGHT_CLICK_AIR) || a.equals(Action.RIGHT_CLICK_BLOCK)) {
 			if (playersTntLocations.containsKey(p.getUniqueId())) {
 				if (playerRecord.contains(p.getUniqueId())) {
 					/* stop */
 					endRecord(p);
 				} else {
 					/* paste */
+
 					pasteRecord(p);
+					if (p.isSneaking()) {
+						/* change */
+						startRecord(p);
+					}
 				}
 
 			} else {
 				/* start */
 				startRecord(p);
 			}
-		} else if (a.equals(Action.LEFT_CLICK_AIR)||a.equals(Action.LEFT_CLICK_BLOCK)) {
+		} else if (a.equals(Action.LEFT_CLICK_AIR) || a.equals(Action.LEFT_CLICK_BLOCK)) {
 			/* delete */
 			deleteRecord(p);
 		}
@@ -125,13 +126,15 @@ public class AutoCannonReloader implements Listener, CommandExecutor {
 		}
 		set = playersTntLocations.get(uuid);
 		if (set.size() >= maxTnt) {
-			Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "cannonReloader_maxTntOverload", String.valueOf(maxTnt));
+			Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "cannonReloader_maxTntOverload",
+					String.valueOf(maxTnt));
 			return;
 		}
 
 		set.add(event.getBlockPlaced().getLocation());
 		if (set.size() == maxTnt) {
-			Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "cannonReloader_maxTnt", String.valueOf(maxTnt));
+			Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "cannonReloader_maxTnt",
+					String.valueOf(maxTnt));
 		}
 		playersTntLocations.put(uuid, set);
 	}
@@ -151,14 +154,13 @@ public class AutoCannonReloader implements Listener, CommandExecutor {
 			return;
 		}
 		HashSet<Location> set = playersTntLocations.get(uuid);
-		if(set.contains(event.getBlock().getLocation())) {
+		if (set.contains(event.getBlock().getLocation())) {
 			set.remove(event.getBlock().getLocation());
 			playersTntLocations.put(uuid, set);
 		}
-		
-		
+
 	}
-	
+
 	public static void startRecord(Player p) {
 		playerRecord.add(p.getUniqueId());
 		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "cannonReloader_startRecord");
@@ -180,7 +182,8 @@ public class AutoCannonReloader implements Listener, CommandExecutor {
 	private void pasteRecord(Player p) {
 		UUID uuid = p.getUniqueId();
 		if (playerAntiSpam.contains(uuid)) {
-			Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "cannonReloader_antispam", String.valueOf(timeout/20));
+			Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "cannonReloader_antispam",
+					String.valueOf(timeout / 20));
 			return;
 		}
 
@@ -201,7 +204,6 @@ public class AutoCannonReloader implements Listener, CommandExecutor {
 			}
 		}, timeout);
 	}
-
 
 	private void showHelp(Player p) {
 		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "cannonReloader_help1");

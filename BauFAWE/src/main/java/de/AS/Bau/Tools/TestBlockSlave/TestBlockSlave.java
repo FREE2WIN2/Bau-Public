@@ -281,12 +281,12 @@ public class TestBlockSlave {
 	
 	private boolean updateFavToDataBase(boolean fav, int tier, String name) {
 		try (Connection conn = DataSource.getConnection()){
-			PreparedStatement statement = conn.prepareStatement("UPDATE TestBlock SET favorite = [?] WHERE owner = ? AND tier = ? AND name = ?");
+			PreparedStatement statement = conn.prepareStatement("UPDATE TestBlock SET favorite = ? WHERE owner = ? AND tier = ? AND name = ?");
 			statement.setBoolean(1, fav);
 			statement.setString(2, owner.getUniqueId().toString());
 			statement.setInt(3, tier);
 			statement.setString(4, name);
-			return true;
+			return statement.executeUpdate() == 1;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

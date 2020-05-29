@@ -151,8 +151,7 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 							event.setCancelled(true);
 							tbManagerInv(p, clicked, event.getCursor());
 						}
-					}else if(invName
-							.equals(StringGetterBau.getString(p, "tbs_gui_addFavoriteInv"))) {
+					} else if (invName.equals(StringGetterBau.getString(p, "tbs_gui_addFavoriteInv"))) {
 						getSlave(p).setTestBlockToFavorite(clicked);
 						p.closeInventory();
 						event.setCancelled(true);
@@ -182,10 +181,11 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 			/* Delete */
 			TestBlock tb = getSlave(p).getBlockOutOfBanner(cursor);
 			String name = tb.getName();
-			JsonCreater deleteBegin = new JsonCreater(StringGetterBau.getString(p, "tbs_deleteCustomBlock")
-					.replaceFirst("%r", tb.getTier() + "").replaceFirst("%r", name));
+			JsonCreater deleteBegin = new JsonCreater(
+					Main.prefix + StringGetterBau.getString(p, "tbs_deleteCustomBlock")
+							.replaceFirst("%r", tb.getTier() + "").replaceFirst("%r", name));
 			JsonCreater deleteClickConfirm = new JsonCreater(
-					Main.prefix + StringGetterBau.getString(p, "tbs_deleteCustomBlockConfirm"));
+					StringGetterBau.getString(p, "tbs_deleteCustomBlockConfirm"));
 			deleteClickConfirm.addClickEvent("/tbs confirmdelete " + p.getUniqueId() + "_" + tb.getTier() + "_" + name,
 					ClickAction.RUN_COMMAND);
 			deleteClickConfirm.addHoverEvent(
@@ -198,14 +198,12 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 			if (getSlave(p).setTestBlockToFavorite(cursor)) {
 				getSlave(p).showTBManager();// aktualisieren
 			}
-			p.closeInventory();
 		} else if (clicked.equals(Banner.MINUS.create(DyeColor.WHITE, DyeColor.BLACK,
 				StringGetterBau.getString(p, "tbs_gui_tbManagerFavoriteRemove")))) {
 			/* Remove from Favorites */
 			if (getSlave(p).removeFavorite(cursor)) {
 				getSlave(p).showTBManager();// aktualisieren
 			}
-			p.closeInventory();
 
 		}
 
