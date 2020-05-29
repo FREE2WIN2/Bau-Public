@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
 
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -19,14 +21,18 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 
 import de.AS.Bau.Main;
+import de.AS.Bau.StringGetterBau;
 import de.AS.Bau.HikariCP.DataSource;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlock.CustomTestBlock;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlock.TestBlock;
 import de.AS.Bau.WorldEdit.UndoManager;
 import de.AS.Bau.WorldEdit.WorldEditHandler;
 import de.AS.Bau.WorldEdit.WorldGuardHandler;
+import de.AS.Bau.utils.ClickAction;
 import de.AS.Bau.utils.CoordGetter;
 import de.AS.Bau.utils.Facing;
+import de.AS.Bau.utils.JsonCreater;
+import de.AS.Bau.utils.Scheduler;
 
 public class TestBlockSlave {
 
@@ -40,6 +46,7 @@ public class TestBlockSlave {
 	private TestBlock last;
 	private Facing lastFacing;
 	private UndoManager undoManager;
+	private Scheduler saveTBParticles;
 
 	/* init */
 
@@ -51,6 +58,7 @@ public class TestBlockSlave {
 		testblocks.put(3, readTestBlocks(3));
 		last = null;
 		undoManager = new UndoManager(owner);
+		saveTBParticles = new Scheduler();
 	}
 
 	private HashSet<CustomTestBlock> readTestBlocks(int tier) {
@@ -88,7 +96,6 @@ public class TestBlockSlave {
 	public void openGUI() {
 		owner.openInventory(TestBlockSlaveGUI.tbsStartInv(owner, readFavs()));
 	}
-
 
 	/* Getter */
 
@@ -141,8 +148,8 @@ public class TestBlockSlave {
 			Main.send(owner, "tbs_tooManyBlocks", "" + tier);
 			return false;
 		}
-		if(nameExists(tier, name)) {
-			Main.send(owner, "tbs_nameNotFree", ""+tier,name);
+		if (nameExists(tier, name)) {
+			Main.send(owner, "tbs_nameNotFree", "" + tier, name);
 			return false;
 		}
 		String plotID = WorldGuardHandler.getPlotId(owner.getLocation());
@@ -223,19 +230,20 @@ public class TestBlockSlave {
 
 	public boolean deleteTestBlock(int tier, String name) {
 		HashSet<CustomTestBlock> blocks = testblocks.get(tier);
-		if(!deleteTestBlockFromDatabase(tier, name)) {
+		if (!deleteTestBlockFromDatabase(tier, name)) {
 			return false;
 		}
-		if(!blocks.remove(getBlockOutOfName(name))) {
+		if (!blocks.remove(getBlockOutOfName(name))) {
 			return false;
 		}
-		Main.send(owner, "tbs_tbDeleted", ""+tier,name);
+		Main.send(owner, "tbs_tbDeleted", "" + tier, name);
 		return true;
 	}
 
 	private boolean deleteTestBlockFromDatabase(int tier, String name) {
-		try(Connection conn = DataSource.getConnection()) {
-			PreparedStatement statement = conn.prepareStatement("DELETE FROM TestBlock WHERE owner = ? AND tier = ? AND name = ?");
+		try (Connection conn = DataSource.getConnection()) {
+			PreparedStatement statement = conn
+					.prepareStatement("DELETE FROM TestBlock WHERE owner = ? AND tier = ? AND name = ?");
 			statement.setString(1, owner.getUniqueId().toString());
 			statement.setInt(2, tier);
 			statement.setString(3, name);
@@ -278,10 +286,11 @@ public class TestBlockSlave {
 		}
 		return false;
 	}
-	
+
 	private boolean updateFavToDataBase(boolean fav, int tier, String name) {
-		try (Connection conn = DataSource.getConnection()){
-			PreparedStatement statement = conn.prepareStatement("UPDATE TestBlock SET favorite = ? WHERE owner = ? AND tier = ? AND name = ?");
+		try (Connection conn = DataSource.getConnection()) {
+			PreparedStatement statement = conn
+					.prepareStatement("UPDATE TestBlock SET favorite = ? WHERE owner = ? AND tier = ? AND name = ?");
 			statement.setBoolean(1, fav);
 			statement.setString(2, owner.getUniqueId().toString());
 			statement.setInt(3, tier);
@@ -298,16 +307,67 @@ public class TestBlockSlave {
 		owner.openInventory(TestBlockSlaveGUI.tbManager(testblocks, owner));
 	}
 
-	
 	public void openAddFavoriteInv() {
 		owner.openInventory(TestBlockSlaveGUI.showAllNonFavorites(testblocks, owner));
 	}
 
-	
 	public void startSavingNewTB() {
 		TestBlockSlaveCore.playersCurrentSelection.put(owner.getUniqueId(), "New_TB_");
-		owner.openInventory(TestBlockSlaveGUI.richtungsInventory(owner));
+		owner.openInventory(TestBlockSlaveGUI.tierInv(owner));
+
+	}
+
+	public void confirmSavingNewTB() {
+		saveTBParticles.cancel();
+		/* Anvil Inv opening */
+
+	}
+
+	public void showParticle(String currentSelection) {
+		JsonCreater creator = new JsonCreater(StringGetterBau.getString(owner, "tbs_gui_confirmRegion"));
+		JsonCreater click = new JsonCreater(StringGetterBau.getString(owner, "tbs_gui_confirmRegionConfirm"));
+		click.addHoverEvent(StringGetterBau.getString(owner, "tbs_gui_confirmRegionHover"))
+				.addClickEvent("/tbs confirmRegion " + owner.getUniqueId() + " " + currentSelection, ClickAction.RUN_COMMAND);
+		creator.addJson(click).send(owner);
 		
+		
+		String plotID = WorldGuardHandler.getPlotId(owner.getLocation());
+		/* currentSelection: New_TB_TIER_FACING_TYPE */
+		String[] args = currentSelection.split("_");
+		Facing facing = Facing.getByShort(args[3]);
+		int tier = Integer.parseInt(args[2]);
+		BlockVector3 middle = CoordGetter.getMiddleRegionTB(plotID, facing);
+		BlockVector3 sizes = CoordGetter.getMaxSizeOfBlock(tier);
+
+		/* If North -> middle.z = min.z ! */
+
+		BlockVector3 min;
+		BlockVector3 max;
+
+		if (facing == Facing.NORTH) {
+			min = middle.subtract(sizes.divide(2).getX(), 0, 1);
+			max = middle.add(sizes.divide(2).getX(), sizes.getY() - 1, sizes.getZ());
+		} else {
+			min = middle.subtract(sizes.divide(2).getX(), 0, sizes.getZ());
+			max = middle.add(sizes.divide(2).getX(), sizes.getY() - 1, -1);
+		}
+		if (args[4].equals("S")) {
+			ConfigurationSection section = Main.getPlugin().getConfig()
+					.getConfigurationSection("coordinates.tbs.sizes." + tier);
+			int shieldSize = section.getInt("shield");
+			min.add(shieldSize, shieldSize, shieldSize);
+			max.add(shieldSize, shieldSize, shieldSize);
+		}
+
+		saveTBParticles.setTask(Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(), new Runnable() {
+
+			@Override
+			public void run() {
+				TestBlockSlaveParticles.showTBParticlesShield(owner, min, max);
+
+			}
+		}, 20));
+
 	}
 
 }

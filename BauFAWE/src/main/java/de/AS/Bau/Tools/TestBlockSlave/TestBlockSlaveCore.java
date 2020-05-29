@@ -96,8 +96,10 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 				/* paste */
 
 				return true;
-			} else {
-
+			} else if(args[0].equals("confirmRegion") && args[1].equals(p.getUniqueId().toString())){
+				// /tbs confirmRegion " + owner.getUniqueId() + " " + currentSelection
+				playersCurrentSelection.put(p.getUniqueId(), args[3]);
+				getSlave(p).confirmSavingNewTB();
 				return false;
 			}
 
@@ -155,6 +157,9 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 						getSlave(p).setTestBlockToFavorite(clicked);
 						p.closeInventory();
 						event.setCancelled(true);
+					}else if(invName.equals(StringGetterBau.getString(p, "tbs_gui_tierInv"))) {
+						tierInv(p, clicked);
+						event.setCancelled(true);
 					}
 
 				}
@@ -165,6 +170,23 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 			}
 		}
 
+	}
+	
+	private void tierInv(Player p, ItemStack clicked) {
+		String clickedName = clicked.getItemMeta().getDisplayName();
+		String current = playersCurrentSelection.get(p.getUniqueId());
+		switch (clickedName) {
+		case "§rTier I":
+			playersCurrentSelection.put(p.getUniqueId(),current + "1_");
+			return;
+		case "§rTier II":
+			playersCurrentSelection.put(p.getUniqueId(), current + "2_");
+			return;
+		case "§rTier III/IV":
+			playersCurrentSelection.put(p.getUniqueId(), current + "3_");
+			return;
+		}
+		p.openInventory(TestBlockSlaveGUI.schildNormalInventory(p));
 	}
 
 	private void tbManagerInv(Player p, ItemStack clicked, ItemStack cursor) {
@@ -262,7 +284,6 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 		String north = StringGetterBau.getString(p, "facingNorth");
 		String clickedName = clicked.getItemMeta().getDisplayName();
 		String current = playersCurrentSelection.get(p.getUniqueId());
-		System.out.println(current);
 		if (current.startsWith("Default_T")) {
 			if (north.equals(clickedName)) {
 				current += "N_";
@@ -321,8 +342,7 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 		}else {
 			/* Saving new TB */
 			
-			/* TODO Show Particles and give a Message */
-			
+			getSlave(p).showParticle(current);
 			
 		}
 

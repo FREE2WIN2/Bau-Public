@@ -33,14 +33,17 @@ coordinates:
         x: 23
         y: 23
         z: 23
+        shields: 8
       2:
         x: 45
         y: 30
         z: 33
+        shields: 12
       3:
         x: 67
         y: 41
         z: 37
+        shields: 16
   spawn: plot2
   teleport:
     plot1: -100.5 8 17.0   #plotID = name of the region -> First make region over the single plots, then over all plots

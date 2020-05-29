@@ -10,6 +10,8 @@ import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -152,6 +154,28 @@ public class TestBlockSlaveGUI implements Listener {
 		Inventory inv = Bukkit.createInventory(null, 9, StringGetterBau.getString(p, "testBlockSklaveTypeInv"));
 		inv.setItem(2, ItemStackCreator.createNewItemStack(Material.SHIELD, StringGetterBau.getString(p, "shield")));
 		inv.setItem(6, ItemStackCreator.createNewItemStack(Material.WHITE_WOOL, "§rNormal"));
+		return inv;
+	}
+
+	public static Inventory tierInv(Player p) {
+		String inventoryName = StringGetterBau.getString(p, "tbs_gui_tierInv");
+		Inventory inv = Bukkit.createInventory(null, 9, inventoryName);
+		inv.setItem(2, Banner.ONE.create(DyeColor.WHITE, DyeColor.BLACK, "§rTier I"));
+		inv.setItem(4, Banner.TWO.create(DyeColor.WHITE, DyeColor.BLACK, "§rTier II"));
+		inv.setItem(6, Banner.THREE.create(DyeColor.WHITE, DyeColor.BLACK, "§rTier III/IV"));
+		return inv;
+	}
+	
+	public static Inventory ChooseNameInv(Player p,int tier) {
+		Inventory inv = (AnvilInventory) Bukkit.createInventory(null, InventoryType.ANVIL);
+		if(tier == 1) {
+			inv.setItem(0, Banner.ONE.create(DyeColor.ORANGE, DyeColor.BLACK, "§rUnnamed"));
+		}else if(tier ==2) {
+			inv.setItem(0, Banner.TWO.create(DyeColor.ORANGE, DyeColor.BLACK, "§rUnnamed"));
+		}else if(tier == 3) {
+			inv.setItem(0, Banner.THREE.create(DyeColor.ORANGE, DyeColor.BLACK, "§rUnnamed"));
+		}
+		
 		return inv;
 	}
 }
