@@ -247,6 +247,13 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 				p.openInventory(TestBlockSlaveGUI.richtungsInventory(p));
 			}
 
+		} else if (clicked.getType().equals(Material.WOODEN_AXE)) {
+			/* save new TB */
+
+			/* Richtung, */
+
+			getSlave(p).startSavingNewTB();
+
 		}
 	}
 
@@ -264,6 +271,14 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 			}
 			playersCurrentSelection.put(p.getUniqueId(), current);
 			p.openInventory(TestBlockSlaveGUI.schildRahmenNormalInventory(p));
+		} else if (current.startsWith("New_TB_")) {
+			if (north.equals(clickedName)) {
+				current += "N_";
+			} else if (south.equals(clickedName)) {
+				current += "S_";
+			}
+			playersCurrentSelection.put(p.getUniqueId(), current);
+			p.openInventory(TestBlockSlaveGUI.schildNormalInventory(p));
 		} else {
 			Facing facing;
 			if (north.equals(clickedName)) {
@@ -284,6 +299,7 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 		String shield = StringGetterBau.getString(p, "shield");
 		String clickedName = clicked.getItemMeta().getDisplayName();
 		String current = playersCurrentSelection.get(p.getUniqueId());
+		
 		if (clickedName.equals(normal)) {
 			current += "N";
 		} else if (clickedName.equals(frame)) {
@@ -291,12 +307,23 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 		} else if (clickedName.equals(shield)) {
 			current += "S";
 		}
-		p.closeInventory();
+		
+		if (current.startsWith("Default_T")) {
+			/* Default TB */
 
-		if (current.contains("_S_")) {
-			getSlave(p).pasteBlock(getDefaultBlock(current.replace("_S_", "_N_")), Facing.SOUTH);
-		} else {
-			getSlave(p).pasteBlock(getDefaultBlock(current), Facing.NORTH);
+			p.closeInventory();
+
+			if (current.contains("_S_")) {
+				getSlave(p).pasteBlock(getDefaultBlock(current.replace("_S_", "_N_")), Facing.SOUTH);
+			} else {
+				getSlave(p).pasteBlock(getDefaultBlock(current), Facing.NORTH);
+			}
+		}else {
+			/* Saving new TB */
+			
+			/* TODO Show Particles and give a Message */
+			
+			
 		}
 
 	}

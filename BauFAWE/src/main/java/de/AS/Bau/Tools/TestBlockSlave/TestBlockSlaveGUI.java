@@ -146,4 +146,12 @@ public class TestBlockSlaveGUI implements Listener {
 		}
 		return inv;
 	}
+
+	
+	public static Inventory schildNormalInventory(Player p) {
+		Inventory inv = Bukkit.createInventory(null, 9, StringGetterBau.getString(p, "testBlockSklaveTypeInv"));
+		inv.setItem(2, ItemStackCreator.createNewItemStack(Material.SHIELD, StringGetterBau.getString(p, "shield")));
+		inv.setItem(6, ItemStackCreator.createNewItemStack(Material.WHITE_WOOL, "§rNormal"));
+		return inv;
+	}
 }

@@ -303,4 +303,11 @@ public class TestBlockSlave {
 		owner.openInventory(TestBlockSlaveGUI.showAllNonFavorites(testblocks, owner));
 	}
 
+	
+	public void startSavingNewTB() {
+		TestBlockSlaveCore.playersCurrentSelection.put(owner.getUniqueId(), "New_TB_");
+		owner.openInventory(TestBlockSlaveGUI.richtungsInventory(owner));
+		
+	}
+
 }
