@@ -80,11 +80,4 @@ public class EmptyTestBlock implements TestBlock {
 	public void setFacing(Facing facing) {
 		this.facing = facing;
 	}
-
-	public void createSchemFile(String ownerUUID) {
-		String dir = Main.schempath + "/" + ownerUUID + "/TestBlockSklave";
-		Clipboard clip = WorldEditHandler.createClipboardOutOfRegion(region,
-				CoordGetter.getTBSPastePosition(plotID, facing), BukkitAdapter.adapt(world));
-		WorldEditHandler.saveClipboardAsSchematic(dir, name, clip);
-	}
 }

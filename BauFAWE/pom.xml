@@ -17,18 +17,18 @@
 	</scm>
 
 	<properties>
-        <!-- Dependency Versions -->
-        <version.worldedit>7.1.0</version.worldedit>
-        <version.worldguard>7.0.2</version.worldguard>
+		<!-- Dependency Versions -->
+		<version.worldedit>7.1.0</version.worldedit>
+		<version.worldguard>7.0.2</version.worldguard>
 
-        <!-- Plugin Versions -->
-        <version.maven-shade-plugin>3.2.3</version.maven-shade-plugin>
+		<!-- Plugin Versions -->
+		<version.maven-shade-plugin>3.2.3</version.maven-shade-plugin>
 
-        <!-- Settings -->
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.target>11</maven.compiler.target>
-        <maven.compiler.source>11</maven.compiler.source>
-    </properties>
+		<!-- Settings -->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.target>11</maven.compiler.target>
+		<maven.compiler.source>11</maven.compiler.source>
+	</properties>
 
 	<repositories>
 		<!-- This adds the Spigot Maven repository to the build -->
@@ -44,18 +44,29 @@
 			<id>sk89q-repo</id>
 			<url>https://maven.enginehub.org/repo/</url>
 		</repository>
-		
+
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
 	</repositories>
 
 	<dependencies>
 		<dependency>
-      		<artifactId>spigotaa</artifactId>
-      		<groupId>spigotbb</groupId>
-      		<version>LATEST</version>
-    		<scope>system</scope>
-    		<systemPath>C:/WGArena/spigot-1.15.2.jar</systemPath>
- 		</dependency>
-	
+			<artifactId>spigotaa</artifactId>
+			<groupId>spigotbb</groupId>
+			<version>LATEST</version>
+			<scope>system</scope>
+			<systemPath>C:/WGArena/spigot-1.15.2.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>com.github.WesJD</groupId>
+			<artifactId>AnvilGUI</artifactId>
+			<version>master-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
+
 		<!--This adds the Spigot API artifact to the build -->
 		<dependency>
 			<groupId>org.spigotmc</groupId>
@@ -68,7 +79,7 @@
 			<groupId>com.sk89q.worldedit</groupId>
 			<artifactId>worldedit-bukkit</artifactId>
 			<version>7.1.0</version>
-		    <scope>provided</scope>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.sk89q.worldguard</groupId>
@@ -99,7 +110,7 @@
 						<goals>
 							<goal>shade</goal>
 						</goals>
-      			     </execution>
+					</execution>
 				</executions>
 			</plugin>
 		</plugins>

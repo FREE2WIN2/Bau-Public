@@ -3,6 +3,7 @@ package de.AS.Bau.Tools.TestBlockSlave;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
+import java.util.function.BiFunction;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
@@ -10,16 +11,18 @@ import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlock.CustomTestBlock;
 import de.AS.Bau.utils.Banner;
 import de.AS.Bau.utils.ItemStackCreator;
+import net.wesjd.anvilgui.AnvilGUI;
+import net.wesjd.anvilgui.AnvilGUI.Builder;
+import net.wesjd.anvilgui.AnvilGUI.Response;
 
 public class TestBlockSlaveGUI implements Listener {
 
@@ -166,16 +169,24 @@ public class TestBlockSlaveGUI implements Listener {
 		return inv;
 	}
 	
-	public static Inventory ChooseNameInv(Player p,int tier) {
-		Inventory inv = (AnvilInventory) Bukkit.createInventory(null, InventoryType.ANVIL);
-		if(tier == 1) {
-			inv.setItem(0, Banner.ONE.create(DyeColor.ORANGE, DyeColor.BLACK, "§rUnnamed"));
-		}else if(tier ==2) {
-			inv.setItem(0, Banner.TWO.create(DyeColor.ORANGE, DyeColor.BLACK, "§rUnnamed"));
-		}else if(tier == 3) {
-			inv.setItem(0, Banner.THREE.create(DyeColor.ORANGE, DyeColor.BLACK, "§rUnnamed"));
-		}
+	public static void ChooseNameInv(Player p,int tier) {
 		
-		return inv;
+		Builder builder = new Builder();
+		BiFunction<Player, String, AnvilGUI.Response> function = new BiFunction<Player, String, AnvilGUI.Response>() {
+			
+			@Override
+			public Response apply(Player t, String u) {
+				return AnvilGUI.Response.text(" ");
+			}
+		};
+		builder.plugin(Main.getPlugin()).onComplete(function).text(" ").title(StringGetterBau.getString(p, "tbs_gui_anvilTitle"));
+		if(tier == 1) {
+			builder.item(Banner.ONE.create(DyeColor.ORANGE, DyeColor.BLACK, "§rUnnamed"));
+		}else if(tier ==2) {
+			builder.item(Banner.TWO.create(DyeColor.ORANGE, DyeColor.BLACK, "§rUnnamed"));
+		}else if(tier == 3) {
+			builder.item(Banner.THREE.create(DyeColor.ORANGE, DyeColor.BLACK, "§rUnnamed"));
+		}
+		builder.open(p);
 	}
 }

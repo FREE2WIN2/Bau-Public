@@ -143,7 +143,7 @@ public class TestBlockSlave {
 
 	/* Adding TestBlocks */
 
-	public boolean addNewCustomTestBlock(int tier, String name, Facing facing) {
+	public boolean addNewCustomTestBlock(int tier, String name, Facing facing, String plotID) {
 
 		if (testblocks.get(tier).size() == 9) {
 			Main.send(owner, "tbs_tooManyBlocks", "" + tier);
@@ -153,7 +153,6 @@ public class TestBlockSlave {
 			Main.send(owner, "tbs_nameNotFree", "" + tier, name);
 			return false;
 		}
-		String plotID = WorldGuardHandler.getPlotId(owner.getLocation());
 		saveRegionAsBlock(tier, facing, plotID, name);
 
 		HashSet<CustomTestBlock> adding = testblocks.get(tier);
@@ -325,20 +324,11 @@ public class TestBlockSlave {
 	}
 	
 	public void saveNewCustomTB(String name) {
-		int tier = newTBToSave.getTier();
-		
-		/*Before saving as new tb, make the schem*/
-		newTBToSave.createSchemFile(owner.getUniqueId().toString());
 		
 		/* Save */
-		CustomTestBlock tb = new CustomTestBlock(owner, name, newTBToSave.getfacing(), tier);
-		HashSet<CustomTestBlock> blocks = testblocks.get(tier);
-		blocks.add(tb);
-		testblocks.put(tier, blocks);
-		newTBToSave = null;
-		
+		addNewCustomTestBlock(newTBToSave.getTier(), name, newTBToSave.getfacing(),newTBToSave.getPlotID());
 		/*Message to player*/
-		Main.send(owner, "tbs_saveOwnTB_success",""+tier,name);
+		Main.send(owner, "tbs_saveOwnTB_success",""+newTBToSave.getTier(),name);
 		}
 
 	public void showParticle(String currentSelection) {
@@ -364,27 +354,28 @@ public class TestBlockSlave {
 		BlockVector3 max;
 
 		if (facing == Facing.NORTH) {
-			min = middle.subtract(sizes.divide(2).getX(), 0, 1);
+			min = middle.subtract(sizes.divide(2).getX(), 0, -1);
 			max = middle.add(sizes.divide(2).getX(), sizes.getY() - 1, sizes.getZ());
 		} else {
 			min = middle.subtract(sizes.divide(2).getX(), 0, sizes.getZ());
-			max = middle.add(sizes.divide(2).getX(), sizes.getY() - 1, -1);
+			max = middle.add(sizes.divide(2).getX(), sizes.getY() -1 , -1);
 		}
 		if (args[4].equals("S")) {
 			ConfigurationSection section = Main.getPlugin().getConfig()
 					.getConfigurationSection("coordinates.tbs.sizes." + tier);
-			int shieldSize = section.getInt("shield");
-			min.add(shieldSize, shieldSize, shieldSize);
-			max.add(shieldSize, shieldSize, shieldSize);
+			int shieldSize = section.getInt("shields");
+			min = min.subtract(shieldSize, 0, shieldSize);
+			max = max.add(shieldSize, shieldSize, shieldSize);
 		}
-
+		BlockVector3 minVector = min;
+		BlockVector3 maxVector = max;
 		newTBToSave = new EmptyTestBlock(tier,new CuboidRegion(min, max),plotID,facing,owner.getWorld());
-		
+		saveTBParticles.cancel();
 		saveTBParticles.setTask(Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), new Runnable() {
 
 			@Override
 			public void run() {
-				TestBlockSlaveParticles.showTBParticlesShield(owner, min, max);
+				TestBlockSlaveParticles.showTBParticlesShield(owner, minVector, maxVector);
 			}
 		}, 0,20));
 

@@ -14,6 +14,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.inventory.InventoryType.SlotType;
+import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -21,6 +23,7 @@ import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlock.DefaultTestBlock;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlock.TestBlock;
+import de.AS.Bau.WorldEdit.WorldGuardHandler;
 import de.AS.Bau.utils.Banner;
 import de.AS.Bau.utils.ClickAction;
 import de.AS.Bau.utils.Facing;
@@ -96,7 +99,7 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 				/* paste */
 
 				return true;
-			} else if(args[0].equals("confirmRegion") && args[1].equals(p.getUniqueId().toString())){
+			} else if (args[0].equals("confirmRegion") && args[1].equals(p.getUniqueId().toString())) {
 				// /tbs confirmRegion " + owner.getUniqueId() + " " + currentSelection
 				playersCurrentSelection.put(p.getUniqueId(), "");
 				getSlave(p).savingNewTBName(Integer.parseInt(args[2].split("_")[2]));
@@ -113,7 +116,7 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 			String name = args[1];
 			Integer tier = Integer.parseInt(args[2]);
 			Facing facing = Facing.valueOf(args[3].toUpperCase());
-			getSlave(p).addNewCustomTestBlock(tier, name, facing);// missing tier!
+			getSlave(p).addNewCustomTestBlock(tier, name, facing, WorldGuardHandler.getPlotId(p.getLocation()));// missing tier!
 			return true;
 		}
 		return false;
@@ -133,7 +136,7 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 							&& event.getClickedInventory().equals(pInv)) {
 						event.setCancelled(true);
 						MainInventory(p, clicked);
-						/* Facing inv (saving and pasting!)*/
+						/* Facing inv (saving and pasting!) */
 					} else if (invName.equals(StringGetterBau.getString(p, "testBlockSklaveFacingInv"))
 							&& event.getClickedInventory().equals(pInv)) {
 						event.setCancelled(true);
@@ -162,12 +165,14 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 						p.closeInventory();
 						event.setCancelled(true);
 						/* Tier inv to save */
-					}else if(invName.equals(StringGetterBau.getString(p, "tbs_gui_tierInv"))) {
+					} else if (invName.equals(StringGetterBau.getString(p, "tbs_gui_tierInv"))) {
 						tierInv(p, clicked);
 						event.setCancelled(true);
-					}else if(pInv.getType().equals(InventoryType.ANVIL)) {
-						System.out.println(event.getSlotType().name());
-						
+					} else if (pInv.getType().equals(InventoryType.ANVIL)) {
+						if (event.getSlotType().equals(SlotType.RESULT)) {
+							p.closeInventory();
+							getSlave(p).saveNewCustomTB(((AnvilInventory) event.getInventory()).getRenameText());
+						}
 					}
 
 				}
@@ -179,19 +184,22 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 		}
 
 	}
-	
+
 	private void tierInv(Player p, ItemStack clicked) {
 		String clickedName = clicked.getItemMeta().getDisplayName();
 		String current = playersCurrentSelection.get(p.getUniqueId());
 		switch (clickedName) {
 		case "§rTier I":
 			current += "1_";
+			break;
 		case "§rTier II":
 			current += "2_";
+			break;
 		case "§rTier III/IV":
 			current += "3_";
+			break;
 		}
-		playersCurrentSelection.put(p.getUniqueId(),current);
+		playersCurrentSelection.put(p.getUniqueId(), current);
 		p.openInventory(TestBlockSlaveGUI.richtungsInventory(p));
 	}
 
@@ -326,7 +334,7 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 		String shield = StringGetterBau.getString(p, "shield");
 		String clickedName = clicked.getItemMeta().getDisplayName();
 		String current = playersCurrentSelection.get(p.getUniqueId());
-		
+
 		if (clickedName.equals(normal)) {
 			current += "N";
 		} else if (clickedName.equals(frame)) {
@@ -334,7 +342,7 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 		} else if (clickedName.equals(shield)) {
 			current += "S";
 		}
-		
+
 		if (current.startsWith("Default_T")) {
 			/* Default TB */
 
@@ -345,11 +353,11 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 			} else {
 				getSlave(p).pasteBlock(getDefaultBlock(current), Facing.NORTH);
 			}
-		}else {
+		} else {
 			/* Saving new TB */
 			p.closeInventory();
 			getSlave(p).showParticle(current);
-			
+
 		}
 
 	}
