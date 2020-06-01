@@ -24,6 +24,7 @@ import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
 import de.AS.Bau.HikariCP.DataSource;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlock.CustomTestBlock;
+import de.AS.Bau.Tools.TestBlockSlave.TestBlock.EmptyTestBlock;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlock.TestBlock;
 import de.AS.Bau.WorldEdit.UndoManager;
 import de.AS.Bau.WorldEdit.WorldEditHandler;
@@ -47,10 +48,10 @@ public class TestBlockSlave {
 	private Facing lastFacing;
 	private UndoManager undoManager;
 	private Scheduler saveTBParticles;
-
+	private EmptyTestBlock newTBToSave;
 	/* init */
 
-	public TestBlockSlave(Player owner) {
+ 	public TestBlockSlave(Player owner) {
 		this.owner = owner;
 		testblocks = new HashMap<>();
 		testblocks.put(1, readTestBlocks(1));
@@ -317,22 +318,40 @@ public class TestBlockSlave {
 
 	}
 
-	public void confirmSavingNewTB() {
+	public void savingNewTBName(int tier) {
 		saveTBParticles.cancel();
 		/* Anvil Inv opening */
-
+		TestBlockSlaveGUI.ChooseNameInv(owner, tier);
 	}
+	
+	public void saveNewCustomTB(String name) {
+		int tier = newTBToSave.getTier();
+		
+		/*Before saving as new tb, make the schem*/
+		newTBToSave.createSchemFile(owner.getUniqueId().toString());
+		
+		/* Save */
+		CustomTestBlock tb = new CustomTestBlock(owner, name, newTBToSave.getfacing(), tier);
+		HashSet<CustomTestBlock> blocks = testblocks.get(tier);
+		blocks.add(tb);
+		testblocks.put(tier, blocks);
+		newTBToSave = null;
+		
+		/*Message to player*/
+		Main.send(owner, "tbs_saveOwnTB_success",""+tier,name);
+		}
 
 	public void showParticle(String currentSelection) {
 		JsonCreater creator = new JsonCreater(StringGetterBau.getString(owner, "tbs_gui_confirmRegion"));
 		JsonCreater click = new JsonCreater(StringGetterBau.getString(owner, "tbs_gui_confirmRegionConfirm"));
-		click.addHoverEvent(StringGetterBau.getString(owner, "tbs_gui_confirmRegionHover"))
-				.addClickEvent("/tbs confirmRegion " + owner.getUniqueId() + " " + currentSelection, ClickAction.RUN_COMMAND);
+		click.addHoverEvent(StringGetterBau.getString(owner, "tbs_gui_confirmRegionHover")).addClickEvent(
+				"/tbs confirmRegion " + owner.getUniqueId() + " " + currentSelection, ClickAction.RUN_COMMAND);
 		creator.addJson(click).send(owner);
-		
-		
+
 		String plotID = WorldGuardHandler.getPlotId(owner.getLocation());
+		
 		/* currentSelection: New_TB_TIER_FACING_TYPE */
+		
 		String[] args = currentSelection.split("_");
 		Facing facing = Facing.getByShort(args[3]);
 		int tier = Integer.parseInt(args[2]);
@@ -359,14 +378,15 @@ public class TestBlockSlave {
 			max.add(shieldSize, shieldSize, shieldSize);
 		}
 
-		saveTBParticles.setTask(Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(), new Runnable() {
+		newTBToSave = new EmptyTestBlock(tier,new CuboidRegion(min, max),plotID,facing,owner.getWorld());
+		
+		saveTBParticles.setTask(Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), new Runnable() {
 
 			@Override
 			public void run() {
 				TestBlockSlaveParticles.showTBParticlesShield(owner, min, max);
-
 			}
-		}, 20));
+		}, 0,20));
 
 	}
 

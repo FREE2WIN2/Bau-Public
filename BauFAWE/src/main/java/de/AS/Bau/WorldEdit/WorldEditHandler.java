@@ -86,6 +86,9 @@ public class WorldEditHandler {
 				e.printStackTrace();
 			}
 		}
+		if (!name.endsWith(".schem")) {
+			name += ".schem";
+		}
 		File file = new File(folder, name);
 		try (ClipboardWriter writer = BuiltInClipboardFormat.SPONGE_SCHEMATIC.getWriter(new FileOutputStream(file))) {
 			writer.write(board);
@@ -127,7 +130,7 @@ public class WorldEditHandler {
 	/* all paste Methods */
 
 	public static void pasten(Schematic schem, String rgID, Player p, boolean ignoreAir) {
-		BlockVector3 at = CoordGetter.getTBSPastePosition(rgID,schem.getFacing());
+		BlockVector3 at = CoordGetter.getTBSPastePosition(rgID, schem.getFacing());
 
 		pasteAsync(new ClipboardHolder(schem.getClip()), at, p, ignoreAir, 1, false, false);
 
