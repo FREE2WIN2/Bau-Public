@@ -20,7 +20,7 @@ public class ParticlesGUI implements Listener {
 	}
 
 	private static Inventory createParticlesGUI(Player p) {
-		Inventory inv = Bukkit.createInventory(null, 9, "§6Particles�7GUI");
+		Inventory inv = Bukkit.createInventory(null, 9, "§6Particles§7GUI");
 		ItemStack toggleOn = ItemStackCreator.createNewItemStack(Material.GLASS_BOTTLE,
 				StringGetterBau.getString(p, "particles_gui_toggleOn"));
 		ItemStack toggleOff = ItemStackCreator.createNewItemStack(Material.EXPERIENCE_BOTTLE,
@@ -67,7 +67,7 @@ public class ParticlesGUI implements Listener {
 		if (clicked == null) {
 			return;
 		}
-		if (event.getView().getTitle().equals("§6Particles�7GUI")) {
+		if (event.getView().getTitle().equals("§6Particles§7GUI")) {
 			String clickedName = clicked.getItemMeta().getDisplayName();
 			if (clickedName.equalsIgnoreCase(StringGetterBau.getString(p, "particles_gui_toggleOn"))) {
 				p.performCommand("particles on");

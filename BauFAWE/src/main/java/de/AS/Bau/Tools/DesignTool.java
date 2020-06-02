@@ -10,8 +10,10 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
@@ -22,8 +24,8 @@ import de.AS.Bau.Scoreboard.ScoreBoardBau;
 public class DesignTool implements Listener, CommandExecutor {
 	public static HashMap<UUID, Boolean> playerHasDtOn = new HashMap<>();
 
-	@EventHandler
-	public void placeBlock(PlayerInteractEvent event) {
+	@EventHandler(priority = EventPriority.NORMAL)
+	public void interactBlock(PlayerInteractEvent event) {
 		if (!event.getHand().equals(EquipmentSlot.HAND)) {
 			return;
 		}
@@ -35,7 +37,9 @@ public class DesignTool implements Listener, CommandExecutor {
 		if (again == null || event.getMaterial() == null) {
 			return;
 		}
-
+		if(again.getType().equals(event.getMaterial())) {
+			return;
+		}
 		if (playerHasDtOn.get(event.getPlayer().getUniqueId()) == true && again != null) {
 			if ((again.getY() < 69 && again.getY() > 8) || again.getType().equals(Material.BARRIER)) {
 				if (!event.getPlayer().isSneaking()) {
@@ -47,7 +51,26 @@ public class DesignTool implements Listener, CommandExecutor {
 		}
 
 	}
+	
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void onblockPlace(BlockPlaceEvent event) {
+		Block again = event.getBlockAgainst();
+		if (again == null || event.getBlockPlaced().getType() == null) {
+			return;
+		}
 
+		if (playerHasDtOn.get(event.getPlayer().getUniqueId()) == true && again != null) {
+			if ((again.getY() < 69 && again.getY() > 8) || again.getType().equals(Material.BARRIER)) {
+				if (!event.getPlayer().isSneaking()) {
+					again.setBlockData(event.getBlockPlaced().getBlockData());
+					event.setCancelled(true);
+				}
+
+			}
+		}
+	}
+
+	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String String, String[] args) {
 		Player p = (Player) sender;

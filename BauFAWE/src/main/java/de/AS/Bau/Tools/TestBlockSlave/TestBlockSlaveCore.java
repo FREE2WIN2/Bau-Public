@@ -178,6 +178,9 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 				}
 			}
 		} else {
+			if(event.getClickedInventory() == null) {
+				return;
+			}
 			if (event.getClickedInventory().equals(pInv)) {
 				event.setCancelled(true);
 			}

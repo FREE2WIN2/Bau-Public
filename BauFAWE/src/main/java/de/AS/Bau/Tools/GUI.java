@@ -104,6 +104,20 @@ public class GUI implements CommandExecutor, Listener {
 				StringGetterBau.getString(p, "teleportPlotThree"));
 		enderPearl3IS.setAmount(3);
 
+		// enderEye
+		ItemStack enderEye1IS = ItemStackCreator.createNewItemStack(Material.ENDER_EYE,
+				StringGetterBau.getString(p, "teleportTestPlotOne"));
+
+		// 2eyes
+		ItemStack enderEye2IS = ItemStackCreator.createNewItemStack(Material.ENDER_EYE,
+				StringGetterBau.getString(p, "teleportTestPlotTwo"));
+		enderEye2IS.setAmount(2);
+
+		// 3eyes
+		ItemStack enderEye3IS = ItemStackCreator.createNewItemStack(Material.ENDER_EYE,
+				StringGetterBau.getString(p, "teleportTestPlotThree"));
+		enderEye3IS.setAmount(3);
+
 		// torch f�r sl
 		ItemStack stoplagIS;
 		if (Stoplag.getStatus(p.getLocation())) {
@@ -114,11 +128,8 @@ public class GUI implements CommandExecutor, Listener {
 					StringGetterBau.getString(p, "torchOn"));
 		}
 
-//		ItemStack rocket = ItemStackCreator.createNewItemStack(Material.FIREWORK_ROCKET,
-//				StringGetterBau.getString(p, "track"));
-
 		ItemStack observer = ItemStackCreator.createNewItemStack(Material.OBSERVER,
-				StringGetterBau.getString(p, "show")); // TODO öffne tail GUI
+				StringGetterBau.getString(p, "show"));
 
 		// NetherStar
 		ItemStack guiItem = ItemStackCreator.createNewItemStack(Material.NETHER_STAR, "§6GUI");
@@ -151,31 +162,33 @@ public class GUI implements CommandExecutor, Listener {
 		ItemStack CannonReloader = ItemStackCreator.createNewItemStack(AutoCannonReloader.toolMaterial,
 				StringGetterBau.getString(p, "cannonReloader_guiName"));
 
+		// Particles
+
 		/* setItems */
 		inv.setItem(0, guiItem);
 		inv.setItem(8, guiItem);
 		inv.setItem(36, guiItem);
 		inv.setItem(44, guiItem);
 
-		inv.setItem(4, Barrier1IS);
+		inv.setItem(3, observer);
+		inv.setItem(5, TestMaterialIS);
 		inv.setItem(11, fz);
-		// inv.setItem(12, rocket);
-		inv.setItem(13, observer);
+		inv.setItem(13, Barrier1IS);
 		inv.setItem(15, CannonReloader);
 		inv.setItem(19, tntIS);
 		inv.setItem(22, playerHeadItem);
 		inv.setItem(25, stoplagIS);
 		inv.setItem(29, ds);
-		inv.setItem(31, TestMaterialIS);
+		inv.setItem(31, ItemStackCreator.createNewItemStack(Material.MELON_SEEDS,
+				StringGetterBau.getString(p, "gui_particles")));
+
 		inv.setItem(33, dst);
 		inv.setItem(37, enderPearl1IS);
 		inv.setItem(38, enderPearl2IS);
 		inv.setItem(39, enderPearl3IS);
-
-		//TODO TestGrundstücke
-		inv.setItem(41, enderPearl1IS);
-		inv.setItem(42, enderPearl2IS);
-		inv.setItem(43, enderPearl3IS);
+		inv.setItem(41, enderEye3IS);
+		inv.setItem(42, enderEye2IS);
+		inv.setItem(43, enderEye1IS);
 		// close DBConnection
 		return inv;
 	}
@@ -246,6 +259,17 @@ public class GUI implements CommandExecutor, Listener {
 		} else if (clickedName.equals(tp3)) {
 			p.closeInventory();
 			p.teleport(CoordGetter.getTeleportLocation(p.getWorld(), "plot3"));
+		} else if (clickedName.equals(StringGetterBau.getString(p, "teleportTestPlotOne"))) {
+			p.closeInventory();
+			p.teleport(CoordGetter.getTeleportLocation(p.getWorld(), "testplot1"));
+		} else if (clickedName.equals(StringGetterBau.getString(p, "teleportTestPlotTwo"))) {
+			p.closeInventory();
+			p.teleport(CoordGetter.getTeleportLocation(p.getWorld(), "testplot2"));
+		} else if (clickedName.equals(StringGetterBau.getString(p, "teleportTestPlotThree"))) {
+			p.closeInventory();
+			p.teleport(CoordGetter.getTeleportLocation(p.getWorld(), "testplot3"));
+		} else if (clickedName.equals(StringGetterBau.getString(p, "gui_particles"))) {
+			p.performCommand("particles gui");
 		} else if (clickedName.equals(memberGUI)) {
 			p.closeInventory();
 			showMember(p);
@@ -274,21 +298,21 @@ public class GUI implements CommandExecutor, Listener {
 		PlayerConnection pConn = ((CraftPlayer) p).getHandle().playerConnection;
 		Set<String> memberlist = DBConnection.getMember(p.getUniqueId().toString());
 
-			p.sendMessage(StringGetterBau.getString(p, "memberListHeader").replace("%r", p.getName()));
-			for (String memberName : memberlist) {
-				String hover = StringGetterBau.getString(p, "memberHoverRemove").replace("%r", memberName);
-				String add;
-				add = "{\"text\":\"§7[§6" + memberName
-						+ "§7] \",\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"/gs remove " + memberName
-						+ "\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"" + hover + "\"}}}";
+		p.sendMessage(StringGetterBau.getString(p, "memberListHeader").replace("%r", p.getName()));
+		for (String memberName : memberlist) {
+			String hover = StringGetterBau.getString(p, "memberHoverRemove").replace("%r", memberName);
+			String add;
+			add = "{\"text\":\"§7[§6" + memberName
+					+ "§7] \",\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"/gs remove " + memberName
+					+ "\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"" + hover + "\"}}}";
 
-				PacketPlayOutChat listp = new PacketPlayOutChat(ChatSerializer.a(add));
-				pConn.sendPacket(listp);
-			}
-			String addMember = "{\"text\":\"§a[+]§r  \",\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"/gs add \"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\""
-					+ StringGetterBau.getString(p, "addMemberHover") + "\"}}}";
-			PacketPlayOutChat addMemberp = new PacketPlayOutChat(ChatSerializer.a(addMember));
-			pConn.sendPacket(addMemberp);
+			PacketPlayOutChat listp = new PacketPlayOutChat(ChatSerializer.a(add));
+			pConn.sendPacket(listp);
+		}
+		String addMember = "{\"text\":\"§a[+]§r  \",\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"/gs add \"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\""
+				+ StringGetterBau.getString(p, "addMemberHover") + "\"}}}";
+		PacketPlayOutChat addMemberp = new PacketPlayOutChat(ChatSerializer.a(addMember));
+		pConn.sendPacket(addMemberp);
 	}
 
 }

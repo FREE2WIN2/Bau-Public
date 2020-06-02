@@ -49,6 +49,9 @@ coordinates:
     plot1: -100.5 8 17.0   #plotID = name of the region -> First make region over the single plots, then over all plots
     plot2: -208.5 8 17.0
     plot3: -316.5 8 17.0
+    testplot1: -100.5 8 17.0   #plotID = name of the region -> First make region over the single plots, then over all plots
+    testplot2: -208.5 8 17.0
+    testplot3: -316.5 8 17.0
   worldBorder:
     min: -370 8 -65
     max: -48 68 98
