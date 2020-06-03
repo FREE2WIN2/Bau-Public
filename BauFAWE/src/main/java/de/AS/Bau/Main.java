@@ -46,6 +46,7 @@ import de.AS.Bau.Tools.Particles.Particles;
 import de.AS.Bau.Tools.Particles.ParticlesGUI;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlockSlaveCore;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlock.DefaultTestBlock;
+import de.AS.Bau.Tools.TestBlockSlave.TestBlockEditor.TestBlockEditorCore;
 import de.AS.Bau.WorldEdit.WorldEditEvents;
 import de.AS.Bau.WorldEdit.WorldEditPreCommand;
 import de.AS.Bau.cmds.Bau;
@@ -59,14 +60,13 @@ public class Main extends JavaPlugin {
 	private static Main plugin;
 	public static StateFlag TntExplosion;
 	public static String schempath;
-	
+
 	private static File customConfigFile;
 	private static YamlConfiguration customConfig;
 	public static String prefix = "§8[§6Bau§8] §r";
 	private static File tempAddConfigFile;
 	private static YamlConfiguration tempAddConfig;
-	
-	
+
 	@Override
 	public void onEnable() {
 		plugin = this;
@@ -108,6 +108,7 @@ public class Main extends JavaPlugin {
 		pm.registerEvents(AutoCannonReloader.getInstance(), this);
 		pm.registerEvents(Particles.getInstance(), this);
 		pm.registerEvents(new ParticlesGUI(), this);
+		pm.registerEvents(new TestBlockEditorCore(), this);
 	}
 
 	private void registerCommands() {
