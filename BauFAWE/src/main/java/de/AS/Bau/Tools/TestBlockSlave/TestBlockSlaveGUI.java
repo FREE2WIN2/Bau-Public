@@ -106,21 +106,13 @@ public class TestBlockSlaveGUI implements Listener {
 	}
 
 	public static Inventory tbManager(HashMap<Integer, HashSet<CustomTestBlock>> tbs, Player p) {
-		Inventory inv = Bukkit.createInventory(null, 54,
-				StringGetterBau.getString(p, "tbs_tbManagerInv").replace("%r", p.getName()));
-		inv.setItem(1, ItemStackCreator.createNewItemStack(Material.BARRIER,
-				StringGetterBau.getString(p, "tbs_gui_tbManagerDelete")));
-		inv.setItem(3, ItemStackCreator.createNewItemStack(Material.WHITE_WOOL,
-				StringGetterBau.getString(p, "tbs_gui_tbManagerPaste")));
-		inv.setItem(5, Banner.PLUS.create(DyeColor.WHITE, DyeColor.BLACK,
-				StringGetterBau.getString(p, "tbs_gui_tbManagerFavorite")));
-		inv.setItem(7, Banner.MINUS.create(DyeColor.WHITE, DyeColor.BLACK,
-				StringGetterBau.getString(p, "tbs_gui_tbManagerFavoriteRemove")));
 
+		Inventory inv = Bukkit.createInventory(null, 45,
+				StringGetterBau.getString(p, "tbs_tbManagerInv").replace("%r", p.getName()));
 		ItemStack whiteBanner = ItemStackCreator.createNewItemStack(Material.WHITE_BANNER, " ");
 
 		for (Entry<Integer, HashSet<CustomTestBlock>> entry : tbs.entrySet()) {
-			int index = (entry.getKey() * 18) - 9;
+			int index = (entry.getKey()-1) * 18;
 
 			for (CustomTestBlock block : entry.getValue()) {
 				inv.setItem(index, block.getBanner());
@@ -130,6 +122,20 @@ public class TestBlockSlaveGUI implements Listener {
 				inv.setItem(i, whiteBanner);
 			}
 		}
+		return inv;
+	}
+	
+	public static Inventory tbManagerActionInv(Player p) {
+		Inventory inv = Bukkit.createInventory(null, 9,
+				StringGetterBau.getString(p, "tbs_tbManagerActionInv").replace("%r", p.getName()));
+		inv.setItem(1, ItemStackCreator.createNewItemStack(Material.BARRIER,
+				StringGetterBau.getString(p, "tbs_gui_tbManagerDelete")));
+		inv.setItem(3, ItemStackCreator.createNewItemStack(Material.WHITE_WOOL,
+				StringGetterBau.getString(p, "tbs_gui_tbManagerPaste")));
+		inv.setItem(5, Banner.PLUS.create(DyeColor.WHITE, DyeColor.BLACK,
+				StringGetterBau.getString(p, "tbs_gui_tbManagerFavorite")));
+		inv.setItem(7, Banner.MINUS.create(DyeColor.WHITE, DyeColor.BLACK,
+				StringGetterBau.getString(p, "tbs_gui_tbManagerFavoriteRemove")));
 		return inv;
 	}
 

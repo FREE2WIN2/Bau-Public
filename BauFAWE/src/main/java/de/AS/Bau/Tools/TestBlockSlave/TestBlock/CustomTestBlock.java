@@ -6,7 +6,6 @@ import org.bukkit.inventory.ItemStack;
 
 import de.AS.Bau.WorldEdit.Schematic;
 import de.AS.Bau.utils.Banner;
-import de.AS.Bau.utils.Facing;
 
 public class CustomTestBlock implements TestBlock {
 
@@ -86,4 +85,6 @@ public class CustomTestBlock implements TestBlock {
 		}
 		return null;
 	}
+
+
 }

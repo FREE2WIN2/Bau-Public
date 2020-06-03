@@ -7,6 +7,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import com.sk89q.worldedit.math.BlockVector3;
 
 import de.AS.Bau.Main;
+import de.AS.Bau.Tools.TestBlockSlave.TestBlock.Facing;
 
 public class CoordGetter {
 

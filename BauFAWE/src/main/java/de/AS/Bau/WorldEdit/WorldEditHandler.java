@@ -34,8 +34,8 @@ import com.sk89q.worldedit.world.World;
 import de.AS.Bau.Main;
 import de.AS.Bau.Tools.Stoplag;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlockSlaveCore;
+import de.AS.Bau.Tools.TestBlockSlave.TestBlock.Facing;
 import de.AS.Bau.utils.CoordGetter;
-import de.AS.Bau.utils.Facing;
 import de.AS.Bau.utils.Scheduler;
 
 public class WorldEditHandler {

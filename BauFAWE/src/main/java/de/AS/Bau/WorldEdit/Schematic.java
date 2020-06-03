@@ -5,7 +5,7 @@ import java.io.File;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 
 import de.AS.Bau.Main;
-import de.AS.Bau.utils.Facing;
+import de.AS.Bau.Tools.TestBlockSlave.TestBlock.Facing;
 
 public class Schematic {
 

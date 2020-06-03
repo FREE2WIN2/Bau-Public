@@ -1,4 +1,4 @@
-package de.AS.Bau.utils;
+package de.AS.Bau.Tools.TestBlockSlave.TestBlock;
 
 public enum Facing {
 	NORTH,SOUTH;

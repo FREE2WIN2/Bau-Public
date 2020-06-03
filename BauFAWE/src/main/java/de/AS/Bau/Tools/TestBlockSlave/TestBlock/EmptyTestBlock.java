@@ -10,7 +10,6 @@ import de.AS.Bau.Main;
 import de.AS.Bau.WorldEdit.Schematic;
 import de.AS.Bau.WorldEdit.WorldEditHandler;
 import de.AS.Bau.utils.CoordGetter;
-import de.AS.Bau.utils.Facing;
 
 public class EmptyTestBlock implements TestBlock {
 

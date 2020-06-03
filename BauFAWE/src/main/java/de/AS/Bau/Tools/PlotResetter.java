@@ -18,10 +18,10 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
+import de.AS.Bau.Tools.TestBlockSlave.TestBlock.Facing;
 import de.AS.Bau.WorldEdit.Schematic;
 import de.AS.Bau.WorldEdit.WorldEditHandler;
 import de.AS.Bau.utils.ClickAction;
-import de.AS.Bau.utils.Facing;
 import de.AS.Bau.utils.JsonCreater;
 import de.AS.Bau.utils.Scheduler;
 

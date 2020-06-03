@@ -25,13 +25,15 @@ import de.AS.Bau.StringGetterBau;
 import de.AS.Bau.HikariCP.DataSource;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlock.CustomTestBlock;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlock.EmptyTestBlock;
+import de.AS.Bau.Tools.TestBlockSlave.TestBlock.Facing;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlock.TestBlock;
+import de.AS.Bau.Tools.TestBlockSlave.TestBlock.TestBlockType;
+import de.AS.Bau.Tools.TestBlockSlave.TestBlock.Type;
 import de.AS.Bau.WorldEdit.UndoManager;
 import de.AS.Bau.WorldEdit.WorldEditHandler;
 import de.AS.Bau.WorldEdit.WorldGuardHandler;
 import de.AS.Bau.utils.ClickAction;
 import de.AS.Bau.utils.CoordGetter;
-import de.AS.Bau.utils.Facing;
 import de.AS.Bau.utils.JsonCreater;
 import de.AS.Bau.utils.Scheduler;
 
@@ -49,6 +51,7 @@ public class TestBlockSlave {
 	private UndoManager undoManager;
 	private Scheduler saveTBParticles;
 	private EmptyTestBlock newTBToSave;
+	private ChooseTestBlock chooseTB;
 	/* init */
 
  	public TestBlockSlave(Player owner) {
@@ -112,6 +115,27 @@ public class TestBlockSlave {
 		return undoManager;
 	}
 
+	public ChooseTestBlock getChooseTB() {
+		return chooseTB;
+	}
+	
+	/* CHOOSING*/
+	
+	public void startNewChoose() {
+		chooseTB = new ChooseTestBlock();
+	}
+	
+	public void startNewChoose(TestBlockType tbtype, int i) {
+		chooseTB = new ChooseTestBlock();
+		chooseTB.setTier(i);
+		chooseTB.setTestBlockType(tbtype);
+	}
+	
+	public void startNewChoose(ItemStack clicked) {
+		chooseTB = new ChooseTestBlock();
+		chooseTB.setTestBlock(getBlockOutOfBanner(clicked));
+	}
+	
 	/* paste a testBlock */
 
 	public void pasteBlock(TestBlock block, Facing facing) {
@@ -129,6 +153,10 @@ public class TestBlockSlave {
 		pasteBlock(getBlockOutOfName(name), facing);
 	}
 
+	public void pasteBlock(ChooseTestBlock chooseTB2, Facing facing) {
+		pasteBlock(chooseTB2.getTestBlock(), facing);
+	}
+	
 	public void undo() {
 		/* Undo last TB */
 
@@ -312,7 +340,8 @@ public class TestBlockSlave {
 	}
 
 	public void startSavingNewTB() {
-		TestBlockSlaveCore.playersCurrentSelection.put(owner.getUniqueId(), "New_TB_");
+		startNewChoose();
+		chooseTB.setTestBlockType(TestBlockType.NEW);
 		owner.openInventory(TestBlockSlaveGUI.tierInv(owner));
 
 	}
@@ -331,20 +360,20 @@ public class TestBlockSlave {
 		Main.send(owner, "tbs_saveOwnTB_success",""+newTBToSave.getTier(),name);
 		}
 
-	public void showParticle(String currentSelection) {
+	public void showParticle() {
 		JsonCreater creator = new JsonCreater(StringGetterBau.getString(owner, "tbs_gui_confirmRegion"));
 		JsonCreater click = new JsonCreater(StringGetterBau.getString(owner, "tbs_gui_confirmRegionConfirm"));
 		click.addHoverEvent(StringGetterBau.getString(owner, "tbs_gui_confirmRegionHover")).addClickEvent(
-				"/tbs confirmRegion " + owner.getUniqueId() + " " + currentSelection, ClickAction.RUN_COMMAND);
+				"/tbs confirmRegion " + owner.getUniqueId(), ClickAction.RUN_COMMAND);
 		creator.addJson(click).send(owner);
 
 		String plotID = WorldGuardHandler.getPlotId(owner.getLocation());
 		
 		/* currentSelection: New_TB_TIER_FACING_TYPE */
 		
-		String[] args = currentSelection.split("_");
-		Facing facing = Facing.getByShort(args[3]);
-		int tier = Integer.parseInt(args[2]);
+
+		Facing facing = chooseTB.getFacing();
+		int tier = chooseTB.getTier();
 		BlockVector3 middle = CoordGetter.getMiddleRegionTB(plotID, facing);
 		BlockVector3 sizes = CoordGetter.getMaxSizeOfBlock(tier);
 
@@ -360,7 +389,7 @@ public class TestBlockSlave {
 			min = middle.subtract(sizes.divide(2).getX(), 0, sizes.getZ());
 			max = middle.add(sizes.divide(2).getX(), sizes.getY() -1 , -1);
 		}
-		if (args[4].equals("S")) {
+		if (chooseTB.getType().equals(Type.SHIELDS)) {
 			ConfigurationSection section = Main.getPlugin().getConfig()
 					.getConfigurationSection("coordinates.tbs.sizes." + tier);
 			int shieldSize = section.getInt("shields");
@@ -380,5 +409,11 @@ public class TestBlockSlave {
 		}, 0,20));
 
 	}
+
+	
+
+	
+
+	
 
 }
