@@ -28,8 +28,9 @@ public class onPlayerMove implements Listener {
 			String rgID = WorldGuardHandler.getPlotId(p.getLocation());
 			/*You have to be in a Region to move(make the Region out of the regions so big.)*/
 			
-			if (rgID == null&&!(p.hasPermission("vip")||p.hasPermission("bau.move.bypass"))) {
+			if (rgID == null&&!p.hasPermission("bau.move.bypass")) {
 				p.teleport(e.getFrom());
+				e.setCancelled(true);
 				return;
 			}
 			if(rgID == null) {

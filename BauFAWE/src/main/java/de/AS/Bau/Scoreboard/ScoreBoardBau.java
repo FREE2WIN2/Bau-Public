@@ -135,24 +135,6 @@ public class ScoreBoardBau {
 	}
 
 	private static String getPlotNumber(Player p) {
-//		RegionManager rm = WorldGuard.getInstance().getPlatform().getRegionContainer()
-//				.get(BukkitAdapter.adapt(p.getWorld()));
-//		if (rm.getApplicableRegions(
-//				BlockVector3.at(p.getLocation().getX(), p.getLocation().getY(), p.getLocation().getZ())).getRegions()
-//				.size() > 0) {
-//			System.out.println(rm
-//					.getApplicableRegionsIDs(
-//							BlockVector3.at(p.getLocation().getX(), p.getLocation().getY(), p.getLocation().getZ()))
-//					.get(0).replace("plot", ""));
-//			return rm
-//					.getApplicableRegionsIDs(
-//							BlockVector3.at(p.getLocation().getX(), p.getLocation().getY(), p.getLocation().getZ()))
-//					.get(0).replace("plot", "");
-		
-//		} else {
-//			return "§cError";
-//		}
-	///	System.out.println(onPlayerMove.playersLastPlot.get(p).replace("plot", ""));
 		return onPlayerMove.playersLastPlot.get(p).replace("plot", "");
 		
 	}

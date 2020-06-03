@@ -52,7 +52,7 @@ public class PlotResetter implements CommandExecutor {
 			creater2.addClickEvent("/delcon " + rgID + " " + p.getUniqueId(), ClickAction.RUN_COMMAND);
 			creater1.addJson(creater2).send(p);
 		} else {
-			if (playerBlockedDelete.contains(p.getUniqueId())) {
+			if (playerBlockedDelete.contains(p.getUniqueId())&&!p.hasPermission("bau.delete.bypass")) {
 				p.sendMessage(StringGetterBau.getString(p, "deletePlotAntiSpaw"));
 				return;
 			}
