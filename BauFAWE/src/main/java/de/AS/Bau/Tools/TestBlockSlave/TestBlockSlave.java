@@ -54,7 +54,7 @@ public class TestBlockSlave {
 	private ChooseTestBlock chooseTB;
 	/* init */
 
- 	public TestBlockSlave(Player owner) {
+	public TestBlockSlave(Player owner) {
 		this.owner = owner;
 		testblocks = new HashMap<>();
 		testblocks.put(1, readTestBlocks(1));
@@ -118,24 +118,25 @@ public class TestBlockSlave {
 	public ChooseTestBlock getChooseTB() {
 		return chooseTB;
 	}
-	
-	/* CHOOSING*/
-	
+
+	/* CHOOSING */
+
 	public void startNewChoose() {
 		chooseTB = new ChooseTestBlock();
 	}
-	
-	public void startNewChoose(TestBlockType tbtype, int i) {
+
+	public void startNewChoose(TestBlockType tbtype, int i) {//Defaults
 		chooseTB = new ChooseTestBlock();
 		chooseTB.setTier(i);
 		chooseTB.setTestBlockType(tbtype);
 	}
-	
-	public void startNewChoose(ItemStack clicked) {
+
+	public void startNewChoose(ItemStack clicked) {//Customs
 		chooseTB = new ChooseTestBlock();
 		chooseTB.setTestBlock(getBlockOutOfBanner(clicked));
+		chooseTB.setTestBlockType(TestBlockType.CUSTOM);
 	}
-	
+
 	/* paste a testBlock */
 
 	public void pasteBlock(TestBlock block, Facing facing) {
@@ -156,7 +157,7 @@ public class TestBlockSlave {
 	public void pasteBlock(ChooseTestBlock chooseTB2, Facing facing) {
 		pasteBlock(chooseTB2.getTestBlock(), facing);
 	}
-	
+
 	public void undo() {
 		/* Undo last TB */
 
@@ -230,29 +231,40 @@ public class TestBlockSlave {
 
 	}
 
-	public boolean setTestBlockToFavorite(ItemStack itemStack) {
+	public boolean setTestBlockToFavorite(TestBlock tb) {
 		if (readFavs().size() == 9) {
 			Main.send(owner, "tbs_tooManyFavorites", "fa");
 		}
-		CustomTestBlock block = getBlockOutOfBanner(itemStack);
-		block.setFavorite(true);
-		updateFavToDataBase(true, block.getTier(), block.getName());
-		Main.send(owner, "tbs_favAdded", block.getName());
-		return true;
+		if (tb instanceof CustomTestBlock) {
+			CustomTestBlock block = (CustomTestBlock) tb;
+			block.setFavorite(true);
+			updateFavToDataBase(true, block.getTier(), block.getName());
+			Main.send(owner, "tbs_favAdded", block.getName());
+			return true;
+		}
+		return false;
+	}
+	
+	public void setTestBlockToFavorite(ItemStack clicked) {
+		setTestBlockToFavorite(getBlockOutOfBanner(clicked));
+		
 	}
 
 	/* Removing TestBlocks */
 
-	public boolean removeFavorite(ItemStack itemStack) {
-		CustomTestBlock block = getBlockOutOfBanner(itemStack);
-		if (!block.isFavorite()) {
-			Main.send(owner, "tbs_blockIsNoFavorite");
-			return false;
+	public boolean removeFavorite(TestBlock tb) {
+		if (tb instanceof CustomTestBlock) {
+			CustomTestBlock block = (CustomTestBlock) tb;
+			if (!block.isFavorite()) {
+				Main.send(owner, "tbs_blockIsNoFavorite");
+				return false;
+			}
+			block.setFavorite(false);
+			updateFavToDataBase(false, block.getTier(), block.getName());
+			Main.send(owner, "tbs_favRemoved", block.getName());
+			return true;
 		}
-		block.setFavorite(false);
-		updateFavToDataBase(false, block.getTier(), block.getName());
-		Main.send(owner, "tbs_favRemoved", block.getName());
-		return true;
+		return false;
 
 	}
 
@@ -346,31 +358,30 @@ public class TestBlockSlave {
 
 	}
 
-	public void savingNewTBName(int tier) {
+	public void savingNewTBName() {
 		saveTBParticles.cancel();
 		/* Anvil Inv opening */
-		TestBlockSlaveGUI.ChooseNameInv(owner, tier);
+		TestBlockSlaveGUI.ChooseNameInv(owner, chooseTB.getTier());
 	}
-	
+
 	public void saveNewCustomTB(String name) {
-		
+
 		/* Save */
-		addNewCustomTestBlock(newTBToSave.getTier(), name, newTBToSave.getfacing(),newTBToSave.getPlotID());
-		/*Message to player*/
-		Main.send(owner, "tbs_saveOwnTB_success",""+newTBToSave.getTier(),name);
-		}
+		addNewCustomTestBlock(newTBToSave.getTier(), name, newTBToSave.getfacing(), newTBToSave.getPlotID());
+		/* Message to player */
+		Main.send(owner, "tbs_saveOwnTB_success", "" + newTBToSave.getTier(), name);
+	}
 
 	public void showParticle() {
 		JsonCreater creator = new JsonCreater(StringGetterBau.getString(owner, "tbs_gui_confirmRegion"));
 		JsonCreater click = new JsonCreater(StringGetterBau.getString(owner, "tbs_gui_confirmRegionConfirm"));
-		click.addHoverEvent(StringGetterBau.getString(owner, "tbs_gui_confirmRegionHover")).addClickEvent(
-				"/tbs confirmRegion " + owner.getUniqueId(), ClickAction.RUN_COMMAND);
+		click.addHoverEvent(StringGetterBau.getString(owner, "tbs_gui_confirmRegionHover"))
+				.addClickEvent("/tbs confirmRegion " + owner.getUniqueId(), ClickAction.RUN_COMMAND);
 		creator.addJson(click).send(owner);
 
 		String plotID = WorldGuardHandler.getPlotId(owner.getLocation());
-		
+
 		/* currentSelection: New_TB_TIER_FACING_TYPE */
-		
 
 		Facing facing = chooseTB.getFacing();
 		int tier = chooseTB.getTier();
@@ -387,7 +398,7 @@ public class TestBlockSlave {
 			max = middle.add(sizes.divide(2).getX(), sizes.getY() - 1, sizes.getZ());
 		} else {
 			min = middle.subtract(sizes.divide(2).getX(), 0, sizes.getZ());
-			max = middle.add(sizes.divide(2).getX(), sizes.getY() -1 , -1);
+			max = middle.add(sizes.divide(2).getX(), sizes.getY() - 1, -1);
 		}
 		if (chooseTB.getType().equals(Type.SHIELDS)) {
 			ConfigurationSection section = Main.getPlugin().getConfig()
@@ -398,7 +409,7 @@ public class TestBlockSlave {
 		}
 		BlockVector3 minVector = min;
 		BlockVector3 maxVector = max;
-		newTBToSave = new EmptyTestBlock(tier,new CuboidRegion(min, max),plotID,facing,owner.getWorld());
+		newTBToSave = new EmptyTestBlock(tier, new CuboidRegion(min, max), plotID, facing, owner.getWorld());
 		saveTBParticles.cancel();
 		saveTBParticles.setTask(Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), new Runnable() {
 
@@ -406,14 +417,10 @@ public class TestBlockSlave {
 			public void run() {
 				TestBlockSlaveParticles.showTBParticlesShield(owner, minVector, maxVector);
 			}
-		}, 0,20));
+		}, 0, 20));
 
 	}
 
-	
 
-	
-
-	
 
 }

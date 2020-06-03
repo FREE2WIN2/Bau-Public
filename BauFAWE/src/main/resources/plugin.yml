@@ -47,3 +47,18 @@ commands:
      description: tntReload command
      aliases: [tntReload,cannonReload,cr]
      usage: /<command>
+     
+     
+permissions:
+  bau.*:
+    default: op
+    childrens:
+      bau.move.bypass: true
+      bau.delete.bypass: true
+  bau.move.bypass:
+    default: false
+  bau.delete.bypass:
+    default: false
+    
+    
+    

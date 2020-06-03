@@ -45,6 +45,7 @@ import de.AS.Bau.Tools.TntChest;
 import de.AS.Bau.Tools.Particles.Particles;
 import de.AS.Bau.Tools.Particles.ParticlesGUI;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlockSlaveCore;
+import de.AS.Bau.Tools.TestBlockSlave.TestBlock.DefaultTestBlock;
 import de.AS.Bau.WorldEdit.WorldEditEvents;
 import de.AS.Bau.WorldEdit.WorldEditPreCommand;
 import de.AS.Bau.cmds.Bau;
@@ -78,7 +79,7 @@ public class Main extends JavaPlugin {
 		WorldHandler.checkForWorldsToUnload();
 		new DataSource();
 		new StringGetterBau();
-		TestBlockSlaveCore.generateDefaultTestBlocks();
+		DefaultTestBlock.generateDefaultTestBlocks();
 		schempath = customConfig.getString("schempath");
 		super.onEnable();
 	}

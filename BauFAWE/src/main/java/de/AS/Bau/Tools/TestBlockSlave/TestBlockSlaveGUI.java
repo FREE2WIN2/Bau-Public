@@ -118,7 +118,10 @@ public class TestBlockSlaveGUI implements Listener {
 				inv.setItem(index, block.getBanner());
 				index++;
 			}
-			for (int i = index; i < (entry.getKey() * 18); i++) {
+			for (int i = index; i < (entry.getKey() * 18 -9); i++) {
+				if(i>=45) {
+					break;
+				}
 				inv.setItem(i, whiteBanner);
 			}
 		}
@@ -130,11 +133,11 @@ public class TestBlockSlaveGUI implements Listener {
 				StringGetterBau.getString(p, "tbs_tbManagerActionInv").replace("%r", p.getName()));
 		inv.setItem(1, ItemStackCreator.createNewItemStack(Material.BARRIER,
 				StringGetterBau.getString(p, "tbs_gui_tbManagerDelete")));
-		inv.setItem(3, ItemStackCreator.createNewItemStack(Material.WHITE_WOOL,
-				StringGetterBau.getString(p, "tbs_gui_tbManagerPaste")));
-		inv.setItem(5, Banner.PLUS.create(DyeColor.WHITE, DyeColor.BLACK,
+		inv.setItem(3, Banner.N.create(DyeColor.WHITE, DyeColor.BLACK, StringGetterBau.getString(p, "facingNorth")));
+		inv.setItem(4, Banner.S.create(DyeColor.WHITE, DyeColor.BLACK, StringGetterBau.getString(p, "facingSouth")));
+		inv.setItem(6, Banner.PLUS.create(DyeColor.WHITE, DyeColor.BLACK,
 				StringGetterBau.getString(p, "tbs_gui_tbManagerFavorite")));
-		inv.setItem(7, Banner.MINUS.create(DyeColor.WHITE, DyeColor.BLACK,
+		inv.setItem(8, Banner.MINUS.create(DyeColor.WHITE, DyeColor.BLACK,
 				StringGetterBau.getString(p, "tbs_gui_tbManagerFavoriteRemove")));
 		return inv;
 	}

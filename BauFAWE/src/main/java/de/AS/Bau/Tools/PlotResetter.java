@@ -112,7 +112,7 @@ public class PlotResetter implements CommandExecutor {
 					}, 0, 1));
 
 			// spamschutz für nicht VIP und Supporter und builder
-			if (!(p.hasPermission("vip") || p.hasPermission("supporter")|| p.hasPermission("builder"))) {
+			if (!(p.hasPermission("bau.delete.bypass"))) {
 				Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(), new Runnable() {
 
 					@Override
