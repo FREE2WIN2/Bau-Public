@@ -48,7 +48,6 @@ import de.AS.Bau.Tools.TestBlockSlave.TestBlockSlaveCore;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlock.DefaultTestBlock;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlockEditor.TestBlockEditorCore;
 import de.AS.Bau.WorldEdit.SaWE;
-import de.AS.Bau.WorldEdit.WorldEditEvents;
 import de.AS.Bau.WorldEdit.WorldEditPreCommand;
 import de.AS.Bau.cmds.Bau;
 import de.AS.Bau.cmds.ds;
@@ -88,7 +87,6 @@ public class Main extends JavaPlugin {
 	private void registerListener() {
 		new onPlayerJoin(this);
 		new SignListener(this);
-		//new WorldEditEvents(this);
 		new ClickListener(this);
 		new onPlayerQuit(this);
 		new onPlayerMove(this);

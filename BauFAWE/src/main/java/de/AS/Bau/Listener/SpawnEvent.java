@@ -3,8 +3,6 @@ package de.AS.Bau.Listener;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -23,6 +21,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
 import de.AS.Bau.HikariCP.DBConnection;
+import de.AS.Bau.utils.HelperMethods;
 
 public class SpawnEvent implements Listener {
 
@@ -105,7 +104,7 @@ public class SpawnEvent implements Listener {
 				f.createNewFile();
 			}
 			FileWriter fw = new FileWriter(f, true);
-			String time = getTime();
+			String time = HelperMethods.getTime();
 			fw.write(time + " " + world.getName() + " " + size + "Entities Entfernt! ->"
 					+ DBConnection.getName(world.getName()) + "\n");
 			fw.flush();

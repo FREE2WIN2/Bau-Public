@@ -20,6 +20,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
 import de.AS.Bau.Scoreboard.ScoreBoardBau;
+import de.AS.Bau.WorldEdit.WorldGuardHandler;
 
 public class DesignTool implements Listener, CommandExecutor {
 	public static HashMap<UUID, Boolean> playerHasDtOn = new HashMap<>();
@@ -41,7 +42,7 @@ public class DesignTool implements Listener, CommandExecutor {
 			return;
 		}
 		if (playerHasDtOn.get(event.getPlayer().getUniqueId()) == true && again != null) {
-			if ((again.getY() < 69 && again.getY() > 8) || again.getType().equals(Material.BARRIER)) {
+			if (WorldGuardHandler.isInBuildRegion(again.getLocation()) && !again.getType().equals(Material.BARRIER)) {
 				if (!event.getPlayer().isSneaking()) {
 					again.setType(event.getMaterial());
 					event.setCancelled(true);
@@ -60,7 +61,7 @@ public class DesignTool implements Listener, CommandExecutor {
 		}
 
 		if (playerHasDtOn.get(event.getPlayer().getUniqueId()) == true && again != null) {
-			if ((again.getY() < 69 && again.getY() > 8) || again.getType().equals(Material.BARRIER)) {
+			if (WorldGuardHandler.isInBuildRegion(again.getLocation()) && !again.getType().equals(Material.BARRIER)) {
 				if (!event.getPlayer().isSneaking()) {
 					again.setBlockData(event.getBlockPlaced().getBlockData());
 					event.setCancelled(true);

@@ -41,6 +41,19 @@ public class WorldGuardHandler {
 		return getRegion(getPlotId(loc), BukkitAdapter.adapt(loc.getWorld()));
 	}
 
+	public static boolean isInBuildRegion(Location loc) {
+		return isInBuildRegion(BlockVector3.at(loc.getX(), loc.getY(), loc.getZ()),
+				BukkitAdapter.adapt(loc.getWorld()));
+	}
+
+	public static boolean isInBuildRegion(BlockVector3 location, World world) {
+		RegionManager regions = container.get(world);
+		if (regions.getApplicableRegionsIDs(location).size() == 0) {
+			return false;
+		}
+		return regions.getApplicableRegionsIDs(location).size() > 1;
+	}
+
 	public static boolean addPlayerToAllRegions(String worldName, String playerUUID) {
 		RegionManager regions = container.get(BukkitAdapter.adapt(WorldHandler.loadWorld(worldName)));
 		for (Entry<String, ProtectedRegion> rg : regions.getRegions().entrySet()) {

@@ -30,7 +30,7 @@ public class SaWE implements Listener {
 			return;
 		}
 		changeMask(p, p.getLocation());
-		if (we.getSessionManager().get(BukkitAdapter.adapt(p)).getMask() != null) {
+		if (we.getSessionManager().get(BukkitAdapter.adapt(p)).getMask() == null) {
 			Main.send(p, "noWE");
 			event.setCancelled(true);
 		}
