@@ -1,6 +1,8 @@
 package de.AS.Bau.utils;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class HelperMethods {
@@ -48,4 +50,11 @@ public class HelperMethods {
 		return output;
 	}
 
+	
+	public static String getTime() {
+		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy' 'HH:mm:ss");
+		Date date = new Date();
+		String time = "[" + formatter.format(date) + "]";
+		return time;
+	}
 }

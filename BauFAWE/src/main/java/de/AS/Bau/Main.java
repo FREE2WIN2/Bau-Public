@@ -47,6 +47,7 @@ import de.AS.Bau.Tools.Particles.ParticlesGUI;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlockSlaveCore;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlock.DefaultTestBlock;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlockEditor.TestBlockEditorCore;
+import de.AS.Bau.WorldEdit.SaWE;
 import de.AS.Bau.WorldEdit.WorldEditEvents;
 import de.AS.Bau.WorldEdit.WorldEditPreCommand;
 import de.AS.Bau.cmds.Bau;
@@ -87,7 +88,7 @@ public class Main extends JavaPlugin {
 	private void registerListener() {
 		new onPlayerJoin(this);
 		new SignListener(this);
-		new WorldEditEvents(this);
+		//new WorldEditEvents(this);
 		new ClickListener(this);
 		new onPlayerQuit(this);
 		new onPlayerMove(this);
@@ -109,6 +110,7 @@ public class Main extends JavaPlugin {
 		pm.registerEvents(Particles.getInstance(), this);
 		pm.registerEvents(new ParticlesGUI(), this);
 		pm.registerEvents(new TestBlockEditorCore(), this);
+		pm.registerEvents(new SaWE(),this);
 	}
 
 	private void registerCommands() {

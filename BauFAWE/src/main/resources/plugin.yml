@@ -55,9 +55,12 @@ permissions:
     childrens:
       bau.move.bypass: true
       bau.delete.bypass: true
+      bau.build.bypass: true
   bau.move.bypass:
     default: false
   bau.delete.bypass:
+    default: false
+  bau.build.bypass:
     default: false
     
     

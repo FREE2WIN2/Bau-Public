@@ -4,10 +4,10 @@ import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -27,11 +27,10 @@ import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
 import de.AS.Bau.HikariCP.DBConnection;
 import de.AS.Bau.WorldEdit.WorldGuardHandler;
+import de.AS.Bau.utils.ClickAction;
 import de.AS.Bau.utils.CoordGetter;
 import de.AS.Bau.utils.ItemStackCreator;
-import net.minecraft.server.v1_15_R1.IChatBaseComponent.ChatSerializer;
-import net.minecraft.server.v1_15_R1.PacketPlayOutChat;
-import net.minecraft.server.v1_15_R1.PlayerConnection;
+import de.AS.Bau.utils.JsonCreater;
 
 public class GUI implements CommandExecutor, Listener {
 
@@ -49,12 +48,7 @@ public class GUI implements CommandExecutor, Listener {
 
 	@SuppressWarnings("deprecation")
 	public Inventory inventarErstellen(Player p) {
-		String worldname;
-		if (p.getWorld().getName().contains("test")) {
-			worldname = p.getWorld().getName();
-		} else {
-			worldname = DBConnection.getName(p.getWorld().getName());
-		}
+		String worldname = getName(p.getWorld());
 
 		String inventoryName = StringGetterBau.getString(p, "inventoryName").replace("%r", worldname);
 		Inventory inv = Bukkit.createInventory(null, 45, inventoryName);
@@ -76,14 +70,14 @@ public class GUI implements CommandExecutor, Listener {
 		// playerHead
 		ItemStack playerHeadItem = new ItemStack(Material.AIR);
 		ItemStack Barrier1IS = new ItemStack(Material.AIR);
-		if (rg.getOwners().contains(p.getUniqueId()) || p.getUniqueId().toString().equals(p.getWorld().getName())) {
-			playerHeadItem = new ItemStack(Material.PLAYER_HEAD);
-			SkullMeta sm = (SkullMeta) playerHeadItem.getItemMeta();
-			sm.setOwner(p.getName());
-			sm.setDisplayName(StringGetterBau.getString(p, "guiMember"));
-			playerHeadItem.setItemMeta(sm);
+		playerHeadItem = new ItemStack(Material.PLAYER_HEAD);
+		SkullMeta sm = (SkullMeta) playerHeadItem.getItemMeta();
+		sm.setOwner(worldname);
+		sm.setDisplayName(StringGetterBau.getString(p, "guiMember").replace("%r", worldname));
+		playerHeadItem.setItemMeta(sm);
 
-			// delete
+		// delete
+		if (rg.getOwners().contains(p.getUniqueId()) || p.getUniqueId().toString().equals(p.getWorld().getName())) {
 			Barrier1IS = ItemStackCreator.createNewItemStack(Material.BARRIER,
 					StringGetterBau.getString(p, "deletePlot"));
 
@@ -233,7 +227,6 @@ public class GUI implements CommandExecutor, Listener {
 		String tp1 = StringGetterBau.getString(p, "teleportPlotOne");
 		String tp2 = StringGetterBau.getString(p, "teleportPlotTwo");
 		String tp3 = StringGetterBau.getString(p, "teleportPlotThree");
-		String memberGUI = StringGetterBau.getString(p, "guiMember");
 		String testBlockSklaveGui = StringGetterBau.getString(p, "testBlockSklaveGui");
 		String trailShow = StringGetterBau.getString(p, "show");
 		String dtItemOn = StringGetterBau.getString(p, "dtItemOff");
@@ -270,7 +263,7 @@ public class GUI implements CommandExecutor, Listener {
 			p.teleport(CoordGetter.getTeleportLocation(p.getWorld(), "testplot3"));
 		} else if (clickedName.equals(StringGetterBau.getString(p, "gui_particles"))) {
 			p.performCommand("particles gui");
-		} else if (clickedName.equals(memberGUI)) {
+		} else if (clicked.getType().equals(Material.PLAYER_HEAD)) {
 			p.closeInventory();
 			showMember(p);
 		} else if (clickedName.equals(testBlockSklaveGui)) {
@@ -295,24 +288,29 @@ public class GUI implements CommandExecutor, Listener {
 	}
 
 	public static void showMember(Player p) {
-		PlayerConnection pConn = ((CraftPlayer) p).getHandle().playerConnection;
+		boolean isOwner = p.getWorld().getName().equals(p.getUniqueId().toString());
 		Set<String> memberlist = DBConnection.getMember(p.getUniqueId().toString());
-
-		p.sendMessage(StringGetterBau.getString(p, "memberListHeader").replace("%r", p.getName()));
+		Main.send(p, "memberListHeader", getName(p.getWorld()));
 		for (String memberName : memberlist) {
 			String hover = StringGetterBau.getString(p, "memberHoverRemove").replace("%r", memberName);
-			String add;
-			add = "{\"text\":\"§7[§6" + memberName
-					+ "§7] \",\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"/gs remove " + memberName
-					+ "\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"" + hover + "\"}}}";
-
-			PacketPlayOutChat listp = new PacketPlayOutChat(ChatSerializer.a(add));
-			pConn.sendPacket(listp);
+			JsonCreater remove = new JsonCreater("§7[§6" + memberName + "§7]");
+			if (isOwner) {
+				remove.addClickEvent("/gs remove " + memberName, ClickAction.SUGGEST_COMMAND).addHoverEvent(hover);
+			}
+			remove.send(p);
 		}
-		String addMember = "{\"text\":\"§a[+]§r  \",\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"/gs add \"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\""
-				+ StringGetterBau.getString(p, "addMemberHover") + "\"}}}";
-		PacketPlayOutChat addMemberp = new PacketPlayOutChat(ChatSerializer.a(addMember));
-		pConn.sendPacket(addMemberp);
+		if (isOwner) {
+			new JsonCreater("§a[+]§r  ").addClickEvent("/gs add ", ClickAction.SUGGEST_COMMAND)
+					.addHoverEvent(StringGetterBau.getString(p, "addMemberHover")).send(p);
+		}
+
 	}
 
+	public static String getName(World w) {
+		if (w.getName().contains("test")) {
+			return w.getName();
+		} else {
+			return DBConnection.getName(w.getName());
+		}
+	}
 }
