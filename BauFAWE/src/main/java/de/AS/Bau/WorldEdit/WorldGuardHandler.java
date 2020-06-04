@@ -1,6 +1,7 @@
 package de.AS.Bau.WorldEdit;
 
 import java.util.UUID;
+import java.util.List;
 import java.util.Map.Entry;
 
 import org.bukkit.Location;
@@ -75,5 +76,15 @@ public class WorldGuardHandler {
 			rg.getValue().setMembers(member);
 		}
 		return true;
+	}
+
+	public static ProtectedRegion getSecondRegion(Location loc) {
+		RegionManager regions = container.get(BukkitAdapter.adapt(loc.getWorld()));
+		List<String> ids = regions.getApplicableRegionsIDs(BlockVector3.at(loc.getX(), loc.getY(), loc.getZ()));
+		if(ids.size()<2) {
+			return null;
+		}
+		return getRegion(ids.get(1), BukkitAdapter.adapt(loc.getWorld()));
+		
 	}
 }

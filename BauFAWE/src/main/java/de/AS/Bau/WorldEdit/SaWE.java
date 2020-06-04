@@ -43,7 +43,7 @@ public class SaWE implements Listener {
 			session.setMask(null);
 			return;
 		}
-		ProtectedRegion rg = WorldGuardHandler.getRegion(to);
+		ProtectedRegion rg = WorldGuardHandler.getSecondRegion(to);
 		session.setMask(null);
 
 		if (rg == null) {
