@@ -102,52 +102,51 @@ public class ShieldModule {
 		switch(position) {
 		case BACK:
 			if(facing == Facing.NORTH) {
-				return maxOfBlock.add(0,0,blockSize.getZ());
+				return maxOfBlock.add(0,0,shieldSizes);
 			}else {
-				return maxOfBlock.subtract(0,0,shieldSizes);
+				return maxOfBlock.subtract(0,0,blockSize.getZ());
 			}
 		case FRONT:
 			if(facing == Facing.NORTH) {
-				return maxOfBlock.subtract(0,0,shieldSizes);
+				return maxOfBlock.subtract(0,0,blockSize.getZ());
 			}else {
-				return maxOfBlock.add(0,0,blockSize.getZ());
+				return maxOfBlock.add(0,0,shieldSizes);
 			}
 		case ROOFBACK:
 			if(facing == Facing.NORTH) {
-				return maxOfBlock.add(0,blockSize.getY(),blockSize.divide(2).getZ());
+				return maxOfBlock.subtract(0,-shieldSizes,0);
 			}else {
-				return maxOfBlock.add(0,blockSize.getY(),0);
+				return maxOfBlock.subtract(0,-shieldSizes,blockSize.divide(2).getZ());
 			}
 		case ROOFFRONT:
 			if(facing == Facing.NORTH) {
-				return maxOfBlock.subtract(0,-blockSize.getY(),0);
+				return maxOfBlock.subtract(0,-shieldSizes,blockSize.divide(2).getZ());
 			}else {
-				return maxOfBlock.add(0,blockSize.getY(),blockSize.divide(2).getZ());
+				return maxOfBlock.add(0,shieldSizes,0);
 			}
 		case RIGHTSIDEBACK:
 			if(facing == Facing.NORTH) {
-				return maxOfBlock.add(blockSize.getX(),0,blockSize.divide(2).getZ());
+				return maxOfBlock.add(shieldSizes,0,0);
 			}else {
-				return maxOfBlock.subtract(1,0,0);
+				return maxOfBlock.subtract(blockSize.getX(),0,blockSize.divide(2).getZ());
 			}
 		case RIGHTSIDEFRONT:
 			if(facing == Facing.NORTH) {
-				return maxOfBlock.add(blockSize.getX(),0,0);
+				return maxOfBlock.add(shieldSizes,0,-blockSize.divide(2).getZ());
 			}else {
-				System.out.println(maxOfBlock);
-				return maxOfBlock.subtract(1,0,-blockSize.divide(2).getZ());
+				return maxOfBlock.subtract(blockSize.getX(),0,0);
 			}
 		case LEFTSIDEBACK:
 			if(facing == Facing.NORTH) {
-				return maxOfBlock.subtract(1,0,-blockSize.divide(2).getZ());
+				return maxOfBlock.subtract(blockSize.getX()-1,0,0);
 			}else {
-				return maxOfBlock.add(blockSize.getX()-1,0,0);
+				return maxOfBlock.add(shieldSizes,0,-blockSize.divide(2).getZ());
 			}
 		case LEFTSIDEFRONT:
 			if(facing == Facing.NORTH) {
-				return maxOfBlock.subtract(1,0,0);
+				return maxOfBlock.subtract(blockSize.getX()+shieldSizes,0,blockSize.divide(2).getZ());
 			}else {
-				return maxOfBlock.add(blockSize.getX()-1,0,blockSize.divide(2).getZ());
+				return maxOfBlock.add(shieldSizes,0,0);
 			}
 		}
 		return null;

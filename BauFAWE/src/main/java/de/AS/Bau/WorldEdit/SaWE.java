@@ -26,9 +26,9 @@ public class SaWE implements Listener {
 			return;
 		}
 		Player p = event.getPlayer();
-		if (p.hasPermission("bau.build.bypass")) {
-			return;
-		}
+//		if (p.hasPermission("bau.build.bypass")) {
+//			return;
+//		}
 		changeMask(p, p.getLocation());
 		if (we.getSessionManager().get(BukkitAdapter.adapt(p)).getMask() == null) {
 			Main.send(p, "noWE");
@@ -39,10 +39,10 @@ public class SaWE implements Listener {
 	private void changeMask(Player player, Location to) {
 		WorldEdit we = WorldEdit.getInstance();
 		LocalSession session = we.getSessionManager().get(BukkitAdapter.adapt(player));
-		if (player.hasPermission("bau.build.bypass")) {
-			session.setMask(null);
-			return;
-		}
+//		if (player.hasPermission("bau.build.bypass")) {
+//			session.setMask(null);
+//			return;
+//		}
 		ProtectedRegion rg = WorldGuardHandler.getSecondRegion(to);
 		session.setMask(null);
 
