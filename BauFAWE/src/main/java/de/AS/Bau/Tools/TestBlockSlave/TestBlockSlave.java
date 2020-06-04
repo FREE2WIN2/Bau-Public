@@ -223,7 +223,7 @@ public class TestBlockSlave {
 			min = middle.subtract(sizes.divide(2).getX(), 0, sizes.getZ());
 			max = middle.add(sizes.divide(2).getX(), sizes.getY() - 1, -1);
 		}
-		Region rg = new CuboidRegion(min, max);
+		Region rg = TestBlockSlaveCore.getTBRegion(tier, plotID, facing);
 		Clipboard board = WorldEditHandler.createClipboardOutOfRegion(rg,
 				CoordGetter.getTBSPastePosition(plotID, facing), BukkitAdapter.adapt(owner.getWorld()));
 		WorldEditHandler.saveClipboardAsSchematic(
@@ -385,25 +385,11 @@ public class TestBlockSlave {
 
 		Facing facing = chooseTB.getFacing();
 		int tier = chooseTB.getTier();
-		BlockVector3 middle = CoordGetter.getMiddleRegionTB(plotID, facing);
-		BlockVector3 sizes = CoordGetter.getMaxSizeOfBlock(tier);
-
-		/* If North -> middle.z = min.z ! */
-
-		BlockVector3 min;
-		BlockVector3 max;
-
-		if (facing == Facing.NORTH) {
-			min = middle.subtract(sizes.divide(2).getX(), 0, -1);
-			max = middle.add(sizes.divide(2).getX(), sizes.getY() - 1, sizes.getZ());
-		} else {
-			min = middle.subtract(sizes.divide(2).getX(), 0, sizes.getZ());
-			max = middle.add(sizes.divide(2).getX(), sizes.getY() - 1, -1);
-		}
+		Region rg = TestBlockSlaveCore.getTBRegion(tier, plotID, facing);
+		BlockVector3 min = rg.getMinimumPoint();
+		BlockVector3 max = rg.getMaximumPoint();
 		if (chooseTB.getType().equals(Type.SHIELDS)) {
-			ConfigurationSection section = Main.getPlugin().getConfig()
-					.getConfigurationSection("coordinates.tbs.sizes." + tier);
-			int shieldSize = section.getInt("shields");
+			int shieldSize = TestBlockSlaveCore.getMaxShieldSizeOfTier(tier);
 			min = min.subtract(shieldSize, 0, shieldSize);
 			max = max.add(shieldSize, shieldSize, shieldSize);
 		}

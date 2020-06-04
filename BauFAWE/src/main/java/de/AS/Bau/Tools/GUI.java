@@ -77,7 +77,7 @@ public class GUI implements CommandExecutor, Listener {
 		playerHeadItem.setItemMeta(sm);
 
 		// delete
-		if (rg.getOwners().contains(p.getUniqueId()) || p.getUniqueId().toString().equals(p.getWorld().getName())) {
+		if (rg.getOwners().contains(p.getUniqueId()) || p.getUniqueId().toString().equals(p.getWorld().getName())||p.hasPermission("admin")) {
 			Barrier1IS = ItemStackCreator.createNewItemStack(Material.BARRIER,
 					StringGetterBau.getString(p, "deletePlot"));
 

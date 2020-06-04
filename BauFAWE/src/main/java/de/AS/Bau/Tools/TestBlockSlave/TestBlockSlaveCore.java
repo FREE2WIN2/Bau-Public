@@ -9,6 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -19,6 +20,10 @@ import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.regions.Region;
+
 import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlock.Facing;
@@ -28,6 +33,7 @@ import de.AS.Bau.Tools.TestBlockSlave.TestBlock.Type;
 import de.AS.Bau.WorldEdit.WorldGuardHandler;
 import de.AS.Bau.utils.Banner;
 import de.AS.Bau.utils.ClickAction;
+import de.AS.Bau.utils.CoordGetter;
 import de.AS.Bau.utils.JsonCreater;
 
 public class TestBlockSlaveCore implements CommandExecutor, Listener {
@@ -64,6 +70,9 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 				}
 				getSlave(p).deleteTestBlock(Integer.parseInt(args1[1]), args1[2]);
 				return true;
+			}else if (args[0].equals("confirmRegion") && args[1].equals(p.getUniqueId().toString())) {
+				getSlave(p).savingNewTBName();
+				return true;
 			}
 			return false;
 		} else if (args.length == 3) {
@@ -95,10 +104,7 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 				getSlave(p).pasteBlock(chooseTB.getTestBlock(),chooseTB.getFacing());
 				/* paste */
 				return true;
-			} else if (args[0].equals("confirmRegion") && args[1].equals(p.getUniqueId().toString())) {
-				getSlave(p).savingNewTBName();
-				return true;
-			}
+			} 
 
 		} else if (args.length == 4) {
 			if (!args[0].equalsIgnoreCase("save")) {
@@ -364,4 +370,28 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 		return instance;
 	}
 
+	public static Region getTBRegion(int tier, String plotID,Facing facing) {
+
+		BlockVector3 middle = CoordGetter.getMiddleRegionTB(plotID, facing);
+		BlockVector3 sizes = CoordGetter.getMaxSizeOfBlock(tier);
+
+		/* If North -> middle.z = min.z ! */
+
+		BlockVector3 min;
+		BlockVector3 max;
+		if (facing == Facing.NORTH) {
+			min = middle.subtract(sizes.divide(2).getX(), 0, -1);
+			max = middle.add(sizes.divide(2).getX(), sizes.getY() - 1, sizes.getZ());
+		} else {
+			min = middle.subtract(sizes.divide(2).getX(), 0, sizes.getZ());
+			max = middle.add(sizes.divide(2).getX(), sizes.getY() - 1, -1);
+		}
+		return new CuboidRegion(min, max);
+	}
+	
+	public static int getMaxShieldSizeOfTier(int tier) {
+		ConfigurationSection section = Main.getPlugin().getConfig()
+				.getConfigurationSection("coordinates.tbs.sizes." + tier);
+		return section.getInt("shields");
+	}
 }
