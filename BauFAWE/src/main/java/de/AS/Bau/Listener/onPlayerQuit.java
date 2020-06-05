@@ -9,6 +9,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 
 import de.AS.Bau.Scoreboard.ScoreBoardBau;
+import de.AS.Bau.Tools.AutoCannonReloader;
 import de.AS.Bau.Tools.DesignTool;
 import de.AS.Bau.Tools.FernzuenderListener;
 
@@ -20,7 +21,8 @@ public onPlayerQuit(JavaPlugin plugin) {
 public void onPlayerLeaveevent(PlayerQuitEvent e) {
 	onPlayerMove.playersLastPlot.remove(e.getPlayer());
 	DesignTool.playerHasDtOn.remove(e.getPlayer().getUniqueId());
-	ScoreBoardBau.stopPlayersScoreboard.put(e.getPlayer(), true);
+	ScoreBoardBau.getS(e.getPlayer()).cancel();
 	FernzuenderListener.playersDetonator.remove(e.getPlayer().getUniqueId());
+	AutoCannonReloader.deleteRecord(e.getPlayer());
 }
 }

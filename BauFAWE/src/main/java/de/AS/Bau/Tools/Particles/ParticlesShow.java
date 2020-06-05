@@ -205,7 +205,6 @@ public class ParticlesShow {
 
 	public void stopParticles() {
 		scheduler.cancel();
-		scheduler.setTask(-1);
 	}
 
 }

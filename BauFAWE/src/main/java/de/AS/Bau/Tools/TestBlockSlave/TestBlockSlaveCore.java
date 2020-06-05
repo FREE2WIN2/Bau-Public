@@ -30,6 +30,7 @@ import de.AS.Bau.Tools.TestBlockSlave.TestBlock.Facing;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlock.TestBlock;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlock.TestBlockType;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlock.Type;
+import de.AS.Bau.Tools.TestBlockSlave.TestBlockEditor.TestBlockEditorCore;
 import de.AS.Bau.WorldEdit.WorldGuardHandler;
 import de.AS.Bau.utils.Banner;
 import de.AS.Bau.utils.ClickAction;
@@ -302,6 +303,8 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 
 			getSlave(p).startSavingNewTB();
 
+		} else if(clicked.getType().equals(Material.WHITE_WOOL)) {
+			TestBlockEditorCore.getEditor(p).openMainInv();
 		}
 	}
 

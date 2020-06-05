@@ -188,8 +188,9 @@ public class WorldEditHandler {
 		}
 
 		boolean stoplagBefore = Stoplag.getStatus(p.getLocation());
-		Stoplag.setStatus(p.getLocation(), true);
-
+		if (!(tbs && saveUndo)) {
+			Stoplag.setStatus(p.getLocation(), true);
+		}
 		Scheduler animation = new Scheduler();
 		int xmin = min.getX();
 		int xmax = max.getX();
@@ -241,8 +242,10 @@ public class WorldEditHandler {
 				}
 				/* all loops are over -> pasting is done */
 				animation.cancel();
-				Stoplag.setStatus(p.getLocation(), stoplagBefore);
-				Stoplag.setStatusTemp(p.getLocation(), true, 5);
+				if (!tbs && saveUndo) {
+					Stoplag.setStatus(p.getLocation(), stoplagBefore);
+					Stoplag.setStatusTemp(p.getLocation(), true, 5);
+				}
 			}
 
 		}, 0, ticksPerPasteInterval));
