@@ -80,7 +80,8 @@ public class PlotResetter implements CommandExecutor {
 
 			World world = p.getWorld();
 			// paste
-			WorldEditHandler.pasten(new Schematic("TestBlockSklave", "ground.schem", Facing.NORTH), rgID, p, true);
+			String schemName = Main.getPlugin().getCustomConfig().getString("plotreset.schemfiles."+rgID) + ".schem";
+			WorldEditHandler.pasten(new Schematic("TestBlockSklave", schemName, Facing.NORTH), rgID, p, true);
 
 			int maxBlockChangePerTick = WorldEditHandler.maxBlockChangePerTick;
 			scheduler.setTask(

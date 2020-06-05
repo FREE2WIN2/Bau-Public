@@ -106,6 +106,7 @@ public class TestBlockEditorCore implements Listener {
 		ShieldPosition pos = ShieldPosition.getByPositionInGUI(slot);
 		if (pos != null) {
 			getEditor(p).setChoosedPosition(pos);
+			getEditor(p).removeModule(pos);
 			getEditor(p).openChooseTypeInv();
 			return;
 		}

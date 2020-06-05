@@ -25,7 +25,6 @@ import de.AS.Bau.Tools.TestBlockSlave.TestBlockSlaveCore;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlock.Facing;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlock.TestBlockType;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlock.Type;
-import de.AS.Bau.WorldEdit.WorldEditHandler;
 import de.AS.Bau.WorldEdit.WorldGuardHandler;
 import de.AS.Bau.utils.Banner;
 import de.AS.Bau.utils.CoordGetter;
@@ -123,6 +122,15 @@ public class TestBlockEditor {
 		modules.add(new ShieldModule(type, choosedPosition));
 		choosedPosition = null;
 	}
+	
+	public void removeModule(ShieldPosition pos) {
+		modules.forEach(module ->{
+			if(module.getPosition()==pos) {
+				modules.remove(module);
+				return;
+			}
+		});
+	}
 
 	public void setChoosedPosition(ShieldPosition choosedPosition) {
 		this.choosedPosition = choosedPosition;
@@ -180,7 +188,6 @@ public class TestBlockEditor {
 
 	private Region calcUndoRegion() {
 		Region normal = TestBlockSlaveCore.getTBRegion(tier, WorldGuardHandler.getPlotId(owner.getLocation()), facing);
-		System.out.println("before: " + normal.getMinimumPoint() + " " + normal.getMaximumPoint());
 		int shieldSize = TestBlockSlaveCore.getMaxShieldSizeOfTier(tier);
 		BlockVector3 min = BlockVector3.at(-shieldSize, 0, -shieldSize);
 		BlockVector3 max = BlockVector3.at(shieldSize, 0, shieldSize);
@@ -189,7 +196,6 @@ public class TestBlockEditor {
 		} catch (RegionOperationException e) {
 			e.printStackTrace();
 		}
-		System.out.println("after: " + normal.getMinimumPoint() + " " + normal.getMaximumPoint());
 		return normal;
 	}
 
