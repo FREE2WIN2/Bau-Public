@@ -124,9 +124,9 @@ public class ParticlesShow {
 		if (!active) {
 			return;
 		}
-		if (scheduler.getTask() >= 0) {
-			return;
-		}
+//		if (scheduler.getTask() >= 0) {
+//			return;
+//		}
 
 		BukkitPlayer p = BukkitAdapter.adapt(player);
 		LocalSession session = WorldEdit.getInstance().getSessionManager().get(p);

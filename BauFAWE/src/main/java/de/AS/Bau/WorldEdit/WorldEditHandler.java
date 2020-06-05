@@ -136,14 +136,14 @@ public class WorldEditHandler {
 
 	}
 
-	public static void pasteTestBlock(Schematic schem, Facing facingto, String rgID, Player p) {
+	public static void pasteTestBlock(Schematic schem, Facing facingto, String rgID, Player p,boolean saveUndo) {
 		BlockVector3 at = CoordGetter.getTBSPastePosition(rgID, facingto);
 		Clipboard board = schem.getClip();
 		if (schem.getFacing() != facingto) {
 			board = rotateClipboard(board);
 		}
 
-		pasteAsync(new ClipboardHolder(board), at, p, true, 1, true, true);
+		pasteAsync(new ClipboardHolder(board), at, p, true, 1, saveUndo, true);
 
 	}
 

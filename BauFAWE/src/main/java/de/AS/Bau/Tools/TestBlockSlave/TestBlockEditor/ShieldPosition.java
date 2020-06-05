@@ -13,28 +13,28 @@ public enum ShieldPosition {
 
 	public int getPositionInGUI() {
 		switch (this) {
-		case FRONT:
+		case BACK:
 			return 3;
 
-		case LEFTSIDEFRONT:
+		case LEFTSIDEBACK:
 			return 18;
 
-		case ROOFFRONT:
+		case ROOFBACK:
 			return 21;
 
-		case RIGHTSIDEFRONT:
+		case RIGHTSIDEBACK:
 			return 24;
 
-		case LEFTSIDEBACK:
+		case LEFTSIDEFRONT:
 			return 27;
 
-		case ROOFBACK:
+		case ROOFFRONT:
 			return 30;
 
-		case RIGHTSIDEBACK:
+		case RIGHTSIDEFRONT:
 			return 33;
 
-		case BACK:
+		case FRONT:
 			return 48;
 
 		default:
@@ -43,24 +43,24 @@ public enum ShieldPosition {
 		return -1;
 	}
 
-	public ShieldPosition getByPositionInGUI(int position) {
+	public static ShieldPosition getByPositionInGUI(int position) {
 		switch (position) {
 		case 3:
-			return FRONT;
-		case 18:
-			return LEFTSIDEFRONT;
-		case 21:
-			return ROOFFRONT;
-		case 24:
-			return RIGHTSIDEFRONT;
-		case 27:
-			return LEFTSIDEBACK;
-		case 30:
-			return ROOFBACK;
-		case 33:
-			return RIGHTSIDEBACK;
-		case 48:
 			return BACK;
+		case 18:
+			return LEFTSIDEBACK;
+		case 21:
+			return ROOFBACK;
+		case 24:
+			return RIGHTSIDEBACK;
+		case 27:
+			return LEFTSIDEFRONT;
+		case 30:
+			return ROOFFRONT;
+		case 33:
+			return RIGHTSIDEFRONT;
+		case 48:
+			return FRONT;
 		}
 		return null;
 	}

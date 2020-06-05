@@ -61,4 +61,8 @@ public class CoordGetter {
 		int z = section.getInt("z");
 		return BlockVector3.at(x, y, z);
 	}
+	
+	public static BlockVector3 locToVec(Location loc) {
+		return BlockVector3.at(loc.getX(), loc.getY(), loc.getZ());
+	}
 }

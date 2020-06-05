@@ -52,7 +52,7 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 		} else if (args.length == 1) {
 			if (args[0].equalsIgnoreCase("last")) {
 				TestBlockSlave slave = getSlave(p);
-				slave.pasteBlock(slave.getlastTestBlock(), slave.getLastFacing());
+				slave.pasteBlock(slave.getlastTestBlock(), slave.getLastFacing(),true);
 				return true;
 			} else if (args[0].equalsIgnoreCase("undo")) {
 				getSlave(p).undo();
@@ -71,7 +71,7 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 				}
 				getSlave(p).deleteTestBlock(Integer.parseInt(args1[1]), args1[2]);
 				return true;
-			}else if (args[0].equals("confirmRegion") && args[1].equals(p.getUniqueId().toString())) {
+			} else if (args[0].equals("confirmRegion") && args[1].equals(p.getUniqueId().toString())) {
 				getSlave(p).savingNewTBName();
 				return true;
 			}
@@ -102,10 +102,10 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 				} else {
 					return false;
 				}
-				getSlave(p).pasteBlock(chooseTB.getTestBlock(),chooseTB.getFacing());
+				getSlave(p).pasteBlock(chooseTB.getTestBlock(), chooseTB.getFacing(),true);
 				/* paste */
 				return true;
-			} 
+			}
 
 		} else if (args.length == 4) {
 			if (!args[0].equalsIgnoreCase("save")) {
@@ -117,7 +117,8 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 			String name = args[1];
 			Integer tier = Integer.parseInt(args[2]);
 			Facing facing = Facing.valueOf(args[3].toUpperCase());
-			getSlave(p).addNewCustomTestBlock(tier, name, facing, WorldGuardHandler.getPlotId(p.getLocation()));// missing tier!
+			getSlave(p).addNewCustomTestBlock(tier, name, facing, WorldGuardHandler.getPlotId(p.getLocation()));// missing
+																												// tier!
 			return true;
 		}
 		return false;
@@ -125,66 +126,64 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 
 	@EventHandler
 	public void onInventoryclick(InventoryClickEvent event) {
+		if (event.getClickedInventory() == null) {
+			return;
+		}
 		Player p = (Player) event.getWhoClicked();
 		Inventory pInv = p.getOpenInventory().getTopInventory();
 		String invName = p.getOpenInventory().getTitle();
 		ItemStack clicked = event.getCurrentItem();
-		if (clicked != null) {
-			if (clicked.hasItemMeta()) {
-				if (!pInv.getType().equals(InventoryType.CREATIVE)) {
-					/* Main Inventroy */
-					if (invName.equals(StringGetterBau.getString(p, "testBlockSklaveMainInv"))
-							&& event.getClickedInventory().equals(pInv)) {
-						event.setCancelled(true);
-						MainInventory(p, clicked);
-						/* Facing inv (saving and pasting!) */
-					} else if (invName.equals(StringGetterBau.getString(p, "testBlockSklaveFacingInv"))
-							&& event.getClickedInventory().equals(pInv)) {
-						event.setCancelled(true);
-						facingInv(p, clicked);
-						/* Type Inv(Saving, default paste) */
-					} else if (invName.equals(StringGetterBau.getString(p, "testBlockSklaveTypeInv"))
-							&& event.getClickedInventory().equals(pInv)) {
-						event.setCancelled(true);
-						typeInv(p, clicked);
+		if (clicked == null) {
+			return;
+		}
+		if (!(clicked.hasItemMeta())) {
+			return;
+		}
+		if (pInv.getType().equals(InventoryType.CREATIVE)) {
+			return;
+		}
+		/* Main Inventory */
+		if (invName.equals(StringGetterBau.getString(p, "testBlockSklaveMainInv"))
+				&& event.getClickedInventory().equals(pInv)) {
+			event.setCancelled(true);
+			MainInventory(p, clicked);
+			/* Facing inv (saving and pasting!) */
+		} else if (invName.equals(StringGetterBau.getString(p, "testBlockSklaveFacingInv"))
+				&& event.getClickedInventory().equals(pInv)) {
+			event.setCancelled(true);
+			facingInv(p, clicked);
+			/* Type Inv(Saving, default paste) */
+		} else if (invName.equals(StringGetterBau.getString(p, "testBlockSklaveTypeInv"))
+				&& event.getClickedInventory().equals(pInv)) {
+			event.setCancelled(true);
+			typeInv(p, clicked);
 
-						/* TB-Manager */
-					} else if (invName
-							.equals(StringGetterBau.getString(p, "tbs_tbManagerInv").replace("%r", p.getName()))) {
-						if (clicked.getItemMeta().getDisplayName().equals(" ")) {
-							/* empty Banner */
-							event.setCancelled(true);
-							return;
-						}
-							event.setCancelled(true);
-							tbManagerInv(p, clicked);
-						/* Fav inv */
-					} else if (invName.equals(StringGetterBau.getString(p, "tbs_gui_addFavoriteInv"))) {
-						getSlave(p).setTestBlockToFavorite(clicked);
-						p.closeInventory();
-						event.setCancelled(true);
-						/* Tier inv to save */
-					} else if (invName.equals(StringGetterBau.getString(p, "tbs_gui_tierInv"))) {
-						tierInv(p, clicked);
-						event.setCancelled(true);
-					}else if(invName.equals(StringGetterBau.getString(p, "tbs_tbManagerActionInv").replace("%r", p.getName()))) {
-						chooseActionToCustomTB(p, clicked);
-					} else if (pInv.getType().equals(InventoryType.ANVIL)) {
-						if (event.getSlotType().equals(SlotType.RESULT)) {
-							p.closeInventory();
-							getSlave(p).saveNewCustomTB(((AnvilInventory) event.getInventory()).getRenameText());
-						}
-					}
-
-				}
-			}
-		} else {
-			if(event.getClickedInventory() == null) {
+			/* TB-Manager */
+		} else if (invName.equals(StringGetterBau.getString(p, "tbs_tbManagerInv").replace("%r", p.getName()))) {
+			if (clicked.getItemMeta().getDisplayName().equals(" ")) {
+				/* empty Banner */
+				event.setCancelled(true);
 				return;
 			}
-			if (event.getClickedInventory().equals(pInv)) {
-				event.setCancelled(true);
+			event.setCancelled(true);
+			tbManagerInv(p, clicked);
+			/* Fav inv */
+		} else if (invName.equals(StringGetterBau.getString(p, "tbs_gui_addFavoriteInv"))) {
+			getSlave(p).setTestBlockToFavorite(clicked);
+			p.closeInventory();
+			event.setCancelled(true);
+			/* Tier inv to save */
+		} else if (invName.equals(StringGetterBau.getString(p, "tbs_gui_tierInv"))) {
+			tierInv(p, clicked);
+			event.setCancelled(true);
+		} else if (invName.equals(StringGetterBau.getString(p, "tbs_tbManagerActionInv").replace("%r", p.getName()))) {
+			chooseActionToCustomTB(p, clicked);
+		} else if (pInv.getType().equals(InventoryType.ANVIL)) {
+			if (event.getSlotType().equals(SlotType.RESULT)) {
+				p.closeInventory();
+				getSlave(p).saveNewCustomTB(((AnvilInventory) event.getInventory()).getRenameText());
 			}
+
 		}
 
 	}
@@ -207,9 +206,9 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 	}
 
 	private void tbManagerInv(Player p, ItemStack clicked) {
-			/* open Next Inv */
-			getSlave(p).startNewChoose(clicked);
-			p.openInventory(TestBlockSlaveGUI.tbManagerActionInv(p));
+		/* open Next Inv */
+		getSlave(p).startNewChoose(clicked);
+		p.openInventory(TestBlockSlaveGUI.tbManagerActionInv(p));
 	}
 
 	private void chooseActionToCustomTB(Player p, ItemStack clicked) {
@@ -218,7 +217,7 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 		String south = StringGetterBau.getString(p, "facingSouth");
 		String north = StringGetterBau.getString(p, "facingNorth");
 		ChooseTestBlock chooseTB = getSlave(p).getChooseTB();
-		
+
 		if (clicked.getType().equals(Material.BARRIER)) {
 			/* Delete */
 			String name = tb.getName();
@@ -246,17 +245,17 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 				getSlave(p).showTBManager();// aktualisieren
 			}
 
-		}else if (north.equals(clickedName)) {
-			chooseTB.setFacing(Facing.SOUTH);
-			getSlave(p).pasteBlock(chooseTB, Facing.NORTH);
+		} else if (north.equals(clickedName)) {
+			chooseTB.setFacing(Facing.NORTH);
+			getSlave(p).pasteBlock(chooseTB,true);
 			p.closeInventory();
 		} else if (south.equals(clickedName)) {
 			chooseTB.setFacing(Facing.SOUTH);
-			getSlave(p).pasteBlock(chooseTB, Facing.SOUTH);
+			getSlave(p).pasteBlock(chooseTB, true);
 			p.closeInventory();
 		}
 	}
-	
+
 	private void MainInventory(Player p, ItemStack clicked) {
 		String close = StringGetterBau.getString(p, "tbs_gui_close");
 		String lastPaste = StringGetterBau.getString(p, "tbs_gui_lastPaste");
@@ -264,23 +263,23 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 		TestBlockSlave slave = getSlave(p);
 		switch (clickedName) {
 		case "§rTier I":
-			slave.startNewChoose(TestBlockType.DEFAULT,1);
+			slave.startNewChoose(TestBlockType.DEFAULT, 1);
 			p.openInventory(TestBlockSlaveGUI.richtungsInventory(p));
 			return;
 		case "§rTier II":
-			slave.startNewChoose(TestBlockType.DEFAULT,2);
+			slave.startNewChoose(TestBlockType.DEFAULT, 2);
 			p.openInventory(TestBlockSlaveGUI.richtungsInventory(p));
 			return;
 		case "§rTier III/IV":
-			slave.startNewChoose(TestBlockType.DEFAULT,3);
+			slave.startNewChoose(TestBlockType.DEFAULT, 3);
 			p.openInventory(TestBlockSlaveGUI.richtungsInventory(p));
 			return;
 		}
 		if (clickedName.equals(close)) {
 			p.closeInventory();
 		} else if (clickedName.equals(lastPaste)) {
-			
-			slave.pasteBlock(slave.getlastTestBlock(), slave.getLastFacing());
+
+			slave.pasteBlock(slave.getlastTestBlock(), slave.getLastFacing(),true);
 			p.closeInventory();
 		} else if (clickedName.equals(StringGetterBau.getString(p, "tbs_gui_tbManager"))) {
 			getSlave(p).showTBManager();
@@ -303,7 +302,7 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 
 			getSlave(p).startSavingNewTB();
 
-		} else if(clicked.getType().equals(Material.WHITE_WOOL)) {
+		} else if (clicked.getType().equals(Material.WHITE_WOOL)) {
 			TestBlockEditorCore.getEditor(p).openMainInv();
 		}
 	}
@@ -324,7 +323,7 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 			p.openInventory(TestBlockSlaveGUI.schildNormalInventory(p));
 		} else {
 			p.closeInventory();
-			getSlave(p).pasteBlock(chooseTB, chooseTB.getFacing());
+			getSlave(p).pasteBlock(chooseTB,true);
 		}
 
 	}
@@ -349,8 +348,8 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 
 			p.closeInventory();
 
-				getSlave(p).pasteBlock(chooseTB.getTestBlock(),chooseTB.getFacing());
-	
+			getSlave(p).pasteBlock(chooseTB.getTestBlock(), chooseTB.getFacing(),true);
+
 		} else {
 			/* Saving new TB */
 			p.closeInventory();
@@ -373,7 +372,7 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 		return instance;
 	}
 
-	public static Region getTBRegion(int tier, String plotID,Facing facing) {
+	public static Region getTBRegion(int tier, String plotID, Facing facing) {
 
 		BlockVector3 middle = CoordGetter.getMiddleRegionTB(plotID, facing);
 		BlockVector3 sizes = CoordGetter.getMaxSizeOfBlock(tier);
@@ -391,7 +390,7 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 		}
 		return new CuboidRegion(min, max);
 	}
-	
+
 	public static int getMaxShieldSizeOfTier(int tier) {
 		ConfigurationSection section = Main.getPlugin().getConfig()
 				.getConfigurationSection("coordinates.tbs.sizes." + tier);

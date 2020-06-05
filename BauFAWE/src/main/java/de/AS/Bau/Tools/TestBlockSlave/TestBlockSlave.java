@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -125,13 +124,13 @@ public class TestBlockSlave {
 		chooseTB = new ChooseTestBlock();
 	}
 
-	public void startNewChoose(TestBlockType tbtype, int i) {//Defaults
+	public void startNewChoose(TestBlockType tbtype, int i) {// Defaults
 		chooseTB = new ChooseTestBlock();
 		chooseTB.setTier(i);
 		chooseTB.setTestBlockType(tbtype);
 	}
 
-	public void startNewChoose(ItemStack clicked) {//Customs
+	public void startNewChoose(ItemStack clicked) {// Customs
 		chooseTB = new ChooseTestBlock();
 		chooseTB.setTestBlock(getBlockOutOfBanner(clicked));
 		chooseTB.setTestBlockType(TestBlockType.CUSTOM);
@@ -139,23 +138,18 @@ public class TestBlockSlave {
 
 	/* paste a testBlock */
 
-	public void pasteBlock(TestBlock block, Facing facing) {
+	public void pasteBlock(TestBlock block, Facing facing, boolean saveUndo) {
 		String rgID = WorldGuardHandler.getPlotId(owner.getLocation());
-
 		/* paste */
 
-		WorldEditHandler.pasteTestBlock(block.getSchematic(), facing, rgID, owner);
+		WorldEditHandler.pasteTestBlock(block.getSchematic(), facing, rgID, owner, saveUndo);
 		last = block;
 		lastFacing = facing;
 
 	}
 
-	public void pasteBlock(String name, Facing facing) {
-		pasteBlock(getBlockOutOfName(name), facing);
-	}
-
-	public void pasteBlock(ChooseTestBlock chooseTB2, Facing facing) {
-		pasteBlock(chooseTB2.getTestBlock(), facing);
+	public void pasteBlock(ChooseTestBlock chooseTB2, boolean saveUndo) {
+		pasteBlock(chooseTB2.getTestBlock(), chooseTB2.getFacing(), saveUndo);
 	}
 
 	public void undo() {
@@ -209,20 +203,6 @@ public class TestBlockSlave {
 	}
 
 	private void saveRegionAsBlock(int tier, Facing facing, String plotID, String name) {
-		BlockVector3 middle = CoordGetter.getMiddleRegionTB(plotID, facing);
-		BlockVector3 sizes = CoordGetter.getMaxSizeOfBlock(tier);
-
-		/* If North -> middle.z = min.z ! */
-
-		BlockVector3 min;
-		BlockVector3 max;
-		if (facing == Facing.NORTH) {
-			min = middle.subtract(sizes.divide(2).getX(), 0, 1);
-			max = middle.add(sizes.divide(2).getX(), sizes.getY() - 1, sizes.getZ());
-		} else {
-			min = middle.subtract(sizes.divide(2).getX(), 0, sizes.getZ());
-			max = middle.add(sizes.divide(2).getX(), sizes.getY() - 1, -1);
-		}
 		Region rg = TestBlockSlaveCore.getTBRegion(tier, plotID, facing);
 		Clipboard board = WorldEditHandler.createClipboardOutOfRegion(rg,
 				CoordGetter.getTBSPastePosition(plotID, facing), BukkitAdapter.adapt(owner.getWorld()));
@@ -244,10 +224,10 @@ public class TestBlockSlave {
 		}
 		return false;
 	}
-	
+
 	public void setTestBlockToFavorite(ItemStack clicked) {
 		setTestBlockToFavorite(getBlockOutOfBanner(clicked));
-		
+
 	}
 
 	/* Removing TestBlocks */
@@ -273,7 +253,7 @@ public class TestBlockSlave {
 		if (!deleteTestBlockFromDatabase(tier, name)) {
 			return false;
 		}
-		if (!blocks.remove(getBlockOutOfName(name))) {
+		if (!blocks.remove(getBlockOutOfName(name, tier))) {
 			return false;
 		}
 		Main.send(owner, "tbs_tbDeleted", "" + tier, name);
@@ -307,12 +287,10 @@ public class TestBlockSlave {
 		return null;
 	}
 
-	private TestBlock getBlockOutOfName(String name) {
-		for (Entry<Integer, HashSet<CustomTestBlock>> testBlockEntries : testblocks.entrySet()) {
-			for (CustomTestBlock block : testBlockEntries.getValue()) {
-				if (block.getName().equals(name)) {
-					return block;
-				}
+	private TestBlock getBlockOutOfName(String name, int tier) {
+		for (CustomTestBlock block : testblocks.get(tier)) {
+			if (block.getName().equals(name)) {
+				return block;
 			}
 		}
 		return null;
@@ -406,7 +384,5 @@ public class TestBlockSlave {
 		}, 0, 20));
 
 	}
-
-
 
 }

@@ -42,7 +42,7 @@ public class ScoreBoardBau {
 
 			@Override
 			public void run() {
-				cmdUpdate(p);
+				update();
 			}
 		}, 0, 600));
 	}

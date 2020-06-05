@@ -32,8 +32,12 @@ public class PlotResetter implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command cmd, String string, String[] args) {
 		if (sender instanceof Player && args.length == 2) {
 			Player p = (Player) sender;
-			if (args[1].equals(p.getUniqueId().toString())
-					&& p.getWorld().getName().equals(p.getUniqueId().toString())) {
+			if (!args[1].equals(p.getUniqueId().toString())) {
+				Main.send(p, "error");
+				return true;
+			}
+
+			if (p.getWorld().getName().equals(p.getUniqueId().toString())|| p.hasPermission("admin")) {
 				resetRegion(args[0], p, true);
 				return true;
 			}
@@ -52,7 +56,7 @@ public class PlotResetter implements CommandExecutor {
 			creater2.addClickEvent("/delcon " + rgID + " " + p.getUniqueId(), ClickAction.RUN_COMMAND);
 			creater1.addJson(creater2).send(p);
 		} else {
-			if (playerBlockedDelete.contains(p.getUniqueId())&&!p.hasPermission("bau.delete.bypass")) {
+			if (playerBlockedDelete.contains(p.getUniqueId()) && !p.hasPermission("bau.delete.bypass")) {
 				p.sendMessage(StringGetterBau.getString(p, "deletePlotAntiSpaw"));
 				return;
 			}

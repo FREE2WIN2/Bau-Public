@@ -86,14 +86,14 @@ public class Main extends JavaPlugin {
 		new StringGetterBau();
 		DefaultTestBlock.generateDefaultTestBlocks();
 		schempath = customConfig.getString("schempath");
-		doTests();
+//		doTests();
 	}
 
 	private void doTests() {
 		for(Facing facing:Facing.values()) {
 		for(ShieldPosition position:ShieldPosition.values()) {
-			ShieldModule module = new ShieldModule(ShieldType.MASSIVE, 1,position,facing);
-			System.out.println(facing.name() + " " + position.name() + " " + module.getMax("plot2"));
+			ShieldModule module = new ShieldModule(ShieldType.MASSIVE,position);
+			System.out.println(facing.name() + " " + position.name() + " " + module.getMax("plot2",1,facing));
 		}
 		}
 		
