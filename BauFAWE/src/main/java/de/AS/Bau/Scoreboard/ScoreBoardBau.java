@@ -37,7 +37,6 @@ public class ScoreBoardBau {
 	public ScoreBoardBau(Player p) {
 		scheduler = new Scheduler();
 		this.p = p;
-		cmdUpdate(p);
 		playersScoreboard.put(p.getUniqueId(), this);
 		scheduler.setTask(Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), new Runnable() {
 
@@ -45,7 +44,7 @@ public class ScoreBoardBau {
 			public void run() {
 				cmdUpdate(p);
 			}
-		}, 600, 600));
+		}, 0, 600));
 	}
 
 	public static ScoreBoardBau getS(Player p) {
