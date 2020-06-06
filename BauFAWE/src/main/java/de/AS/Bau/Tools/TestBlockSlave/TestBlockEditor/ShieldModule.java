@@ -97,10 +97,10 @@ public class ShieldModule {
 			rg = getFrontRegion(plotID, tier, facing);
 
 			if (facing == Facing.SOUTH) {
-				blockFace = BlockFace.SOUTH;
+				blockFace = BlockFace.NORTH;
 				shiftz = 1;
 			} else {
-				blockFace = BlockFace.NORTH;
+				blockFace = BlockFace.SOUTH;
 				shiftz = -1;
 			}
 			break;
@@ -152,7 +152,7 @@ public class ShieldModule {
 
 		rg.shift(BlockVector3.at(shiftx, shifty, shiftz));
 		bd = (Directional) Material.OBSERVER.createBlockData();
-		bd.setFacing(blockFace.getOppositeFace());
+		bd.setFacing(blockFace);
 		setRegionToBlockData(world, rg, bd);
 
 	}
