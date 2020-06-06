@@ -188,7 +188,7 @@ public class AutoCannonReloader implements Listener, CommandExecutor {
 		}
 
 		for (Location loc : playersTntLocations.get(uuid)) {
-			if (loc.getBlock().getType().isAir()) {
+			if (loc.getBlock().getType().isAir()||loc.getBlock().isLiquid()) {
 				loc.getBlock().setType(Material.TNT);
 			}
 		}

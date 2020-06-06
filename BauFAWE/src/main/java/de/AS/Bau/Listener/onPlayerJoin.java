@@ -20,6 +20,7 @@ import de.AS.Bau.StringGetterBau;
 import de.AS.Bau.HikariCP.DBConnection;
 import de.AS.Bau.Scoreboard.ScoreBoardBau;
 import de.AS.Bau.Tools.DesignTool;
+import de.AS.Bau.utils.ItemStackCreator;
 import de.AS.Bau.utils.Language;
 import de.AS.Bau.utils.WorldHandler;
 
@@ -55,11 +56,7 @@ public class onPlayerJoin implements Listener {
 		p.teleport(loc);
 		// wenn ja-> teleportieren
 		// item
-		ItemStack guiItem = new ItemStack(Material.NETHER_STAR);
-		ItemMeta guiMeta = guiItem.getItemMeta();
-		guiMeta.setDisplayName("§6GUI");
-		guiItem.setItemMeta(guiMeta);
-		p.getInventory().setItem(0, guiItem);
+		p.getInventory().setItem(0, ItemStackCreator.createNewItemStack(Material.NETHER_STAR, "§6GUI"));
 		new ScoreBoardBau(p);
 
 	}

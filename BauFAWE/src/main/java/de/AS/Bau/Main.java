@@ -54,6 +54,7 @@ import de.AS.Bau.Tools.TestBlockSlave.TestBlockEditor.TestBlockEditorCore;
 import de.AS.Bau.WorldEdit.SaWE;
 import de.AS.Bau.WorldEdit.WorldEditPreCommand;
 import de.AS.Bau.cmds.Bau;
+import de.AS.Bau.cmds.clear;
 import de.AS.Bau.cmds.ds;
 import de.AS.Bau.cmds.gs;
 import de.AS.Bau.cmds.stats;
@@ -145,6 +146,7 @@ public class Main extends JavaPlugin {
 		getCommand("particles").setTabCompleter(new particlesTC());
 		getCommand("tr").setExecutor(AutoCannonReloader.getInstance());
 		getCommand("tr").setTabCompleter(new TntReloaderTC());
+		getCommand("clear").setExecutor(new clear());
 	}
 
 	public void createConfigs() {

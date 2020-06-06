@@ -11,7 +11,6 @@ import org.bukkit.craftbukkit.v1_15_R1.block.CraftBlock;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.regions.RegionOperationException;
 
 import de.AS.Bau.Tools.TestBlockSlave.TestBlockSlaveCore;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlock.Facing;
@@ -51,11 +50,33 @@ public class ShieldModule {
 			max = rg.getMaximumPoint();
 			Region up = new CuboidRegion(BlockVector3.at(min.getX(), max.getY(), min.getZ()), max);
 			setRegionToMaterial(world, up, Material.SANDSTONE_WALL);
-			updatePhysics(world, up);
 			break;
 		case ARTOX:
+			switch(position) {
+			case BACK:
+			case FRONT:
+				rg = getFrontRegion(plotID, tier, facing);
+			case LEFTSIDEBACK:
+			case LEFTSIDEFRONT:
+			case RIGHTSIDEBACK:
+			case RIGHTSIDEFRONT:
+				rg = getSideRegion(plotID, tier, facing);
+				break;
+			case ROOFBACK:
+			case ROOFFRONT:
+				rg = getUpperRegion(plotID, tier, facing);
+				break;
+			}
+			if(position==ShieldPosition.FRONT) {
+	
+			}else if(position==ShieldPosition.ROOFBACK||position==ShieldPosition.ROOFFRONT) {
+				
+			}
+			
 			break;
 		case BACKSTAB:
+			rg = getUpperRegion(plotID, tier, facing);
+			setRegionToMaterial(world, rg, Material.END_STONE);
 			break;
 		case MASSIVE:
 			rg = new CuboidRegion(getMin(plotID, tier, facing), getMax(plotID, tier, facing));
@@ -72,18 +93,16 @@ public class ShieldModule {
 		}
 	}
 
-	private void updatePhysics(World world, Region up) {
-		BlockVector3 middle = up.getCenter().toBlockPoint();
-		Block block = world.getBlockAt(middle.getX(), middle.getY(), middle.getZ());
-		((CraftWorld) world).getHandle().applyPhysics(new BlockPosition(block.getX(), block.getY(), block.getZ()),
-				((CraftBlock) block).getNMS().getBlock());
-
+	public Region getUpperRegion(String plotID, int tier, Facing facing) {
+		BlockVector3 min = getMin(plotID, tier, facing);
+		BlockVector3 max = getMax(plotID, tier, facing);
+		min = BlockVector3.at(min.getX(), max.getY(), min.getZ());
+		return new CuboidRegion(min, max);
 	}
-
+	
 	public Region getFrontRegion(String plotID, int tier, Facing facing) {
 		BlockVector3 min = getMin(plotID, tier, facing);
 		BlockVector3 max = getMax(plotID, tier, facing);
-		System.out.println("origin: min= " + min + " max=" + max);
 		switch (position) {
 		case BACK:
 			switch (facing) {
@@ -98,34 +117,14 @@ public class ShieldModule {
 
 		case LEFTSIDEBACK:
 		case LEFTSIDEFRONT:
-			switch (facing) {
-			case NORTH:
-				// xkleiner
-				max = BlockVector3.at(min.getX(), max.getY(), max.getZ());
-				break;
-			case SOUTH:
-				// x größer
-				min = BlockVector3.at(max.getX(), min.getY(), min.getZ());
-				break;
+			if(type == ShieldType.SAND) {
+				return getSideRegion(plotID, tier, facing);
 			}
-			System.out.println("Min="+min + " max:" + max);
-			return new CuboidRegion(min, max);
-
 		case RIGHTSIDEBACK:
 		case RIGHTSIDEFRONT:
-			switch (facing) {
-			case NORTH:
-				// xgrößer
-				min = BlockVector3.at(max.getX(), min.getY(), min.getZ());
-				break;
-			case SOUTH:
-				// xkleiner
-				max = BlockVector3.at(min.getX(), max.getY(), max.getZ());
-				break;
+			if(type == ShieldType.SAND) {
+				return getSideRegion(plotID, tier, facing);
 			}
-			System.out.println(min + " " + max);
-			return new CuboidRegion(min, max);
-
 		case FRONT:
 		case ROOFBACK:
 		case ROOFFRONT:
@@ -142,6 +141,42 @@ public class ShieldModule {
 		return null;
 	}
 
+	public Region getSideRegion(String plotID, int tier, Facing facing) {
+		BlockVector3 min = getMin(plotID, tier, facing);
+		BlockVector3 max = getMax(plotID, tier, facing);
+		switch (position) {
+		case LEFTSIDEBACK:
+		case LEFTSIDEFRONT:
+		
+			switch (facing) {
+			case NORTH:
+				max = BlockVector3.at(max.getX(), max.getY(), min.getZ());
+				break;
+			case SOUTH:
+				min = BlockVector3.at(min.getX(), min.getY(), max.getZ());
+				break;
+			}
+			return new CuboidRegion(min, max);
+		case RIGHTSIDEBACK:
+		case RIGHTSIDEFRONT:
+			switch (facing) {
+			case NORTH:
+				// xgrößer
+				min = BlockVector3.at(max.getX(), min.getY(), min.getZ());
+				break;
+			case SOUTH:
+				// xkleiner
+				max = BlockVector3.at(min.getX(), max.getY(), max.getZ());
+				break;
+			}
+			return new CuboidRegion(min, max);
+
+		default:
+			break;
+		}
+		return null;
+	}
+	
 	public Location vecToLoc(BlockVector3 vector, World world) {
 		return new Location(world, vector.getX(), vector.getY(), vector.getZ());
 	}

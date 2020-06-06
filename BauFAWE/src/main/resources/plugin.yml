@@ -47,6 +47,8 @@ commands:
      description: tntReload command
      aliases: [tntReload,cannonReload,cr]
      usage: /<command>
+   clear:
+     description: Resets your inventory
      
      
 permissions:
