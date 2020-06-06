@@ -110,20 +110,20 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 				return true;
 			}
 
-		} else if (args.length == 4) {
-			if (!args[0].equalsIgnoreCase("save")) {
-				return false;
-			}
-
-			/* tbs save <name> <tier> <facing> */
-
-			String name = args[1];
-			Integer tier = Integer.parseInt(args[2]);
-			Facing facing = Facing.valueOf(args[3].toUpperCase());
-			getSlave(p).addNewCustomTestBlock(tier, name, facing, WorldGuardHandler.getPlotId(p.getLocation()));// missing
-																												// tier!
-			return true;
-		}
+		} //else if (args.length == 4) {
+//			if (!args[0].equalsIgnoreCase("save")) {
+//				return false;
+//			}
+//
+//			/* tbs save <name> <tier> <facing> */
+//
+//			String name = args[1];
+//			Integer tier = Integer.parseInt(args[2]);
+//			Facing facing = Facing.valueOf(args[3].toUpperCase());
+//			getSlave(p).addNewCustomTestBlock(tier, name, facing, WorldGuardHandler.getPlotId(p.getLocation()));// missing
+//																												// tier!
+//			return true;
+//		}
 		return false;
 		
 	}

@@ -39,7 +39,7 @@ public class ShieldModule {
 		return type;
 	}
 
-	public void visualize(String plotID, World world, int tier, Facing facing) throws RegionOperationException {
+	public void visualize(String plotID, World world, int tier, Facing facing) {
 		Region rg = null;
 		BlockVector3 min;
 		BlockVector3 max;
@@ -56,69 +56,18 @@ public class ShieldModule {
 			setRegionToMaterial(world, up, Material.SANDSTONE_WALL);
 			break;
 		case ARTOX:
-			int shiftz = 0;
-			int shifty = 0;
-			int shiftx = 0;
-			BlockFace blockFace = null;
-			switch (position) {
-			case BACK:
-			case FRONT:
-				rg = getFrontRegion(plotID, tier, facing);
-				setRegionToMaterial(world, rg, Material.END_STONE);
-				if (facing == Facing.SOUTH) {
-					blockFace = BlockFace.SOUTH;
-					shiftz = -1;
-				} else {
-					blockFace = BlockFace.NORTH;
-					shiftz = 1;
-				}
-				break;
-			case LEFTSIDEBACK:
-			case LEFTSIDEFRONT:
-				rg = getSideRegion(plotID, tier, facing);
-				setRegionToMaterial(world, rg, Material.END_STONE);
-				if (facing == Facing.SOUTH) {
-					blockFace = BlockFace.EAST;
-					shiftx = -1;
-				} else {
-					blockFace = BlockFace.WEST;
-					shiftx = 1;
-				}
-				break;
-			case RIGHTSIDEBACK:
-			case RIGHTSIDEFRONT:
-				rg = getSideRegion(plotID, tier, facing);
-				setRegionToMaterial(world, rg, Material.END_STONE);
-				if (facing == Facing.SOUTH) {
-					blockFace = BlockFace.WEST;
-					shiftx = -1;
-				} else {
-					blockFace = BlockFace.EAST;
-					shiftx = 1;
-				}
-				break;
-			case ROOFBACK:
-			case ROOFFRONT:
-				blockFace = BlockFace.UP;
-				rg = getUpperRegion(plotID, tier, facing);
-				setRegionToMaterial(world, rg, Material.END_STONE);
-				shifty = -1;
-				break;
+			try {
+				showArtox(plotID, tier, facing, world);
+			} catch (Exception e) {
 			}
-			
-			rg.shift(BlockVector3.at(shiftx, shifty, shiftz));
-			Directional bd = (Directional) Material.PISTON.createBlockData();
-			bd.setFacing(blockFace);
-			setRegionToBlockData(world, rg, bd);
-			
-			rg.shift(BlockVector3.at(shiftx, shifty, shiftz));
-			bd = (Directional) Material.OBSERVER.createBlockData();
-			bd.setFacing(blockFace.getOppositeFace());
-			setRegionToBlockData(world, rg, bd);
 			break;
 		case BACKSTAB:
 			rg = getUpperRegion(plotID, tier, facing);
 			setRegionToMaterial(world, rg, Material.END_STONE);
+			if (position != ShieldPosition.ROOFBACK && position != ShieldPosition.ROOFFRONT) {
+				rg = getMiddleRegion(plotID, tier, facing);
+				setRegionToMaterial(world, rg, Material.END_STONE);
+			}
 			break;
 		case MASSIVE:
 			rg = new CuboidRegion(getMin(plotID, tier, facing), getMax(plotID, tier, facing));
@@ -131,10 +80,93 @@ public class ShieldModule {
 			break;
 		case SPIKE:
 			rg = new CuboidRegion(getMin(plotID, tier, facing), getMax(plotID, tier, facing));
-			setSpikes(world,rg,Material.END_STONE);
+			setSpikes(world, rg, Material.END_STONE);
 			break;
 
 		}
+	}
+
+	private void showArtox(String plotID, int tier, Facing facing, World world) throws RegionOperationException {
+		int shiftz = 0;
+		int shifty = 0;
+		int shiftx = 0;
+		BlockFace blockFace = null;
+		Region rg = null;
+		switch (position) {
+		case BACK:
+			rg = getFrontRegion(plotID, tier, facing);
+
+			if (facing == Facing.SOUTH) {
+				blockFace = BlockFace.SOUTH;
+				shiftz = 1;
+			} else {
+				blockFace = BlockFace.NORTH;
+				shiftz = -1;
+			}
+			break;
+		case FRONT:
+			rg = getFrontRegion(plotID, tier, facing);
+			if (facing == Facing.SOUTH) {
+				blockFace = BlockFace.SOUTH;
+				shiftz = -1;
+			} else {
+				blockFace = BlockFace.NORTH;
+				shiftz = 1;
+			}
+			break;
+		case LEFTSIDEBACK:
+		case LEFTSIDEFRONT:
+			rg = getSideRegion(plotID, tier, facing);
+			if (facing == Facing.SOUTH) {
+				blockFace = BlockFace.EAST;
+				shiftx = -1;
+			} else {
+				blockFace = BlockFace.WEST;
+				shiftx = 1;
+			}
+			break;
+		case RIGHTSIDEBACK:
+		case RIGHTSIDEFRONT:
+			rg = getSideRegion(plotID, tier, facing);
+			if (facing == Facing.SOUTH) {
+				blockFace = BlockFace.WEST;
+				shiftx = 1;
+			} else {
+				blockFace = BlockFace.EAST;
+				shiftx = -1;
+			}
+			break;
+		case ROOFBACK:
+		case ROOFFRONT:
+			blockFace = BlockFace.UP;
+			rg = getUpperRegion(plotID, tier, facing);
+			shifty = -1;
+			break;
+		}
+		setRegionToMaterial(world, rg, Material.END_STONE);
+
+		rg.shift(BlockVector3.at(shiftx, shifty, shiftz));
+		Directional bd = (Directional) Material.PISTON.createBlockData();
+		bd.setFacing(blockFace);
+		setRegionToBlockData(world, rg, bd);
+
+		rg.shift(BlockVector3.at(shiftx, shifty, shiftz));
+		bd = (Directional) Material.OBSERVER.createBlockData();
+		bd.setFacing(blockFace.getOppositeFace());
+		setRegionToBlockData(world, rg, bd);
+
+	}
+
+	private Region getMiddleRegion(String plotID, int tier, Facing facing) {
+		BlockVector3 min = getMin(plotID, tier, facing);
+		BlockVector3 max = getMax(plotID, tier, facing);
+		int half = (max.getY() - min.getY()) / 2;
+		min = min.add(0, half, 0);
+		max = max.subtract(0, half, 0);
+		if (min.getY() != max.getY()) {
+			min = min.add(0, 1, 0);
+		}
+		return new CuboidRegion(min, max);
 	}
 
 	public Region getUpperRegion(String plotID, int tier, Facing facing) {
@@ -170,6 +202,10 @@ public class ShieldModule {
 				return getSideRegion(plotID, tier, facing);
 			}
 		case FRONT:
+			if (type == ShieldType.ARTILLERY) {
+				int shieldSize = TestBlockSlaveCore.getMaxShieldSizeOfTier(tier);
+				max = max.add(0, shieldSize, 0);
+			}
 			switch (facing) {
 			case NORTH:
 				max = BlockVector3.at(max.getX(), max.getY(), min.getZ());
@@ -179,11 +215,10 @@ public class ShieldModule {
 				break;
 			}
 			return new CuboidRegion(min, max);
-		
+
 		case ROOFBACK:
 		case ROOFFRONT:
-			int shieldSize = TestBlockSlaveCore.getMaxShieldSizeOfTier(tier);
-			max = max.add(0,shieldSize -1,0);
+
 			switch (facing) {
 			case NORTH:
 				max = BlockVector3.at(max.getX(), max.getY(), min.getZ());
@@ -193,7 +228,7 @@ public class ShieldModule {
 				break;
 			}
 			return new CuboidRegion(min, max);
-	
+
 		}
 		return null;
 	}
@@ -207,10 +242,10 @@ public class ShieldModule {
 
 			switch (facing) {
 			case NORTH:
-				max = BlockVector3.at(max.getX(), max.getY(), min.getZ());
+				max = BlockVector3.at(min.getX(), max.getY(), max.getZ());
 				break;
 			case SOUTH:
-				min = BlockVector3.at(min.getX(), min.getY(), max.getZ());
+				min = BlockVector3.at(max.getX(), min.getY(), min.getZ());
 				break;
 			}
 			return new CuboidRegion(min, max);
@@ -318,7 +353,7 @@ public class ShieldModule {
 			if (facing == Facing.NORTH) {
 				return maxOfBlock.subtract(0, -shieldSizes, 0);
 			} else {
-				return maxOfBlock.subtract(0, -shieldSizes, blockSize.divide(2).getZ());
+				return maxOfBlock.subtract(0, -shieldSizes, blockSize.divide(2).getZ() - 1);
 			}
 		case ROOFFRONT:
 			if (facing == Facing.NORTH) {
@@ -330,7 +365,7 @@ public class ShieldModule {
 			if (facing == Facing.NORTH) {
 				return maxOfBlock.add(shieldSizes, 0, 0);
 			} else {
-				return maxOfBlock.subtract(blockSize.getX(), 0, blockSize.divide(2).getZ());
+				return maxOfBlock.subtract(blockSize.getX(), 0, blockSize.divide(2).getZ() - 1);
 			}
 		case RIGHTSIDEFRONT:
 			if (facing == Facing.NORTH) {
@@ -342,7 +377,10 @@ public class ShieldModule {
 			if (facing == Facing.NORTH) {
 				return maxOfBlock.subtract(blockSize.getX(), 0, 0);
 			} else {
-				return maxOfBlock.add(shieldSizes, 0, -blockSize.divide(2).getZ());
+				if(tier ==2) {
+					return maxOfBlock.add(shieldSizes, 0, -blockSize.divide(2).getZ());					
+				}
+				return maxOfBlock.add(shieldSizes, 0, -blockSize.divide(2).getZ() - 1);
 			}
 		case LEFTSIDEFRONT:
 			if (facing == Facing.NORTH) {
@@ -365,10 +403,11 @@ public class ShieldModule {
 			world.getBlockAt(vecToLoc(vector, world)).setBlockData(data, true);
 		}
 	}
+
 	private void setSpikes(World world, Region rg, Material mat) {
-		
+
 		Iterator<Region> iterator;
-		switch(position) {
+		switch (position) {
 		case BACK:
 		case FRONT:
 			iterator = new FrontIterator(rg);
@@ -381,9 +420,9 @@ public class ShieldModule {
 			iterator = new SideIterator(rg);
 			break;
 		}
-		while(iterator.hasNext()) {
+		while (iterator.hasNext()) {
 			setRegionToMaterial(world, iterator.next(), mat);
 		}
-		
+
 	}
 }

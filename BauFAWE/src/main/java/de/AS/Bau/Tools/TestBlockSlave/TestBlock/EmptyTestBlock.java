@@ -19,13 +19,15 @@ public class EmptyTestBlock implements TestBlock {
 	private String plotID;
 	private Facing facing;
 	private World world;
+	private Type type;
 
-	public EmptyTestBlock(int tier, Region region, String regionID, Facing facing, World world) {
+	public EmptyTestBlock(int tier, Region region, String regionID, Facing facing, World world,Type type) {
 		this.facing = facing;
 		this.region = region;
 		this.plotID = regionID;
 		this.tier = tier;
 		this.world = world;
+		this.type = type;
 	}
 
 	public EmptyTestBlock() {
@@ -59,6 +61,9 @@ public class EmptyTestBlock implements TestBlock {
 		return facing;
 	}
 
+	public Type getType() {
+		return type;
+	}
 	/* SETTER */
 	public void setName(String name) {
 		this.name = name;
@@ -78,5 +83,10 @@ public class EmptyTestBlock implements TestBlock {
 
 	public void setFacing(Facing facing) {
 		this.facing = facing;
+	}
+
+	
+	public void setType(Type type) {
+		this.type = type;
 	}
 }

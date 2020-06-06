@@ -94,6 +94,8 @@ public class TestBlockEditorCore implements Listener {
 
 	private void chooseTypeInv(Player p, ItemStack clicked) {
 		ShieldType type = ShieldType.getByItem(clicked);
+
+		getEditor(p).removeModule(getEditor(p).getPos());
 		if (type != null) {
 			getEditor(p).addModule(type);
 		}
@@ -106,7 +108,6 @@ public class TestBlockEditorCore implements Listener {
 		ShieldPosition pos = ShieldPosition.getByPositionInGUI(slot);
 		if (pos != null) {
 			getEditor(p).setChoosedPosition(pos);
-			getEditor(p).removeModule(pos);
 			getEditor(p).openChooseTypeInv();
 			return;
 		}

@@ -17,6 +17,7 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.session.ClipboardHolder;
 
 import de.AS.Bau.Main;
@@ -166,8 +167,11 @@ public class TestBlockSlave {
 
 	/* Adding TestBlocks */
 
-	public boolean addNewCustomTestBlock(int tier, String name, Facing facing, String plotID) {
-
+	public boolean addNewCustomTestBlock(String name) {
+		int tier = newTBToSave.getTier();
+		String plotID = newTBToSave.getPlotID();
+		Facing facing = newTBToSave.getfacing();
+		Type type = newTBToSave.getType();
 		if (testblocks.get(tier).size() == 9) {
 			Main.send(owner, "tbs_tooManyBlocks", "" + tier);
 			return false;
@@ -176,8 +180,7 @@ public class TestBlockSlave {
 			Main.send(owner, "tbs_nameNotFree", "" + tier, name);
 			return false;
 		}
-		saveRegionAsBlock(tier, facing, plotID, name);
-
+		saveRegionAsBlock(tier, facing, plotID, name,type);
 		HashSet<CustomTestBlock> adding = testblocks.get(tier);
 		CustomTestBlock block = new CustomTestBlock(owner, name, facing, tier);
 		adding.add(block);
@@ -202,8 +205,15 @@ public class TestBlockSlave {
 		}
 	}
 
-	private void saveRegionAsBlock(int tier, Facing facing, String plotID, String name) {
+	private void saveRegionAsBlock(int tier, Facing facing, String plotID, String name,Type type) {
 		Region rg = TestBlockSlaveCore.getTBRegion(tier, plotID, facing);
+		if(type.equals(Type.SHIELDS)) {
+			int shielsSize = TestBlockSlaveCore.getMaxShieldSizeOfTier(tier);
+			try {
+				rg.expand(BlockVector3.at(shielsSize, shielsSize, shielsSize),BlockVector3.at(-shielsSize, 0, -shielsSize));
+			} catch (RegionOperationException e) {
+			}
+		}
 		Clipboard board = WorldEditHandler.createClipboardOutOfRegion(rg,
 				CoordGetter.getTBSPastePosition(plotID, facing), BukkitAdapter.adapt(owner.getWorld()));
 		WorldEditHandler.saveClipboardAsSchematic(
@@ -345,9 +355,10 @@ public class TestBlockSlave {
 	public void saveNewCustomTB(String name) {
 
 		/* Save */
-		addNewCustomTestBlock(newTBToSave.getTier(), name, newTBToSave.getfacing(), newTBToSave.getPlotID());
-		/* Message to player */
-		Main.send(owner, "tbs_saveOwnTB_success", "" + newTBToSave.getTier(), name);
+		if (addNewCustomTestBlock(name)) {
+			/* Message to player */
+			Main.send(owner, "tbs_saveOwnTB_success", "" + newTBToSave.getTier(), name);
+		}
 	}
 
 	public void showParticle() {
@@ -371,13 +382,14 @@ public class TestBlockSlave {
 		BlockVector3 min = rg.getMinimumPoint();
 		BlockVector3 max = rg.getMaximumPoint();
 		if (chooseTB.getType().equals(Type.SHIELDS)) {
+			System.out.println("Shields");
 			int shieldSize = TestBlockSlaveCore.getMaxShieldSizeOfTier(tier);
 			min = min.subtract(shieldSize, 0, shieldSize);
 			max = max.add(shieldSize, shieldSize, shieldSize);
 		}
 		BlockVector3 minVector = min;
 		BlockVector3 maxVector = max;
-		newTBToSave = new EmptyTestBlock(tier, new CuboidRegion(min, max), plotID, facing, owner.getWorld());
+		newTBToSave = new EmptyTestBlock(tier, new CuboidRegion(min, max), plotID, facing, owner.getWorld(),chooseTB.getType());
 		saveTBParticles.cancel();
 		saveTBParticles.setTask(Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), new Runnable() {
 
@@ -394,10 +406,10 @@ public class TestBlockSlave {
 	}
 
 	public void cancelSave() {
-		if(saveTBParticles.isRunning()) {
+		if (saveTBParticles.isRunning()) {
 			saveTBParticles.cancel();
 			Main.send(owner, "tbs_save_canceled");
-		}else {
+		} else {
 			Main.send(owner, "tbs_save_NoSaveToCancel");
 		}
 	}

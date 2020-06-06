@@ -1,5 +1,6 @@
 package de.AS.Bau.Tools.TestBlockSlave.TestBlockEditor;
 
+import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -45,6 +46,7 @@ public class TestBlockEditor {
 	private Facing facing;
 	private int tier;
 	private boolean save;
+
 	public TestBlockEditor(Player owner) {
 		this.modules = new HashSet<>();
 		this.choosedPosition = null;
@@ -84,6 +86,8 @@ public class TestBlockEditor {
 		inv.setItem(1, ShieldType.MASSIVE.getItem());
 		inv.setItem(2, ShieldType.SAND.getItem());
 		inv.setItem(3, ShieldType.SPIKE.getItem());
+		inv.setItem(4, ItemStackCreator.createNewItemStack(Material.BARRIER,
+				StringGetterBau.getString(owner, "tbs_editor_removeType")));
 		inv.setItem(5, ShieldType.ARTOX.getItem());
 		inv.setItem(6, ShieldType.ARTILLERY.getItem());
 		inv.setItem(7, ShieldType.BACKSTAB.getItem());
@@ -123,14 +127,20 @@ public class TestBlockEditor {
 		modules.add(new ShieldModule(type, choosedPosition));
 		choosedPosition = null;
 	}
-	
+
 	public void removeModule(ShieldPosition pos) {
-		modules.forEach(module ->{
-			if(module.getPosition()==pos) {
-				modules.remove(module);
-				return;
-			}
-		});
+		Set<ShieldModule> moduleClone = new HashSet<>();
+		moduleClone.addAll(modules);
+		try {
+			modules.forEach(module -> {
+				if (module.getPosition() == pos) {
+					moduleClone.remove(module);
+					return;
+				}
+			});
+		} catch (ConcurrentModificationException e) {
+		}
+		modules = moduleClone;
 	}
 
 	public void setChoosedPosition(ShieldPosition choosedPosition) {
@@ -140,11 +150,13 @@ public class TestBlockEditor {
 	public void startSave() {
 		/* First: Visualize */
 		startVisualize();
+		save = true;
 		/* Then start normel TBS to save */
-		
+
 	}
-	
+
 	public void save(ChooseTestBlock chooseTB) {
+		chooseTB.setType(Type.SHIELDS).setTestBlockType(TestBlockType.NEW);
 		TestBlockSlaveCore.getSlave(owner).setChooseTB(chooseTB);
 		TestBlockSlaveCore.getSlave(owner).showParticle();
 		save = false;
@@ -171,11 +183,11 @@ public class TestBlockEditor {
 		tb.setTestBlockType(TestBlockType.DEFAULT);
 		tb.setFacing(facing).setTier(tier).setType(Type.NORMAL);
 		slave.pasteBlock(tb, false);
-		if(save) {
-			save(tb.setType(Type.SHIELDS).setTestBlockType(TestBlockType.NEW));
+		if (save) {
+			save(tb);
 		}
 		Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(), new Runnable() {
-			
+
 			@Override
 			public void run() {
 				/* visualizing single modules */
@@ -189,21 +201,17 @@ public class TestBlockEditor {
 					@Override
 					public void run() {
 						if (iter.hasNext()) {
-							try {
-								iter.next().visualize(plotID, world, tier, facing);
-							} catch (RegionOperationException e) {
-								e.printStackTrace();
-							}
+							iter.next().visualize(plotID, world, tier, facing);
+
 						} else {
 							scheduler.cancel();
 						}
 
 					}
 				}, 0, 4));
-				
+
 			}
 		}, 30);
-		
 
 	}
 
@@ -232,5 +240,9 @@ public class TestBlockEditor {
 
 	public void setTier(int tier) {
 		this.tier = tier;
+	}
+
+	public ShieldPosition getPos() {
+		return choosedPosition;
 	}
 }
