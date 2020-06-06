@@ -49,7 +49,7 @@ public class WorldGuardHandler {
 
 	public static boolean isInBuildRegion(BlockVector3 location, World world) {
 		RegionManager regions = container.get(world);
-		if (regions.getApplicableRegionsIDs(location).size() == 0) {
+		if (regions.getApplicableRegionsIDs(location).size() <= 1) {
 			return false;
 		}
 		return regions.getApplicableRegionsIDs(location).size() > 1;

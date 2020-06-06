@@ -61,24 +61,22 @@ public class WorldHandler {
 		}
 		// worldguard regionen
 		File worldGuardWorldDir = new File(Bukkit.getWorldContainer(), "plugins/WorldGuard/worlds/" + uuid);
-		if (!worldGuardWorldDir.exists()) {
-			File vorlageWorldGuardWorldDir = new File(Bukkit.getWorldContainer(),
-					"plugins/WorldGuard/worlds/" + templateName);
-			copyFolder_raw(vorlageWorldGuardWorldDir, worldGuardWorldDir);
-			Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.getPlugin(), new Runnable() {
+		File vorlageWorldGuardWorldDir = new File(Bukkit.getWorldContainer(),
+				"plugins/WorldGuard/worlds/" + templateName);
+		copyFolder_raw(vorlageWorldGuardWorldDir, worldGuardWorldDir);
+		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.getPlugin(), new Runnable() {
 
-				@Override
-				public void run() {
-					Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(),
-							"rg addowner -w \"" + uuid + "\" plot1 " + p.getUniqueId().toString());
-					Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(),
-							"rg addowner -w \"" + uuid + "\" plot2 " + p.getUniqueId().toString());
-					Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(),
-							"rg addowner -w \"" + uuid + "\" plot3 " + p.getUniqueId().toString());
-				}
-			}, 20);
+			@Override
+			public void run() {
+				Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(),
+						"rg addowner -w \"" + uuid + "\" plot1 " + p.getUniqueId().toString());
+				Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(),
+						"rg addowner -w \"" + uuid + "\" plot2 " + p.getUniqueId().toString());
+				Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(),
+						"rg addowner -w \"" + uuid + "\" plot3 " + p.getUniqueId().toString());
+			}
+		}, 20);
 
-		}
 	}
 
 	public static boolean deleteWorld(World w) {

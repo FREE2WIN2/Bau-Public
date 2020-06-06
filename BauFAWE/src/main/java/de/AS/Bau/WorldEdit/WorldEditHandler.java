@@ -136,7 +136,7 @@ public class WorldEditHandler {
 
 	}
 
-	public static void pasteTestBlock(Schematic schem, Facing facingto, String rgID, Player p,boolean saveUndo) {
+	public static void pasteTestBlock(Schematic schem, Facing facingto, String rgID, Player p, boolean saveUndo) {
 		BlockVector3 at = CoordGetter.getTBSPastePosition(rgID, facingto);
 		Clipboard board = schem.getClip();
 		if (schem.getFacing() != facingto) {
@@ -225,14 +225,18 @@ public class WorldEditHandler {
 							/* set block in world out of schematic */
 
 							BlockVector3 blockLoc = BlockVector3.at(x, y, z);
-							if (!(clipboard.getFullBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial().isAir()
-									&& ignoreAir)) {
-								try {
-									world.setBlock(blockLoc.add(offset), clipboard.getFullBlock(blockLoc));
-									blockChanged++;
-								} catch (WorldEditException e) {
-									e.printStackTrace();
+							if (WorldGuardHandler.isInBuildRegion(blockLoc, world)) {
+								if (!(clipboard.getFullBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial()
+										.isAir() && ignoreAir)) {
+									try {
+										world.setBlock(blockLoc.add(offset), clipboard.getFullBlock(blockLoc));
+										blockChanged++;
+									} catch (WorldEditException e) {
+										e.printStackTrace();
+									}
 								}
+							}else {
+								blockChanged++;
 							}
 
 						}

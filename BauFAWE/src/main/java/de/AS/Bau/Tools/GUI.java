@@ -123,7 +123,7 @@ public class GUI implements CommandExecutor, Listener {
 		}
 
 		ItemStack observer = ItemStackCreator.createNewItemStack(Material.OBSERVER,
-				StringGetterBau.getString(p, "show"));
+				StringGetterBau.getString(p, "tbs_gui_trail"));
 
 		// NetherStar
 		ItemStack guiItem = ItemStackCreator.createNewItemStack(Material.NETHER_STAR, "§6GUI");

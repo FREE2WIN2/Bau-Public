@@ -11,8 +11,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import de.AS.Bau.Main;
@@ -20,6 +18,7 @@ import de.AS.Bau.StringGetterBau;
 import de.AS.Bau.HikariCP.DBConnection;
 import de.AS.Bau.Scoreboard.ScoreBoardBau;
 import de.AS.Bau.Tools.DesignTool;
+import de.AS.Bau.utils.CoordGetter;
 import de.AS.Bau.utils.ItemStackCreator;
 import de.AS.Bau.utils.Language;
 import de.AS.Bau.utils.WorldHandler;
@@ -51,8 +50,9 @@ public class onPlayerJoin implements Listener {
 		World world = WorldHandler.loadWorld(p.getUniqueId().toString());
 
 		DesignTool.playerHasDtOn.put(p.getUniqueId(), false);
-		Location loc = new Location(world, -208, 8, 17);
-		onPlayerMove.playersLastPlot.put(p, "plot2");
+		String spawnPlot =  main.getCustomConfig().getString("coordinates.spawn");
+		Location loc = CoordGetter.getTeleportLocation(world,spawnPlot);
+		onPlayerMove.playersLastPlot.put(p, spawnPlot);
 		p.teleport(loc);
 		// wenn ja-> teleportieren
 		// item
