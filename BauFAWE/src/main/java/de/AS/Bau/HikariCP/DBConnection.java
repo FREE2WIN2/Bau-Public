@@ -197,7 +197,7 @@ public class DBConnection {
 			}
 			PreparedStatement statement2 = DataSource.getConnection()
 					.prepareStatement("DELETE FROM `Plot` WHERE `PlotID` = ?");
-
+			statement2.setString(1, uuid);
 			return statement2.executeUpdate() == 1;
 
 		} catch (Exception e) {

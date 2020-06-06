@@ -1,5 +1,7 @@
 package de.AS.Bau.Tools.TestBlockSlave.TestBlock;
 
+import org.bukkit.block.BlockFace;
+
 public enum Facing {
 	NORTH,SOUTH;
 	
@@ -19,5 +21,16 @@ public enum Facing {
 		case "s": return SOUTH;
 		}
 		return null;
+	}
+
+	
+	public  BlockFace toBlockFace() {
+		switch(this){
+		case NORTH:
+			return BlockFace.NORTH;
+		case SOUTH:
+			return BlockFace.SOUTH;
+	}
+	return null;
 	}
 }

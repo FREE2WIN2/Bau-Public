@@ -9,13 +9,14 @@ public class Scheduler {
 	int y;
 	int ymin;
 	int z;
-
+	boolean running;
 	public Scheduler() {
-		id = -1;
+		running = false;
 	}
 
 	public void cancel() {
 		Bukkit.getScheduler().cancelTask(id);
+		running = false;
 	}
 
 	public void setX(int x) {
@@ -52,9 +53,14 @@ public class Scheduler {
 
 	public void setTask(int task) {
 		id = task;
+		running = true;
 	}
 
 	public int getTask() {
 		return id;
+	}
+	
+	public boolean isRunning() {
+		return running;
 	}
 }

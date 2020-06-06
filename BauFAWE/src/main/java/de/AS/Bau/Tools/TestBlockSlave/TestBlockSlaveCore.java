@@ -74,6 +74,9 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 			} else if (args[0].equals("confirmRegion") && args[1].equals(p.getUniqueId().toString())) {
 				getSlave(p).savingNewTBName();
 				return true;
+			} else if (args[0].equals("confirmRegionCancel") && args[1].equals(p.getUniqueId().toString())) {
+				getSlave(p).cancelSave();
+				return true;
 			}
 			return false;
 		} else if (args.length == 3) {
@@ -122,6 +125,7 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 			return true;
 		}
 		return false;
+		
 	}
 
 	@EventHandler

@@ -355,7 +355,11 @@ public class TestBlockSlave {
 		JsonCreater click = new JsonCreater(StringGetterBau.getString(owner, "tbs_gui_confirmRegionConfirm"));
 		click.addHoverEvent(StringGetterBau.getString(owner, "tbs_gui_confirmRegionHover"))
 				.addClickEvent("/tbs confirmRegion " + owner.getUniqueId(), ClickAction.RUN_COMMAND);
-		creator.addJson(click).send(owner);
+		JsonCreater cancel = new JsonCreater(StringGetterBau.getString(owner, "tbs_gui_confirmRegionCancel"));
+		cancel.addHoverEvent(StringGetterBau.getString(owner, "tbs_gui_confirmRegionCancelHover"))
+				.addClickEvent("/tbs confirmRegionCancel " + owner.getUniqueId(), ClickAction.RUN_COMMAND);
+
+		creator.addJson(click).addJson(cancel).send(owner);
 
 		String plotID = WorldGuardHandler.getPlotId(owner.getLocation());
 
@@ -385,4 +389,16 @@ public class TestBlockSlave {
 
 	}
 
+	public void setChooseTB(ChooseTestBlock chooseTB) {
+		this.chooseTB = chooseTB;
+	}
+
+	public void cancelSave() {
+		if(saveTBParticles.isRunning()) {
+			saveTBParticles.cancel();
+			Main.send(owner, "tbs_save_canceled");
+		}else {
+			Main.send(owner, "tbs_save_NoSaveToCancel");
+		}
+	}
 }

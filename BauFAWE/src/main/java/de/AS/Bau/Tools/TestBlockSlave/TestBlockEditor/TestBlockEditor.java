@@ -44,11 +44,12 @@ public class TestBlockEditor {
 	private ShieldPosition choosedPosition;
 	private Facing facing;
 	private int tier;
-
+	private boolean save;
 	public TestBlockEditor(Player owner) {
 		this.modules = new HashSet<>();
 		this.choosedPosition = null;
 		this.owner = owner;
+		save = false;
 	}
 
 	public void openMainInv() {
@@ -137,10 +138,16 @@ public class TestBlockEditor {
 	}
 
 	public void startSave() {
-		// TODO Auto-generated method stub
 		/* First: Visualize */
-
+		startVisualize();
 		/* Then start normel TBS to save */
+		
+	}
+	
+	public void save(ChooseTestBlock chooseTB) {
+		TestBlockSlaveCore.getSlave(owner).setChooseTB(chooseTB);
+		TestBlockSlaveCore.getSlave(owner).showParticle();
+		save = false;
 	}
 
 	public void startVisualize() {
@@ -164,25 +171,39 @@ public class TestBlockEditor {
 		tb.setTestBlockType(TestBlockType.DEFAULT);
 		tb.setFacing(facing).setTier(tier).setType(Type.NORMAL);
 		slave.pasteBlock(tb, false);
-
-		/* visualizing single modules */
-		String plotID = WorldGuardHandler.getPlotId(owner.getLocation());
-		World world = owner.getWorld();
-		Iterator<ShieldModule> iter = modules.iterator();
-		Scheduler scheduler = new Scheduler();
-
-		scheduler.setTask(Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), new Runnable() {
-
+		if(save) {
+			save(tb.setType(Type.SHIELDS).setTestBlockType(TestBlockType.NEW));
+		}
+		Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(), new Runnable() {
+			
 			@Override
 			public void run() {
-				if (iter.hasNext()) {
-					iter.next().visualize(plotID, world, tier, facing);
-				} else {
-					scheduler.cancel();
-				}
+				/* visualizing single modules */
+				String plotID = WorldGuardHandler.getPlotId(owner.getLocation());
+				World world = owner.getWorld();
+				Iterator<ShieldModule> iter = modules.iterator();
+				Scheduler scheduler = new Scheduler();
 
+				scheduler.setTask(Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), new Runnable() {
+
+					@Override
+					public void run() {
+						if (iter.hasNext()) {
+							try {
+								iter.next().visualize(plotID, world, tier, facing);
+							} catch (RegionOperationException e) {
+								e.printStackTrace();
+							}
+						} else {
+							scheduler.cancel();
+						}
+
+					}
+				}, 0, 4));
+				
 			}
-		}, 0, 1));
+		}, 30);
+		
 
 	}
 
