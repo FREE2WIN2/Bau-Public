@@ -128,9 +128,8 @@ public class WorldEditHandler {
 
 	/* all paste Methods */
 
-	public static void pasten(Schematic schem, String rgID, Player p, boolean ignoreAir) {
+	public static void pasteground(Schematic schem, String rgID, Player p, boolean ignoreAir) {
 		BlockVector3 at = CoordGetter.getTBSPastePosition(rgID, schem.getFacing(),p.getWorld().getName());
-
 		pasteAsync(new ClipboardHolder(schem.getClip()), at, p, ignoreAir, 1, false, false);
 
 	}
@@ -160,7 +159,6 @@ public class WorldEditHandler {
 	 */
 	public static void pasteAsync(ClipboardHolder clipboardHolder, BlockVector3 at, Player p, boolean ignoreAir,
 			int ticksPerPasteInterval, boolean saveUndo, boolean tbs) {
-		System.out.println(at);
 		
 		/* Get Clipboard out of the ClipboardHolder with the transform */
 
@@ -177,9 +175,8 @@ public class WorldEditHandler {
 		BlockVector3 offset = at.subtract(clipboard.getOrigin());
 		BlockVector3 min = clipboard.getMinimumPoint();
 		BlockVector3 max = clipboard.getMaximumPoint();
-		System.out.println("min: " + min.add(offset));
-		System.out.println("max: " + max.add(offset));
 		World world = BukkitAdapter.adapt(p.getWorld());
+		String originRegion = WorldGuardHandler.getPlotId(clipboard.getOrigin().add(offset), world);
 
 		if (saveUndo) {
 			if (tbs) {
@@ -222,8 +219,8 @@ public class WorldEditHandler {
 							/* set block in world out of schematic */
 
 							BlockVector3 blockLoc = BlockVector3.at(x, y, z);
-							if (WorldGuardHandler.isInBuildRegion(blockLoc, world)) {
-								if (!(clipboard.getFullBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial()
+							if (WorldGuardHandler.getPlotId(blockLoc.add(offset), world).equals(originRegion)||!tbs) {
+								if (!(clipboard.getFullBlock(blockLoc).getBlockType().getMaterial()
 										.isAir() && ignoreAir)) {
 									try {
 										world.setBlock(blockLoc.add(offset), clipboard.getFullBlock(blockLoc));

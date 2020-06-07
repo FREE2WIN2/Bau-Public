@@ -137,7 +137,6 @@ public class ScoreBoardBau {
 
 	private String getPlotNumber() {
 		return onPlayerMove.playersLastPlot.get(p).replace("plot", "");
-
 	}
 
 	public void cancel() {

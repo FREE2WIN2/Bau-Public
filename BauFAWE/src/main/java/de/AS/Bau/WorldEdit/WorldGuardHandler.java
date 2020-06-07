@@ -59,9 +59,11 @@ public class WorldGuardHandler {
 	public static boolean addPlayerToAllRegions(String worldName, String playerUUID) {
 		RegionManager regions = container.get(BukkitAdapter.adapt(WorldHandler.loadWorld(worldName)));
 		for (Entry<String, ProtectedRegion> rg : regions.getRegions().entrySet()) {
-			DefaultDomain member = rg.getValue().getMembers();
-			member.addPlayer(UUID.fromString(playerUUID));
-			rg.getValue().setMembers(member);
+			if (rg.getValue().getPriority() > 10) {
+				DefaultDomain member = rg.getValue().getMembers();
+				member.addPlayer(UUID.fromString(playerUUID));
+				rg.getValue().setMembers(member);
+			}
 		}
 		return true;
 	}
@@ -69,12 +71,14 @@ public class WorldGuardHandler {
 	public static boolean removeMemberFromAllRegions(String worldName, UUID playerUUID) {
 		RegionManager regions = container.get(BukkitAdapter.adapt(WorldHandler.loadWorld(worldName)));
 		for (Entry<String, ProtectedRegion> rg : regions.getRegions().entrySet()) {
-			DefaultDomain member = rg.getValue().getMembers();
+			if (rg.getValue().getPriority() > 10) {
+				DefaultDomain member = rg.getValue().getMembers();
 
-			member.removePlayer(DBConnection.getName(playerUUID.toString()));
+				member.removePlayer(DBConnection.getName(playerUUID.toString()));
 
-			member.removePlayer(playerUUID);
-			rg.getValue().setMembers(member);
+				member.removePlayer(playerUUID);
+				rg.getValue().setMembers(member);
+			}
 		}
 		return true;
 	}
@@ -86,6 +90,19 @@ public class WorldGuardHandler {
 			return null;
 		}
 		return getRegion(ids.get(1), BukkitAdapter.adapt(loc.getWorld()));
+
+	}
+
+	
+	public static void addOwnerToAllRegions(UUID uniqueId) {
+		RegionManager regions = container.get(BukkitAdapter.adapt(WorldHandler.loadWorld(uniqueId.toString())));
+		for (Entry<String, ProtectedRegion> rg : regions.getRegions().entrySet()) {
+			if (rg.getValue().getPriority() > 10) {
+				DefaultDomain owner = rg.getValue().getOwners();
+				owner.addPlayer(uniqueId);
+				rg.getValue().setOwners(owner);
+			}
+		}
 
 	}
 }

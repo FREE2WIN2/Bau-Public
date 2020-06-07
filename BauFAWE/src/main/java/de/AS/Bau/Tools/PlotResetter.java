@@ -18,7 +18,6 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
-import de.AS.Bau.Plots.Plots;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlock.Facing;
 import de.AS.Bau.WorldEdit.Schematic;
 import de.AS.Bau.WorldEdit.WorldEditHandler;
@@ -48,13 +47,13 @@ public class PlotResetter implements CommandExecutor {
 	}
 
 	public static void resetRegion(String rgID, Player p, boolean confirmed) {
-		int rgIDint = Integer.parseInt(rgID.replace("plot", ""));
+//		int rgIDint = Integer.parseInt(rgID.replace("plot", ""));
 		if (!confirmed) {
 			JsonCreater creater1 = new JsonCreater(
-					Main.prefix + StringGetterBau.getString(p, "delePlotConfirmation").replace("%r", "" + rgIDint));
+					Main.prefix + StringGetterBau.getString(p, "delePlotConfirmation", rgID.replace("plot", "")));
 			JsonCreater creater2 = new JsonCreater(
-					StringGetterBau.getString(p, "deletePlotHere").replace("%r", "" + rgIDint));
-			creater2.addHoverEvent(StringGetterBau.getString(p, "delePlotHover").replace("%r", "" + rgIDint));
+					StringGetterBau.getString(p, "deletePlotHere",rgID.replace("plot", "")));
+			creater2.addHoverEvent(StringGetterBau.getString(p, "delePlotHover", rgID.replace("plot", "")));
 			creater2.addClickEvent("/delcon " + rgID + " " + p.getUniqueId(), ClickAction.RUN_COMMAND);
 			creater1.addJson(creater2).send(p);
 		} else {
@@ -63,7 +62,7 @@ public class PlotResetter implements CommandExecutor {
 				return;
 			}
 			playerBlockedDelete.add(p.getUniqueId());
-			p.sendMessage(StringGetterBau.getString(p, "delePlot").replace("%r", "" + rgIDint));
+			Main.send(p, "delePlot", rgID.replace("plot", ""));
 			// für jede Zeile rgid festlegen
 			ProtectedRegion rg = WorldGuard.getInstance().getPlatform().getRegionContainer()
 					.get(BukkitAdapter.adapt(p.getWorld())).getRegion(rgID);
@@ -84,7 +83,7 @@ public class PlotResetter implements CommandExecutor {
 			// paste
 			String schemName = CoordGetter.getConfigOfWorld(p.getWorld().getName())
 					.getString("plotreset.schemfiles." + rgID) + ".schem";
-			WorldEditHandler.pasten(new Schematic("TestBlockSklave", schemName, Facing.NORTH), rgID, p, true);
+			WorldEditHandler.pasteground(new Schematic("TestBlockSklave", schemName, Facing.NORTH), rgID, p, true);
 
 			int maxBlockChangePerTick = WorldEditHandler.maxBlockChangePerTick;
 			scheduler.setTask(

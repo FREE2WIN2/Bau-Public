@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 
 import de.AS.Bau.Main;
 import de.AS.Bau.HikariCP.DBConnection;
+import de.AS.Bau.WorldEdit.WorldGuardHandler;
 
 public class WorldHandler {
 
@@ -68,12 +69,7 @@ public class WorldHandler {
 
 			@Override
 			public void run() {
-				Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(),
-						"rg addowner -w \"" + uuid + "\" plot1 " + p.getUniqueId().toString());
-				Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(),
-						"rg addowner -w \"" + uuid + "\" plot2 " + p.getUniqueId().toString());
-				Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(),
-						"rg addowner -w \"" + uuid + "\" plot3 " + p.getUniqueId().toString());
+				WorldGuardHandler.addOwnerToAllRegions(p.getUniqueId());
 			}
 		}, 20);
 
