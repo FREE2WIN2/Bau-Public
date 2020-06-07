@@ -64,4 +64,9 @@ public class Plots {
 		String template = getPlot(ownerUUID).getTemplate();
 		return gsConfigs.get(template);
 	}
+	public static YamlConfiguration getConfigOfPlot(String worldName) {
+		if(worldName)
+		String template = getPlot(ownerUUID).getTemplate();
+		return gsConfigs.get(template);
+	}
 }

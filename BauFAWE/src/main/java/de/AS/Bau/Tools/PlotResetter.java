@@ -18,10 +18,12 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
+import de.AS.Bau.Plots.Plots;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlock.Facing;
 import de.AS.Bau.WorldEdit.Schematic;
 import de.AS.Bau.WorldEdit.WorldEditHandler;
 import de.AS.Bau.utils.ClickAction;
+import de.AS.Bau.utils.CoordGetter;
 import de.AS.Bau.utils.JsonCreater;
 import de.AS.Bau.utils.Scheduler;
 
@@ -37,7 +39,7 @@ public class PlotResetter implements CommandExecutor {
 				return true;
 			}
 
-			if (p.getWorld().getName().equals(p.getUniqueId().toString())|| p.hasPermission("admin")) {
+			if (p.getWorld().getName().equals(p.getUniqueId().toString()) || p.hasPermission("admin")) {
 				resetRegion(args[0], p, true);
 				return true;
 			}
@@ -80,7 +82,8 @@ public class PlotResetter implements CommandExecutor {
 
 			World world = p.getWorld();
 			// paste
-			String schemName = Main.getPlugin().getCustomConfig().getString("plotreset.schemfiles."+rgID) + ".schem";
+			String schemName = CoordGetter.getConfigOfWorld(p.getWorld().getName())
+					.getString("plotreset.schemfiles." + rgID) + ".schem";
 			WorldEditHandler.pasten(new Schematic("TestBlockSklave", schemName, Facing.NORTH), rgID, p, true);
 
 			int maxBlockChangePerTick = WorldEditHandler.maxBlockChangePerTick;

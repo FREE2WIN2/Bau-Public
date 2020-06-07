@@ -12,6 +12,8 @@ import java.util.UUID;
 
 import org.bukkit.entity.Player;
 
+import de.AS.Bau.utils.WorldHandler;
+
 public class DBConnection {
 	public DBConnection() {
 	}
@@ -60,8 +62,9 @@ public class DBConnection {
 		String uuid = owner.toString();
 		try (Connection conn = DataSource.getConnection()) {
 			PreparedStatement statement = conn
-					.prepareStatement("INSERT INTO `Plot`(`PlotID`) VALUES (?)");
+					.prepareStatement("INSERT INTO `Plot`(`PlotID`,template) VALUES (?,?)");
 			statement.setString(1, uuid);
+			statement.setString(1, WorldHandler.templateName);
 			return statement.executeUpdate() == 1;
 		} catch (Exception e) {
 			e.printStackTrace();

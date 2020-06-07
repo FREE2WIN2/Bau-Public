@@ -33,28 +33,12 @@ public class CoordGetter {
 		return BlockVector3.at(x, y, z);
 	}
 
-	private static YamlConfiguration getConfigOfWorld(String worldName) {
+	public static YamlConfiguration getConfigOfWorld(String worldName) {
 		if (worldName.contains("test")) {
 			return Plots.getConfig(Main.getPlugin().getCustomConfig().getString("test.template"));
 		}
 		return Plots.getConfigOfPlot(UUID.fromString(worldName));
 	}
-
-//	public static BlockVector3 getMaxWorldVector() {
-//		String[] coords = Main.getPlugin().getConfig().getString("coordinates.worldBorder.max").split(" ");
-//		int x = Integer.parseInt(coords[0]);
-//		int y = Integer.parseInt(coords[1]);
-//		int z = Integer.parseInt(coords[2]);
-//		return BlockVector3.at(x, y, z);
-//	}
-//
-//	public static BlockVector3 getMinWorldVector() {
-//		String[] coords = Main.getPlugin().getConfig().getString("coordinates.worldBorder.min").split(" ");
-//		int x = Integer.parseInt(coords[0]);
-//		int y = Integer.parseInt(coords[1]);
-//		int z = Integer.parseInt(coords[2]);
-//		return BlockVector3.at(x, y, z);
-//	}
 
 	public static BlockVector3 getMiddleRegionTB(String plotID, Facing facing, String worldName) {
 		YamlConfiguration config = getConfigOfWorld(worldName);
