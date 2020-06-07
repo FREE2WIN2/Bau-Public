@@ -31,6 +31,7 @@ import de.AS.Bau.Listener.onPlayerMove;
 import de.AS.Bau.Listener.onPlayerQuit;
 import de.AS.Bau.Listener.onPlayerRespawn;
 import de.AS.Bau.Listener.onPlayerTeleport;
+import de.AS.Bau.Plots.Plots;
 import de.AS.Bau.TabCompleter.TntReloaderTC;
 import de.AS.Bau.TabCompleter.gsTC;
 import de.AS.Bau.TabCompleter.particlesTC;
@@ -77,6 +78,7 @@ public class Main extends JavaPlugin {
 		registerCommands();
 		registerListener();
 
+		new Plots();
 		gs.startCheckForTempAdd();
 		WorldHandler.checkForWorldsToUnload();
 		new DataSource();

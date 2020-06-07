@@ -21,6 +21,9 @@ public class Plots {
 		loadedWorlds = new HashMap<>();
 		gsConfigs = new HashMap<>();
 		File configDir = new File(Main.getPlugin().getDataFolder(),"worldConfigs");
+		if(!configDir.exists()) {
+			configDir.mkdirs();
+		}
 		for(File config:configDir.listFiles()) {
 			YamlConfiguration configyaml = new YamlConfiguration();
 			String key = config.getName().replace(".yml", "");
@@ -61,11 +64,6 @@ public class Plots {
 		return getConfigOfPlot(uniqueId).getString("coordinates.spawn");
 	}
 	public static YamlConfiguration getConfigOfPlot(UUID ownerUUID) {
-		String template = getPlot(ownerUUID).getTemplate();
-		return gsConfigs.get(template);
-	}
-	public static YamlConfiguration getConfigOfPlot(String worldName) {
-		if(worldName)
 		String template = getPlot(ownerUUID).getTemplate();
 		return gsConfigs.get(template);
 	}
