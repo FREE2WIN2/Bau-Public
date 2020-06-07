@@ -206,7 +206,7 @@ public class TestBlockSlave {
 	}
 
 	private void saveRegionAsBlock(int tier, Facing facing, String plotID, String name,Type type) {
-		Region rg = TestBlockSlaveCore.getTBRegion(tier, plotID, facing);
+		Region rg = TestBlockSlaveCore.getTBRegion(tier, plotID, facing,owner.getWorld().getName());
 		if(type.equals(Type.SHIELDS)) {
 			int shielsSize = TestBlockSlaveCore.getMaxShieldSizeOfTier(tier);
 			try {
@@ -215,7 +215,7 @@ public class TestBlockSlave {
 			}
 		}
 		Clipboard board = WorldEditHandler.createClipboardOutOfRegion(rg,
-				CoordGetter.getTBSPastePosition(plotID, facing), BukkitAdapter.adapt(owner.getWorld()));
+				CoordGetter.getTBSPastePosition(plotID, facing, owner.getWorld().getName()), BukkitAdapter.adapt(owner.getWorld()));
 		WorldEditHandler.saveClipboardAsSchematic(
 				Main.schempath + "/" + owner.getUniqueId().toString() + "/TestBlockSklave", name + ".schem", board);
 
@@ -378,7 +378,7 @@ public class TestBlockSlave {
 
 		Facing facing = chooseTB.getFacing();
 		int tier = chooseTB.getTier();
-		Region rg = TestBlockSlaveCore.getTBRegion(tier, plotID, facing);
+		Region rg = TestBlockSlaveCore.getTBRegion(tier, plotID, facing,owner.getWorld().getName());
 		BlockVector3 min = rg.getMinimumPoint();
 		BlockVector3 max = rg.getMaximumPoint();
 		if (chooseTB.getType().equals(Type.SHIELDS)) {

@@ -2,14 +2,9 @@ package de.AS.Bau.Tools.TestBlockSlave.TestBlock;
 
 import org.bukkit.World;
 
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.regions.Region;
 
-import de.AS.Bau.Main;
 import de.AS.Bau.WorldEdit.Schematic;
-import de.AS.Bau.WorldEdit.WorldEditHandler;
-import de.AS.Bau.utils.CoordGetter;
 
 public class EmptyTestBlock implements TestBlock {
 
@@ -26,7 +21,7 @@ public class EmptyTestBlock implements TestBlock {
 		this.region = region;
 		this.plotID = regionID;
 		this.tier = tier;
-		this.world = world;
+		this.setWorld(world);
 		this.type = type;
 	}
 
@@ -88,5 +83,13 @@ public class EmptyTestBlock implements TestBlock {
 	
 	public void setType(Type type) {
 		this.type = type;
+	}
+
+	public World getWorld() {
+		return world;
+	}
+
+	public void setWorld(World world) {
+		this.world = world;
 	}
 }

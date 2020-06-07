@@ -15,6 +15,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 
+import de.AS.Bau.HikariCP.DBConnection;
 import de.AS.Bau.utils.WorldHandler;
 
 public class WorldGuardHandler {
@@ -65,14 +66,14 @@ public class WorldGuardHandler {
 		return true;
 	}
 
-	public static boolean removeMemberFromAllRegions(String worldName, String playerUUID, String playerNameToRemove) {
+	public static boolean removeMemberFromAllRegions(String worldName, UUID playerUUID) {
 		RegionManager regions = container.get(BukkitAdapter.adapt(WorldHandler.loadWorld(worldName)));
 		for (Entry<String, ProtectedRegion> rg : regions.getRegions().entrySet()) {
 			DefaultDomain member = rg.getValue().getMembers();
-			if (playerNameToRemove != null) {
-				member.removePlayer(playerNameToRemove);
-			}
-			member.removePlayer(UUID.fromString(playerUUID));
+
+			member.removePlayer(DBConnection.getName(playerUUID.toString()));
+
+			member.removePlayer(playerUUID);
 			rg.getValue().setMembers(member);
 		}
 		return true;
@@ -81,10 +82,10 @@ public class WorldGuardHandler {
 	public static ProtectedRegion getSecondRegion(Location loc) {
 		RegionManager regions = container.get(BukkitAdapter.adapt(loc.getWorld()));
 		List<String> ids = regions.getApplicableRegionsIDs(BlockVector3.at(loc.getX(), loc.getY(), loc.getZ()));
-		if(ids.size()<2) {
+		if (ids.size() < 2) {
 			return null;
 		}
 		return getRegion(ids.get(1), BukkitAdapter.adapt(loc.getWorld()));
-		
+
 	}
 }

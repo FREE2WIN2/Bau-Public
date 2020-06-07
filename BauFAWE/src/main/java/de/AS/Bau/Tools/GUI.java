@@ -28,7 +28,6 @@ import de.AS.Bau.StringGetterBau;
 import de.AS.Bau.HikariCP.DBConnection;
 import de.AS.Bau.WorldEdit.WorldGuardHandler;
 import de.AS.Bau.utils.ClickAction;
-import de.AS.Bau.utils.CoordGetter;
 import de.AS.Bau.utils.ItemStackCreator;
 import de.AS.Bau.utils.JsonCreater;
 
@@ -86,31 +85,7 @@ public class GUI implements CommandExecutor, Listener {
 
 		// enderpearls
 		ItemStack enderPearl1IS = ItemStackCreator.createNewItemStack(Material.ENDER_PEARL,
-				StringGetterBau.getString(p, "teleportPlotOne"));
-
-		// 2pearls
-		ItemStack enderPearl2IS = ItemStackCreator.createNewItemStack(Material.ENDER_PEARL,
-				StringGetterBau.getString(p, "teleportPlotTwo"));
-		enderPearl2IS.setAmount(2);
-
-		// 3pearls
-		ItemStack enderPearl3IS = ItemStackCreator.createNewItemStack(Material.ENDER_PEARL,
-				StringGetterBau.getString(p, "teleportPlotThree"));
-		enderPearl3IS.setAmount(3);
-
-		// enderEye
-		ItemStack enderEye1IS = ItemStackCreator.createNewItemStack(Material.ENDER_EYE,
-				StringGetterBau.getString(p, "teleportTestPlotOne"));
-
-		// 2eyes
-		ItemStack enderEye2IS = ItemStackCreator.createNewItemStack(Material.ENDER_EYE,
-				StringGetterBau.getString(p, "teleportTestPlotTwo"));
-		enderEye2IS.setAmount(2);
-
-		// 3eyes
-		ItemStack enderEye3IS = ItemStackCreator.createNewItemStack(Material.ENDER_EYE,
-				StringGetterBau.getString(p, "teleportTestPlotThree"));
-		enderEye3IS.setAmount(3);
+				StringGetterBau.getString(p, "gui_teleporter"));
 
 		// torch f�r sl
 		ItemStack stoplagIS;
@@ -177,12 +152,8 @@ public class GUI implements CommandExecutor, Listener {
 				StringGetterBau.getString(p, "gui_particles")));
 
 		inv.setItem(33, dst);
-		inv.setItem(37, enderPearl1IS);
-		inv.setItem(38, enderPearl2IS);
-		inv.setItem(39, enderPearl3IS);
-		inv.setItem(41, enderEye3IS);
-		inv.setItem(42, enderEye2IS);
-		inv.setItem(43, enderEye1IS);
+		
+		inv.setItem(40, enderPearl1IS);
 		// close DBConnection
 		return inv;
 	}
@@ -224,9 +195,7 @@ public class GUI implements CommandExecutor, Listener {
 		String tntallowed = StringGetterBau.getString(p, "tntAllowed");
 		String clickedName = clicked.getItemMeta().getDisplayName();
 		String reset = StringGetterBau.getString(p, "deletePlot");
-		String tp1 = StringGetterBau.getString(p, "teleportPlotOne");
-		String tp2 = StringGetterBau.getString(p, "teleportPlotTwo");
-		String tp3 = StringGetterBau.getString(p, "teleportPlotThree");
+		String tp1 = StringGetterBau.getString(p, "gui_teleporter");
 		String testBlockSklaveGui = StringGetterBau.getString(p, "testBlockSklaveGui");
 		String trailShow = StringGetterBau.getString(p, "show");
 		String dtItemOn = StringGetterBau.getString(p, "dtItemOff");
@@ -244,23 +213,7 @@ public class GUI implements CommandExecutor, Listener {
 			String rgID = WorldGuardHandler.getPlotId(p.getLocation());
 			PlotResetter.resetRegion(rgID, p, false);
 		} else if (clickedName.equals(tp1)) {
-			p.closeInventory();
-			p.teleport(CoordGetter.getTeleportLocation(p.getWorld(), "plot1"));
-		} else if (clickedName.equals(tp2)) {
-			p.closeInventory();
-			p.teleport(CoordGetter.getTeleportLocation(p.getWorld(), "plot2"));
-		} else if (clickedName.equals(tp3)) {
-			p.closeInventory();
-			p.teleport(CoordGetter.getTeleportLocation(p.getWorld(), "plot3"));
-		} else if (clickedName.equals(StringGetterBau.getString(p, "teleportTestPlotOne"))) {
-			p.closeInventory();
-			p.teleport(CoordGetter.getTeleportLocation(p.getWorld(), "testplot1"));
-		} else if (clickedName.equals(StringGetterBau.getString(p, "teleportTestPlotTwo"))) {
-			p.closeInventory();
-			p.teleport(CoordGetter.getTeleportLocation(p.getWorld(), "testplot2"));
-		} else if (clickedName.equals(StringGetterBau.getString(p, "teleportTestPlotThree"))) {
-			p.closeInventory();
-			p.teleport(CoordGetter.getTeleportLocation(p.getWorld(), "testplot3"));
+			PlotTeleporter.openInv(p);
 		} else if (clickedName.equals(StringGetterBau.getString(p, "gui_particles"))) {
 			p.performCommand("particles gui");
 		} else if (clicked.getType().equals(Material.PLAYER_HEAD)) {

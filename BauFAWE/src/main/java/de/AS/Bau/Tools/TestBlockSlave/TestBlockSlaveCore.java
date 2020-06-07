@@ -31,7 +31,6 @@ import de.AS.Bau.Tools.TestBlockSlave.TestBlock.TestBlock;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlock.TestBlockType;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlock.Type;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlockEditor.TestBlockEditorCore;
-import de.AS.Bau.WorldEdit.WorldGuardHandler;
 import de.AS.Bau.utils.Banner;
 import de.AS.Bau.utils.ClickAction;
 import de.AS.Bau.utils.CoordGetter;
@@ -376,9 +375,9 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 		return instance;
 	}
 
-	public static Region getTBRegion(int tier, String plotID, Facing facing) {
+	public static Region getTBRegion(int tier, String plotID, Facing facing,String worldName) {
 
-		BlockVector3 middle = CoordGetter.getMiddleRegionTB(plotID, facing);
+		BlockVector3 middle = CoordGetter.getMiddleRegionTB(plotID, facing,worldName);
 		BlockVector3 sizes = CoordGetter.getMaxSizeOfBlock(tier);
 
 		/* If North -> middle.z = min.z ! */

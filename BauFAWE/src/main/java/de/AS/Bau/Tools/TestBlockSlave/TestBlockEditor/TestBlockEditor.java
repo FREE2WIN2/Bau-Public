@@ -216,7 +216,7 @@ public class TestBlockEditor {
 	}
 
 	private Region calcUndoRegion() {
-		Region normal = TestBlockSlaveCore.getTBRegion(tier, WorldGuardHandler.getPlotId(owner.getLocation()), facing);
+		Region normal = TestBlockSlaveCore.getTBRegion(tier, WorldGuardHandler.getPlotId(owner.getLocation()), facing,owner.getWorld().getName());
 		int shieldSize = TestBlockSlaveCore.getMaxShieldSizeOfTier(tier);
 		BlockVector3 min = BlockVector3.at(-shieldSize, 0, -shieldSize);
 		BlockVector3 max = BlockVector3.at(shieldSize, 0, shieldSize);

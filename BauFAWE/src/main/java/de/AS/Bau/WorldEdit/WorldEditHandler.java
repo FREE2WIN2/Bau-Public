@@ -32,7 +32,6 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
 
 import de.AS.Bau.Main;
-import de.AS.Bau.Tools.Stoplag;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlockSlaveCore;
 import de.AS.Bau.Tools.TestBlockSlave.TestBlock.Facing;
 import de.AS.Bau.utils.CoordGetter;
@@ -130,14 +129,14 @@ public class WorldEditHandler {
 	/* all paste Methods */
 
 	public static void pasten(Schematic schem, String rgID, Player p, boolean ignoreAir) {
-		BlockVector3 at = CoordGetter.getTBSPastePosition(rgID, schem.getFacing());
+		BlockVector3 at = CoordGetter.getTBSPastePosition(rgID, schem.getFacing(),p.getWorld().getName());
 
 		pasteAsync(new ClipboardHolder(schem.getClip()), at, p, ignoreAir, 1, false, false);
 
 	}
 
 	public static void pasteTestBlock(Schematic schem, Facing facingto, String rgID, Player p, boolean saveUndo) {
-		BlockVector3 at = CoordGetter.getTBSPastePosition(rgID, facingto);
+		BlockVector3 at = CoordGetter.getTBSPastePosition(rgID, facingto,p.getWorld().getName());
 		Clipboard board = schem.getClip();
 		if (schem.getFacing() != facingto) {
 			board = rotateClipboard(board);

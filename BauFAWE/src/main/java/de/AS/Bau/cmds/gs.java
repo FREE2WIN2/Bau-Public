@@ -24,8 +24,8 @@ import org.bukkit.entity.Player;
 import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
 import de.AS.Bau.HikariCP.DBConnection;
+import de.AS.Bau.Plots.Plots;
 import de.AS.Bau.Tools.GUI;
-import de.AS.Bau.WorldEdit.WorldGuardHandler;
 import de.AS.Bau.utils.ClickAction;
 import de.AS.Bau.utils.CoordGetter;
 import de.AS.Bau.utils.HelperMethods;
@@ -38,15 +38,14 @@ import net.minecraft.server.v1_15_R1.PlayerConnection;
 
 public class gs implements CommandExecutor {
 
-	public static String joinPLot = Main.getPlugin().getCustomConfig().getString("coordinates.spawn");
 	public static File logFile;
 	private HashSet<UUID> firstWarnNewPlot = new HashSet<>();
 	private HashSet<UUID> secondWarnNewPlot = new HashSet<>();
 	private HashSet<UUID> blocked = new HashSet<>();
 
 	public gs() {
-		logFile = new File(Main.getPlugin().getDataFolder(),"GsMemberedLog.txt");
-		if(!logFile.exists()) {
+		logFile = new File(Main.getPlugin().getDataFolder(), "GsMemberedLog.txt");
+		if (!logFile.exists()) {
 			try {
 				logFile.getParentFile().mkdirs();
 				logFile.createNewFile();
@@ -55,21 +54,22 @@ public class gs implements CommandExecutor {
 			}
 		}
 	}
-	
+
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String string, String[] args) {
 
 		Player p = (Player) sender;
 		if (args.length == 0) {
 			// gs -> tp zum own gs
-			p.teleport(CoordGetter.getTeleportLocation(WorldHandler.loadWorld(p.getUniqueId().toString()), joinPLot));
+			p.teleport(CoordGetter.getTeleportLocation(WorldHandler.loadWorld(p.getUniqueId().toString()),
+					Plots.getJoinPlot(p.getUniqueId())));
 			return true;
 		} else if (args.length == 1) {
 			if (args[0].equalsIgnoreCase("list")) {
 				// gs list
 				ArrayList<String> memberedPlots = new ArrayList<>();
 				memberedPlots.add(p.getName());
-				memberedPlots.addAll(DBConnection.getMemberedPlots(p.getUniqueId()));
+				memberedPlots.addAll(Plots.getPlot(p.getUniqueId()).getMember());
 				sendMemberedGs(p, memberedPlots);
 				return true;
 
@@ -112,8 +112,10 @@ public class gs implements CommandExecutor {
 				// if (conn.isMember(p, args[1]) || p.hasPermission("moderator")) {
 				if ((DBConnection.isMember(p.getUniqueId(), args[1]) || p.hasPermission("moderator"))
 						&& DBConnection.hasOwnPlots(args[1])) {
-					String plotID = DBConnection.getUUID(args[1]);
-					p.teleport(CoordGetter.getTeleportLocation(WorldHandler.loadWorld(plotID), joinPLot));
+					String plotID = DBConnection.getUUID(args[1]); // == UUID of the Owner
+					p.teleport(CoordGetter.getTeleportLocation(WorldHandler.loadWorld(plotID),
+							Plots.getJoinPlot(UUID.fromString(plotID))));
+
 				} else {
 					p.sendMessage(Main.prefix + StringGetterBau.getString(p, "noPlotMember"));
 				}
@@ -205,11 +207,8 @@ public class gs implements CommandExecutor {
 
 	public void removeMember(Player p, String playerNameToRemove) {
 		if (!p.getName().equalsIgnoreCase(playerNameToRemove)) {
-			if (DBConnection.removeMember(p.getUniqueId().toString(), playerNameToRemove)) {
-				p.sendMessage(Main.prefix
-						+ StringGetterBau.getString(p, "plotMemberRemoved").replace("%r", playerNameToRemove));
-				WorldGuardHandler.removeMemberFromAllRegions(p.getUniqueId().toString(),
-						DBConnection.getUUID(playerNameToRemove), playerNameToRemove);
+			if (Plots.getPlot(p.getUniqueId()).removeMember(DBConnection.getUUID(playerNameToRemove),
+					playerNameToRemove)) {
 				writeLog(playerNameToRemove + " removed from " + p.getName() + "'s plot at " + HelperMethods.getTime());
 			} else {
 				Main.send(p, "error");
@@ -220,13 +219,12 @@ public class gs implements CommandExecutor {
 	}
 
 	public boolean addMember(Player p, String playerName) {
-		if (DBConnection.isMember(UUID.fromString(DBConnection.getUUID(playerName)), p.getName())) {
+		if (Plots.getPlot(p.getUniqueId()).isMember(UUID.fromString(DBConnection.getUUID(playerName)))) {
 			p.sendMessage(Main.prefix + StringGetterBau.getString(p, "alreadyMember").replace("%r", playerName));
 			return false;
 		} else {
-			if (DBConnection.addMember(p.getUniqueId(), playerName)) {
+			if (Plots.getPlot(p.getUniqueId()).addMember(DBConnection.getUUID(playerName))) {
 				p.sendMessage(Main.prefix + StringGetterBau.getString(p, "plotMemberAdded").replace("%r", playerName));
-				WorldGuardHandler.addPlayerToAllRegions(p.getUniqueId().toString(), DBConnection.getUUID(playerName));
 				writeLog(playerName + " added to " + p.getName() + "'s plot at " + HelperMethods.getTime());
 				return true;
 			} else {
@@ -240,10 +238,9 @@ public class gs implements CommandExecutor {
 		if (DBConnection.isMember(UUID.fromString(DBConnection.getUUID(playerName)), p.getName())) {
 			Main.send(p, "alreadyMember", playerName);
 		} else {
-			if (DBConnection.addMember(p.getUniqueId(), playerName)) {
-				String uuidMember = DBConnection.getUUID(playerName);
+			String uuidMember = DBConnection.getUUID(playerName);
+			if (Plots.getPlot(p.getUniqueId()).addMember(uuidMember)) {
 				Main.send(p, "memberTempAdded", playerName, "" + time);
-				WorldGuardHandler.addPlayerToAllRegions(p.getUniqueId().toString(), uuidMember);
 
 				FileConfiguration config = Main.getPlugin().getTempAddConfig();
 				Long Time;
@@ -312,10 +309,9 @@ public class gs implements CommandExecutor {
 						Long time = config.getLong(s + "." + m);
 						if (time < Time) {
 							String uuidMember = m;
-							if (DBConnection.removeMember(uuidOwner, DBConnection.getName(uuidMember))) {
-								// wg remove member
-								WorldGuardHandler.removeMemberFromAllRegions(uuidOwner, uuidMember, null);
-							} else {
+
+							if (!Plots.getPlot(UUID.fromString(uuidOwner)).removeMember(m,
+									DBConnection.getName(uuidMember))) {
 								System.err.println("Member konnte nicht entfernt werden : MeberUUID: " + uuidMember
 										+ " | OwnerUUID: ");
 								return;
@@ -329,23 +325,12 @@ public class gs implements CommandExecutor {
 								return;
 							}
 
-							/* Message to Owner */
-							boolean ownerOn = false;
+							/* Log */
 							String memberName = DBConnection.getName(uuidMember);
 							String ownerName = DBConnection.getName(uuidOwner);
-							for (Player owner : Bukkit.getServer().getOnlinePlayers()) {
-								if (owner.getUniqueId().toString().equals(uuidOwner)) {
-									owner.sendMessage(Main.prefix + StringGetterBau
-											.getString(owner, "plotMemberRemoved").replace("%r", memberName));
-									ownerOn = true;
-									break;
-								}
-							}
-							if (!ownerOn) {
-								DBConnection.addMail("plugin: BAU", uuidOwner, StringGetterBau
-										.getString(uuidOwner, "plotMemberRemoved").replace("%r", memberName));
-							}
-							writeLog(memberName + " removed from " + ownerName + "'s plot at " + HelperMethods.getTime());
+
+							writeLog(memberName + " removed from " + ownerName + "'s plot at "
+									+ HelperMethods.getTime());
 
 							// output?
 						}
@@ -359,7 +344,7 @@ public class gs implements CommandExecutor {
 
 	public static void writeLog(String message) {
 		try {
-			BufferedWriter writer = new BufferedWriter(new FileWriter(logFile,true));
+			BufferedWriter writer = new BufferedWriter(new FileWriter(logFile, true));
 			writer.write(message);
 			writer.newLine();
 			writer.flush();
@@ -368,5 +353,5 @@ public class gs implements CommandExecutor {
 			e.printStackTrace();
 		}
 	}
-	
+
 }

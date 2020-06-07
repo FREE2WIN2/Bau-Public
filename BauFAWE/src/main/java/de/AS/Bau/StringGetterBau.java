@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import org.bukkit.entity.Player;
 
+import de.AS.Bau.HikariCP.DBConnection;
 import de.AS.Bau.utils.Language;
 
 public class StringGetterBau {
@@ -40,6 +41,10 @@ public class StringGetterBau {
 	public static String getString(UUID uuid, String name) {
 		if (playersLanguage.containsKey(uuid)) {
 			if (playersLanguage.get(uuid).equals(Language.EN)) {
+				return english.getProperty(name);
+			}
+		}else {
+			if(Language.getLanguageByString(DBConnection.getLanguage(uuid.toString()))==Language.EN) {
 				return english.getProperty(name);
 			}
 		}

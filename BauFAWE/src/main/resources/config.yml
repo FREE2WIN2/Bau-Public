@@ -68,3 +68,5 @@ tntReload:
   materialType: TNT_MINECART
   timeout: 5                 #antispam
 fernzuender: WOODEN_HOE
+testworlds:
+  template: BauGsVorlage

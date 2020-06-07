@@ -70,34 +70,42 @@ public class DBConnection {
 	}
 
 	public static boolean addMember(UUID owner, String memberName) {
-		String ownerUUID = owner.toString();
-		String memberUUID = getUUID(memberName);
+		
+		UUID memberUUID = UUID.fromString(getUUID(memberName));
+		return addMember(owner, memberUUID);
+	}
+
+	public static boolean addMember(UUID owner, UUID memberUUID) {
 		try (Connection conn = DataSource.getConnection()) {
 			PreparedStatement statement = conn
 					.prepareStatement("INSERT INTO `Player_has_Plot`(`Plot_PlotID`, `Player_UUID`) VALUES (?,?)");
-			statement.setString(1, ownerUUID);
-			statement.setString(2, memberUUID);
+			statement.setString(1, owner.toString());
+			statement.setString(2, memberUUID.toString());
 			return statement.executeUpdate() == 1;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}
 	}
+	
+	public static boolean removeMember(UUID uuidOwner, String memberName) {
+		UUID memberUUID = UUID.fromString(getUUID(memberName));
+		return removeMember(uuidOwner, memberUUID);
+	}
 
-	public static boolean removeMember(String uuidOwner, String memberName) {
-		String memberUUID = getUUID(memberName);
+	public static boolean removeMember(UUID owner, UUID memberUUID) {
 		try (Connection conn = DataSource.getConnection()) {
 			PreparedStatement statement = conn
 					.prepareStatement("DELETE FROM `Player_has_Plot` WHERE `Player_UUID` = ? AND Plot_PlotID = ?");
-			statement.setString(1, memberUUID);
-			statement.setString(2, uuidOwner);
+			statement.setString(1, memberUUID.toString());
+			statement.setString(2, owner.toString());
 			return statement.executeUpdate() == 1;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}
 	}
-
+	
 	public static boolean isMember(UUID member, String ownerName) {
 		String memberUUID = member.toString();
 		String ownerUUID = getUUID(ownerName);
@@ -235,6 +243,23 @@ public class DBConnection {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return out;
+		}
+	}
+
+	
+	public static String getTemplate(UUID ownerUUID) {
+		try (Connection conn = DataSource.getConnection()) {
+			PreparedStatement statement = conn
+					.prepareStatement("SELECT template FROM Plot WHERE PlotID = ?");
+			statement.setString(1, ownerUUID.toString());
+			ResultSet rs = statement.executeQuery();
+			if(rs.next()) {
+				return rs.getString(1);
+			}
+			return null;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
 		}
 	}
 }
