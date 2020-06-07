@@ -160,13 +160,13 @@ public class WorldEditHandler {
 	 */
 	public static void pasteAsync(ClipboardHolder clipboardHolder, BlockVector3 at, Player p, boolean ignoreAir,
 			int ticksPerPasteInterval, boolean saveUndo, boolean tbs) {
-
+		System.out.println(at);
+		
 		/* Get Clipboard out of the ClipboardHolder with the transform */
 
 		FlattenedClipboardTransform result = FlattenedClipboardTransform.transform(clipboardHolder.getClipboard(),
 				clipboardHolder.getTransform());
 		Clipboard clipboard = result.getClip(result.getTransformedRegion());
-
 		/* offset from origin pasteloc and new pasteloc -> have to be added */
 
 		if (clipboard == null) {
@@ -177,6 +177,8 @@ public class WorldEditHandler {
 		BlockVector3 offset = at.subtract(clipboard.getOrigin());
 		BlockVector3 min = clipboard.getMinimumPoint();
 		BlockVector3 max = clipboard.getMaximumPoint();
+		System.out.println("min: " + min.add(offset));
+		System.out.println("max: " + max.add(offset));
 		World world = BukkitAdapter.adapt(p.getWorld());
 
 		if (saveUndo) {
@@ -186,10 +188,6 @@ public class WorldEditHandler {
 			}
 		}
 
-//		boolean stoplagBefore = Stoplag.getStatus(p.getLocation());
-//		if (tbs && !saveUndo) {
-//			Stoplag.setStatus(p.getLocation(), true);
-//		}
 		Scheduler animation = new Scheduler();
 		int xmin = min.getX();
 		int xmax = max.getX();

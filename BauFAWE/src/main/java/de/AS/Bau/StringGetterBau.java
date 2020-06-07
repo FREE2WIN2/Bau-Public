@@ -51,4 +51,11 @@ public class StringGetterBau {
 		//standard
 		return german.getProperty(name);
 	}
+	public static String getString(Player p, String name, String... args) {
+		String msg = getString(p, name);
+		for(String a:args) {
+			msg = msg.replaceFirst("%r", a);
+		}
+		return msg;
+	}
 }

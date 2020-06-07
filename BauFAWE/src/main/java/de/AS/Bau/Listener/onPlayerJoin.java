@@ -16,6 +16,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import de.AS.Bau.Main;
 import de.AS.Bau.StringGetterBau;
 import de.AS.Bau.HikariCP.DBConnection;
+import de.AS.Bau.Plots.Plots;
 import de.AS.Bau.Scoreboard.ScoreBoardBau;
 import de.AS.Bau.Tools.DesignTool;
 import de.AS.Bau.utils.CoordGetter;
@@ -50,7 +51,7 @@ public class onPlayerJoin implements Listener {
 		World world = WorldHandler.loadWorld(p.getUniqueId().toString());
 
 		DesignTool.playerHasDtOn.put(p.getUniqueId(), false);
-		String spawnPlot =  main.getCustomConfig().getString("coordinates.spawn");
+		String spawnPlot =  Plots.getJoinPlot(p.getUniqueId());
 		Location loc = CoordGetter.getTeleportLocation(world,spawnPlot);
 		onPlayerMove.playersLastPlot.put(p, spawnPlot);
 		p.teleport(loc);

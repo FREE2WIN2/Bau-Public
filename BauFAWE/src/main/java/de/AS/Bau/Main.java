@@ -41,6 +41,7 @@ import de.AS.Bau.Tools.DesignTool;
 import de.AS.Bau.Tools.FernzuenderListener;
 import de.AS.Bau.Tools.GUI;
 import de.AS.Bau.Tools.PlotResetter;
+import de.AS.Bau.Tools.PlotTeleporter;
 import de.AS.Bau.Tools.Stoplag;
 import de.AS.Bau.Tools.TntChest;
 import de.AS.Bau.Tools.Particles.Particles;
@@ -113,6 +114,7 @@ public class Main extends JavaPlugin {
 		pm.registerEvents(new ParticlesGUI(), this);
 		pm.registerEvents(new TestBlockEditorCore(), this);
 		pm.registerEvents(new SaWE(),this);
+		pm.registerEvents(new PlotTeleporter(), this);
 	}
 
 	private void registerCommands() {

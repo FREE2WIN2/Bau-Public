@@ -396,7 +396,7 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 
 	public static int getMaxShieldSizeOfTier(int tier) {
 		ConfigurationSection section = Main.getPlugin().getConfig()
-				.getConfigurationSection("coordinates.tbs.sizes." + tier);
+				.getConfigurationSection("sizes." + tier);
 		return section.getInt("shields");
 	}
 }

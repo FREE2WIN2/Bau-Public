@@ -51,7 +51,7 @@ public class CoordGetter {
 
 	public static BlockVector3 getMaxSizeOfBlock(int tier) {
 		ConfigurationSection section = Main.getPlugin().getConfig()
-				.getConfigurationSection("coordinates.tbs.sizes." + tier);
+				.getConfigurationSection("sizes." + tier);
 		int x = section.getInt("x");
 		int y = section.getInt("y");
 		int z = section.getInt("z");
