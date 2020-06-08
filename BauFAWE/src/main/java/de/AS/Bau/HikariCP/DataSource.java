@@ -41,17 +41,4 @@ public class DataSource {
 		return ds.getConnection();
 	}
 
-	public ResultSet getMemberedPlots(Player p) {
-		String uuid = p.getUniqueId().toString();
-		try {
-			PreparedStatement statement = getConnection()
-					.prepareStatement("SELECT Plot_PlotID FROM `Player_has_Plot` WHERE `Player_UUID` = ?");
-			statement.setString(1, uuid);
-			ResultSet rs = statement.executeQuery();
-			return rs;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
 }

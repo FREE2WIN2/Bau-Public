@@ -6,6 +6,8 @@ import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.block.SpongeAbsorbEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 public class eventsToCancel implements Listener {
 
@@ -29,5 +31,11 @@ public class eventsToCancel implements Listener {
 	@EventHandler
 	public void BlockGrow(BlockGrowEvent e) {
 		e.setCancelled(true);
+	}
+
+	public void PlayerDamage(EntityDamageEvent event) {
+		if(!event.getCause().equals(DamageCause.ENTITY_EXPLOSION)){
+			event.setCancelled(true);
+		}
 	}
 }
