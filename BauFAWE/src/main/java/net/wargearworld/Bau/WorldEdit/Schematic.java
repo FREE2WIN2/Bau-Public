@@ -27,7 +27,6 @@ public class Schematic {
 		}else {
 			schemFile = new File(Main.getPlugin().getCustomConfig().getString("schempath") + "/" + dir + "/" + name);
 		}
-		System.out.println("path: " + schemFile.getAbsolutePath());
 		if(!schemFile.exists()) {
 			System.err.println("Schematic not fount: " + schemFile.getAbsolutePath());
 		}else {
