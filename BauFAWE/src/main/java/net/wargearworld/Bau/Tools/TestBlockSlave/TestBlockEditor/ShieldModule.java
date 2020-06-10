@@ -202,7 +202,7 @@ public class ShieldModule {
 				return getSideRegion(plotID, tier, facing,worldName);
 			}
 		case FRONT:
-			if (type == ShieldType.ARTILLERY) {
+			if (type == ShieldType.ARTILLERY&& position == ShieldPosition.FRONT) {
 				int shieldSize = TestBlockSlaveCore.getMaxShieldSizeOfTier(tier);
 				max = max.add(0, shieldSize, 0);
 			}

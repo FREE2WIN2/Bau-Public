@@ -43,7 +43,7 @@ public class DesignTool implements Listener, CommandExecutor {
 		}
 		if (playerHasDtOn.get(event.getPlayer().getUniqueId()) == true && again != null) {
 			if (WorldGuardHandler.isInBuildRegion(again.getLocation()) && !again.getType().equals(Material.BARRIER)) {
-				if (!event.getPlayer().isSneaking()) {
+				if (!event.getPlayer().isSneaking()&&!again.getRelative(event.getBlockFace()).isEmpty()) {
 					again.setType(event.getMaterial());
 					event.setCancelled(true);
 				}
