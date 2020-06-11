@@ -21,16 +21,19 @@ public class TntChest implements CommandExecutor, Listener {
 	public boolean onCommand(CommandSender sender, Command cmd, String string, String[] args) {
 		if(sender instanceof Player) {
 			Player p = (Player) sender;
-			ItemStack is = new ItemStack(Material.CHEST);
-			ItemMeta im = is.getItemMeta();
-			im.addEnchant(Enchantment.PROTECTION_EXPLOSIONS, 1, true);
-			im.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-			is.setItemMeta(im);
-			p.getEquipment().setItemInMainHand(is);
+			p.getEquipment().setItemInMainHand(getTNTChest());
 		}
 		return true;
 	}
 
+	public static ItemStack getTNTChest() {
+		ItemStack is = new ItemStack(Material.CHEST);
+		ItemMeta im = is.getItemMeta();
+		im.addEnchant(Enchantment.PROTECTION_EXPLOSIONS, 1, true);
+		im.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+		is.setItemMeta(im);
+		return is;
+	}
 	
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onblockPlace(BlockPlaceEvent e) {

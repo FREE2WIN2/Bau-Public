@@ -148,12 +148,13 @@ public class GUI implements CommandExecutor, Listener {
 		inv.setItem(22, playerHeadItem);
 		inv.setItem(25, stoplagIS);
 		inv.setItem(29, ds);
-		inv.setItem(31, ItemStackCreator.createNewItemStack(Material.MELON_SEEDS,
-				StringGetterBau.getString(p, "gui_particles")));
+		inv.setItem(31, enderPearl1IS);
 
 		inv.setItem(33, dst);
 		
-		inv.setItem(40, enderPearl1IS);
+		inv.setItem(39, ItemStackCreator.createNewItemStack(Material.MELON_SEEDS,
+				StringGetterBau.getString(p, "gui_particles")));
+		inv.setItem(41, TntChest.getTNTChest());
 		// close DBConnection
 		return inv;
 	}
@@ -167,7 +168,7 @@ public class GUI implements CommandExecutor, Listener {
 		if (clicked != null) {
 			if (clicked.getType().equals(Material.NETHER_STAR)
 					|| clicked.getType().equals(FernzuenderListener.toolMaterial)
-					|| clicked.getType().equals(AutoCannonReloader.toolMaterial)) {
+					|| clicked.getType().equals(AutoCannonReloader.toolMaterial)||clicked.getType() == Material.CHEST) {
 				return;
 			}
 			if (clicked.hasItemMeta()) {

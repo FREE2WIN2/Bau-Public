@@ -46,7 +46,7 @@ public class ShieldModule {
 		switch (type) {
 		case ARTILLERY:
 			/* Get Front */
-			rg = getFrontRegion(plotID, tier, facing,world.getName());
+			rg = getFrontRegion(plotID, tier, facing, world.getName());
 			setRegionToMaterial(world, rg, Material.END_STONE);
 
 			/* get Upper region */
@@ -62,24 +62,26 @@ public class ShieldModule {
 			}
 			break;
 		case BACKSTAB:
-			rg = getUpperRegion(plotID, tier, facing,world.getName());
+			rg = getUpperRegion(plotID, tier, facing, world.getName());
 			setRegionToMaterial(world, rg, Material.END_STONE);
 			if (position != ShieldPosition.ROOFBACK && position != ShieldPosition.ROOFFRONT) {
-				rg = getMiddleRegion(plotID, tier, facing,world.getName());
+				rg = getMiddleRegion(plotID, tier, facing, world.getName());
 				setRegionToMaterial(world, rg, Material.END_STONE);
 			}
 			break;
 		case MASSIVE:
-			rg = new CuboidRegion(getMin(plotID, tier, facing,world.getName()), getMax(plotID, tier, facing,world.getName()));
+			rg = new CuboidRegion(getMin(plotID, tier, facing, world.getName()),
+					getMax(plotID, tier, facing, world.getName()));
 			setRegionToMaterial(world, rg, Material.END_STONE);
 
 			break;
 		case SAND:
-			rg = getFrontRegion(plotID, tier, facing,world.getName());
+			rg = getFrontRegion(plotID, tier, facing, world.getName());
 			setRegionToMaterial(world, rg, Material.SAND);
 			break;
 		case SPIKE:
-			rg = new CuboidRegion(getMin(plotID, tier, facing,world.getName()), getMax(plotID, tier, facing,world.getName()));
+			rg = new CuboidRegion(getMin(plotID, tier, facing, world.getName()),
+					getMax(plotID, tier, facing, world.getName()));
 			setSpikes(world, rg, Material.END_STONE);
 			break;
 
@@ -94,7 +96,7 @@ public class ShieldModule {
 		Region rg = null;
 		switch (position) {
 		case BACK:
-			rg = getFrontRegion(plotID, tier, facing,world.getName());
+			rg = getFrontRegion(plotID, tier, facing, world.getName());
 
 			if (facing == Facing.SOUTH) {
 				blockFace = BlockFace.NORTH;
@@ -105,7 +107,7 @@ public class ShieldModule {
 			}
 			break;
 		case FRONT:
-			rg = getFrontRegion(plotID, tier, facing,world.getName());
+			rg = getFrontRegion(plotID, tier, facing, world.getName());
 			if (facing == Facing.SOUTH) {
 				blockFace = BlockFace.SOUTH;
 				shiftz = -1;
@@ -116,7 +118,7 @@ public class ShieldModule {
 			break;
 		case LEFTSIDEBACK:
 		case LEFTSIDEFRONT:
-			rg = getSideRegion(plotID, tier, facing,world.getName());
+			rg = getSideRegion(plotID, tier, facing, world.getName());
 			if (facing == Facing.SOUTH) {
 				blockFace = BlockFace.EAST;
 				shiftx = -1;
@@ -127,7 +129,7 @@ public class ShieldModule {
 			break;
 		case RIGHTSIDEBACK:
 		case RIGHTSIDEFRONT:
-			rg = getSideRegion(plotID, tier, facing,world.getName());
+			rg = getSideRegion(plotID, tier, facing, world.getName());
 			if (facing == Facing.SOUTH) {
 				blockFace = BlockFace.WEST;
 				shiftx = 1;
@@ -139,7 +141,7 @@ public class ShieldModule {
 		case ROOFBACK:
 		case ROOFFRONT:
 			blockFace = BlockFace.UP;
-			rg = getUpperRegion(plotID, tier, facing,world.getName());
+			rg = getUpperRegion(plotID, tier, facing, world.getName());
 			shifty = -1;
 			break;
 		}
@@ -157,9 +159,9 @@ public class ShieldModule {
 
 	}
 
-	private Region getMiddleRegion(String plotID, int tier, Facing facing,String worldName) {
-		BlockVector3 min = getMin(plotID, tier, facing,worldName);
-		BlockVector3 max = getMax(plotID, tier, facing,worldName);
+	private Region getMiddleRegion(String plotID, int tier, Facing facing, String worldName) {
+		BlockVector3 min = getMin(plotID, tier, facing, worldName);
+		BlockVector3 max = getMax(plotID, tier, facing, worldName);
 		int half = (max.getY() - min.getY()) / 2;
 		min = min.add(0, half, 0);
 		max = max.subtract(0, half, 0);
@@ -169,16 +171,16 @@ public class ShieldModule {
 		return new CuboidRegion(min, max);
 	}
 
-	public Region getUpperRegion(String plotID, int tier, Facing facing,String worldName) {
-		BlockVector3 min = getMin(plotID, tier, facing,worldName);
-		BlockVector3 max = getMax(plotID, tier, facing,worldName);
+	public Region getUpperRegion(String plotID, int tier, Facing facing, String worldName) {
+		BlockVector3 min = getMin(plotID, tier, facing, worldName);
+		BlockVector3 max = getMax(plotID, tier, facing, worldName);
 		min = BlockVector3.at(min.getX(), max.getY(), min.getZ());
 		return new CuboidRegion(min, max);
 	}
 
-	public Region getFrontRegion(String plotID, int tier, Facing facing,String worldName) {
-		BlockVector3 min = getMin(plotID, tier, facing,worldName);
-		BlockVector3 max = getMax(plotID, tier, facing,worldName);
+	public Region getFrontRegion(String plotID, int tier, Facing facing, String worldName) {
+		BlockVector3 min = getMin(plotID, tier, facing, worldName);
+		BlockVector3 max = getMax(plotID, tier, facing, worldName);
 		switch (position) {
 		case BACK:
 			switch (facing) {
@@ -194,15 +196,15 @@ public class ShieldModule {
 		case LEFTSIDEBACK:
 		case LEFTSIDEFRONT:
 			if (type == ShieldType.SAND) {
-				return getSideRegion(plotID, tier, facing,worldName);
+				return getSideRegion(plotID, tier, facing, worldName);
 			}
 		case RIGHTSIDEBACK:
 		case RIGHTSIDEFRONT:
 			if (type == ShieldType.SAND) {
-				return getSideRegion(plotID, tier, facing,worldName);
+				return getSideRegion(plotID, tier, facing, worldName);
 			}
 		case FRONT:
-			if (type == ShieldType.ARTILLERY&& position == ShieldPosition.FRONT) {
+			if (type == ShieldType.ARTILLERY && position == ShieldPosition.FRONT) {
 				int shieldSize = TestBlockSlaveCore.getMaxShieldSizeOfTier(tier);
 				max = max.add(0, shieldSize, 0);
 			}
@@ -233,9 +235,9 @@ public class ShieldModule {
 		return null;
 	}
 
-	public Region getSideRegion(String plotID, int tier, Facing facing,String worldName) {
-		BlockVector3 min = getMin(plotID, tier, facing,worldName);
-		BlockVector3 max = getMax(plotID, tier, facing,worldName);
+	public Region getSideRegion(String plotID, int tier, Facing facing, String worldName) {
+		BlockVector3 min = getMin(plotID, tier, facing, worldName);
+		BlockVector3 max = getMax(plotID, tier, facing, worldName);
 		switch (position) {
 		case LEFTSIDEBACK:
 		case LEFTSIDEFRONT:
@@ -273,8 +275,8 @@ public class ShieldModule {
 		return new Location(world, vector.getX(), vector.getY(), vector.getZ());
 	}
 
-	public BlockVector3 getMin(String plotID, int tier, Facing facing,String worldName) {
-		Region blockRegion = TestBlockSlaveCore.getTBRegion(tier, plotID, facing,worldName);
+	public BlockVector3 getMin(String plotID, int tier, Facing facing, String worldName) {
+		Region blockRegion = TestBlockSlaveCore.getTBRegion(tier, plotID, facing, worldName);
 		BlockVector3 minOfBlock = blockRegion.getMinimumPoint();
 		BlockVector3 blockSize = CoordGetter.getMaxSizeOfBlock(tier);
 		int shieldSizes = TestBlockSlaveCore.getMaxShieldSizeOfTier(tier);
@@ -331,8 +333,8 @@ public class ShieldModule {
 		return null;
 	}
 
-	public BlockVector3 getMax(String plotID, int tier, Facing facing,String worldName) {
-		Region blockRegion = TestBlockSlaveCore.getTBRegion(tier, plotID, facing,worldName);
+	public BlockVector3 getMax(String plotID, int tier, Facing facing, String worldName) {
+		Region blockRegion = TestBlockSlaveCore.getTBRegion(tier, plotID, facing, worldName);
 		BlockVector3 maxOfBlock = blockRegion.getMaximumPoint();
 		BlockVector3 blockSize = CoordGetter.getMaxSizeOfBlock(tier);
 		int shieldSizes = TestBlockSlaveCore.getMaxShieldSizeOfTier(tier);
@@ -353,6 +355,10 @@ public class ShieldModule {
 			if (facing == Facing.NORTH) {
 				return maxOfBlock.subtract(0, -shieldSizes, 0);
 			} else {
+				if (tier == 2) {
+					return maxOfBlock.subtract(0, -shieldSizes, blockSize.divide(2).getZ());
+
+				}
 				return maxOfBlock.subtract(0, -shieldSizes, blockSize.divide(2).getZ() - 1);
 			}
 		case ROOFFRONT:
@@ -365,11 +371,18 @@ public class ShieldModule {
 			if (facing == Facing.NORTH) {
 				return maxOfBlock.add(shieldSizes, 0, 0);
 			} else {
-				return maxOfBlock.subtract(blockSize.getX(), 0, blockSize.divide(2).getZ() - 1);
+
+				if (tier == 2) {
+					return maxOfBlock.subtract(blockSize.getX(), 0, blockSize.divide(2).getZ());
+				}
+				return maxOfBlock.subtract(blockSize.getX(), 0, blockSize.divide(2).getZ() + 1);
 			}
 		case RIGHTSIDEFRONT:
 			if (facing == Facing.NORTH) {
-				return maxOfBlock.add(shieldSizes, 0, -blockSize.divide(2).getZ());
+				if (tier == 2) {
+					return maxOfBlock.add(shieldSizes, 0, -blockSize.divide(2).getZ());
+				}
+				return maxOfBlock.add(shieldSizes, 0, -blockSize.divide(2).getZ() - 1);
 			} else {
 				return maxOfBlock.subtract(blockSize.getX(), 0, 0);
 			}
@@ -377,14 +390,17 @@ public class ShieldModule {
 			if (facing == Facing.NORTH) {
 				return maxOfBlock.subtract(blockSize.getX(), 0, 0);
 			} else {
-				if(tier ==2) {
-					return maxOfBlock.add(shieldSizes, 0, -blockSize.divide(2).getZ());					
+				if (tier == 2) {
+					return maxOfBlock.add(shieldSizes, 0, -blockSize.divide(2).getZ());
 				}
 				return maxOfBlock.add(shieldSizes, 0, -blockSize.divide(2).getZ() - 1);
 			}
 		case LEFTSIDEFRONT:
 			if (facing == Facing.NORTH) {
-				return maxOfBlock.subtract(blockSize.getX(), 0, blockSize.divide(2).getZ());
+				if (tier == 2) {
+					return maxOfBlock.subtract(blockSize.getX(), 0, blockSize.divide(2).getZ());
+				}
+				return maxOfBlock.subtract(blockSize.getX(), 0, blockSize.divide(2).getZ()+1);
 			} else {
 				return maxOfBlock.add(shieldSizes, 0, 0);
 			}
