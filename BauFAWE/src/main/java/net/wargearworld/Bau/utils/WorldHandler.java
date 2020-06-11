@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
@@ -14,6 +15,7 @@ import org.bukkit.entity.Player;
 
 import net.wargearworld.Bau.Main;
 import net.wargearworld.Bau.HikariCP.DBConnection;
+import net.wargearworld.Bau.Plots.Plots;
 import net.wargearworld.Bau.WorldEdit.WorldGuardHandler;
 
 public class WorldHandler {
@@ -44,6 +46,9 @@ public class WorldHandler {
 			return;
 		}
 		Bukkit.unloadWorld(world, true);
+		if (!world.getName().contains("test") && !world.getName().contains("world")) {
+			Plots.removeWorld(UUID.fromString(world.getName()));
+		}
 	}
 
 	public static void createWorldDir(Player p) {
@@ -56,10 +61,7 @@ public class WorldHandler {
 		neu.setReadable(true, false);
 		neu.setWritable(true, false);
 		copyFolder_raw(vorlage, neu);
-
-		if (!DBConnection.hasOwnPlots(p.getName())) {
-			DBConnection.registerNewPlot(p.getUniqueId());
-		}
+		DBConnection.registerNewPlot(p.getUniqueId());
 		// worldguard regionen
 		File worldGuardWorldDir = new File(Bukkit.getWorldContainer(), "plugins/WorldGuard/worlds/" + uuid);
 		File vorlageWorldGuardWorldDir = new File(Bukkit.getWorldContainer(),
@@ -77,6 +79,9 @@ public class WorldHandler {
 
 	public static boolean deleteWorld(World w) {
 		Bukkit.getServer().unloadWorld(w, true);
+		if (!w.getName().contains("test") && !w.getName().contains("world")) {
+			Plots.removeWorld(UUID.fromString(w.getName()));
+		}
 		if (w.getWorldFolder().exists()) {
 			if (deleteDir(w.getWorldFolder()) && DBConnection.deleteGs(w.getName())) {
 				File file = new File(Bukkit.getWorldContainer(), "plugins/WorldGuard/worlds/" + w.getName());

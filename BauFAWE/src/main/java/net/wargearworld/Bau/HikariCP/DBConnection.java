@@ -47,11 +47,9 @@ public class DBConnection {
 					.prepareStatement("SELECT * FROM `Plot` WHERE `PlotID` = ?");
 			statement.setString(1, uuid);
 			ResultSet rs = statement.executeQuery();
-			if (rs.next()) {
-				return true;
-			} else {
-				return false;
-			}
+			boolean out = rs.next();
+			System.out.println("hasPlot: " + out);
+			return out;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
@@ -64,7 +62,7 @@ public class DBConnection {
 			PreparedStatement statement = conn
 					.prepareStatement("INSERT INTO `Plot`(`PlotID`,template) VALUES (?,?)");
 			statement.setString(1, uuid);
-			statement.setString(1, WorldHandler.templateName);
+			statement.setString(2, WorldHandler.templateName);
 			return statement.executeUpdate() == 1;
 		} catch (Exception e) {
 			e.printStackTrace();

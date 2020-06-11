@@ -286,9 +286,8 @@ public class gs implements CommandExecutor {
 		}
 		if (WorldHandler.deleteWorld(w) && !mute) {
 			Main.send(p, "gsDeleted", playerName);
-		} else {
+		} else if(!mute) {
 			Main.send(p, "error");
-			p.sendMessage(Main.prefix + StringGetterBau.getString(p, "error"));
 		}
 	}
 

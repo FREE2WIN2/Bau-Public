@@ -83,13 +83,13 @@ public class WorldGuardHandler {
 		return true;
 	}
 
-	public static ProtectedRegion getSecondRegion(Location loc) {
+	public static ProtectedRegion getBuildRegion(Location loc) {
 		RegionManager regions = container.get(BukkitAdapter.adapt(loc.getWorld()));
 		List<String> ids = regions.getApplicableRegionsIDs(BlockVector3.at(loc.getX(), loc.getY(), loc.getZ()));
-		if (ids.size() < 2) {
-			return null;
+		if (ids.size() <= 2) {
+			return regions.getRegion(ids.get(0));
 		}
-		return getRegion(ids.get(1), BukkitAdapter.adapt(loc.getWorld()));
+		return regions.getRegion(ids.get(1));
 
 	}
 

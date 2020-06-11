@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -32,19 +33,21 @@ public class PlotTeleporter implements Listener {
 			index++;
 		}
 
-
-			int countOftestPlotsPerTier = CoordGetter.getConfigOfWorld(p.getWorld().getName()).getInt("counttestblockspertier");
-			index = 9;
-			for (int tier = 1; tier <= 3; tier++) {
-				for (int i = 1; i <= countOftestPlotsPerTier; i++) {
-					ItemStack teleportTest = ItemStackCreator.createNewItemStack(Material.ENDER_EYE,
-							StringGetterBau.getString(p, "teleportTestPlot", "" + i, "" + tier));
-					teleportTest.setAmount(tier);
-					inv.setItem(index, teleportTest);
-					index++;
-				}
+		ConfigurationSection section = CoordGetter.getConfigOfWorld(p.getWorld().getName()).getConfigurationSection("counttestblockspertier");
+		int[] countOfTestBlocks = new int[3];
+		for(int i = 1;i<=3;i++) {
+			countOfTestBlocks[i-1] = section.getInt(""+i);
+		}
+		index = 9;
+		for (int tier = 1; tier <= 3; tier++) {
+			for (int i = 1; i <= countOfTestBlocks[tier-1]; i++) {
+				ItemStack teleportTest = ItemStackCreator.createNewItemStack(Material.ENDER_EYE,
+						StringGetterBau.getString(p, "teleportTestPlot", "" + i, "" + tier));
+				teleportTest.setAmount(tier);
+				inv.setItem(index, teleportTest);
+				index++;
 			}
-		
+		}
 
 		p.openInventory(inv);
 	}
@@ -91,13 +94,17 @@ public class PlotTeleporter implements Listener {
 				return "plot4";
 			}
 			return "plot2";
-		} else if (item.getType() == Material.ENDER_EYE) {			
-			int countOftestPlotsPerTier = CoordGetter.getConfigOfWorld(p.getWorld().getName()).getInt("counttestblockspertier");
+		} else if (item.getType() == Material.ENDER_EYE) {
+			ConfigurationSection section = CoordGetter.getConfigOfWorld(p.getWorld().getName()).getConfigurationSection("counttestblockspertier");
+			int[] countOfTestBlocks = new int[3];
+			for(int i = 1;i<=3;i++) {
+				countOfTestBlocks[i-1] = section.getInt(""+i);
+			}
 			for (int tier = 1; tier <= 3; tier++) {
-				for (int i = 1; i <= countOftestPlotsPerTier; i++) {
+				for (int i = 1; i <= countOfTestBlocks[tier-1]; i++) {
 					String name = StringGetterBau.getString(p, "teleportTestPlot", "" + i, "" + tier);
 					if (item.getItemMeta().getDisplayName().equals(name)) {
-						return "plottier" + tier + "test" + i;
+						return "t" + tier + "," + i;
 					}
 				}
 			}

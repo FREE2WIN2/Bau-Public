@@ -197,7 +197,7 @@ public class GUI implements CommandExecutor, Listener {
 		String reset = StringGetterBau.getString(p, "deletePlot");
 		String tp1 = StringGetterBau.getString(p, "gui_teleporter");
 		String testBlockSklaveGui = StringGetterBau.getString(p, "testBlockSklaveGui");
-		String trailShow = StringGetterBau.getString(p, "show");
+		String trailgui = StringGetterBau.getString(p, "tbs_gui_trail");
 		String dtItemOn = StringGetterBau.getString(p, "dtItemOff");
 		String dtItemOff = StringGetterBau.getString(p, "dtItemOn");
 		if (clickedName.equals(tntallowed)) {
@@ -226,12 +226,8 @@ public class GUI implements CommandExecutor, Listener {
 			// stoplag
 			p.closeInventory();
 			p.performCommand("sl");
-
-		} else if (clickedName.equals(StringGetterBau.getString(p, "track"))) {
-			p.performCommand("trail new");
-			p.closeInventory();
-		} else if (clickedName.equals(trailShow)) {
-			p.performCommand("trail show");
+		} else if (clickedName.equals(trailgui)) {
+			p.performCommand("trail gui");
 			p.closeInventory();
 		} else if (clickedName.equals(dtItemOff) || clickedName.equals(dtItemOn)) {
 			p.performCommand("dt");

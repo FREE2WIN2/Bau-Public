@@ -79,11 +79,11 @@ public class Main extends JavaPlugin {
 		registerCommands();
 		registerListener();
 
-		new Plots();
 		gs.startCheckForTempAdd();
 		WorldHandler.checkForWorldsToUnload();
 		new DataSource();
 		new StringGetterBau();
+		new Plots();
 		DefaultTestBlock.generateDefaultTestBlocks();
 		schempath = customConfig.getString("schempath");
 //		doTests();

@@ -179,9 +179,9 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 		} else if (invName.equals(StringGetterBau.getString(p, "tbs_gui_tierInv"))) {
 			tierInv(p, clicked);
 			event.setCancelled(true);
-		} else if (invName.equals(StringGetterBau.getString(p, "tbs_tbManagerActionInv").replace("%r", p.getName()))) {
+		} else if (invName.equals(StringGetterBau.getString(p, "tbs_tbManagerActionInv", p.getName()))) {
 			chooseActionToCustomTB(p, clicked);
-		} else if (pInv.getType().equals(InventoryType.ANVIL)) {
+		} else if (invName.equals(StringGetterBau.getString(p, "tbs_gui_anvilTitle"))) {
 			if (event.getSlotType().equals(SlotType.RESULT)) {
 				p.closeInventory();
 				getSlave(p).saveNewCustomTB(((AnvilInventory) event.getInventory()).getRenameText());

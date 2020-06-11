@@ -53,4 +53,7 @@ plotreset:
     plot2: ground
     plot3: ground
 countplots: 4
-counttestblockspertier: 2
+counttestblockspertier:
+  1: 3
+  2: 2
+  3: 2
