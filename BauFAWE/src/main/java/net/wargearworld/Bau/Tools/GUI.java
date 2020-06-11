@@ -228,7 +228,6 @@ public class GUI implements CommandExecutor, Listener {
 			p.performCommand("sl");
 		} else if (clickedName.equals(trailgui)) {
 			p.performCommand("trail gui");
-			p.closeInventory();
 		} else if (clickedName.equals(dtItemOff) || clickedName.equals(dtItemOn)) {
 			p.performCommand("dt");
 			p.closeInventory();

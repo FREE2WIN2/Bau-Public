@@ -46,6 +46,7 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 	public boolean onCommand(CommandSender sender, Command cmds, String string, String[] args) {
 		Player p = (Player) sender;
 		if (args.length == 0) {
+			System.out.println(getSlave(p));
 			getSlave(p).openGUI();
 			return true;
 		} else if (args.length == 1) {

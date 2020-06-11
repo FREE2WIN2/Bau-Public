@@ -17,7 +17,7 @@ import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlock.Facing;
 
 public class TestBlockEditorCore implements Listener {
 
-	static Map<UUID, TestBlockEditor> playersTestBlockEditor;
+	public static Map<UUID, TestBlockEditor> playersTestBlockEditor;
 
 	public TestBlockEditorCore() {
 		playersTestBlockEditor = new HashMap<>();

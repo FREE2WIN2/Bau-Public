@@ -25,7 +25,7 @@ public class onPlayerMove implements Listener {
 		Player p = e.getPlayer();
 		if (!p.getWorld().getName().equals("world")) {
 
-			String rgID = WorldGuardHandler.getPlotId(p.getLocation());
+			String rgID = WorldGuardHandler.getPlotId(e.getTo());
 			/*You have to be in a Region to move(make the Region out of the regions so big.)*/
 			
 			if (rgID == null&&!p.hasPermission("bau.move.bypass")) {
