@@ -359,7 +359,7 @@ public class ShieldModule {
 					return maxOfBlock.subtract(0, -shieldSizes, blockSize.divide(2).getZ());
 
 				}
-				return maxOfBlock.subtract(0, -shieldSizes, blockSize.divide(2).getZ() - 1);
+				return maxOfBlock.subtract(0, -shieldSizes, blockSize.divide(2).getZ() + 1);
 			}
 		case ROOFFRONT:
 			if (facing == Facing.NORTH) {

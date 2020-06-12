@@ -183,7 +183,7 @@ public class DBConnection {
 		HashSet<String> out = new HashSet<>();
 		try (Connection conn = DataSource.getConnection()) {
 			PreparedStatement statement = conn
-					.prepareStatement("SELECT Player.name FROM `Player_has_Plot`,Player WHERE `Plot_PlotID` = ? AND Player.UUID = Player_has_Plot.Player_UUID");
+					.prepareStatement("SELECT Player_UUID FROM `Player_has_Plot`,Player WHERE `Plot_PlotID` = ?");
 			statement.setString(1, plotName);
 			ResultSet rs = statement.executeQuery();
 			while(rs.next()) {

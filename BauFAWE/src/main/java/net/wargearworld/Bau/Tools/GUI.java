@@ -219,7 +219,7 @@ public class GUI implements CommandExecutor, Listener {
 			p.performCommand("particles gui");
 		} else if (clicked.getType().equals(Material.PLAYER_HEAD)) {
 			p.closeInventory();
-			showMember(p);
+			p.performCommand("gs info");
 		} else if (clickedName.equals(testBlockSklaveGui)) {
 			p.performCommand("tbs");
 		} else if (clickedName.equals(StringGetterBau.getString(p, "torchOn"))
@@ -240,7 +240,8 @@ public class GUI implements CommandExecutor, Listener {
 		boolean isOwner = p.getWorld().getName().equals(p.getUniqueId().toString());
 		Set<String> memberlist = DBConnection.getMember(p.getUniqueId().toString());
 		Main.send(p, "memberListHeader", getName(p.getWorld()));
-		for (String memberName : memberlist) {
+		for (String memberUUID : memberlist) {
+			String memberName = DBConnection.getName(memberUUID);
 			String hover = StringGetterBau.getString(p, "memberHoverRemove").replace("%r", memberName);
 			JsonCreater remove = new JsonCreater("§7[§6" + memberName + "§7]");
 			if (isOwner) {

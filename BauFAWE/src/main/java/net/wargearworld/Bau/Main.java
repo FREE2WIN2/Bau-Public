@@ -67,8 +67,8 @@ public class Main extends JavaPlugin {
 	private static File customConfigFile;
 	private static YamlConfiguration customConfig;
 	public static String prefix = "§8[§6Bau§8] §r";
-	private static File tempAddConfigFile;
-	private static YamlConfiguration tempAddConfig;
+	public static File tempAddConfigFile;
+	public static YamlConfiguration tempAddConfig;
 
 	@Override
 	public void onEnable() {
@@ -154,16 +154,16 @@ public class Main extends JavaPlugin {
 		Particles.particleConfig = createConfig(Particles.particlesConfigFile);
 	}
 
-	private File createConfigFile(String string) {
-		File configFile = new File(getDataFolder(), string);
+	public static File createConfigFile(String string) {
+		File configFile = new File(plugin.getDataFolder(), string);
 		if (!configFile.exists()) {
 			configFile.getParentFile().mkdirs();
-			saveResource(string, false);
+			plugin.saveResource(string, false);
 		}
 		return configFile;
 	}
 
-	private YamlConfiguration createConfig(File configFile) {
+	public static YamlConfiguration createConfig(File configFile) {
 		YamlConfiguration config = new YamlConfiguration();
 
 		try {

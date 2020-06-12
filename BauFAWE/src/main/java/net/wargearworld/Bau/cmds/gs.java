@@ -18,6 +18,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
@@ -255,7 +256,7 @@ public class gs implements CommandExecutor {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				writeLog(playerName + " tempadded to " + p.getName() + "'s plot at " + HelperMethods.getTime());
+				writeLog(playerName + " tempadded for " + time + " hours to " + p.getName() + "'s plot at " + HelperMethods.getTime());
 			} else {
 				p.sendMessage(Main.prefix + StringGetterBau.getString(p, "error"));
 			}
@@ -296,7 +297,9 @@ public class gs implements CommandExecutor {
 
 			@Override
 			public void run() {
-				FileConfiguration config = Main.getPlugin().getTempAddConfig();
+				Main.tempAddConfigFile = Main.createConfigFile("tempAddConfig.yml");
+				Main.tempAddConfig = Main.createConfig(Main.tempAddConfigFile);
+				YamlConfiguration config = Main.tempAddConfig;
 				Long Time;
 				SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmm");
 				Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Europe/Berlin"));
@@ -311,8 +314,8 @@ public class gs implements CommandExecutor {
 
 							if (!Plots.getPlot(UUID.fromString(uuidOwner)).removeMember(m,
 									DBConnection.getName(uuidMember))) {
-								System.err.println("Member konnte nicht entfernt werden : MeberUUID: " + uuidMember
-										+ " | OwnerUUID: ");
+								System.err.println("Member konnte nicht entfernt werden : MemberName: " + DBConnection.getName(uuidMember)
+										+ " | OwnerUUID: " + uuidOwner);
 								return;
 							}
 							// config remove

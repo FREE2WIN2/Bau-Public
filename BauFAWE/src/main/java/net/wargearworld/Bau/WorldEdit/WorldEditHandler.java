@@ -32,6 +32,7 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
 
 import net.wargearworld.Bau.Main;
+import net.wargearworld.Bau.Tools.Stoplag;
 import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlockSlaveCore;
 import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlock.Facing;
 import net.wargearworld.Bau.utils.CoordGetter;
@@ -129,13 +130,13 @@ public class WorldEditHandler {
 	/* all paste Methods */
 
 	public static void pasteground(Schematic schem, String rgID, Player p, boolean ignoreAir) {
-		BlockVector3 at = CoordGetter.getTBSPastePosition(rgID, schem.getFacing(),p.getWorld().getName());
+		BlockVector3 at = CoordGetter.getTBSPastePosition(rgID, schem.getFacing(), p.getWorld().getName());
 		pasteAsync(new ClipboardHolder(schem.getClip()), at, p, ignoreAir, 1, false, false);
 
 	}
 
 	public static void pasteTestBlock(Schematic schem, Facing facingto, String rgID, Player p, boolean saveUndo) {
-		BlockVector3 at = CoordGetter.getTBSPastePosition(rgID, facingto,p.getWorld().getName());
+		BlockVector3 at = CoordGetter.getTBSPastePosition(rgID, facingto, p.getWorld().getName());
 		Clipboard board = schem.getClip();
 		if (schem.getFacing() != facingto) {
 			board = rotateClipboard(board);
@@ -159,7 +160,7 @@ public class WorldEditHandler {
 	 */
 	public static void pasteAsync(ClipboardHolder clipboardHolder, BlockVector3 at, Player p, boolean ignoreAir,
 			int ticksPerPasteInterval, boolean saveUndo, boolean tbs) {
-		
+
 		/* Get Clipboard out of the ClipboardHolder with the transform */
 
 		FlattenedClipboardTransform result = FlattenedClipboardTransform.transform(clipboardHolder.getClipboard(),
@@ -196,7 +197,9 @@ public class WorldEditHandler {
 		animation.setX(xmin);
 		animation.setY(ymin);
 		animation.setZ(zmin);
-
+		if (tbs && !saveUndo &&!ignoreAir) {
+			Stoplag.setStatusTemp(p.getLocation(), true, 5);
+		}
 		animation.setTask(Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), new Runnable() {
 
 			@Override
@@ -219,9 +222,9 @@ public class WorldEditHandler {
 							/* set block in world out of schematic */
 
 							BlockVector3 blockLoc = BlockVector3.at(x, y, z);
-							if (WorldGuardHandler.getPlotId(blockLoc.add(offset), world).equals(originRegion)||!tbs) {
-								if (!(clipboard.getFullBlock(blockLoc).getBlockType().getMaterial()
-										.isAir() && ignoreAir)) {
+							if (WorldGuardHandler.getPlotId(blockLoc.add(offset), world).equals(originRegion) || !tbs) {
+								if (!(clipboard.getFullBlock(blockLoc).getBlockType().getMaterial().isAir()
+										&& ignoreAir)) {
 									try {
 										world.setBlock(blockLoc.add(offset), clipboard.getFullBlock(blockLoc));
 										blockChanged++;
@@ -229,7 +232,7 @@ public class WorldEditHandler {
 										e.printStackTrace();
 									}
 								}
-							}else {
+							} else {
 								blockChanged++;
 							}
 

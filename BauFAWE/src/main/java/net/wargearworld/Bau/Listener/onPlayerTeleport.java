@@ -11,6 +11,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import net.wargearworld.Bau.Main;
 import net.wargearworld.Bau.StringGetterBau;
 import net.wargearworld.Bau.HikariCP.DBConnection;
+import net.wargearworld.Bau.Scoreboard.ScoreBoardBau;
 
 public class onPlayerTeleport implements Listener {
 	public onPlayerTeleport(JavaPlugin plugin) {
@@ -21,6 +22,10 @@ public class onPlayerTeleport implements Listener {
 	public void onPlayerTeleportEvent(PlayerTeleportEvent e) {
 		Player p = e.getPlayer();
 		if(e.getTo().getWorld().getName().contains("test")&& p.hasPermission("supporter")){
+			return;
+		}
+		if(e.getTo().getWorld() == e.getFrom().getWorld()) {
+			ScoreBoardBau.cmdUpdate(p);
 			return;
 		}
 		

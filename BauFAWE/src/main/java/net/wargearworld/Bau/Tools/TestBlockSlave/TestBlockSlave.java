@@ -12,6 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import com.google.common.base.CharMatcher;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -355,10 +356,26 @@ public class TestBlockSlave {
 	public void saveNewCustomTB(String name) {
 
 		/* Save */
+		boolean isValid = checkIfValid(name);
+		if(!isValid) {
+			Main.send(owner, "tbs_saveOwnTB_invalidName");
+			Main.send(owner, "tbs_saveOwnTB_invalidLetters");
+			return;
+		}
 		if (addNewCustomTestBlock(name)) {
 			/* Message to player */
 			Main.send(owner, "tbs_saveOwnTB_success", "" + newTBToSave.getTier(), name);
 		}
+	}
+
+	private boolean checkIfValid(String name) {
+		if(name.contains(".")) {
+			return false;
+		}
+		if(name.startsWith(" ")&&name.length() == 1) {
+			return false;
+		}
+		return CharMatcher.ascii().matchesAllOf(name);
 	}
 
 	public void showParticle() {
@@ -382,7 +399,6 @@ public class TestBlockSlave {
 		BlockVector3 min = rg.getMinimumPoint();
 		BlockVector3 max = rg.getMaximumPoint();
 		if (chooseTB.getType().equals(Type.SHIELDS)) {
-			System.out.println("Shields");
 			int shieldSize = TestBlockSlaveCore.getMaxShieldSizeOfTier(tier);
 			min = min.subtract(shieldSize, 0, shieldSize);
 			max = max.add(shieldSize, shieldSize, shieldSize);

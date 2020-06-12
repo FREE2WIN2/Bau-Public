@@ -219,7 +219,7 @@ public class TestBlockEditor {
 		Region normal = TestBlockSlaveCore.getTBRegion(tier, WorldGuardHandler.getPlotId(owner.getLocation()), facing,owner.getWorld().getName());
 		int shieldSize = TestBlockSlaveCore.getMaxShieldSizeOfTier(tier);
 		BlockVector3 min = BlockVector3.at(-shieldSize, 0, -shieldSize);
-		BlockVector3 max = BlockVector3.at(shieldSize, 0, shieldSize);
+		BlockVector3 max = BlockVector3.at(shieldSize, shieldSize, shieldSize);
 		try {
 			normal.expand(min, max);
 		} catch (RegionOperationException e) {

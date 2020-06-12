@@ -1,5 +1,4 @@
 package net.wargearworld.Bau.Plots;
-
 import java.util.Set;
 import java.util.UUID;
 
@@ -21,6 +20,9 @@ public class UsersPlot {
 		this.ownerUUID  = ownerUUID;
 		this.template = template;
 		this.member = member;
+//		System.out.println("OwnerUUID: " + ownerUUID);
+//		System.out.println("Template: " + template);
+//		System.out.println("member: " + Arrays.toString(member.toArray()));
 	}
 	
 
@@ -47,7 +49,9 @@ public class UsersPlot {
 				}
 				return true;
 			}
+//			System.out.println("mmember nicht aus DB");
 		}
+//		System.out.println("member could not be removed");
 		return false;
 	}
 	public boolean isMember(UUID uuid) {

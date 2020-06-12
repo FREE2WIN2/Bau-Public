@@ -1,7 +1,6 @@
 package net.wargearworld.Bau.Tools.Particles;
 
 import org.bukkit.Bukkit;
-import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -59,7 +58,7 @@ public class ParticlesGUI implements Listener {
 		inv.addItem(new ItemStack(Material.YELLOW_DYE));
 		return inv;
 	}
-	@SuppressWarnings("deprecation")
+	
 	@EventHandler
 	public void onClickInInventory(InventoryClickEvent event) {
 		ItemStack clicked = event.getCurrentItem();
@@ -86,17 +85,25 @@ public class ParticlesGUI implements Listener {
 			}
 			event.setCancelled(true);
 		} else if (event.getView().getTitle().equals(StringGetterBau.getString(p, "particles_gui_changeColorClipboardTitle"))) {
-			DyeColor color = DyeColor.getByDyeData(clicked.getData().getData());
 			event.setCancelled(true);
 			p.closeInventory();
-			p.performCommand("particles clipboard " + color.name());
+			p.performCommand("particles clipboard " + getColor(clicked));
 		
 		} else if (event.getView().getTitle().equals(StringGetterBau.getString(p, "particles_gui_changeColorSelectionTitle"))) {
-			DyeColor color = DyeColor.getByDyeData(clicked.getData().getData());
 			event.setCancelled(true);
 			p.closeInventory();
-			p.performCommand("particles selection " + color.name());
+			p.performCommand("particles selection " + getColor(clicked));
 		}
 
+	}
+	
+	
+	public String getColor(ItemStack clicked) {
+		Material m = clicked.getType();
+		if(m.name().contains("DYE")) {
+			return m.name().replace("_DYE","");
+		}else {
+			return "BLACK";
+		}
 	}
 }
