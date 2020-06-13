@@ -34,6 +34,7 @@ public class onPlayerJoin implements Listener {
 	public void onPlayerJoinEvent(PlayerJoinEvent e) {
 		// sprache
 		Player p = e.getPlayer();
+		DesignTool.playerHasDtOn.put(p.getUniqueId(), false);
 		p.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
 		// p.teleport(new Location(Bukkit.getWorld("world"), 0, 30, 0));
 		String lang = DBConnection.getLanguage(p);
@@ -50,10 +51,9 @@ public class onPlayerJoin implements Listener {
 		}
 		World world = WorldHandler.loadWorld(p.getUniqueId().toString());
 
-		DesignTool.playerHasDtOn.put(p.getUniqueId(), false);
 		String spawnPlot =  Plots.getJoinPlot(p.getUniqueId());
-		Location loc = CoordGetter.getTeleportLocation(world,spawnPlot);
 		onPlayerMove.playersLastPlot.put(p.getUniqueId(), spawnPlot);
+		Location loc = CoordGetter.getTeleportLocation(world,spawnPlot);
 		p.teleport(loc);
 		// wenn ja-> teleportieren
 		// item

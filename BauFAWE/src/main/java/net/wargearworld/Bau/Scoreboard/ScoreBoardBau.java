@@ -139,11 +139,16 @@ public class ScoreBoardBau {
 	}
 
 	private String getPlotNumber() {
+		if(onPlayerMove.playersLastPlot.containsKey(p.getUniqueId())) {
 		return onPlayerMove.playersLastPlot.get(p.getUniqueId()).replace("plot", "");
+		}
+		getS(p).cancel();
+		return null;
 	}
 
 	public void cancel() {
 		scheduler.cancel();
+		playersScoreboard.remove(p.getUniqueId());
 	}
 
 }

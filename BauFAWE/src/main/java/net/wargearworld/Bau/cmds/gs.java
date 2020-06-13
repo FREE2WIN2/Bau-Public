@@ -70,7 +70,7 @@ public class gs implements CommandExecutor {
 				// gs list
 				ArrayList<String> memberedPlots = new ArrayList<>();
 				memberedPlots.add(p.getName());
-				memberedPlots.addAll(Plots.getPlot(p.getUniqueId()).getMember());
+				memberedPlots.addAll(DBConnection.getMemberedPlots(p.getUniqueId()));
 				sendMemberedGs(p, memberedPlots);
 				return true;
 
@@ -267,6 +267,7 @@ public class gs implements CommandExecutor {
 		PlayerConnection pConn = ((CraftPlayer) p).getHandle().playerConnection;
 		p.sendMessage(StringGetterBau.getString(p, "listGsHeading"));
 		for (String s : memberedPlots) {
+			/* s == PlayerName */
 			String hover = StringGetterBau.getString(p, "listGsHover").replace("%r", s);
 			String name = s;
 			String txt = "{\"text\":\"§7[§6" + name

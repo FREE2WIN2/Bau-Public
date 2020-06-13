@@ -86,6 +86,7 @@ public class Main extends JavaPlugin {
 		new Plots();
 		DefaultTestBlock.generateDefaultTestBlocks();
 		schempath = customConfig.getString("schempath");
+	
 //		doTests();
 	}
 

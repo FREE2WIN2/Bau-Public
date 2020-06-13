@@ -27,7 +27,7 @@ public class DBConnection {
 		HashSet<String> out = new HashSet<>();
 		try (Connection conn = DataSource.getConnection()) {
 			PreparedStatement statement = conn
-					.prepareStatement("SELECT Player.name FROM `Player_has_Plot`,Player WHERE `Player_UUID` = ? AND Player_has_Plot.Player_UUID = Player.UUID");
+					.prepareStatement("SELECT Player.name FROM Player_has_Plot,Player WHERE Player_has_Plot.Plot_PlotID = Player.UUID AND Player_has_Plot.Player_UUID = ?");
 			statement.setString(1, uuid);
 			ResultSet rs = statement.executeQuery();
 			while(rs.next()) {
