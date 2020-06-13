@@ -52,6 +52,9 @@ public class Scheduler {
 	}
 
 	public void setTask(int task) {
+		if(running) {
+			cancel();
+		}
 		id = task;
 		running = true;
 	}

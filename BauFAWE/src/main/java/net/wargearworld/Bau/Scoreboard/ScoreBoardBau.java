@@ -48,6 +48,9 @@ public class ScoreBoardBau {
 	}
 
 	public static ScoreBoardBau getS(Player p) {
+		if(!playersScoreboard.containsKey(p.getUniqueId())) {
+			return new ScoreBoardBau(p);
+		}
 		return playersScoreboard.get(p.getUniqueId());
 	}
 
@@ -84,7 +87,7 @@ public class ScoreBoardBau {
 	}
 
 	private String getSl() {
-		String rgID = onPlayerMove.playersLastPlot.get(p);
+		String rgID = onPlayerMove.playersLastPlot.get(p.getUniqueId());
 		if (Stoplag.getStatus(p.getWorld().getName(), rgID)) {
 			// System.out.println("sl on");
 			return StringGetterBau.getString(p, "boardOn");
@@ -136,7 +139,7 @@ public class ScoreBoardBau {
 	}
 
 	private String getPlotNumber() {
-		return onPlayerMove.playersLastPlot.get(p).replace("plot", "");
+		return onPlayerMove.playersLastPlot.get(p.getUniqueId()).replace("plot", "");
 	}
 
 	public void cancel() {

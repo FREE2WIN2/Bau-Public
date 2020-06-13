@@ -20,6 +20,7 @@ import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
+import org.bukkit.event.entity.ExplosionPrimeEvent;
 
 import net.wargearworld.Bau.Main;
 import net.wargearworld.Bau.StringGetterBau;
@@ -177,5 +178,9 @@ public class Stoplag implements Listener,CommandExecutor {
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public static void onBlockFromTo(BlockFromToEvent e) {
 		e.setCancelled(getStatus(e.getBlock().getLocation()));
+	}
+
+	public void entityPrime(ExplosionPrimeEvent e) {
+		e.setCancelled(getStatus(e.getEntity().getLocation()));
 	}
 }

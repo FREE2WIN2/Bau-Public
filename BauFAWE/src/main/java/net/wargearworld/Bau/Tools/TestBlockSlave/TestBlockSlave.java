@@ -356,6 +356,8 @@ public class TestBlockSlave {
 	public void saveNewCustomTB(String name) {
 
 		/* Save */
+		name = name.replaceFirst(" ","");
+		name = name.replace(" ", "_");
 		boolean isValid = checkIfValid(name);
 		if(!isValid) {
 			Main.send(owner, "tbs_saveOwnTB_invalidName");
@@ -372,7 +374,7 @@ public class TestBlockSlave {
 		if(name.contains(".")) {
 			return false;
 		}
-		if(name.startsWith(" ")&&name.length() == 1) {
+		if(name.startsWith(" ")&&name.length() == 1 || name.equals("")) {
 			return false;
 		}
 		return CharMatcher.ascii().matchesAllOf(name);

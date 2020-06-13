@@ -135,7 +135,7 @@ public class ParticlesShow {
 
 			@Override
 			public void run() {
-				if (!active) {
+				if (!active||player.getEquipment().getItemInMainHand().getType()!=Material.WOODEN_AXE) {
 					stopParticles();
 					return;
 				}

@@ -53,7 +53,7 @@ public class onPlayerJoin implements Listener {
 		DesignTool.playerHasDtOn.put(p.getUniqueId(), false);
 		String spawnPlot =  Plots.getJoinPlot(p.getUniqueId());
 		Location loc = CoordGetter.getTeleportLocation(world,spawnPlot);
-		onPlayerMove.playersLastPlot.put(p, spawnPlot);
+		onPlayerMove.playersLastPlot.put(p.getUniqueId(), spawnPlot);
 		p.teleport(loc);
 		// wenn ja-> teleportieren
 		// item

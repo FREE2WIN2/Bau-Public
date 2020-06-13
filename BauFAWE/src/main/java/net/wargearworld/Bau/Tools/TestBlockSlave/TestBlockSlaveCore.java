@@ -305,7 +305,7 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 
 			getSlave(p).startSavingNewTB();
 
-		} else if (clicked.getType().equals(Material.WHITE_WOOL)) {
+		} else if (clickedName.equals("§6Editor")) {
 			TestBlockEditorCore.getEditor(p).openMainInv();
 		}
 	}

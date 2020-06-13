@@ -1,6 +1,7 @@
 package net.wargearworld.Bau.Listener;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -13,7 +14,7 @@ import net.wargearworld.Bau.Scoreboard.ScoreBoardBau;
 import net.wargearworld.Bau.WorldEdit.WorldGuardHandler;
 
 public class onPlayerMove implements Listener {
-	public static HashMap<Player, String> playersLastPlot = new HashMap<>();
+	public static HashMap<UUID, String> playersLastPlot = new HashMap<>();
 
 	public onPlayerMove(JavaPlugin plugin) {
 		Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
@@ -36,8 +37,8 @@ public class onPlayerMove implements Listener {
 			if(rgID == null) {
 				return;
 			}
-			if (!rgID.equals(playersLastPlot.get(p)) && !rgID.equals("allplots")) {
-				playersLastPlot.put(p, rgID);
+			if (!rgID.equals(playersLastPlot.get(p.getUniqueId())) && !rgID.equals("allplots")) {
+				playersLastPlot.put(p.getUniqueId(), rgID);
 				ScoreBoardBau.cmdUpdate(p);
 			}
 

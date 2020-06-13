@@ -276,7 +276,7 @@ public class gs implements CommandExecutor {
 			PacketPlayOutChat txtp = new PacketPlayOutChat(txtc);
 			pConn.sendPacket(txtp);
 		}
-		p.sendMessage("�7----------------------------");
+		p.sendMessage("§7----------------------------");
 	}
 
 	public void deletePlot(Player p, String playerName, boolean mute) {

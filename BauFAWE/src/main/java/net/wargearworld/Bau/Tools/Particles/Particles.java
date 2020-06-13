@@ -168,26 +168,25 @@ public class Particles implements CommandExecutor, Listener {
 	@EventHandler
 	public void switchHandListener(PlayerItemHeldEvent event) {
 		Player p = event.getPlayer();
-		ItemStack old = p.getInventory().getItem(event.getPreviousSlot());
+//		ItemStack old = p.getInventory().getItem(event.getPreviousSlot());
 		ItemStack newItem = p.getInventory().getItem(event.getNewSlot());
 		ParticlesShow particleShow = playersParticlesShow.get(p.getUniqueId());
-
 		if (newItem == null) {
-			if (old == null) {
-				return;
-			} else if (old.getType().equals(Material.WOODEN_AXE)) {
-				particleShow.stopParticles();
-				return;
-			}
+//			if (old == null) {
+//				return;
+//			} else if (old.getType().equals(Material.WOODEN_AXE)) {
+//				particleShow.stopParticles();
+//				return;
+//			}
 			return;
 		}
 		if (!newItem.getType().equals(Material.WOODEN_AXE)) {
-			if (old == null) {
-				return;
-			} else if (old.getType().equals(Material.WOODEN_AXE)) {
-				particleShow.stopParticles();
-				return;
-			}
+//			if (old == null) {
+//				return;
+//			} else if (old.getType().equals(Material.WOODEN_AXE)) {
+//				particleShow.stopParticles();
+//				return;
+//			}
 			return;
 		}
 

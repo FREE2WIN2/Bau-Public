@@ -17,7 +17,7 @@ commands:
       usage: /<command>
       description: Open a GUI for your plot.
    tbs:
-      usage: /<command> [1,2,3,4] [N,S] [N,S,F,R]
+      usage: /<command> [undo,last,1,2,3,4] [N,S] [N,S,F,R]
       description: Opens Tnt-Slave
    sl:
       usage: /<command>
@@ -59,11 +59,11 @@ permissions:
       bau.delete.bypass: true
       bau.build.bypass: true
   bau.move.bypass:
-    default: false
+    default: op
   bau.delete.bypass:
-    default: false
+    default: op
   bau.build.bypass:
-    default: false
+    default: op
     
     
     

@@ -41,13 +41,14 @@ public class DesignTool implements Listener, CommandExecutor {
 		if(again.getType().equals(event.getMaterial())) {
 			return;
 		}
+		Player p = event.getPlayer();
 		if (playerHasDtOn.get(event.getPlayer().getUniqueId()) == true && again != null) {
 			if (WorldGuardHandler.isInBuildRegion(again.getLocation()) && !again.getType().equals(Material.BARRIER)) {
-				if (!event.getPlayer().isSneaking()&&!again.getRelative(event.getBlockFace()).isEmpty()) {
+				if (!p.isSneaking()&&!again.getRelative(event.getBlockFace()).isEmpty()) {
 					again.setType(event.getMaterial());
 					event.setCancelled(true);
 				}
-
+				
 			}
 		}
 
@@ -59,10 +60,10 @@ public class DesignTool implements Listener, CommandExecutor {
 		if (again == null || event.getBlockPlaced().getType() == null) {
 			return;
 		}
-
-		if (playerHasDtOn.get(event.getPlayer().getUniqueId()) == true && again != null) {
+		Player p = event.getPlayer();
+		if (playerHasDtOn.get(p.getUniqueId()) == true && again != null) {
 			if (WorldGuardHandler.isInBuildRegion(again.getLocation()) && !again.getType().equals(Material.BARRIER)) {
-				if (!event.getPlayer().isSneaking()) {
+				if (!p.isSneaking()) {
 					again.setBlockData(event.getBlockPlaced().getBlockData());
 					event.setCancelled(true);
 				}
