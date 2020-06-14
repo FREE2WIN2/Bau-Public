@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.vehicle.VehicleCreateEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import net.wargearworld.Bau.Main;
@@ -95,6 +96,12 @@ public class SpawnEvent implements Listener {
 		}
 	}
 
+	@EventHandler
+	public void VehicleSpawn(VehicleCreateEvent event) {
+		event.setCancelled(true);
+		
+	}
+	
 	private void logeintrag(World world, int size) {
 
 		try {

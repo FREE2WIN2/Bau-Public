@@ -27,6 +27,9 @@ public class DesignTool implements Listener, CommandExecutor {
 
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void interactBlock(PlayerInteractEvent event) {
+		if(event.getHand() == null) {
+			return;
+		}
 		if (!event.getHand().equals(EquipmentSlot.HAND)) {
 			return;
 		}
