@@ -14,7 +14,7 @@ import net.wargearworld.Bau.HikariCP.DBConnection;
 public class Plots {
 
 	private static HashMap<String,YamlConfiguration> gsConfigs;
-	private static HashMap<UUID,UsersPlot> loadedWorlds;
+	private static HashMap<UUID,UsersWorld> loadedWorlds;
 	
 	public Plots() {
 		
@@ -40,7 +40,7 @@ public class Plots {
 		if(loadedWorlds.containsKey(ownerUUID)) {
 			return false;
 		}
-		UsersPlot plot = new UsersPlot(ownerUUID, DBConnection.getTemplate(ownerUUID),DBConnection.getMember(ownerUUID.toString()));
+		UsersWorld plot = new UsersWorld(ownerUUID, DBConnection.getTemplate(ownerUUID),DBConnection.getMember(ownerUUID.toString()));
 		loadedWorlds.put(ownerUUID, plot);
 		return true;
 	}
@@ -53,7 +53,7 @@ public class Plots {
 		return gsConfigs.get(template);
 	}
 	
-	public static UsersPlot getPlot(UUID owner) {
+	public static UsersWorld getPlot(UUID owner) {
 		if(!loadedWorlds.containsKey(owner)) {
 			addPlot(owner);
 		}

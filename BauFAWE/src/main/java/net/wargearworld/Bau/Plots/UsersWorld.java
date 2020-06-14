@@ -10,13 +10,13 @@ import net.wargearworld.Bau.StringGetterBau;
 import net.wargearworld.Bau.HikariCP.DBConnection;
 import net.wargearworld.Bau.WorldEdit.WorldGuardHandler;
 
-public class UsersPlot {
+public class UsersWorld {
 
 	UUID ownerUUID;
 	String template;
 	Set<String> member;
 
-	public UsersPlot(UUID ownerUUID, String template, Set<String> member) {
+	public UsersWorld(UUID ownerUUID, String template, Set<String> member) {
 		this.ownerUUID  = ownerUUID;
 		this.template = template;
 		this.member = member;

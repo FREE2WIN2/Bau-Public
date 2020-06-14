@@ -2,6 +2,7 @@ package net.wargearworld.Bau.Tools;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -26,11 +27,12 @@ import net.wargearworld.Bau.Main;
 import net.wargearworld.Bau.StringGetterBau;
 import net.wargearworld.Bau.Scoreboard.ScoreBoardBau;
 import net.wargearworld.Bau.WorldEdit.WorldGuardHandler;
+import net.wargearworld.Bau.utils.HelperMethods;
 
 public class Stoplag implements Listener,CommandExecutor {
 	public static File stoplagConfigFile;
 	public static YamlConfiguration stoplagConfig;
-
+	private static HashMap<String,Boolean> stoplagBefore = new HashMap<>();
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String string, String[] args) {
@@ -48,14 +50,35 @@ public class Stoplag implements Listener,CommandExecutor {
 			sendToAll(p);
 			return true;			
 		} else if (args.length == 1) {
+			//sl paste -> toggle
+			
 			if (args[0].equalsIgnoreCase("on") || args[0].equalsIgnoreCase("an")) {
 				setStatus(p.getLocation(), true);
 				p.sendMessage(Main.prefix + StringGetterBau.getString(p, "slOn"));
 			} else if (args[0].equalsIgnoreCase("aus") || args[0].equalsIgnoreCase("off")) {
 				setStatus(p.getLocation(), false);
 				p.sendMessage(Main.prefix + StringGetterBau.getString(p, "slOff"));
+			}else if(args[0].equalsIgnoreCase("paste")) {
+				
 			}
 			sendToAll(p);
+			return true;
+		}else if(args.length == 2) {
+			//sl paste on|off
+			//sl paste <time>
+			if(!args[0].equalsIgnoreCase("paste")) {
+				return true;
+			}
+			if(args[1].equals("on")||args[1].equals("an")) {
+				setPasteState(p.getLocation(), true);
+				Main.send(p, "stoplag_paste", args[1]);
+			}else if(args[1].equals("off")||args[1].equals("aus")) {
+				setPasteState(p.getLocation(), false);
+				Main.send(p, "stoplag_paste", args[1]);
+			}else if(HelperMethods.isInt(args[1])) {
+				setPasteTime(p.getLocation(), Integer.parseInt(args[1]));
+				Main.send(p, "stoplag_pasteTime", args[1]);
+			}
 			return true;
 		} else {
 			return false;
@@ -100,12 +123,16 @@ public class Stoplag implements Listener,CommandExecutor {
 	}
 
 	public static boolean setStatusTemp(String worldName, String regionID, boolean on, int time) {
-		boolean stateBefore = getStatus(worldName, regionID);
+		if(!stoplagBefore.containsKey(worldName + "_" + regionID)) {
+			stoplagBefore.put(worldName + "_" + regionID, getStatus(worldName, regionID));
+		}
+		boolean stateBefore = stoplagBefore.get(worldName + "_" + regionID);
 		/* remove after time secs */
 		Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(), new Runnable() {
 
 			@Override
 			public void run() {
+				stoplagBefore.remove(worldName + "_" + regionID);
 				setStatus(worldName, regionID, stateBefore);
 			}
 		}, 20 * time);
@@ -139,6 +166,45 @@ public class Stoplag implements Listener,CommandExecutor {
 		return getStatus(loc.getWorld().getName(), WorldGuardHandler.getPlotId(loc));
 	}
 
+	/* Paste */
+	
+	public static void setPasteState(Location loc, boolean on) {
+		String worldName = loc.getWorld().getName();
+		stoplagConfig.set(worldName + ".paste", on);
+		try {
+			stoplagConfig.save(stoplagConfigFile);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static boolean getPasteState(Location loc) {
+		String worldName = loc.getWorld().getName();
+		if (!stoplagConfig.contains(worldName + ".paste")) {
+			setPasteState(loc, true);
+		}
+
+		return stoplagConfig.getBoolean(worldName + ".paste");
+	}
+	
+	public static void setPasteTime(Location loc, int time) {
+		String worldName = loc.getWorld().getName();
+		stoplagConfig.set(worldName + ".pasteTime", time);
+		try {
+			stoplagConfig.save(stoplagConfigFile);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static int getPasteTime(Location loc) {
+		String worldName = loc.getWorld().getName();
+		if (!stoplagConfig.contains(worldName + ".pasteTime")) {
+			setPasteTime(loc, 5);
+		}
+
+		return stoplagConfig.getInt(worldName + ".pasteTime");
+	}
 	/* Events for Stoplag */
 
 	@EventHandler(priority = EventPriority.HIGHEST)
