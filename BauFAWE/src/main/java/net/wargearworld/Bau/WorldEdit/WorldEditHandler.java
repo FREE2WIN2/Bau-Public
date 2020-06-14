@@ -32,7 +32,6 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
 
 import net.wargearworld.Bau.Main;
-import net.wargearworld.Bau.Scoreboard.ScoreBoardBau;
 import net.wargearworld.Bau.Tools.Stoplag;
 import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlockSlaveCore;
 import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlock.Facing;
@@ -143,7 +142,7 @@ public class WorldEditHandler {
 			board = rotateClipboard(board);
 		}
 
-		pasteAsync(new ClipboardHolder(board), at, p, true, 1, saveUndo, true);
+		pasteAsync(new ClipboardHolder(board), at, p, false, 1, saveUndo, true);
 
 	}
 
@@ -198,16 +197,8 @@ public class WorldEditHandler {
 		animation.setX(xmin);
 		animation.setY(ymin);
 		animation.setZ(zmin);
-		if (tbs && !saveUndo && !ignoreAir) {
-			Stoplag.setStatusTemp(p.getLocation(), true, 5);
-			ScoreBoardBau.cmdUpdate(p);
-			Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(), new Runnable() {
-
-				@Override
-				public void run() {
-					ScoreBoardBau.cmdUpdate(p);
-				}
-			}, 5 * 20);
+		if (tbs && !saveUndo && !ignoreAir&Stoplag.getStatus(p.getLocation())) {
+			Stoplag.setStatusTemp(p.getLocation(), true, Stoplag.getPasteTime(p.getLocation()));
 		}
 		animation.setTask(Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), new Runnable() {
 
@@ -252,10 +243,6 @@ public class WorldEditHandler {
 				}
 				/* all loops are over -> pasting is done */
 				animation.cancel();
-//				if (tbs && !saveUndo) {
-//					Stoplag.setStatus(p.getLocation(), stoplagBefore);
-//					Stoplag.setStatusTemp(p.getLocation(), true, 5);
-//				}
 			}
 
 		}, 0, ticksPerPasteInterval));

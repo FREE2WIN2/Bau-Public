@@ -11,7 +11,7 @@ public class Schematic {
 
 	private Facing facing;
 	private Clipboard board;
-	
+	private File file;
 	
 	/**
 	 * creates a new Schematic out of the owner-File of the Schem-System
@@ -21,16 +21,15 @@ public class Schematic {
 	 * @param name: the name of the Schematic(WITH ENDING!)
 	 */ 
  	public Schematic(String dir, String name, Facing facing) {
-		File schemFile;
  		if(dir == null) {
-			schemFile = new File(Main.getPlugin().getCustomConfig().getString("schempath") + "/" + name);
+			file = new File(Main.getPlugin().getCustomConfig().getString("schempath") + "/" + name);
 		}else {
-			schemFile = new File(Main.getPlugin().getCustomConfig().getString("schempath") + "/" + dir + "/" + name);
+			file = new File(Main.getPlugin().getCustomConfig().getString("schempath") + "/" + dir + "/" + name);
 		}
-		if(!schemFile.exists()) {
-			System.err.println("Schematic not fount: " + schemFile.getAbsolutePath());
+		if(!file.exists()) {
+			System.err.println("Schematic not fount: " + file.getAbsolutePath());
 		}else {
-			board = WorldEditHandler.createClipboard(schemFile);
+			board = WorldEditHandler.createClipboard(file);
 		}
 		this.facing = facing;
 	}
@@ -54,5 +53,9 @@ public class Schematic {
 
 	public void setClipboard(Clipboard clipboard) {
 		this.board = clipboard;
+	}
+
+	public File getFile() {
+		return file;
 	}
 }

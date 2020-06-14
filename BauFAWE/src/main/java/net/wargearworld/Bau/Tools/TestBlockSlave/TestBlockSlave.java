@@ -264,9 +264,11 @@ public class TestBlockSlave {
 		if (!deleteTestBlockFromDatabase(tier, name)) {
 			return false;
 		}
-		if (!blocks.remove(getBlockOutOfName(name, tier))) {
+		TestBlock tb = getBlockOutOfName(name, tier);
+		if (!blocks.remove(tb)) {
 			return false;
 		}
+		tb.getSchematic().getFile().delete();
 		Main.send(owner, "tbs_tbDeleted", "" + tier, name);
 		return true;
 	}
