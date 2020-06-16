@@ -146,9 +146,15 @@ public class ScoreBoardBau {
 		return null;
 	}
 
+	@SuppressWarnings("deprecation")
 	public void cancel() {
 		scheduler.cancel();
 		playersScoreboard.remove(p.getUniqueId());
+		try {
+			this.finalize();
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
 	}
 
 }

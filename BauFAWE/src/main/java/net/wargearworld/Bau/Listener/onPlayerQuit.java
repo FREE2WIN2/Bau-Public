@@ -11,7 +11,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import net.wargearworld.Bau.Scoreboard.ScoreBoardBau;
 import net.wargearworld.Bau.Tools.AutoCannonReloader;
 import net.wargearworld.Bau.Tools.DesignTool;
-import net.wargearworld.Bau.Tools.FernzuenderListener;
+import net.wargearworld.Bau.Tools.Fernzuender.FernzuenderListener;
 import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlockSlaveCore;
 import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlockEditor.TestBlockEditorCore;
 
@@ -22,12 +22,13 @@ public onPlayerQuit(JavaPlugin plugin) {
 @EventHandler(priority = EventPriority.LOWEST)
 public void onPlayerLeaveevent(PlayerQuitEvent e) {
 	Player p = e.getPlayer();
+	ScoreBoardBau.getS(p).cancel();
 	onPlayerMove.playersLastPlot.remove(p.getUniqueId());
 	DesignTool.playerHasDtOn.remove(p.getUniqueId());
-	ScoreBoardBau.getS(p).cancel();
 	FernzuenderListener.playersDetonator.remove(p.getUniqueId());
 	AutoCannonReloader.deleteRecord(p);
 	TestBlockSlaveCore.playersTestBlockSlave.remove(p.getUniqueId());
 	TestBlockEditorCore.playersTestBlockEditor.remove(p.getUniqueId());
+	FernzuenderListener.playersDetonator.remove(p.getUniqueId());
 }
 }
