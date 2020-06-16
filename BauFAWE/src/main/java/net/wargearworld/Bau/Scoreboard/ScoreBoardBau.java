@@ -3,7 +3,6 @@ package net.wargearworld.Bau.Scoreboard;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -13,18 +12,15 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.flags.StateFlag.State;
-import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.protection.regions.RegionContainer;
 
 import net.wargearworld.Bau.Main;
 import net.wargearworld.Bau.StringGetterBau;
 import net.wargearworld.Bau.Listener.onPlayerMove;
 import net.wargearworld.Bau.Tools.DesignTool;
 import net.wargearworld.Bau.Tools.Stoplag;
+import net.wargearworld.Bau.WorldEdit.WorldGuardHandler;
 import net.wargearworld.Bau.utils.Scheduler;
 
 public class ScoreBoardBau {
@@ -48,7 +44,7 @@ public class ScoreBoardBau {
 	}
 
 	public static ScoreBoardBau getS(Player p) {
-		if(!playersScoreboard.containsKey(p.getUniqueId())) {
+		if (!playersScoreboard.containsKey(p.getUniqueId())) {
 			return new ScoreBoardBau(p);
 		}
 		return playersScoreboard.get(p.getUniqueId());
@@ -63,22 +59,17 @@ public class ScoreBoardBau {
 	}
 
 	private String getTNT() {
-		RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-		RegionManager regions = container.get(BukkitAdapter.adapt(p.getWorld()));
-		List<String> rgIDs = regions.getApplicableRegionsIDs(
-				BlockVector3.at(p.getLocation().getX(), p.getLocation().getY(), p.getLocation().getZ()));
-		if (rgIDs.size() > 0) {
-			// String rgID = rgIDs.get(0);
-			ProtectedRegion rg = regions.getRegion(rgIDs.get(0));
-			String returnString;
+
+		// String rgID = rgIDs.get(0);
+		String rgID = onPlayerMove.playersLastPlot.get(p.getUniqueId());
+		ProtectedRegion rg = WorldGuardHandler.getRegion(rgID, BukkitAdapter.adapt(p.getWorld()));
+		if (rg != null) {
 			if (rg.getFlag(Main.TntExplosion) == State.ALLOW) {
 				// System.out.println("tnt on");
-				returnString = StringGetterBau.getString(p, "boardOn");
-				return returnString;
+				return StringGetterBau.getString(p, "boardOn");
 			} else {
 				// System.out.println("tnt off");
-				returnString = StringGetterBau.getString(p, "boardOff");
-				return returnString;
+				return StringGetterBau.getString(p, "boardOff");
 			}
 		} else {
 			return StringGetterBau.getString(p, "boardOff");
@@ -99,7 +90,12 @@ public class ScoreBoardBau {
 	}
 
 	public static void cmdUpdate(Player p) {
-		getS(p).update();
+		if (p == null) {
+			return;
+		}
+		if (onPlayerMove.playersLastPlot.containsKey(p.getUniqueId())) {
+			getS(p).update();
+		}
 	}
 
 	public void update() {
@@ -139,8 +135,8 @@ public class ScoreBoardBau {
 	}
 
 	private String getPlotNumber() {
-		if(onPlayerMove.playersLastPlot.containsKey(p.getUniqueId())) {
-		return onPlayerMove.playersLastPlot.get(p.getUniqueId()).replace("plot", "");
+		if (onPlayerMove.playersLastPlot.containsKey(p.getUniqueId())) {
+			return onPlayerMove.playersLastPlot.get(p.getUniqueId()).replace("plot", "");
 		}
 		getS(p).cancel();
 		return null;

@@ -243,7 +243,9 @@ public class Stoplag implements Listener, TabExecutor {
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public static void pistonextend(BlockPistonExtendEvent e) {
-		e.setCancelled(getStatus(e.getBlock().getLocation()));
+		if(getStatus(e.getBlock().getLocation())) {
+			e.setCancelled(true);
+		}
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)

@@ -22,8 +22,8 @@ public onPlayerQuit(JavaPlugin plugin) {
 @EventHandler(priority = EventPriority.LOWEST)
 public void onPlayerLeaveevent(PlayerQuitEvent e) {
 	Player p = e.getPlayer();
-	ScoreBoardBau.getS(p).cancel();
 	onPlayerMove.playersLastPlot.remove(p.getUniqueId());
+	ScoreBoardBau.getS(p).cancel();
 	DesignTool.playerHasDtOn.remove(p.getUniqueId());
 	FernzuenderListener.playersDetonator.remove(p.getUniqueId());
 	AutoCannonReloader.deleteRecord(p);

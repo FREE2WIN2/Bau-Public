@@ -47,7 +47,6 @@ public class eventsToCancel implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void Pistonextend(BlockPistonExtendEvent event) {
 		for(Block b:event.getBlocks()) {
-			System.out.println(b.getLocation());
 			if(!WorldGuardHandler.isInBuildRegion(b.getLocation())) {
 				event.setCancelled(true);
 				return;
