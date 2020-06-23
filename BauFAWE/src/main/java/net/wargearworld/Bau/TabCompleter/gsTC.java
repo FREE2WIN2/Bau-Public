@@ -51,7 +51,10 @@ public class gsTC implements TabCompleter {
 					out.remove(p.getName());
 					return HelperMethods.checkFortiped(args[1], out);
 				case "remove":
-					out.addAll(DBConnection.getMember(p.getUniqueId().toString()));
+					
+					for(String uuidMember:DBConnection.getMember(p.getUniqueId().toString())) {
+						out.add(DBConnection.getName(uuidMember));
+					}
 					return HelperMethods.checkFortiped(args[1], out);
 				}
 			}

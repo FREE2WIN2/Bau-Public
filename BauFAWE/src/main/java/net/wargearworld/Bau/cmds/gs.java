@@ -174,6 +174,7 @@ public class gs implements CommandExecutor {
 		if (secondWarnNewPlot.contains(uuid) && argsLength == 3) {
 			Main.send(p, "gs_newPlotGenerating");
 			deletePlot(p, p.getName(), true);
+			writeLog("World New: " + p.getName() + "(" +p.getUniqueId().toString()+ ")");
 			secondWarnNewPlot.remove(uuid);
 			firstWarnNewPlot.remove(uuid);
 			blocked.add(uuid);
@@ -208,9 +209,10 @@ public class gs implements CommandExecutor {
 
 	public void removeMember(Player p, String playerNameToRemove) {
 		if (!p.getName().equalsIgnoreCase(playerNameToRemove)) {
-			if (Plots.getPlot(p.getUniqueId()).removeMember(DBConnection.getUUID(playerNameToRemove),
+			UUID membetUUID = UUID.fromString(DBConnection.getUUID(playerNameToRemove));
+			if (Plots.getPlot(p.getUniqueId()).removeMember(membetUUID.toString(),
 					playerNameToRemove)) {
-				writeLog(playerNameToRemove + " removed from " + p.getName() + "'s plot at " + HelperMethods.getTime());
+				writeLog(playerNameToRemove + "("+membetUUID.toString()+") removed from " + p.getName() + "'s("+p.getUniqueId().toString()+") plot at " + HelperMethods.getTime());
 			} else {
 				Main.send(p, "error");
 			}
@@ -224,9 +226,10 @@ public class gs implements CommandExecutor {
 			p.sendMessage(Main.prefix + StringGetterBau.getString(p, "alreadyMember").replace("%r", playerName));
 			return false;
 		} else {
-			if (Plots.getPlot(p.getUniqueId()).addMember(DBConnection.getUUID(playerName))) {
+			String memberUUID = DBConnection.getUUID(playerName);
+			if (Plots.getPlot(p.getUniqueId()).addMember(memberUUID)) {
 				p.sendMessage(Main.prefix + StringGetterBau.getString(p, "plotMemberAdded").replace("%r", playerName));
-				writeLog(playerName + " added to " + p.getName() + "'s plot at " + HelperMethods.getTime());
+				writeLog(playerName + "("+memberUUID+") added to " + p.getName() + "'s("+p.getUniqueId().toString()+") plot at " + HelperMethods.getTime());
 				return true;
 			} else {
 				p.sendMessage(Main.prefix + StringGetterBau.getString(p, "error"));
@@ -256,7 +259,7 @@ public class gs implements CommandExecutor {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				writeLog(playerName + " tempadded for " + time + " hours to " + p.getName() + "'s plot at " + HelperMethods.getTime());
+				writeLog(playerName + "("+uuidMember+") tempadded for " + time + " hours to " + p.getName() + "'s("+p.getUniqueId().toString()+") plot at " + HelperMethods.getTime());
 			} else {
 				p.sendMessage(Main.prefix + StringGetterBau.getString(p, "error"));
 			}
@@ -288,9 +291,11 @@ public class gs implements CommandExecutor {
 		}
 		if (WorldHandler.deleteWorld(w) && !mute) {
 			Main.send(p, "gsDeleted", playerName);
+			writeLog("World Deleted: " + p.getName() + "(" +p.getUniqueId().toString()+ ")");
 		} else if(!mute) {
 			Main.send(p, "error");
 		}
+		
 	}
 
 	public static void startCheckForTempAdd() {
@@ -312,12 +317,20 @@ public class gs implements CommandExecutor {
 						Long time = config.getLong(s + "." + m);
 						if (time < Time) {
 							String uuidMember = m;
+							if(DBConnection.isMember(UUID.fromString(uuidMember), DBConnection.getName(uuidOwner))) {
+								if (!Plots.getPlot(UUID.fromString(uuidOwner)).removeMember(m,
+										DBConnection.getName(uuidMember))) {
+									System.err.println("Member konnte nicht entfernt werden : MemberName: " + DBConnection.getName(uuidMember)
+									+ " | OwnerUUID: " + uuidOwner);
+									
+									/* Log */
+									String memberName = DBConnection.getName(uuidMember);
+									String ownerName = DBConnection.getName(uuidOwner);
 
-							if (!Plots.getPlot(UUID.fromString(uuidOwner)).removeMember(m,
-									DBConnection.getName(uuidMember))) {
-								System.err.println("Member konnte nicht entfernt werden : MemberName: " + DBConnection.getName(uuidMember)
-										+ " | OwnerUUID: " + uuidOwner);
-								return;
+									writeLog(memberName + "("+uuidMember + ")removed from " + ownerName + "'s("+uuidOwner+") plot at "
+											+ HelperMethods.getTime());
+									return;
+								}								
 							}
 							// config remove
 							config.set(uuidOwner + "." + uuidMember, null);
@@ -328,12 +341,7 @@ public class gs implements CommandExecutor {
 								return;
 							}
 
-							/* Log */
-							String memberName = DBConnection.getName(uuidMember);
-							String ownerName = DBConnection.getName(uuidOwner);
-
-							writeLog(memberName + " removed from " + ownerName + "'s plot at "
-									+ HelperMethods.getTime());
+							
 
 							// output?
 						}

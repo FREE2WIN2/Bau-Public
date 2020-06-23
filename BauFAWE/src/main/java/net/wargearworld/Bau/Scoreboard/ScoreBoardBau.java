@@ -61,7 +61,20 @@ public class ScoreBoardBau {
 	private String getTNT() {
 
 		// String rgID = rgIDs.get(0);
+		if(p == null) {
+			scheduler.cancel();
+			return null;
+		}
+		if(!onPlayerMove.playersLastPlot.containsKey(p.getUniqueId())) {
+			scheduler.cancel();
+			return null;
+		}
+		
 		String rgID = onPlayerMove.playersLastPlot.get(p.getUniqueId());
+		if(rgID == null) {
+			scheduler.cancel();
+			return null;
+		}
 		ProtectedRegion rg = WorldGuardHandler.getRegion(rgID, BukkitAdapter.adapt(p.getWorld()));
 		if (rg != null) {
 			if (rg.getFlag(Main.TntExplosion) == State.ALLOW) {
