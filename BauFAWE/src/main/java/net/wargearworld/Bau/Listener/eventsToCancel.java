@@ -13,6 +13,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import net.wargearworld.Bau.WorldEdit.WorldGuardHandler;
+import org.bukkit.event.world.PortalCreateEvent;
 
 public class eventsToCancel implements Listener {
 
@@ -52,5 +53,10 @@ public class eventsToCancel implements Listener {
 				return;
 			}
 		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void portalCreate(PortalCreateEvent event){
+		event.setCancelled(true);
 	}
 }

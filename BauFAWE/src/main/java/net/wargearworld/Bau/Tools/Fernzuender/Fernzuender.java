@@ -62,9 +62,15 @@ public class Fernzuender {
 	private void activateJuke(Block block, Player p) {
 		NoteBlock note = (NoteBlock) block.getBlockData();
 		note.setPowered(!note.isPowered());
-		block.setBlockData(note);
-		applyPhysics(block);
+		block.setBlockData(note,true);
 		Main.send(p, "fzNoteBlockActivate");
+		Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(), new Runnable() {
+			@Override
+			public void run() {
+				note.setPowered(!note.isPowered());
+				block.setBlockData(note,false);
+			}
+		},1 );
 	}
 
 	private void activateSwitch(Block block, Player p) {

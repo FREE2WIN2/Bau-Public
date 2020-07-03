@@ -15,7 +15,7 @@ public class onPlayerRespawn implements Listener {
 		Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerLeaveevent(PlayerRespawnEvent e) {
 		e.setRespawnLocation(CoordGetter.getTeleportLocation(e.getPlayer().getWorld(), Plots.getJoinPlot(e.getPlayer().getUniqueId())));
 	}
