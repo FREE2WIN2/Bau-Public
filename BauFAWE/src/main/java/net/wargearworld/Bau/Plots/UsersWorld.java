@@ -41,6 +41,11 @@ public class UsersWorld {
 		if(member.remove(uuidMember)) {	
 			if(DBConnection.removeMember(ownerUUID, UUID.fromString(uuidMember))) {
 				WorldGuardHandler.removeMemberFromAllRegions(ownerUUID.toString(),UUID.fromString(uuidMember));
+				Player member = Bukkit.getPlayer(UUID.fromString(uuidMember));
+				if(member != null){
+					Main.send(member,"plotMemberRemove_memberMsg",DBConnection.getName(this.ownerUUID.toString()));
+					member.performCommand("gs");
+				}
 				if(ownerIsOn()) {
 					Main.send(getOwner(), "plotMemberRemoved", playerName);
 				}else {
