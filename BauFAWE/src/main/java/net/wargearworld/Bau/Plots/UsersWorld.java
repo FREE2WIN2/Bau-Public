@@ -44,7 +44,9 @@ public class UsersWorld {
 				Player member = Bukkit.getPlayer(UUID.fromString(uuidMember));
 				if(member != null){
 					Main.send(member,"plotMemberRemove_memberMsg",DBConnection.getName(this.ownerUUID.toString()));
-					member.performCommand("gs");
+					if(member.getWorld().getName().equals(ownerUUID.toString())) {
+						member.performCommand("gs");
+					}
 				}
 				if(ownerIsOn()) {
 					Main.send(getOwner(), "plotMemberRemoved", playerName);
@@ -54,7 +56,7 @@ public class UsersWorld {
 				}
 				return true;
 			}
-//			System.out.println("mmember nicht aus DB");
+//			System.out.println("member nicht aus DB");
 		}
 //		System.out.println("member could not be removed");
 		return false;
