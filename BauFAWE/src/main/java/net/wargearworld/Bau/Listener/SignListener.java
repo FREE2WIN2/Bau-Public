@@ -36,7 +36,7 @@ public class SignListener implements Listener {
                     @Override
                     public void run() {
                         b.setBlockData(signBD);
-                        for(int i = 0;i<=0;i++){
+                        for(int i = 0;i<4;i++){
                             sign.setLine(i,metasign.getLine(i));
                         }
                         sign.update();

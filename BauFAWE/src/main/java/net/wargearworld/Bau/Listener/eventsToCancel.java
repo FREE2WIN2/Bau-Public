@@ -11,6 +11,7 @@ import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.block.SpongeAbsorbEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
 import net.wargearworld.Bau.WorldEdit.WorldGuardHandler;
 import org.bukkit.event.world.PortalCreateEvent;
@@ -58,5 +59,14 @@ public class eventsToCancel implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void portalCreate(PortalCreateEvent event){
 		event.setCancelled(true);
+	}
+
+	@EventHandler
+	public void onGamemodeCommand(PlayerCommandPreprocessEvent event) {
+		String[] args = event.getMessage().split(" ");
+		if(args[0].equals("/gamemode")&& args.length >= 3) {
+			event.setCancelled(true);
+		}
+		
 	}
 }
