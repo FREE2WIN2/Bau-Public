@@ -69,7 +69,7 @@
       <artifactId>spigotaa</artifactId>
       <version>LATEST</version>
       <scope>system</scope>
-      <systemPath>C:/WGArena/spigot-1.15.2.jar</systemPath>
+      <systemPath>C:/Users/Nutzer/Desktop/JARS/spigot-1.15.2.jar</systemPath>
     </dependency>
   </dependencies>
   <properties>
