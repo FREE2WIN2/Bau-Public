@@ -43,7 +43,6 @@ import net.wargearworld.Bau.Tools.PlotResetter;
 import net.wargearworld.Bau.Tools.PlotTeleporter;
 import net.wargearworld.Bau.Tools.Stoplag;
 import net.wargearworld.Bau.Tools.TntChest;
-import net.wargearworld.Bau.Tools.Fernzuender.FernzuenderListener;
 import net.wargearworld.Bau.Tools.Particles.Particles;
 import net.wargearworld.Bau.Tools.Particles.ParticlesGUI;
 import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlockSlaveCore;
@@ -107,7 +106,6 @@ public class Main extends JavaPlugin {
 		pm.registerEvents(new Stoplag(), this);
 		pm.registerEvents(new WorldEditPreCommand(), this);
 		pm.registerEvents(new DesignTool(), this);
-		pm.registerEvents(new FernzuenderListener(), this);
 		pm.registerEvents(new TntChest(), this);
 		pm.registerEvents(new GUI(), this);
 		pm.registerEvents(AutoCannonReloader.getInstance(), this);

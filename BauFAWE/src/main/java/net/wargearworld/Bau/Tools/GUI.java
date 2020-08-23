@@ -26,7 +26,6 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import net.wargearworld.Bau.Main;
 import net.wargearworld.Bau.StringGetterBau;
 import net.wargearworld.Bau.HikariCP.DBConnection;
-import net.wargearworld.Bau.Tools.Fernzuender.FernzuenderListener;
 import net.wargearworld.Bau.WorldEdit.WorldGuardHandler;
 import net.wargearworld.Bau.utils.ClickAction;
 import net.wargearworld.Bau.utils.ItemStackCreator;
@@ -126,7 +125,8 @@ public class GUI implements CommandExecutor, Listener {
 		dst.setItemMeta(dtIM);
 
 		// FZ
-		ItemStack fz = ItemStackCreator.createNewItemStack(FernzuenderListener.toolMaterial,
+		ItemStack fz = ItemStackCreator.createNewItemStack(Material
+				.valueOf(Main.getPlugin().getCustomConfig().getString("fernzuender")),
 				StringGetterBau.getString(p, "fernzuender"));
 
 		ItemStack CannonReloader = ItemStackCreator.createNewItemStack(AutoCannonReloader.toolMaterial,
@@ -168,7 +168,8 @@ public class GUI implements CommandExecutor, Listener {
 		ItemStack clicked = event.getCurrentItem();
 		if (clicked != null) {
 			if (clicked.getType().equals(Material.NETHER_STAR)
-					|| clicked.getType().equals(FernzuenderListener.toolMaterial)
+					|| clicked.getType().equals(Material
+							.valueOf(Main.getPlugin().getCustomConfig().getString("fernzuender")))
 					|| clicked.getType().equals(AutoCannonReloader.toolMaterial)||clicked.getType() == Material.CHEST) {
 				return;
 			}
