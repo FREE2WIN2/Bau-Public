@@ -20,7 +20,7 @@
 		<!-- Dependency Versions -->
 		<version.worldedit>7.1.0</version.worldedit>
 		<version.worldguard>7.0.2</version.worldguard>
-
+		<version.spigot-api>1.15.2-R0.1-SNAPSHOT</version.spigot-api>
 		<!-- Plugin Versions -->
 		<version.maven-shade-plugin>3.2.3</version.maven-shade-plugin>
 
@@ -30,48 +30,20 @@
 		<maven.compiler.source>11</maven.compiler.source>
 	</properties>
 
-	<repositories>
-		<!-- This adds the Spigot Maven repository to the build -->
-		<repository>
-			<id>spigot-repo</id>
-			<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-		</repository>
-		<repository>
-			<id>enginehub-maven</id>
-			<url>http://maven.enginehub.org/repo/</url>
-		</repository>
-		<repository>
-			<id>sk89q-repo</id>
-			<url>https://maven.enginehub.org/repo/</url>
-		</repository>
-
-		<repository>
-			<id>jitpack.io</id>
-			<url>https://jitpack.io</url>
-		</repository>
-	</repositories>
-
 	<dependencies>
-		<dependency>
-			<artifactId>spigotaa</artifactId>
-			<groupId>spigotbb</groupId>
-			<version>LATEST</version>
-			<scope>system</scope>
-			<systemPath>C:/Users/Nutzer/Desktop/JARS/spigot-1.15.2.jar</systemPath>
-		</dependency>
 
 		<dependency>
 			<groupId>com.github.WesJD</groupId>
 			<artifactId>AnvilGUI</artifactId>
-			<version>master-SNAPSHOT</version>
+			<version>1.0</version>
 			<scope>compile</scope>
 		</dependency>
 
 		<!--This adds the Spigot API artifact to the build -->
 		<dependency>
-			<groupId>org.spigotmc</groupId>
-			<artifactId>spigot-api</artifactId>
-			<version>1.15.2-R0.1-SNAPSHOT</version>
+			<groupId>com.destroystokyo.paper</groupId>
+			<artifactId>paper</artifactId>
+			<version>${version.spigot-api}</version>
 			<scope>provided</scope>
 		</dependency>
 

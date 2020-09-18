@@ -27,28 +27,10 @@
       </plugin>
     </plugins>
   </build>
-  <repositories>
-    <repository>
-      <id>spigot-repo</id>
-      <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-    </repository>
-    <repository>
-      <id>enginehub-maven</id>
-      <url>http://maven.enginehub.org/repo/</url>
-    </repository>
-    <repository>
-      <id>sk89q-repo</id>
-      <url>https://maven.enginehub.org/repo/</url>
-    </repository>
-    <repository>
-      <id>jitpack.io</id>
-      <url>https://jitpack.io</url>
-    </repository>
-  </repositories>
   <dependencies>
     <dependency>
-      <groupId>org.spigotmc</groupId>
-      <artifactId>spigot-api</artifactId>
+      <groupId>com.destroystokyo.paper</groupId>
+      <artifactId>paper</artifactId>
       <version>1.15.2-R0.1-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
@@ -64,19 +46,13 @@
       <version>7.0.1</version>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>spigotbb</groupId>
-      <artifactId>spigotaa</artifactId>
-      <version>LATEST</version>
-      <scope>system</scope>
-      <systemPath>C:/Users/Nutzer/Desktop/JARS/spigot-1.15.2.jar</systemPath>
-    </dependency>
   </dependencies>
   <properties>
     <maven.compiler.target>11</maven.compiler.target>
     <version.worldguard>7.0.2</version.worldguard>
     <version.maven-shade-plugin>3.2.3</version.maven-shade-plugin>
     <maven.compiler.source>11</maven.compiler.source>
+    <version.spigot-api>1.15.2-R0.1-SNAPSHOT</version.spigot-api>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <version.worldedit>7.1.0</version.worldedit>
   </properties>

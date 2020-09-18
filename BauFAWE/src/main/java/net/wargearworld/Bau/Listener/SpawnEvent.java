@@ -40,6 +40,8 @@ public class SpawnEvent implements Listener {
 			e.setCancelled(true);
 			return;
 		}
+		if(e.getLocation().getWorld().getName().contains("test"))
+			return;
 		if (etype.equals(EntityType.FALLING_BLOCK)) {
 			if (!etype.equals(EntityType.FALLING_BLOCK) && !e.getEntity().isCustomNameVisible()) {
 				e.setCancelled(true);

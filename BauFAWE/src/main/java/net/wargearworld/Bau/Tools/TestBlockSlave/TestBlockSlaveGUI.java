@@ -15,14 +15,15 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import main.java.net.wesjd.anvilgui.AnvilGUI;
+import main.java.net.wesjd.anvilgui.AnvilGUI.Builder;
+import main.java.net.wesjd.anvilgui.AnvilGUI.Response;
 import net.wargearworld.Bau.Main;
 import net.wargearworld.Bau.StringGetterBau;
 import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlock.CustomTestBlock;
 import net.wargearworld.Bau.utils.Banner;
 import net.wargearworld.Bau.utils.ItemStackCreator;
-import net.wesjd.anvilgui.AnvilGUI;
-import net.wesjd.anvilgui.AnvilGUI.Builder;
-import net.wesjd.anvilgui.AnvilGUI.Response;
+
 
 public class TestBlockSlaveGUI implements Listener {
 
