@@ -9,7 +9,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import net.wargearworld.Bau.Main;
-import net.wargearworld.Bau.StringGetterBau;
+import net.wargearworld.Bau.MessageHandler;
 import net.wargearworld.Bau.HikariCP.DBConnection;
 import net.wargearworld.Bau.Scoreboard.ScoreBoardBau;
 
@@ -35,7 +35,7 @@ public class onPlayerTeleport implements Listener {
 				if (!DBConnection.isMember(p.getUniqueId(), DBConnection.getName(e.getTo().getWorld().getName()))) {
 					// wenn er nicht owner und nicht Member ist
 					e.setCancelled(true);
-					p.sendMessage(Main.prefix +StringGetterBau.getString(p,"noPlotMember"));
+					p.sendMessage(Main.prefix +MessageHandler.getInstance().getString(p,"noPlotMember"));
 				}
 			}
 		}

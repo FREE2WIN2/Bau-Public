@@ -19,7 +19,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import net.wargearworld.Bau.Main;
-import net.wargearworld.Bau.StringGetterBau;
+import net.wargearworld.Bau.MessageHandler;
 
 public class AutoCannonReloader implements Listener, CommandExecutor {
 
@@ -73,7 +73,7 @@ public class AutoCannonReloader implements Listener, CommandExecutor {
 			}
 		}
 
-		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "cannonReloader_wrongCommand");
+		Main.send(p, true, MessageHandler.getInstance().getString(p, "cannonReloader_prefix"), "cannonReloader_wrongCommand");
 		return true;
 	}
 
@@ -126,14 +126,14 @@ public class AutoCannonReloader implements Listener, CommandExecutor {
 		}
 		set = playersTntLocations.get(uuid);
 		if (set.size() >= maxTnt) {
-			Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "cannonReloader_maxTntOverload",
+			Main.send(p, true, MessageHandler.getInstance().getString(p, "cannonReloader_prefix"), "cannonReloader_maxTntOverload",
 					String.valueOf(maxTnt));
 			return;
 		}
 
 		set.add(event.getBlockPlaced().getLocation());
 		if (set.size() == maxTnt) {
-			Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "cannonReloader_maxTnt",
+			Main.send(p, true, MessageHandler.getInstance().getString(p, "cannonReloader_prefix"), "cannonReloader_maxTnt",
 					String.valueOf(maxTnt));
 		}
 		playersTntLocations.put(uuid, set);
@@ -163,26 +163,26 @@ public class AutoCannonReloader implements Listener, CommandExecutor {
 
 	public static void startRecord(Player p) {
 		playerRecord.add(p.getUniqueId());
-		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "cannonReloader_startRecord");
+		Main.send(p, true, MessageHandler.getInstance().getString(p, "cannonReloader_prefix"), "cannonReloader_startRecord");
 	}
 
 	public static void endRecord(Player p) {
 		playerRecord.remove(p.getUniqueId());
-		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "cannonReloader_endRecord");
+		Main.send(p, true, MessageHandler.getInstance().getString(p, "cannonReloader_prefix"), "cannonReloader_endRecord");
 	}
 
 	public static void deleteRecord(Player p) {
 		playerRecord.remove(p.getUniqueId());
 		if (playersTntLocations.containsKey(p.getUniqueId())) {
 			playersTntLocations.remove(p.getUniqueId());
-			Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "cannonReloader_deleteRecord");
+			Main.send(p, true, MessageHandler.getInstance().getString(p, "cannonReloader_prefix"), "cannonReloader_deleteRecord");
 		}
 	}
 
 	private void pasteRecord(Player p) {
 		UUID uuid = p.getUniqueId();
 		if (playerAntiSpam.contains(uuid)) {
-			Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "cannonReloader_antispam",
+			Main.send(p, true, MessageHandler.getInstance().getString(p, "cannonReloader_prefix"), "cannonReloader_antispam",
 					String.valueOf(timeout / 20));
 			return;
 		}
@@ -192,7 +192,7 @@ public class AutoCannonReloader implements Listener, CommandExecutor {
 				loc.getBlock().setType(Material.TNT);
 			}
 		}
-		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "cannonReloader_pasteRecord");
+		Main.send(p, true, MessageHandler.getInstance().getString(p, "cannonReloader_prefix"), "cannonReloader_pasteRecord");
 		antispam(uuid);
 	}
 
@@ -208,10 +208,10 @@ public class AutoCannonReloader implements Listener, CommandExecutor {
 	}
 
 	private void showHelp(Player p) {
-		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "cannonReloader_help1");
-		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "cannonReloader_help2");
-		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "cannonReloader_help3");
-		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "cannonReloader_help4");
-		Main.send(p, true, StringGetterBau.getString(p, "cannonReloader_prefix"), "cannonReloader_help5");
+		Main.send(p, true, MessageHandler.getInstance().getString(p, "cannonReloader_prefix"), "cannonReloader_help1");
+		Main.send(p, true, MessageHandler.getInstance().getString(p, "cannonReloader_prefix"), "cannonReloader_help2");
+		Main.send(p, true, MessageHandler.getInstance().getString(p, "cannonReloader_prefix"), "cannonReloader_help3");
+		Main.send(p, true, MessageHandler.getInstance().getString(p, "cannonReloader_prefix"), "cannonReloader_help4");
+		Main.send(p, true, MessageHandler.getInstance().getString(p, "cannonReloader_prefix"), "cannonReloader_help5");
 	}
 }

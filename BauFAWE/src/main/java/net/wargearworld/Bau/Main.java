@@ -37,6 +37,7 @@ import net.wargearworld.Bau.TabCompleter.gsTC;
 import net.wargearworld.Bau.TabCompleter.particlesTC;
 import net.wargearworld.Bau.TabCompleter.tbsTC;
 import net.wargearworld.Bau.Tools.AutoCannonReloader;
+import net.wargearworld.Bau.Tools.CompassBar;
 import net.wargearworld.Bau.Tools.DesignTool;
 import net.wargearworld.Bau.Tools.GUI;
 import net.wargearworld.Bau.Tools.PlotResetter;
@@ -48,6 +49,7 @@ import net.wargearworld.Bau.Tools.Particles.ParticlesGUI;
 import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlockSlaveCore;
 import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlock.DefaultTestBlock;
 import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlockEditor.TestBlockEditorCore;
+import net.wargearworld.Bau.World.WorldManager;
 import net.wargearworld.Bau.WorldEdit.SaWE;
 import net.wargearworld.Bau.WorldEdit.WorldEditPreCommand;
 import net.wargearworld.Bau.cmds.Bau;
@@ -56,11 +58,11 @@ import net.wargearworld.Bau.cmds.ds;
 import net.wargearworld.Bau.cmds.gs;
 import net.wargearworld.Bau.cmds.stats;
 import net.wargearworld.Bau.cmds.tnt;
-import net.wargearworld.Bau.utils.WorldHandler;
 
 public class Main extends JavaPlugin {
 	private static Main plugin;
 	public static StateFlag TntExplosion;
+	public static StateFlag stoplag;
 	public static String schempath;
 
 	private static File customConfigFile;
@@ -79,10 +81,11 @@ public class Main extends JavaPlugin {
 		registerListener();
 
 		gs.startCheckForTempAdd();
-		WorldHandler.checkForWorldsToUnload();
+		WorldManager.checkForWorldsToUnload();
 		new DataSource();
-		new StringGetterBau();
+		new MessageHandler();
 		new Plots();
+		new CompassBar();
 		DefaultTestBlock.generateDefaultTestBlocks();
 		schempath = customConfig.getString("schempath");
 	
@@ -146,9 +149,6 @@ public class Main extends JavaPlugin {
 		tempAddConfigFile = createConfigFile("tempAddConfig.yml");
 		tempAddConfig = createConfig(tempAddConfigFile);
 
-		Stoplag.stoplagConfigFile = createConfigFile("stoplag.yml");
-		Stoplag.stoplagConfig = createConfig(Stoplag.stoplagConfigFile);
-
 		Particles.particlesConfigFile = createConfigFile("particles.yml");
 		Particles.particleConfig = createConfig(Particles.particlesConfigFile);
 	}
@@ -187,12 +187,17 @@ public class Main extends JavaPlugin {
 		try {
 			// create a flag with the name "my-custom-flag", defaulting to true
 			StateFlag flag = new StateFlag("TntExplosion", true);
+			StateFlag stoplag = new StateFlag("stoplag", true);
 			registry.register(flag);
+			registry.register(stoplag);
 			TntExplosion = flag; // only set our field if there was no error
+			Main.stoplag = stoplag;
 		} catch (FlagConflictException e) {
 			Flag<?> existing = registry.get("TntExplosion");
-			if (existing instanceof StateFlag) {
+			Flag<?> existingSL = registry.get("stoplag");
+			if ((existing instanceof StateFlag) && existingSL instanceof StateFlag) {
 				TntExplosion = (StateFlag) existing;
+				stoplag = (StateFlag) existingSL;
 			} else {
 				System.out.println("Fehler");
 				// types don't match - this is bad news! some other plugin conflicts with you
@@ -260,7 +265,7 @@ public class Main extends JavaPlugin {
 	}
 
 	public static void send(Player p, String messageKey, String... args) {
-		String message = Main.prefix + StringGetterBau.getString(p, messageKey);
+		String message = Main.prefix + MessageHandler.getInstance().getString(p, messageKey);
 		for (String rep : args) {
 			message = message.replaceFirst("%r", rep);
 		}
@@ -268,7 +273,7 @@ public class Main extends JavaPlugin {
 	}
 
 	public static void send(Player p, boolean otherPrefix, String prefix, String messageKey, String... args) {
-		String message = prefix + StringGetterBau.getString(p, messageKey);
+		String message = prefix + MessageHandler.getInstance().getString(p, messageKey);
 		for (String rep : args) {
 			message = message.replaceFirst("%r", rep);
 		}

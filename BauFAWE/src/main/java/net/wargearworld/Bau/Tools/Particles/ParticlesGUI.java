@@ -9,7 +9,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import net.wargearworld.Bau.StringGetterBau;
+import net.wargearworld.Bau.MessageHandler;
 import net.wargearworld.Bau.utils.ItemStackCreator;
 
 public class ParticlesGUI implements Listener {
@@ -21,13 +21,13 @@ public class ParticlesGUI implements Listener {
 	private static Inventory createParticlesGUI(Player p) {
 		Inventory inv = Bukkit.createInventory(null, 9, "§6Particles§7GUI");
 		ItemStack toggleOn = ItemStackCreator.createNewItemStack(Material.GLASS_BOTTLE,
-				StringGetterBau.getString(p, "particles_gui_toggleOn"));
+				MessageHandler.getInstance().getString(p, "particles_gui_toggleOn"));
 		ItemStack toggleOff = ItemStackCreator.createNewItemStack(Material.EXPERIENCE_BOTTLE,
-				StringGetterBau.getString(p, "particles_gui_toggleOff"));
+				MessageHandler.getInstance().getString(p, "particles_gui_toggleOff"));
 		ItemStack colorClip = ItemStackCreator.createNewItemStack(Material.GLOBE_BANNER_PATTERN,
-				StringGetterBau.getString(p, "particles_gui_changeColorClipboard"));
+				MessageHandler.getInstance().getString(p, "particles_gui_changeColorClipboard"));
 		ItemStack colorSel = ItemStackCreator.createNewItemStack(Material.WOODEN_AXE,
-				StringGetterBau.getString(p, "particles_gui_changeColorSelection"));
+				MessageHandler.getInstance().getString(p, "particles_gui_changeColorSelection"));
 		if (Particles.playersParticlesShow.get(p.getUniqueId()).isActive()) {
 			inv.setItem(2, toggleOff);
 		} else {
@@ -68,28 +68,28 @@ public class ParticlesGUI implements Listener {
 		}
 		if (event.getView().getTitle().equals("§6Particles§7GUI")) {
 			String clickedName = clicked.getItemMeta().getDisplayName();
-			if (clickedName.equalsIgnoreCase(StringGetterBau.getString(p, "particles_gui_toggleOn"))) {
+			if (clickedName.equalsIgnoreCase(MessageHandler.getInstance().getString(p, "particles_gui_toggleOn"))) {
 				p.performCommand("particles on");
 				p.closeInventory();
-			} else if (clickedName.equalsIgnoreCase(StringGetterBau.getString(p, "particles_gui_toggleOff"))) {
+			} else if (clickedName.equalsIgnoreCase(MessageHandler.getInstance().getString(p, "particles_gui_toggleOff"))) {
 				p.performCommand("particles off");
 				p.closeInventory();
 			} else if (clickedName
-					.equalsIgnoreCase(StringGetterBau.getString(p, "particles_gui_changeColorClipboard"))) {
+					.equalsIgnoreCase(MessageHandler.getInstance().getString(p, "particles_gui_changeColorClipboard"))) {
 				p.openInventory(
-						createColorGUI(StringGetterBau.getString(p, "particles_gui_changeColorClipboardTitle")));
+						createColorGUI(MessageHandler.getInstance().getString(p, "particles_gui_changeColorClipboardTitle")));
 			} else if (clickedName
-					.equalsIgnoreCase(StringGetterBau.getString(p, "particles_gui_changeColorSelection"))) {
+					.equalsIgnoreCase(MessageHandler.getInstance().getString(p, "particles_gui_changeColorSelection"))) {
 				p.openInventory(
-						createColorGUI(StringGetterBau.getString(p, "particles_gui_changeColorSelectionTitle")));
+						createColorGUI(MessageHandler.getInstance().getString(p, "particles_gui_changeColorSelectionTitle")));
 			}
 			event.setCancelled(true);
-		} else if (event.getView().getTitle().equals(StringGetterBau.getString(p, "particles_gui_changeColorClipboardTitle"))) {
+		} else if (event.getView().getTitle().equals(MessageHandler.getInstance().getString(p, "particles_gui_changeColorClipboardTitle"))) {
 			event.setCancelled(true);
 			p.closeInventory();
 			p.performCommand("particles clipboard " + getColor(clicked));
 		
-		} else if (event.getView().getTitle().equals(StringGetterBau.getString(p, "particles_gui_changeColorSelectionTitle"))) {
+		} else if (event.getView().getTitle().equals(MessageHandler.getInstance().getString(p, "particles_gui_changeColorSelectionTitle"))) {
 			event.setCancelled(true);
 			p.closeInventory();
 			p.performCommand("particles selection " + getColor(clicked));

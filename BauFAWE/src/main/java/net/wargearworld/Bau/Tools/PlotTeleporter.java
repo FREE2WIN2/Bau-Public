@@ -13,7 +13,7 @@ import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import net.wargearworld.Bau.StringGetterBau;
+import net.wargearworld.Bau.MessageHandler;
 import net.wargearworld.Bau.Scoreboard.ScoreBoardBau;
 import net.wargearworld.Bau.utils.CoordGetter;
 import net.wargearworld.Bau.utils.ItemStackCreator;
@@ -21,13 +21,13 @@ import net.wargearworld.Bau.utils.ItemStackCreator;
 public class PlotTeleporter implements Listener {
 
 	public static void openInv(Player p) {
-		Inventory inv = Bukkit.createInventory(null, 18, StringGetterBau.getString(p, "gui_teleporter"));
+		Inventory inv = Bukkit.createInventory(null, 18, MessageHandler.getInstance().getString(p, "gui_teleporter"));
 		// 2pearls
 		int countOfNormalPlots = CoordGetter.getConfigOfWorld(p.getWorld().getName()).getInt("countplots");
 		int index = 0;
 		for (int i = 1; i <= countOfNormalPlots; i++) {
 			ItemStack teleportNormal = ItemStackCreator.createNewItemStack(Material.ENDER_PEARL,
-					StringGetterBau.getString(p, "teleportNormalPlot", "" + i));
+					MessageHandler.getInstance().getString(p, "teleportNormalPlot", "" + i));
 			teleportNormal.setAmount(i);
 			inv.setItem(index, teleportNormal);
 			index++;
@@ -42,7 +42,7 @@ public class PlotTeleporter implements Listener {
 		for (int tier = 1; tier <= 3; tier++) {
 			for (int i = 1; i <= countOfTestBlocks[tier-1]; i++) {
 				ItemStack teleportTest = ItemStackCreator.createNewItemStack(Material.ENDER_EYE,
-						StringGetterBau.getString(p, "teleportTestPlot", "" + i, "" + tier));
+						MessageHandler.getInstance().getString(p, "teleportTestPlot", "" + i, "" + tier));
 				teleportTest.setAmount(tier);
 				inv.setItem(index, teleportTest);
 				index++;
@@ -69,7 +69,7 @@ public class PlotTeleporter implements Listener {
 		}
 
 		Player p = (Player) event.getWhoClicked();
-		if (!event.getView().getTitle().equals(StringGetterBau.getString(p, "gui_teleporter"))) {
+		if (!event.getView().getTitle().equals(MessageHandler.getInstance().getString(p, "gui_teleporter"))) {
 			return;
 		}
 		event.setCancelled(true);
@@ -102,7 +102,7 @@ public class PlotTeleporter implements Listener {
 			}
 			for (int tier = 1; tier <= 3; tier++) {
 				for (int i = 1; i <= countOfTestBlocks[tier-1]; i++) {
-					String name = StringGetterBau.getString(p, "teleportTestPlot", "" + i, "" + tier);
+					String name = MessageHandler.getInstance().getString(p, "teleportTestPlot", "" + i, "" + tier);
 					if (item.getItemMeta().getDisplayName().equals(name)) {
 						return "t" + tier + "," + i;
 					}

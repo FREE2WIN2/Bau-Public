@@ -22,7 +22,7 @@ import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.session.ClipboardHolder;
 
 import net.wargearworld.Bau.Main;
-import net.wargearworld.Bau.StringGetterBau;
+import net.wargearworld.Bau.MessageHandler;
 import net.wargearworld.Bau.HikariCP.DataSource;
 import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlock.CustomTestBlock;
 import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlock.EmptyTestBlock;
@@ -383,12 +383,12 @@ public class TestBlockSlave {
 	}
 
 	public void showParticle() {
-		JsonCreater creator = new JsonCreater(StringGetterBau.getString(owner, "tbs_gui_confirmRegion"));
-		JsonCreater click = new JsonCreater(StringGetterBau.getString(owner, "tbs_gui_confirmRegionConfirm"));
-		click.addHoverEvent(StringGetterBau.getString(owner, "tbs_gui_confirmRegionHover"))
+		JsonCreater creator = new JsonCreater(MessageHandler.getInstance().getString(owner, "tbs_gui_confirmRegion"));
+		JsonCreater click = new JsonCreater(MessageHandler.getInstance().getString(owner, "tbs_gui_confirmRegionConfirm"));
+		click.addHoverEvent(MessageHandler.getInstance().getString(owner, "tbs_gui_confirmRegionHover"))
 				.addClickEvent("/tbs confirmRegion " + owner.getUniqueId(), ClickAction.RUN_COMMAND);
-		JsonCreater cancel = new JsonCreater(StringGetterBau.getString(owner, "tbs_gui_confirmRegionCancel"));
-		cancel.addHoverEvent(StringGetterBau.getString(owner, "tbs_gui_confirmRegionCancelHover"))
+		JsonCreater cancel = new JsonCreater(MessageHandler.getInstance().getString(owner, "tbs_gui_confirmRegionCancel"));
+		cancel.addHoverEvent(MessageHandler.getInstance().getString(owner, "tbs_gui_confirmRegionCancelHover"))
 				.addClickEvent("/tbs confirmRegionCancel " + owner.getUniqueId(), ClickAction.RUN_COMMAND);
 
 		creator.addJson(click).addJson(cancel).send(owner);

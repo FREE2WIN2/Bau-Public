@@ -5,6 +5,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
+import net.wargearworld.Bau.Player.BauPlayer;
 import net.wargearworld.Bau.Tools.Stoplag;
 
 public class WorldEditPreCommand implements Listener{
@@ -14,8 +15,9 @@ public class WorldEditPreCommand implements Listener{
 
 		String command = event.getMessage();
 		Player p = event.getPlayer();
-		if (command.startsWith("//paste")&&Stoplag.getPasteState(p.getLocation())) {
-			Stoplag.setStatusTemp(p.getLocation(), true, Stoplag.getPasteTime(p.getLocation()));
+		BauPlayer player = BauPlayer.getBauPlayer(p);
+		if (command.startsWith("//paste")&&player.getPasteState()) {
+			Stoplag.getInstance().setStatusTemp(p.getLocation(), true, player.getPasteTime());
 		}
 
 		if (command.equalsIgnoreCase("//rotate")) {

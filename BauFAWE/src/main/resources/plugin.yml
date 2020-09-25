@@ -22,6 +22,7 @@ commands:
    sl:
       usage: /<command>
       description: turn Stoplag on/off
+      aliases: [stoplag]
    dt:
       usage: /<command>
       description: Turns Design-Tool on and off.

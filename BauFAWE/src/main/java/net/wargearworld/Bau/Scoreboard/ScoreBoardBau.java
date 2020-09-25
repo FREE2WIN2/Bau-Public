@@ -16,7 +16,7 @@ import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import net.wargearworld.Bau.Main;
-import net.wargearworld.Bau.StringGetterBau;
+import net.wargearworld.Bau.MessageHandler;
 import net.wargearworld.Bau.Listener.onPlayerMove;
 import net.wargearworld.Bau.Tools.DesignTool;
 import net.wargearworld.Bau.Tools.Stoplag;
@@ -79,25 +79,25 @@ public class ScoreBoardBau {
 		if (rg != null) {
 			if (rg.getFlag(Main.TntExplosion) == State.ALLOW) {
 				// System.out.println("tnt on");
-				return StringGetterBau.getString(p, "boardOn");
+				return MessageHandler.getInstance().getString(p, "boardOn");
 			} else {
 				// System.out.println("tnt off");
-				return StringGetterBau.getString(p, "boardOff");
+				return MessageHandler.getInstance().getString(p, "boardOff");
 			}
 		} else {
-			return StringGetterBau.getString(p, "boardOff");
+			return MessageHandler.getInstance().getString(p, "boardOff");
 		}
 
 	}
 
 	private String getSl() {
 		String rgID = onPlayerMove.playersLastPlot.get(p.getUniqueId());
-		if (Stoplag.getStatus(p.getWorld().getName(), rgID)) {
+		if (Stoplag.getStatus(p.getWorld(), rgID)) {
 			// System.out.println("sl on");
-			return StringGetterBau.getString(p, "boardOn");
+			return MessageHandler.getInstance().getString(p, "boardOn");
 		} else {
 			// System.out.println("sl off");
-			return StringGetterBau.getString(p, "boardOff");
+			return MessageHandler.getInstance().getString(p, "boardOff");
 		}
 
 	}
@@ -136,10 +136,10 @@ public class ScoreBoardBau {
 		if (DesignTool.playerHasDtOn.containsKey(p.getUniqueId())) {
 			if (DesignTool.playerHasDtOn.get(p.getUniqueId())) {
 				// System.out.println("dt on");
-				return StringGetterBau.getString(p, "boardOn");
+				return MessageHandler.getInstance().getString(p, "boardOn");
 			} else {
 				// System.out.println("dt off");
-				return StringGetterBau.getString(p, "boardOff");
+				return MessageHandler.getInstance().getString(p, "boardOff");
 			}
 		} else {
 			return "§cError ";

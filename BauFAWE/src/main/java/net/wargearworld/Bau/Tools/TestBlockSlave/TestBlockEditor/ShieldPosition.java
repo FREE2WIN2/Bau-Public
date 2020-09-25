@@ -4,7 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import net.wargearworld.Bau.StringGetterBau;
+import net.wargearworld.Bau.MessageHandler;
 import net.wargearworld.Bau.utils.ItemStackCreator;
 
 public enum ShieldPosition {
@@ -69,28 +69,28 @@ public enum ShieldPosition {
 		switch (this) {
 		case BACK:
 			return ItemStackCreator.createNewItemStack(Material.LIME_STAINED_GLASS_PANE,
-					StringGetterBau.getString(p, "tbs_editor_" + this.name()));
+					MessageHandler.getInstance().getString(p, "tbs_editor_" + this.name()));
 		case FRONT:
 			return ItemStackCreator.createNewItemStack(Material.YELLOW_STAINED_GLASS_PANE,
-					StringGetterBau.getString(p, "tbs_editor_" + this.name()));
+					MessageHandler.getInstance().getString(p, "tbs_editor_" + this.name()));
 		case LEFTSIDEBACK:
 			return ItemStackCreator.createNewItemStack(Material.BLUE_STAINED_GLASS_PANE,
-					StringGetterBau.getString(p, "tbs_editor_" + this.name()));
+					MessageHandler.getInstance().getString(p, "tbs_editor_" + this.name()));
 		case LEFTSIDEFRONT:
 			return ItemStackCreator.createNewItemStack(Material.BLUE_STAINED_GLASS_PANE,
-					StringGetterBau.getString(p, "tbs_editor_" + this.name()));
+					MessageHandler.getInstance().getString(p, "tbs_editor_" + this.name()));
 		case RIGHTSIDEBACK:
 			return ItemStackCreator.createNewItemStack(Material.RED_STAINED_GLASS_PANE,
-					StringGetterBau.getString(p, "tbs_editor_" + this.name()));
+					MessageHandler.getInstance().getString(p, "tbs_editor_" + this.name()));
 		case RIGHTSIDEFRONT:
 			return ItemStackCreator.createNewItemStack(Material.RED_STAINED_GLASS_PANE,
-					StringGetterBau.getString(p, "tbs_editor_" + this.name()));
+					MessageHandler.getInstance().getString(p, "tbs_editor_" + this.name()));
 		case ROOFBACK:
 			return ItemStackCreator.createNewItemStack(Material.BLACK_STAINED_GLASS_PANE,
-					StringGetterBau.getString(p, "tbs_editor_" + this.name()));
+					MessageHandler.getInstance().getString(p, "tbs_editor_" + this.name()));
 		case ROOFFRONT:
 			return ItemStackCreator.createNewItemStack(Material.BLACK_STAINED_GLASS_PANE,
-					StringGetterBau.getString(p, "tbs_editor_" + this.name()));
+					MessageHandler.getInstance().getString(p, "tbs_editor_" + this.name()));
 		}
 		return null;
 	}

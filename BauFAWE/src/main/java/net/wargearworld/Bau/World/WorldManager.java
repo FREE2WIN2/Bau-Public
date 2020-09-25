@@ -1,9 +1,10 @@
-package net.wargearworld.Bau.utils;
+package net.wargearworld.Bau.World;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -18,8 +19,14 @@ import net.wargearworld.Bau.HikariCP.DBConnection;
 import net.wargearworld.Bau.Plots.Plots;
 import net.wargearworld.Bau.WorldEdit.WorldGuardHandler;
 
-public class WorldHandler {
+public class WorldManager {
 
+	private static HashMap<UUID,BauWorld> worlds = new HashMap<>();
+	
+	public static BauWorld get(World world) {
+		return worlds.get(world.getUID());
+	}
+	
 	public static String templateName = Main.getPlugin().getCustomConfig().getString("plottemplate");
 
 	public static World loadWorld(String worldName) {
@@ -31,6 +38,8 @@ public class WorldHandler {
 			w.setThundering(false);
 			w.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
 			w.setGameRule(GameRule.DO_MOB_SPAWNING, false);
+			
+//			worlds.put(w.getUID(), new BauWorld(id, owner, world))
 			return w;
 		} else {
 			return Bukkit.getWorld(worldName);
@@ -94,8 +103,6 @@ public class WorldHandler {
 	}
 
 	public static void copyFolder_raw(File sourceFolder, File destinationfolder) {
-		// Check if sourceFolder is a directory or file
-		// If sourceFolder is file; then copy the file directly to new location
 		if (sourceFolder.isDirectory()) {
 			// Verify if destinationFolder is already present, if not then create it
 			if (!destinationfolder.exists()) {
@@ -150,5 +157,7 @@ public class WorldHandler {
 			}
 		}, 20 * 60, 20 * 60);
 	}
+
+	
 
 }

@@ -16,7 +16,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 
 import net.wargearworld.Bau.HikariCP.DBConnection;
-import net.wargearworld.Bau.utils.WorldHandler;
+import net.wargearworld.Bau.World.WorldManager;
 
 public class WorldGuardHandler {
 	static RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
@@ -57,7 +57,7 @@ public class WorldGuardHandler {
 	}
 
 	public static boolean addPlayerToAllRegions(String worldName, String playerUUID) {
-		RegionManager regions = container.get(BukkitAdapter.adapt(WorldHandler.loadWorld(worldName)));
+		RegionManager regions = container.get(BukkitAdapter.adapt(WorldManager.loadWorld(worldName)));
 		for (Entry<String, ProtectedRegion> rg : regions.getRegions().entrySet()) {
 			if (rg.getValue().getPriority() > 10) {
 				DefaultDomain member = rg.getValue().getMembers();
@@ -69,7 +69,7 @@ public class WorldGuardHandler {
 	}
 
 	public static boolean removeMemberFromAllRegions(String worldName, UUID playerUUID) {
-		RegionManager regions = container.get(BukkitAdapter.adapt(WorldHandler.loadWorld(worldName)));
+		RegionManager regions = container.get(BukkitAdapter.adapt(WorldManager.loadWorld(worldName)));
 		for (Entry<String, ProtectedRegion> rg : regions.getRegions().entrySet()) {
 			if (rg.getValue().getPriority() > 10) {
 				DefaultDomain member = rg.getValue().getMembers();
@@ -95,7 +95,7 @@ public class WorldGuardHandler {
 
 	
 	public static void addOwnerToAllRegions(UUID uniqueId) {
-		RegionManager regions = container.get(BukkitAdapter.adapt(WorldHandler.loadWorld(uniqueId.toString())));
+		RegionManager regions = container.get(BukkitAdapter.adapt(WorldManager.loadWorld(uniqueId.toString())));
 		for (Entry<String, ProtectedRegion> rg : regions.getRegions().entrySet()) {
 			if (rg.getValue().getPriority() > 10) {
 				DefaultDomain owner = rg.getValue().getOwners();

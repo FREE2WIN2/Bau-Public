@@ -17,7 +17,7 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import net.wargearworld.Bau.Main;
-import net.wargearworld.Bau.StringGetterBau;
+import net.wargearworld.Bau.MessageHandler;
 import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlock.Facing;
 import net.wargearworld.Bau.WorldEdit.Schematic;
 import net.wargearworld.Bau.WorldEdit.WorldEditHandler;
@@ -50,15 +50,15 @@ public class PlotResetter implements CommandExecutor {
 //		int rgIDint = Integer.parseInt(rgID.replace("plot", ""));
 		if (!confirmed) {
 			JsonCreater creater1 = new JsonCreater(
-					Main.prefix + StringGetterBau.getString(p, "delePlotConfirmation", rgID.replace("plot", "")));
+					Main.prefix + MessageHandler.getInstance().getString(p, "delePlotConfirmation", rgID.replace("plot", "")));
 			JsonCreater creater2 = new JsonCreater(
-					StringGetterBau.getString(p, "deletePlotHere",rgID.replace("plot", "")));
-			creater2.addHoverEvent(StringGetterBau.getString(p, "delePlotHover", rgID.replace("plot", "")));
+					MessageHandler.getInstance().getString(p, "deletePlotHere",rgID.replace("plot", "")));
+			creater2.addHoverEvent(MessageHandler.getInstance().getString(p, "delePlotHover", rgID.replace("plot", "")));
 			creater2.addClickEvent("/delcon " + rgID + " " + p.getUniqueId(), ClickAction.RUN_COMMAND);
 			creater1.addJson(creater2).send(p);
 		} else {
 			if (playerBlockedDelete.contains(p.getUniqueId()) && !p.hasPermission("bau.delete.bypass")) {
-				p.sendMessage(StringGetterBau.getString(p, "deletePlotAntiSpaw"));
+				p.sendMessage(MessageHandler.getInstance().getString(p, "deletePlotAntiSpaw"));
 				return;
 			}
 			playerBlockedDelete.add(p.getUniqueId());

@@ -14,15 +14,15 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import net.wargearworld.Bau.Main;
-import net.wargearworld.Bau.StringGetterBau;
+import net.wargearworld.Bau.MessageHandler;
 import net.wargearworld.Bau.HikariCP.DBConnection;
 import net.wargearworld.Bau.Plots.Plots;
 import net.wargearworld.Bau.Scoreboard.ScoreBoardBau;
 import net.wargearworld.Bau.Tools.DesignTool;
+import net.wargearworld.Bau.World.WorldManager;
 import net.wargearworld.Bau.utils.CoordGetter;
 import net.wargearworld.Bau.utils.ItemStackCreator;
-import net.wargearworld.Bau.utils.Language;
-import net.wargearworld.Bau.utils.WorldHandler;
+import net.wargearworld.StringGetter.Language;
 
 public class onPlayerJoin implements Listener {
 
@@ -38,7 +38,7 @@ public class onPlayerJoin implements Listener {
 		p.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
 		// p.teleport(new Location(Bukkit.getWorld("world"), 0, 30, 0));
 		String lang = DBConnection.getLanguage(p);
-		StringGetterBau.playersLanguage.put(p.getUniqueId(), Language.getLanguageByString(lang));
+		MessageHandler.playersLanguage.put(p.getUniqueId(), Language.valueOf(lang.toUpperCase()));
 		Main main = Main.getPlugin();
 		// has own gs?
 		String path = main.getCustomConfig().getString("Config.path");
@@ -46,10 +46,10 @@ public class onPlayerJoin implements Listener {
 		if (!DBConnection.hasOwnPlots(p.getName()) && !gs.exists()) {
 			// Bukkit.createWorld((WorldCreator) WorldCreator.name("test").createWorld());
 			// wenn nicht-> erstellen und hinteleportieren
-			WorldHandler.createWorldDir(p);
-			p.sendMessage(Main.prefix + StringGetterBau.getString(p, "plotGenerating"));
+			WorldManager.createWorldDir(p);
+			p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "plotGenerating"));
 		}
-		World world = WorldHandler.loadWorld(p.getUniqueId().toString());
+		World world = WorldManager.loadWorld(p.getUniqueId().toString());
 
 		String spawnPlot =  Plots.getJoinPlot(p.getUniqueId());
 		onPlayerMove.playersLastPlot.put(p.getUniqueId(), spawnPlot);

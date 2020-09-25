@@ -14,7 +14,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 
 import net.wargearworld.Bau.Main;
-import net.wargearworld.Bau.StringGetterBau;
+import net.wargearworld.Bau.MessageHandler;
 import net.wargearworld.Bau.Scoreboard.ScoreBoardBau;
 
 public class tnt implements CommandExecutor {
@@ -34,16 +34,16 @@ public class tnt implements CommandExecutor {
 				rg.setFlag(Main.TntExplosion, State.DENY);
 				for (Player a : p.getWorld().getPlayers()) {
 					ScoreBoardBau.cmdUpdate(a);
-					a.sendTitle(StringGetterBau.getString(p,"tntDeactivatedTitle"),
-							StringGetterBau.getString(p,"tntTitleSmall").replace("%r", rgID.replace("plot", "")), 1,
+					a.sendTitle(MessageHandler.getInstance().getString(p,"tntDeactivatedTitle"),
+							MessageHandler.getInstance().getString(p,"tntTitleSmall").replace("%r", rgID.replace("plot", "")), 1,
 							1, 60);
 				}
 			} else {
 				rg.setFlag(Main.TntExplosion, State.ALLOW);
 				for (Player a : p.getWorld().getPlayers()) {
 					ScoreBoardBau.cmdUpdate(a);
-					a.sendTitle(StringGetterBau.getString(p,"tntActivatedTitle"),
-							StringGetterBau.getString(p,"tntTitleSmall").replace("%r", rgID.replace("plot", "")), 1,
+					a.sendTitle(MessageHandler.getInstance().getString(p,"tntActivatedTitle"),
+							MessageHandler.getInstance().getString(p,"tntTitleSmall").replace("%r", rgID.replace("plot", "")), 1,
 							1, 60);
 				}
 			}

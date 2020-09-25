@@ -24,7 +24,7 @@ import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import net.wargearworld.Bau.Main;
-import net.wargearworld.Bau.StringGetterBau;
+import net.wargearworld.Bau.MessageHandler;
 import net.wargearworld.Bau.HikariCP.DBConnection;
 import net.wargearworld.Bau.WorldEdit.WorldGuardHandler;
 import net.wargearworld.Bau.utils.ClickAction;
@@ -49,17 +49,17 @@ public class GUI implements CommandExecutor, Listener {
 	public Inventory inventarErstellen(Player p) {
 		String worldname = getName(p.getWorld());
 
-		String inventoryName = StringGetterBau.getString(p, "inventoryName").replace("%r", worldname);
+		String inventoryName = MessageHandler.getInstance().getString(p, "inventoryName").replace("%r", worldname);
 		Inventory inv = Bukkit.createInventory(null, 45, inventoryName);
 //erstes item: tnt
 		ItemStack tntIS = new ItemStack(Material.TNT);
 		ItemMeta tntIM = tntIS.getItemMeta();
 		ProtectedRegion rg = WorldGuardHandler.getRegion(p.getLocation());
 		if (rg.getFlag(Main.TntExplosion) == State.DENY) {
-			tntIM.setDisplayName(StringGetterBau.getString(p, "tntDenied"));
+			tntIM.setDisplayName(MessageHandler.getInstance().getString(p, "tntDenied"));
 
 		} else {
-			tntIM.setDisplayName(StringGetterBau.getString(p, "tntAllowed"));
+			tntIM.setDisplayName(MessageHandler.getInstance().getString(p, "tntAllowed"));
 			tntIM.addEnchant(Enchantment.PROTECTION_EXPLOSIONS, 1, true);
 			tntIM.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 		}
@@ -72,33 +72,33 @@ public class GUI implements CommandExecutor, Listener {
 		playerHeadItem = new ItemStack(Material.PLAYER_HEAD);
 		SkullMeta sm = (SkullMeta) playerHeadItem.getItemMeta();
 		sm.setOwner(worldname);
-		sm.setDisplayName(StringGetterBau.getString(p, "guiMember").replace("%r", worldname));
+		sm.setDisplayName(MessageHandler.getInstance().getString(p, "guiMember").replace("%r", worldname));
 		playerHeadItem.setItemMeta(sm);
 
 		// delete
 		if (rg.getOwners().contains(p.getUniqueId()) || p.getUniqueId().toString().equals(p.getWorld().getName())||p.hasPermission("admin")) {
 			Barrier1IS = ItemStackCreator.createNewItemStack(Material.BARRIER,
-					StringGetterBau.getString(p, "deletePlot"));
+					MessageHandler.getInstance().getString(p, "deletePlot"));
 
 		}
 		// TestBlockSklave->Wolle
 
 		// enderpearls
 		ItemStack enderPearl1IS = ItemStackCreator.createNewItemStack(Material.ENDER_PEARL,
-				StringGetterBau.getString(p, "gui_teleporter"));
+				MessageHandler.getInstance().getString(p, "gui_teleporter"));
 
 		// torch f�r sl
 		ItemStack stoplagIS;
 		if (Stoplag.getStatus(p.getLocation())) {
 			stoplagIS = ItemStackCreator.createNewItemStack(Material.REDSTONE,
-					StringGetterBau.getString(p, "torchOff"));
+					MessageHandler.getInstance().getString(p, "torchOff"));
 		} else {
 			stoplagIS = ItemStackCreator.createNewItemStack(Material.GUNPOWDER,
-					StringGetterBau.getString(p, "torchOn"));
+					MessageHandler.getInstance().getString(p, "torchOn"));
 		}
 
 		ItemStack observer = ItemStackCreator.createNewItemStack(Material.OBSERVER,
-				StringGetterBau.getString(p, "tbs_gui_trail"));
+				MessageHandler.getInstance().getString(p, "tbs_gui_trail"));
 
 		// NetherStar
 		ItemStack guiItem = ItemStackCreator.createNewItemStack(Material.NETHER_STAR, "§6GUI");
@@ -108,18 +108,18 @@ public class GUI implements CommandExecutor, Listener {
 
 		// TBS
 		ItemStack TestMaterialIS = ItemStackCreator.createNewItemStack(Material.WHITE_WOOL,
-				StringGetterBau.getString(p, "testBlockSklaveGui"));
+				MessageHandler.getInstance().getString(p, "testBlockSklaveGui"));
 
 		// DT
 		String dtName;
 		ItemStack dst = new ItemStack(Material.WOODEN_SHOVEL);
 		ItemMeta dtIM = observer.getItemMeta();
 		if (DesignTool.playerHasDtOn.get(p.getUniqueId())) {
-			dtName = StringGetterBau.getString(p, "dtItemOn");
+			dtName = MessageHandler.getInstance().getString(p, "dtItemOn");
 			dtIM.addEnchant(Enchantment.SILK_TOUCH, 1, true);
 			dtIM.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 		} else {
-			dtName = StringGetterBau.getString(p, "dtItemOff");
+			dtName = MessageHandler.getInstance().getString(p, "dtItemOff");
 		}
 		dtIM.setDisplayName(dtName);
 		dst.setItemMeta(dtIM);
@@ -127,10 +127,10 @@ public class GUI implements CommandExecutor, Listener {
 		// FZ
 		ItemStack fz = ItemStackCreator.createNewItemStack(Material
 				.valueOf(Main.getPlugin().getCustomConfig().getString("fernzuender")),
-				StringGetterBau.getString(p, "fernzuender"));
+				MessageHandler.getInstance().getString(p, "fernzuender"));
 
 		ItemStack CannonReloader = ItemStackCreator.createNewItemStack(AutoCannonReloader.toolMaterial,
-				StringGetterBau.getString(p, "cannonReloader_guiName"));
+				MessageHandler.getInstance().getString(p, "cannonReloader_guiName"));
 
 		// Particles
 
@@ -154,7 +154,7 @@ public class GUI implements CommandExecutor, Listener {
 		inv.setItem(33, dst);
 		
 		inv.setItem(39, ItemStackCreator.createNewItemStack(Material.MELON_SEEDS,
-				StringGetterBau.getString(p, "gui_particles")));
+				MessageHandler.getInstance().getString(p, "gui_particles")));
 		inv.setItem(41, TntChest.getTNTChest());
 		// close DBConnection
 		return inv;
@@ -181,7 +181,7 @@ public class GUI implements CommandExecutor, Listener {
 					} else {
 						worldname = DBConnection.getName(p.getWorld().getName());
 					}
-					if (invName.equals(StringGetterBau.getString(p, "inventoryName").replace("%r", worldname))
+					if (invName.equals(MessageHandler.getInstance().getString(p, "inventoryName").replace("%r", worldname))
 							&& event.getClickedInventory().equals(pInv)) {
 						event.setCancelled(true);
 						inventoryGUI(p, pInv, clicked);
@@ -194,38 +194,38 @@ public class GUI implements CommandExecutor, Listener {
 	}
 
 	private void inventoryGUI(Player p, Inventory pInv, ItemStack clicked) {
-		String tntdenied = StringGetterBau.getString(p, "tntDenied");
-		String tntallowed = StringGetterBau.getString(p, "tntAllowed");
+		String tntdenied = MessageHandler.getInstance().getString(p, "tntDenied");
+		String tntallowed = MessageHandler.getInstance().getString(p, "tntAllowed");
 		String clickedName = clicked.getItemMeta().getDisplayName();
-		String reset = StringGetterBau.getString(p, "deletePlot");
-		String tp1 = StringGetterBau.getString(p, "gui_teleporter");
-		String testBlockSklaveGui = StringGetterBau.getString(p, "testBlockSklaveGui");
-		String trailgui = StringGetterBau.getString(p, "tbs_gui_trail");
-		String dtItemOn = StringGetterBau.getString(p, "dtItemOff");
-		String dtItemOff = StringGetterBau.getString(p, "dtItemOn");
+		String reset = MessageHandler.getInstance().getString(p, "deletePlot");
+		String tp1 = MessageHandler.getInstance().getString(p, "gui_teleporter");
+		String testBlockSklaveGui = MessageHandler.getInstance().getString(p, "testBlockSklaveGui");
+		String trailgui = MessageHandler.getInstance().getString(p, "tbs_gui_trail");
+		String dtItemOn = MessageHandler.getInstance().getString(p, "dtItemOff");
+		String dtItemOff = MessageHandler.getInstance().getString(p, "dtItemOn");
 		if (clickedName.equals(tntallowed)) {
 			p.closeInventory();
 			p.performCommand("tnt");
-			p.sendMessage(Main.prefix + StringGetterBau.getString(p, "tntDeniedMessage"));
+			p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "tntDeniedMessage"));
 		} else if (clickedName.equals(tntdenied)) {
 			p.closeInventory();
 			p.performCommand("tnt");
-			p.sendMessage(Main.prefix + StringGetterBau.getString(p, "tntAllowedMessage"));
+			p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "tntAllowedMessage"));
 		} else if (clickedName.equals(reset)) {
 			p.closeInventory();
 			String rgID = WorldGuardHandler.getPlotId(p.getLocation());
 			PlotResetter.resetRegion(rgID, p, false);
 		} else if (clickedName.equals(tp1)) {
 			PlotTeleporter.openInv(p);
-		} else if (clickedName.equals(StringGetterBau.getString(p, "gui_particles"))) {
+		} else if (clickedName.equals(MessageHandler.getInstance().getString(p, "gui_particles"))) {
 			p.performCommand("particles gui");
 		} else if (clicked.getType().equals(Material.PLAYER_HEAD)) {
 			p.closeInventory();
 			p.performCommand("gs info");
 		} else if (clickedName.equals(testBlockSklaveGui)) {
 			p.performCommand("tbs");
-		} else if (clickedName.equals(StringGetterBau.getString(p, "torchOn"))
-				|| clickedName.equals(StringGetterBau.getString(p, "torchOff"))) {
+		} else if (clickedName.equals(MessageHandler.getInstance().getString(p, "torchOn"))
+				|| clickedName.equals(MessageHandler.getInstance().getString(p, "torchOff"))) {
 			// stoplag
 			p.closeInventory();
 			p.performCommand("sl");
@@ -244,7 +244,7 @@ public class GUI implements CommandExecutor, Listener {
 		Main.send(p, "memberListHeader", getName(p.getWorld()));
 		for (String memberUUID : memberlist) {
 			String memberName = DBConnection.getName(memberUUID);
-			String hover = StringGetterBau.getString(p, "memberHoverRemove").replace("%r", memberName);
+			String hover = MessageHandler.getInstance().getString(p, "memberHoverRemove").replace("%r", memberName);
 			JsonCreater remove = new JsonCreater("§7[§6" + memberName + "§7]");
 			if (isOwner) {
 				remove.addClickEvent("/gs remove " + memberName, ClickAction.SUGGEST_COMMAND).addHoverEvent(hover);
@@ -253,7 +253,7 @@ public class GUI implements CommandExecutor, Listener {
 		}
 		if (isOwner) {
 			new JsonCreater("§a[+]§r  ").addClickEvent("/gs add ", ClickAction.SUGGEST_COMMAND)
-					.addHoverEvent(StringGetterBau.getString(p, "addMemberHover")).send(p);
+					.addHoverEvent(MessageHandler.getInstance().getString(p, "addMemberHover")).send(p);
 		}
 
 	}

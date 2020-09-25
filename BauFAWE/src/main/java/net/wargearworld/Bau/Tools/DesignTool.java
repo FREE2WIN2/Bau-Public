@@ -18,7 +18,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
 import net.wargearworld.Bau.Main;
-import net.wargearworld.Bau.StringGetterBau;
+import net.wargearworld.Bau.MessageHandler;
 import net.wargearworld.Bau.Scoreboard.ScoreBoardBau;
 import net.wargearworld.Bau.WorldEdit.WorldGuardHandler;
 
@@ -101,13 +101,13 @@ public class DesignTool implements Listener, CommandExecutor {
 
 	private void dtoff(Player p) {
 		playerHasDtOn.put(p.getUniqueId(), false);
-		p.sendMessage(Main.prefix + StringGetterBau.getString(p, "dtOff"));
+		p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "dtOff"));
 		ScoreBoardBau.cmdUpdate(p);
 	}
 
 	private void dton(Player p) {
 		playerHasDtOn.put(p.getUniqueId(), true);
-		p.sendMessage(Main.prefix + StringGetterBau.getString(p, "dtOn"));
+		p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "dtOn"));
 		ScoreBoardBau.cmdUpdate(p);
 	}
 }

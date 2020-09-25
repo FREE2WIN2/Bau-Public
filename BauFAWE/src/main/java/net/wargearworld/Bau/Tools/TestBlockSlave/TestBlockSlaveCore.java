@@ -25,7 +25,7 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 
 import net.wargearworld.Bau.Main;
-import net.wargearworld.Bau.StringGetterBau;
+import net.wargearworld.Bau.MessageHandler;
 import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlock.Facing;
 import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlock.TestBlock;
 import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlock.TestBlockType;
@@ -146,23 +146,23 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 			return;
 		}
 		/* Main Inventory */
-		if (invName.equals(StringGetterBau.getString(p, "testBlockSklaveMainInv"))
+		if (invName.equals(MessageHandler.getInstance().getString(p, "testBlockSklaveMainInv"))
 				&& event.getClickedInventory().equals(pInv)) {
 			event.setCancelled(true);
 			MainInventory(p, clicked);
 			/* Facing inv (saving and pasting!) */
-		} else if (invName.equals(StringGetterBau.getString(p, "testBlockSklaveFacingInv"))
+		} else if (invName.equals(MessageHandler.getInstance().getString(p, "testBlockSklaveFacingInv"))
 				&& event.getClickedInventory().equals(pInv)) {
 			event.setCancelled(true);
 			facingInv(p, clicked);
 			/* Type Inv(Saving, default paste) */
-		} else if (invName.equals(StringGetterBau.getString(p, "testBlockSklaveTypeInv"))
+		} else if (invName.equals(MessageHandler.getInstance().getString(p, "testBlockSklaveTypeInv"))
 				&& event.getClickedInventory().equals(pInv)) {
 			event.setCancelled(true);
 			typeInv(p, clicked);
 
 			/* TB-Manager */
-		} else if (invName.equals(StringGetterBau.getString(p, "tbs_tbManagerInv").replace("%r", p.getName()))) {
+		} else if (invName.equals(MessageHandler.getInstance().getString(p, "tbs_tbManagerInv").replace("%r", p.getName()))) {
 			if (clicked.getItemMeta().getDisplayName().equals(" ")) {
 				/* empty Banner */
 				event.setCancelled(true);
@@ -171,17 +171,17 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 			event.setCancelled(true);
 			tbManagerInv(p, clicked);
 			/* Fav inv */
-		} else if (invName.equals(StringGetterBau.getString(p, "tbs_gui_addFavoriteInv"))) {
+		} else if (invName.equals(MessageHandler.getInstance().getString(p, "tbs_gui_addFavoriteInv"))) {
 			getSlave(p).setTestBlockToFavorite(clicked);
 			p.closeInventory();
 			event.setCancelled(true);
 			/* Tier inv to save */
-		} else if (invName.equals(StringGetterBau.getString(p, "tbs_gui_tierInv"))) {
+		} else if (invName.equals(MessageHandler.getInstance().getString(p, "tbs_gui_tierInv"))) {
 			tierInv(p, clicked);
 			event.setCancelled(true);
-		} else if (invName.equals(StringGetterBau.getString(p, "tbs_tbManagerActionInv", p.getName()))) {
+		} else if (invName.equals(MessageHandler.getInstance().getString(p, "tbs_tbManagerActionInv", p.getName()))) {
 			chooseActionToCustomTB(p, clicked);
-		} else if (invName.equals(StringGetterBau.getString(p, "tbs_gui_anvilTitle"))) {
+		} else if (invName.equals(MessageHandler.getInstance().getString(p, "tbs_gui_anvilTitle"))) {
 			if (event.getSlotType().equals(SlotType.RESULT)) {
 				p.closeInventory();
 				getSlave(p).saveNewCustomTB(((AnvilInventory) event.getInventory()).getRenameText());
@@ -217,32 +217,32 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 	private void chooseActionToCustomTB(Player p, ItemStack clicked) {
 		TestBlock tb = getSlave(p).getChooseTB().getTestBlock();
 		String clickedName = clicked.getItemMeta().getDisplayName();
-		String south = StringGetterBau.getString(p, "facingSouth");
-		String north = StringGetterBau.getString(p, "facingNorth");
+		String south = MessageHandler.getInstance().getString(p, "facingSouth");
+		String north = MessageHandler.getInstance().getString(p, "facingNorth");
 		ChooseTestBlock chooseTB = getSlave(p).getChooseTB();
 
 		if (clicked.getType().equals(Material.BARRIER)) {
 			/* Delete */
 			String name = tb.getName();
 			JsonCreater deleteBegin = new JsonCreater(
-					Main.prefix + StringGetterBau.getString(p, "tbs_deleteCustomBlock")
+					Main.prefix + MessageHandler.getInstance().getString(p, "tbs_deleteCustomBlock")
 							.replaceFirst("%r", tb.getTier() + "").replaceFirst("%r", name));
 			JsonCreater deleteClickConfirm = new JsonCreater(
-					StringGetterBau.getString(p, "tbs_deleteCustomBlockConfirm"));
+					MessageHandler.getInstance().getString(p, "tbs_deleteCustomBlockConfirm"));
 			deleteClickConfirm.addClickEvent("/tbs confirmdelete " + p.getUniqueId() + "_" + tb.getTier() + "_" + name,
 					ClickAction.RUN_COMMAND);
 			deleteClickConfirm.addHoverEvent(
-					StringGetterBau.getString(p, "tbs_deleteCustomBlockConfirm_hover").replace("%r", name));
+					MessageHandler.getInstance().getString(p, "tbs_deleteCustomBlockConfirm_hover").replace("%r", name));
 			deleteBegin.addJson(deleteClickConfirm).send(p);
 			p.closeInventory();
 		} else if (clicked.equals(Banner.PLUS.create(DyeColor.WHITE, DyeColor.BLACK,
-				StringGetterBau.getString(p, "tbs_gui_tbManagerFavorite")))) {
+				MessageHandler.getInstance().getString(p, "tbs_gui_tbManagerFavorite")))) {
 			/* Add to Favorite */
 			if (getSlave(p).setTestBlockToFavorite(tb)) {
 				getSlave(p).showTBManager();// aktualisieren
 			}
 		} else if (clicked.equals(Banner.MINUS.create(DyeColor.WHITE, DyeColor.BLACK,
-				StringGetterBau.getString(p, "tbs_gui_tbManagerFavoriteRemove")))) {
+				MessageHandler.getInstance().getString(p, "tbs_gui_tbManagerFavoriteRemove")))) {
 			/* Remove from Favorites */
 			if (getSlave(p).removeFavorite(tb)) {
 				getSlave(p).showTBManager();// aktualisieren
@@ -260,8 +260,8 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 	}
 
 	private void MainInventory(Player p, ItemStack clicked) {
-		String close = StringGetterBau.getString(p, "tbs_gui_close");
-		String lastPaste = StringGetterBau.getString(p, "tbs_gui_lastPaste");
+		String close = MessageHandler.getInstance().getString(p, "tbs_gui_close");
+		String lastPaste = MessageHandler.getInstance().getString(p, "tbs_gui_lastPaste");
 		String clickedName = clicked.getItemMeta().getDisplayName();
 		TestBlockSlave slave = getSlave(p);
 		switch (clickedName) {
@@ -284,12 +284,12 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 
 			slave.pasteBlock(slave.getlastTestBlock(), slave.getLastFacing(),true);
 			p.closeInventory();
-		} else if (clickedName.equals(StringGetterBau.getString(p, "tbs_gui_tbManager"))) {
+		} else if (clickedName.equals(MessageHandler.getInstance().getString(p, "tbs_gui_tbManager"))) {
 			getSlave(p).showTBManager();
 		} else if (clicked.getType().equals(Material.WHITE_BANNER)) {
 			/* All Banner are White banner! */
 
-			if (clickedName.equalsIgnoreCase(StringGetterBau.getString(p, "tbs_gui_addFavorites"))) {
+			if (clickedName.equalsIgnoreCase(MessageHandler.getInstance().getString(p, "tbs_gui_addFavorites"))) {
 				/* Add Favorites */
 				getSlave(p).openAddFavoriteInv();
 			} else {
@@ -311,8 +311,8 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 	}
 
 	private void facingInv(Player p, ItemStack clicked) {
-		String south = StringGetterBau.getString(p, "facingSouth");
-		String north = StringGetterBau.getString(p, "facingNorth");
+		String south = MessageHandler.getInstance().getString(p, "facingSouth");
+		String north = MessageHandler.getInstance().getString(p, "facingNorth");
 		String clickedName = clicked.getItemMeta().getDisplayName();
 		ChooseTestBlock chooseTB = getSlave(p).getChooseTB();
 		if (north.equals(clickedName)) {
@@ -333,8 +333,8 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 
 	private void typeInv(Player p, ItemStack clicked) {
 		String normal = "§rNormal";
-		String frame = StringGetterBau.getString(p, "frame");
-		String shield = StringGetterBau.getString(p, "shield");
+		String frame = MessageHandler.getInstance().getString(p, "frame");
+		String shield = MessageHandler.getInstance().getString(p, "shield");
 		String clickedName = clicked.getItemMeta().getDisplayName();
 		ChooseTestBlock chooseTB = getSlave(p).getChooseTB();
 

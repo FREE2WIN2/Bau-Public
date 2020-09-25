@@ -19,7 +19,7 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionOperationException;
 
 import net.wargearworld.Bau.Main;
-import net.wargearworld.Bau.StringGetterBau;
+import net.wargearworld.Bau.MessageHandler;
 import net.wargearworld.Bau.Tools.TestBlockSlave.ChooseTestBlock;
 import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlockSlave;
 import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlockSlaveCore;
@@ -72,22 +72,22 @@ public class TestBlockEditor {
 		}
 		/* Other Actions */
 		inv.setItem(17, ItemStackCreator.createNewItemStack(Material.WOODEN_AXE,
-				StringGetterBau.getString(owner, "tbs_editor_mainInv_save")));
+				MessageHandler.getInstance().getString(owner, "tbs_editor_mainInv_save")));
 		inv.setItem(35, ItemStackCreator.createNewItemStack(Material.WHITE_WOOL,
-				StringGetterBau.getString(owner, "tbs_editor_mainInv_show")));
+				MessageHandler.getInstance().getString(owner, "tbs_editor_mainInv_show")));
 		inv.setItem(53, ItemStackCreator.createNewItemStack(Material.BARRIER,
-				StringGetterBau.getString(owner, "tbs_editor_mainInv_reset")));
+				MessageHandler.getInstance().getString(owner, "tbs_editor_mainInv_reset")));
 
 		owner.openInventory(inv);
 	}
 
 	public void openChooseTypeInv() {
-		Inventory inv = Bukkit.createInventory(null, 9, StringGetterBau.getString(owner, "tbs_editor_chooseTypeInv"));
+		Inventory inv = Bukkit.createInventory(null, 9, MessageHandler.getInstance().getString(owner, "tbs_editor_chooseTypeInv"));
 		inv.setItem(1, ShieldType.MASSIVE.getItem());
 		inv.setItem(2, ShieldType.SAND.getItem());
 		inv.setItem(3, ShieldType.SPIKE.getItem());
 		inv.setItem(4, ItemStackCreator.createNewItemStack(Material.BARRIER,
-				StringGetterBau.getString(owner, "tbs_editor_removeType")));
+				MessageHandler.getInstance().getString(owner, "tbs_editor_removeType")));
 		inv.setItem(5, ShieldType.ARTOX.getItem());
 		inv.setItem(6, ShieldType.ARTILLERY.getItem());
 		inv.setItem(7, ShieldType.BACKSTAB.getItem());
@@ -96,19 +96,19 @@ public class TestBlockEditor {
 
 	public void openFacingInv() {
 		ItemStack isN = Banner.N.create(DyeColor.WHITE, DyeColor.BLACK,
-				StringGetterBau.getString(owner, "facingNorth"));
+				MessageHandler.getInstance().getString(owner, "facingNorth"));
 		// süden
 		ItemStack isS = Banner.S.create(DyeColor.WHITE, DyeColor.BLACK,
-				StringGetterBau.getString(owner, "facingSouth"));
+				MessageHandler.getInstance().getString(owner, "facingSouth"));
 		// setzen
-		Inventory inv = Bukkit.createInventory(null, 9, StringGetterBau.getString(owner, "tbs_editor_facingInv"));
+		Inventory inv = Bukkit.createInventory(null, 9, MessageHandler.getInstance().getString(owner, "tbs_editor_facingInv"));
 		inv.setItem(2, isN);
 		inv.setItem(6, isS);
 		owner.openInventory(inv);
 	}
 
 	public void openTierInv() {
-		String inventoryName = StringGetterBau.getString(owner, "tbs_editor_tierInv");
+		String inventoryName = MessageHandler.getInstance().getString(owner, "tbs_editor_tierInv");
 		Inventory inv = Bukkit.createInventory(null, 9, inventoryName);
 		inv.setItem(2, Banner.ONE.create(DyeColor.WHITE, DyeColor.BLACK, "§rTier I"));
 		inv.setItem(4, Banner.TWO.create(DyeColor.WHITE, DyeColor.BLACK, "§rTier II"));

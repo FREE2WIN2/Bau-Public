@@ -8,10 +8,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
-import net.wargearworld.Bau.StringGetterBau;
+import net.wargearworld.Bau.MessageHandler;
 import net.wargearworld.Bau.Tools.Particles.Colors;
 import net.wargearworld.Bau.utils.HelperMethods;
-import net.wargearworld.Bau.utils.Language;
+import net.wargearworld.StringGetter.Language;
 
 public class particlesTC implements TabCompleter {
 
@@ -22,8 +22,8 @@ public class particlesTC implements TabCompleter {
 		}
 		Player p = (Player) sender;
 		Language lang = Language.DE;
-		if (StringGetterBau.playersLanguage.containsKey(p.getUniqueId())) {
-			lang = StringGetterBau.playersLanguage.get(p.getUniqueId());
+		if (MessageHandler.playersLanguage.containsKey(p.getUniqueId())) {
+			lang = MessageHandler.playersLanguage.get(p.getUniqueId());
 		}
 		List<String> out = new LinkedList<>();
 		if (args.length == 1) {

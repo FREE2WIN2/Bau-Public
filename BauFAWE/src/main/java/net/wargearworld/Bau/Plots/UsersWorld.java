@@ -6,7 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import net.wargearworld.Bau.Main;
-import net.wargearworld.Bau.StringGetterBau;
+import net.wargearworld.Bau.MessageHandler;
 import net.wargearworld.Bau.HikariCP.DBConnection;
 import net.wargearworld.Bau.WorldEdit.WorldGuardHandler;
 
@@ -51,8 +51,8 @@ public class UsersWorld {
 				if(ownerIsOn()) {
 					Main.send(getOwner(), "plotMemberRemoved", playerName);
 				}else {
-					DBConnection.addMail("plugin: BAU", ownerUUID.toString(), StringGetterBau
-							.getString(ownerUUID, "plotMemberRemoved").replace("%r", playerName));
+					DBConnection.addMail("plugin: BAU", ownerUUID.toString(), MessageHandler
+							.getInstance().getString(ownerUUID, "plotMemberRemoved").replace("%r", playerName));
 				}
 				return true;
 			}

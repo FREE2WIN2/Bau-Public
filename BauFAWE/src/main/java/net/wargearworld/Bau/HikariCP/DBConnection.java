@@ -12,7 +12,7 @@ import java.util.UUID;
 
 import org.bukkit.entity.Player;
 
-import net.wargearworld.Bau.utils.WorldHandler;
+import net.wargearworld.Bau.World.WorldManager;
 
 public class DBConnection {
 	public DBConnection() {
@@ -62,7 +62,7 @@ public class DBConnection {
 			PreparedStatement statement = conn
 					.prepareStatement("INSERT INTO `Plot`(`PlotID`,template) VALUES (?,?)");
 			statement.setString(1, uuid);
-			statement.setString(2, WorldHandler.templateName);
+			statement.setString(2, WorldManager.templateName);
 			return statement.executeUpdate() == 1;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -253,6 +253,22 @@ public class DBConnection {
 			PreparedStatement statement = conn
 					.prepareStatement("SELECT template FROM Plot WHERE PlotID = ?");
 			statement.setString(1, ownerUUID.toString());
+			ResultSet rs = statement.executeQuery();
+			if(rs.next()) {
+				return rs.getString(1);
+			}
+			return null;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public static String getTemplate(int id) {
+		try (Connection conn = DataSource.getConnection()) {
+			PreparedStatement statement = conn
+					.prepareStatement("SELECT template FROM Plot WHERE ID = ?");
+			statement.setInt(1, id);
 			ResultSet rs = statement.executeQuery();
 			if(rs.next()) {
 				return rs.getString(1);

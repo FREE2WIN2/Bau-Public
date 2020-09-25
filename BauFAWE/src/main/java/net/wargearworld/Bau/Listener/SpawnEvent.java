@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -20,7 +19,7 @@ import org.bukkit.event.vehicle.VehicleCreateEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import net.wargearworld.Bau.Main;
-import net.wargearworld.Bau.StringGetterBau;
+import net.wargearworld.Bau.MessageHandler;
 import net.wargearworld.Bau.HikariCP.DBConnection;
 import net.wargearworld.Bau.utils.HelperMethods;
 
@@ -32,7 +31,6 @@ public class SpawnEvent implements Listener {
 		Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
 	}
 
-	@SuppressWarnings("unlikely-arg-type")
 	@EventHandler
 	public void onEntitSpawn(EntitySpawnEvent e) {
 		EntityType etype = e.getEntityType();
@@ -40,8 +38,14 @@ public class SpawnEvent implements Listener {
 			e.setCancelled(true);
 			return;
 		}
-		if(e.getLocation().getWorld().getName().contains("test"))
+		if (e.getLocation().getWorld().getName().contains("test")) {
+
+			if (!(etype == EntityType.PLAYER || etype == EntityType.PRIMED_TNT || etype == EntityType.FALLING_BLOCK
+					|| etype == EntityType.ARROW || etype == EntityType.TRIDENT)) {
+				e.setCancelled(true);
+			}
 			return;
+		}
 		if (etype.equals(EntityType.FALLING_BLOCK)) {
 			if (!etype.equals(EntityType.FALLING_BLOCK) && !e.getEntity().isCustomNameVisible()) {
 				e.setCancelled(true);
@@ -56,7 +60,7 @@ public class SpawnEvent implements Listener {
 						}
 					}
 					for (Player p : e.getLocation().getWorld().getPlayers()) {
-						p.sendMessage(Main.prefix + StringGetterBau.getString(p, "tooManyEntities"));
+						p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "tooManyEntities"));
 					}
 					worldSpawnEntitiesBlocked.add(e.getLocation().getWorld().getUID());
 					Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.getPlugin(), new Runnable() {
@@ -68,7 +72,7 @@ public class SpawnEvent implements Listener {
 					}, 80);
 				}
 			}
-		} else if (etype.equals(EntityType.PRIMED_TNT) || etype.equals(Material.FIRE_CHARGE)) {
+		} else if (etype == EntityType.PRIMED_TNT || etype == EntityType.FIREBALL) {
 			// gucken ob in dern Nähe ungezündetes TNT ist
 			if (e.getLocation().getWorld().getEntities().size() > 1000) {
 
@@ -81,7 +85,7 @@ public class SpawnEvent implements Listener {
 					}
 				}
 				for (Player p : e.getLocation().getWorld().getPlayers()) {
-					p.sendMessage(Main.prefix + StringGetterBau.getString(p, "tooManyEntities"));
+					p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "tooManyEntities"));
 					// Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kick "+ p.getName());
 				}
 				Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.getPlugin(), new Runnable() {
@@ -94,16 +98,20 @@ public class SpawnEvent implements Listener {
 				// wann wieder false? ->
 			}
 		} else {
-			e.setCancelled(true);
+			if (!(etype == EntityType.PLAYER || etype == EntityType.PRIMED_TNT || etype == EntityType.FALLING_BLOCK
+					|| etype == EntityType.ARROW || etype == EntityType.TRIDENT)) {
+				e.setCancelled(true);
+				return;
+			}
 		}
 	}
 
 	@EventHandler
 	public void VehicleSpawn(VehicleCreateEvent event) {
 		event.setCancelled(true);
-		
+
 	}
-	
+
 	private void logeintrag(World world, int size) {
 
 		try {
@@ -122,6 +130,5 @@ public class SpawnEvent implements Listener {
 			e.printStackTrace();
 		}
 	}
-	
-	
+
 }

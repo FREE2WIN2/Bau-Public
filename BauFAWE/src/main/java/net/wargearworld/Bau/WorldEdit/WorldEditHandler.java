@@ -32,6 +32,7 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
 
 import net.wargearworld.Bau.Main;
+import net.wargearworld.Bau.Player.BauPlayer;
 import net.wargearworld.Bau.Tools.Stoplag;
 import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlockSlaveCore;
 import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlock.Facing;
@@ -198,7 +199,7 @@ public class WorldEditHandler {
 		animation.setY(ymin);
 		animation.setZ(zmin);
 		if (tbs && !saveUndo && !ignoreAir&Stoplag.getStatus(p.getLocation())) {
-			Stoplag.setStatusTemp(p.getLocation(), true, Stoplag.getPasteTime(p.getLocation()));
+			Stoplag.getInstance().setStatusTemp(p.getLocation(), true, BauPlayer.getBauPlayer(p).getPasteTime());
 		}
 		animation.setTask(Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), new Runnable() {
 

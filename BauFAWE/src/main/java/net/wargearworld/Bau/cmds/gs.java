@@ -25,15 +25,15 @@ import org.bukkit.entity.Player;
 import net.minecraft.server.v1_15_R1.IChatBaseComponent;
 import net.minecraft.server.v1_15_R1.IChatBaseComponent.ChatSerializer;
 import net.wargearworld.Bau.Main;
-import net.wargearworld.Bau.StringGetterBau;
+import net.wargearworld.Bau.MessageHandler;
 import net.wargearworld.Bau.HikariCP.DBConnection;
 import net.wargearworld.Bau.Plots.Plots;
 import net.wargearworld.Bau.Tools.GUI;
+import net.wargearworld.Bau.World.WorldManager;
 import net.wargearworld.Bau.utils.ClickAction;
 import net.wargearworld.Bau.utils.CoordGetter;
 import net.wargearworld.Bau.utils.HelperMethods;
 import net.wargearworld.Bau.utils.JsonCreater;
-import net.wargearworld.Bau.utils.WorldHandler;
 import net.minecraft.server.v1_15_R1.PacketPlayOutChat;
 import net.minecraft.server.v1_15_R1.PlayerConnection;
 
@@ -62,7 +62,7 @@ public class gs implements CommandExecutor {
 		Player p = (Player) sender;
 		if (args.length == 0) {
 			// gs -> tp zum own gs
-			p.teleport(CoordGetter.getTeleportLocation(WorldHandler.loadWorld(p.getUniqueId().toString()),
+			p.teleport(CoordGetter.getTeleportLocation(WorldManager.loadWorld(p.getUniqueId().toString()),
 					Plots.getJoinPlot(p.getUniqueId())));
 			return true;
 		} else if (args.length == 1) {
@@ -95,11 +95,11 @@ public class gs implements CommandExecutor {
 				break;
 			case "addtemp":
 				p.sendMessage(Main.prefix
-						+ StringGetterBau.getString(p, "wrongCommand").replace("%r", "gs addtemp <Spieler> <Zeit(h)>"));
+						+ MessageHandler.getInstance().getString(p, "wrongCommand").replace("%r", "gs addtemp <Spieler> <Zeit(h)>"));
 				break;
 			case "tempadd":
 				p.sendMessage(Main.prefix
-						+ StringGetterBau.getString(p, "wrongCommand").replace("%r", "gs tempadd <Spieler> <Zeit(h)>"));
+						+ MessageHandler.getInstance().getString(p, "wrongCommand").replace("%r", "gs tempadd <Spieler> <Zeit(h)>"));
 				break;
 			case "remove":
 				removeMember(p, args[1]);
@@ -114,11 +114,11 @@ public class gs implements CommandExecutor {
 				if ((DBConnection.isMember(p.getUniqueId(), args[1]) || p.hasPermission("moderator"))
 						&& DBConnection.hasOwnPlots(args[1])) {
 					String plotID = DBConnection.getUUID(args[1]); // == UUID of the Owner
-					p.teleport(CoordGetter.getTeleportLocation(WorldHandler.loadWorld(plotID),
+					p.teleport(CoordGetter.getTeleportLocation(WorldManager.loadWorld(plotID),
 							Plots.getJoinPlot(UUID.fromString(plotID))));
 
 				} else {
-					p.sendMessage(Main.prefix + StringGetterBau.getString(p, "noPlotMember"));
+					p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "noPlotMember"));
 				}
 				// bau tp [Playername]
 				break;
@@ -179,17 +179,17 @@ public class gs implements CommandExecutor {
 			firstWarnNewPlot.remove(uuid);
 			blocked.add(uuid);
 		} else if (firstWarnNewPlot.contains(uuid) && argsLength == 2) {
-			JsonCreater jsonMsg = new JsonCreater(Main.prefix + StringGetterBau.getString(p, "gs_newPlot_secondWarn"));
-			JsonCreater jsonMsgClick = new JsonCreater(StringGetterBau.getString(p, "gs_newPlot_secondWarn_click"));
-			jsonMsgClick.addHoverEvent(StringGetterBau.getString(p, "gs_newPlot_secondWarn_clickHover"));
+			JsonCreater jsonMsg = new JsonCreater(Main.prefix + MessageHandler.getInstance().getString(p, "gs_newPlot_secondWarn"));
+			JsonCreater jsonMsgClick = new JsonCreater(MessageHandler.getInstance().getString(p, "gs_newPlot_secondWarn_click"));
+			jsonMsgClick.addHoverEvent(MessageHandler.getInstance().getString(p, "gs_newPlot_secondWarn_clickHover"));
 			jsonMsg.addJson(jsonMsgClick.addClickEvent("/gs new " + uuid.toString() + " " + uuid.toString(),
 					ClickAction.RUN_COMMAND)).send(p);
 
 			secondWarnNewPlot.add(uuid);
 		} else if (argsLength == 1) {
-			JsonCreater jsonMsg = new JsonCreater(Main.prefix + StringGetterBau.getString(p, "gs_newPlot_firstWarn"));
-			JsonCreater jsonMsgClick = new JsonCreater(StringGetterBau.getString(p, "gs_newPlot_firstWarn_click"));
-			jsonMsgClick.addHoverEvent(StringGetterBau.getString(p, "gs_newPlot_firstWarn_clickHover"));
+			JsonCreater jsonMsg = new JsonCreater(Main.prefix + MessageHandler.getInstance().getString(p, "gs_newPlot_firstWarn"));
+			JsonCreater jsonMsgClick = new JsonCreater(MessageHandler.getInstance().getString(p, "gs_newPlot_firstWarn_click"));
+			jsonMsgClick.addHoverEvent(MessageHandler.getInstance().getString(p, "gs_newPlot_firstWarn_clickHover"));
 			jsonMsg.addJson(jsonMsgClick.addClickEvent("/gs new " + uuid.toString(), ClickAction.RUN_COMMAND)).send(p);
 
 			firstWarnNewPlot.add(uuid);
@@ -223,16 +223,16 @@ public class gs implements CommandExecutor {
 
 	public boolean addMember(Player p, String playerName) {
 		if (Plots.getPlot(p.getUniqueId()).isMember(UUID.fromString(DBConnection.getUUID(playerName)))) {
-			p.sendMessage(Main.prefix + StringGetterBau.getString(p, "alreadyMember").replace("%r", playerName));
+			p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "alreadyMember").replace("%r", playerName));
 			return false;
 		} else {
 			String memberUUID = DBConnection.getUUID(playerName);
 			if (Plots.getPlot(p.getUniqueId()).addMember(memberUUID)) {
-				p.sendMessage(Main.prefix + StringGetterBau.getString(p, "plotMemberAdded").replace("%r", playerName));
+				p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "plotMemberAdded").replace("%r", playerName));
 				writeLog(playerName + "("+memberUUID+") added to " + p.getName() + "'s("+p.getUniqueId().toString()+") plot at " + HelperMethods.getTime());
 				return true;
 			} else {
-				p.sendMessage(Main.prefix + StringGetterBau.getString(p, "error"));
+				p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "error"));
 				return false;
 			}
 		}
@@ -261,17 +261,17 @@ public class gs implements CommandExecutor {
 				}
 				writeLog(playerName + "("+uuidMember+") tempadded for " + time + " hours to " + p.getName() + "'s("+p.getUniqueId().toString()+") plot at " + HelperMethods.getTime());
 			} else {
-				p.sendMessage(Main.prefix + StringGetterBau.getString(p, "error"));
+				p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "error"));
 			}
 		}
 	}
 
 	public void sendMemberedGs(Player p, ArrayList<String> memberedPlots) {
 		PlayerConnection pConn = ((CraftPlayer) p).getHandle().playerConnection;
-		p.sendMessage(StringGetterBau.getString(p, "listGsHeading"));
+		p.sendMessage(MessageHandler.getInstance().getString(p, "listGsHeading"));
 		for (String s : memberedPlots) {
 			/* s == PlayerName */
-			String hover = StringGetterBau.getString(p, "listGsHover").replace("%r", s);
+			String hover = MessageHandler.getInstance().getString(p, "listGsHover").replace("%r", s);
 			String name = s;
 			String txt = "{\"text\":\"§7[§6" + name
 					+ "§7]\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/gs tp " + name
@@ -285,11 +285,11 @@ public class gs implements CommandExecutor {
 
 	public void deletePlot(Player p, String playerName, boolean mute) {
 		String worldName = DBConnection.getUUID(playerName);
-		World w = WorldHandler.loadWorld(worldName);
+		World w = WorldManager.loadWorld(worldName);
 		for (Player a : w.getPlayers()) {
 			a.kickPlayer("GS DELETE");
 		}
-		if (WorldHandler.deleteWorld(w) && !mute) {
+		if (WorldManager.deleteWorld(w) && !mute) {
 			Main.send(p, "gsDeleted", playerName);
 			writeLog("World Deleted: " + p.getName() + "(" +p.getUniqueId().toString()+ ")");
 		} else if(!mute) {

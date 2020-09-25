@@ -20,7 +20,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 
 import net.wargearworld.Bau.Main;
-import net.wargearworld.Bau.StringGetterBau;
+import net.wargearworld.Bau.MessageHandler;
 
 public class stats implements CommandExecutor {
 
@@ -33,7 +33,7 @@ public class stats implements CommandExecutor {
 			Region rg = session.getSelection(BukkitAdapter.adapt(p.getWorld()));
 			getStats(rg, p);
 		} catch (IncompleteRegionException e) {
-			p.sendMessage(Main.prefix + StringGetterBau.getString(p, "statsNoRegion"));
+			p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "statsNoRegion"));
 			e.printStackTrace();
 		}
 		return true;
@@ -81,17 +81,17 @@ public class stats implements CommandExecutor {
 			// v - t / v
 			int all_count = slab_count + endstone_count + others_count + tnt_count + air_count + tech_count;
 			Double percentage = (double) ((((double) all_count - (double) tnt_count) / (double) all_count));
-			p.sendMessage(StringGetterBau.getString(p, "statsHeader"));
-			p.sendMessage(StringGetterBau.getString(p, "statsEndStone").replace("%r", endstone_count.toString()));
-			p.sendMessage(StringGetterBau.getString(p, "statsTNT").replace("%r", tnt_count.toString()));
-			p.sendMessage(StringGetterBau.getString(p, "statsTechnic").replace("%r", tech_count.toString()));
-			p.sendMessage(StringGetterBau.getString(p, "statsAir").replace("%r", air_count.toString()));
-			p.sendMessage(StringGetterBau.getString(p, "statsSlabs").replace("%r", slab_count.toString()));
-			p.sendMessage(StringGetterBau.getString(p, "statsRating").replace("%r", percentage.toString()));
-			p.sendMessage(StringGetterBau.getString(p, "statsEnd"));
+			p.sendMessage(MessageHandler.getInstance().getString(p, "statsHeader"));
+			p.sendMessage(MessageHandler.getInstance().getString(p, "statsEndStone").replace("%r", endstone_count.toString()));
+			p.sendMessage(MessageHandler.getInstance().getString(p, "statsTNT").replace("%r", tnt_count.toString()));
+			p.sendMessage(MessageHandler.getInstance().getString(p, "statsTechnic").replace("%r", tech_count.toString()));
+			p.sendMessage(MessageHandler.getInstance().getString(p, "statsAir").replace("%r", air_count.toString()));
+			p.sendMessage(MessageHandler.getInstance().getString(p, "statsSlabs").replace("%r", slab_count.toString()));
+			p.sendMessage(MessageHandler.getInstance().getString(p, "statsRating").replace("%r", percentage.toString()));
+			p.sendMessage(MessageHandler.getInstance().getString(p, "statsEnd"));
 		}
 		else {
-			p.sendMessage(Main.prefix + StringGetterBau.getString(p, "statsTooBigRegion"));
+			p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "statsTooBigRegion"));
 		}
 	}
 

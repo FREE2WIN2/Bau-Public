@@ -12,7 +12,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import net.wargearworld.Bau.StringGetterBau;
+import net.wargearworld.Bau.MessageHandler;
 import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlock.Facing;
 
 public class TestBlockEditorCore implements Listener {
@@ -45,15 +45,15 @@ public class TestBlockEditorCore implements Listener {
 			event.setCancelled(true);
 			editorInv(p, clicked, event.getSlot());
 			return;
-		} else if (invName.equals(StringGetterBau.getString(p, "tbs_editor_chooseTypeInv"))) {
+		} else if (invName.equals(MessageHandler.getInstance().getString(p, "tbs_editor_chooseTypeInv"))) {
 			event.setCancelled(true);
 			chooseTypeInv(p, clicked);
 			return;
-		} else if (invName.equals(StringGetterBau.getString(p, "tbs_editor_tierInv"))) {
+		} else if (invName.equals(MessageHandler.getInstance().getString(p, "tbs_editor_tierInv"))) {
 			event.setCancelled(true);
 			tierInv(p, clicked);
 			return;
-		} else if (invName.equals(StringGetterBau.getString(p, "tbs_editor_facingInv"))) {
+		} else if (invName.equals(MessageHandler.getInstance().getString(p, "tbs_editor_facingInv"))) {
 			event.setCancelled(true);
 			facingInv(p, clicked);
 			return;
@@ -62,8 +62,8 @@ public class TestBlockEditorCore implements Listener {
 
 	private void facingInv(Player p, ItemStack clicked) {
 		String clickedName = clicked.getItemMeta().getDisplayName();
-		String south = StringGetterBau.getString(p, "facingSouth");
-		String north = StringGetterBau.getString(p, "facingNorth");
+		String south = MessageHandler.getInstance().getString(p, "facingSouth");
+		String north = MessageHandler.getInstance().getString(p, "facingNorth");
 		if (north.equals(clickedName)) {
 			getEditor(p).setFacing(Facing.NORTH);
 		} else if (south.equals(clickedName)) {
@@ -111,11 +111,11 @@ public class TestBlockEditorCore implements Listener {
 			getEditor(p).openChooseTypeInv();
 			return;
 		}
-		if (clickedName.equals(StringGetterBau.getString(p, "tbs_editor_mainInv_save"))) {
+		if (clickedName.equals(MessageHandler.getInstance().getString(p, "tbs_editor_mainInv_save"))) {
 			getEditor(p).startSave();
-		} else if (clickedName.equals(StringGetterBau.getString(p, "tbs_editor_mainInv_reset"))) {
+		} else if (clickedName.equals(MessageHandler.getInstance().getString(p, "tbs_editor_mainInv_reset"))) {
 			getEditor(p).reset();
-		} else if (clickedName.equals(StringGetterBau.getString(p, "tbs_editor_mainInv_show"))) {
+		} else if (clickedName.equals(MessageHandler.getInstance().getString(p, "tbs_editor_mainInv_show"))) {
 			getEditor(p).startVisualize();
 		}
 
