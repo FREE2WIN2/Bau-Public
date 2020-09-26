@@ -18,7 +18,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import net.wargearworld.Bau.Main;
 import net.wargearworld.Bau.MessageHandler;
 import net.wargearworld.Bau.Listener.onPlayerMove;
-import net.wargearworld.Bau.Tools.DesignTool;
+import net.wargearworld.Bau.Player.BauPlayer;
 import net.wargearworld.Bau.Tools.Stoplag;
 import net.wargearworld.Bau.WorldEdit.WorldGuardHandler;
 import net.wargearworld.Bau.utils.Scheduler;
@@ -28,11 +28,12 @@ public class ScoreBoardBau {
 	public static HashMap<UUID, ScoreBoardBau> playersScoreboard = new HashMap<>();
 
 	private Scheduler scheduler;
-	Player p;
-
+	private Player p;
+	private BauPlayer player;
 	public ScoreBoardBau(Player p) {
 		scheduler = new Scheduler();
 		this.p = p;
+		player = BauPlayer.getBauPlayer(p);
 		playersScoreboard.put(p.getUniqueId(), this);
 		scheduler.setTask(Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), new Runnable() {
 
@@ -61,17 +62,17 @@ public class ScoreBoardBau {
 	private String getTNT() {
 
 		// String rgID = rgIDs.get(0);
-		if(p == null) {
+		if (p == null) {
 			scheduler.cancel();
 			return null;
 		}
-		if(!onPlayerMove.playersLastPlot.containsKey(p.getUniqueId())) {
+		if (!onPlayerMove.playersLastPlot.containsKey(p.getUniqueId())) {
 			scheduler.cancel();
 			return null;
 		}
-		
+
 		String rgID = onPlayerMove.playersLastPlot.get(p.getUniqueId());
-		if(rgID == null) {
+		if (rgID == null) {
 			scheduler.cancel();
 			return null;
 		}
@@ -133,18 +134,13 @@ public class ScoreBoardBau {
 	}
 
 	private String getDt() {
-		if (DesignTool.playerHasDtOn.containsKey(p.getUniqueId())) {
-			if (DesignTool.playerHasDtOn.get(p.getUniqueId())) {
-				// System.out.println("dt on");
-				return MessageHandler.getInstance().getString(p, "boardOn");
-			} else {
-				// System.out.println("dt off");
-				return MessageHandler.getInstance().getString(p, "boardOff");
-			}
+		if (player.getDT()) {
+			// System.out.println("dt on");
+			return MessageHandler.getInstance().getString(p, "boardOn");
 		} else {
-			return "§cError ";
+			// System.out.println("dt off");
+			return MessageHandler.getInstance().getString(p, "boardOff");
 		}
-
 	}
 
 	private String getPlotNumber() {

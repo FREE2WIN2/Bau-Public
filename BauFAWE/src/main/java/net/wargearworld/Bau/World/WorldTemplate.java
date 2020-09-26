@@ -11,6 +11,9 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import net.wargearworld.Bau.Main;
+import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlock.Facing;
+import net.wargearworld.Bau.WorldEdit.Schematic;
+import net.wargearworld.Bau.utils.Loc;
 
 public class WorldTemplate {
 	private static HashMap<String,WorldTemplate> templates;
@@ -33,7 +36,9 @@ public class WorldTemplate {
 	private FileConfiguration config;
 	private String name;
 	
-	List<String> plotIDs;
+	private List<PlotPattern> plots;
+	private String spawnPlotID;
+
 	private WorldTemplate(File configFile) {
 		name = configFile.getName().split("\\.")[0];
 		this.configFile = configFile;
@@ -52,21 +57,32 @@ public class WorldTemplate {
 		return config;
 	}
 	
-	public List<String> getPlotIDs(){
-		if(plotIDs == null) {
-			plotIDs = new ArrayList<String>();
+	public List<PlotPattern> getPlots(){
+		if(plots == null) {
+			plots = new ArrayList<>();
 			for(String id:config.getConfigurationSection("plots").getValues(false).keySet()) {
-				plotIDs.add(id);
+				Loc middleNorth = Loc.getByString(config.getString("middle." + id));
+				PlotType type = getType(id);
+				Schematic ground = new Schematic(Main.schempath + "/TestBlockSklave", config.getString("plotreset.schemfiles." + id), Facing.NORTH);
+				plots.add(new PlotPattern(middleNorth, ground, type, id));
 			}
 		}
-		return plotIDs;
+		return plots;
 	}
 	
-	public PlotType getType(Plot plot) {
-		return PlotType.valueOf(config.getString("plots." + plot.getId()).toUpperCase());
+	public String getSpawnPlotID() {
+		if(spawnPlotID == null) {
+			spawnPlotID = config.getString("spawn");
+		}
+		return spawnPlotID;
 	}
+	
+//	public PlotType getType(Plot plot) {
+//		return PlotType.valueOf(config.getString("plots." + plot.getId()).toUpperCase());
+//	}
 
 	public PlotType getType(String plotID) {
 		return PlotType.valueOf(config.getString("plots." + plotID).toUpperCase());
 	}
+
 }

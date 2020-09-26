@@ -18,7 +18,6 @@ import net.wargearworld.Bau.MessageHandler;
 import net.wargearworld.Bau.HikariCP.DBConnection;
 import net.wargearworld.Bau.Plots.Plots;
 import net.wargearworld.Bau.Scoreboard.ScoreBoardBau;
-import net.wargearworld.Bau.Tools.DesignTool;
 import net.wargearworld.Bau.World.WorldManager;
 import net.wargearworld.Bau.utils.CoordGetter;
 import net.wargearworld.Bau.utils.ItemStackCreator;
@@ -34,7 +33,6 @@ public class onPlayerJoin implements Listener {
 	public void onPlayerJoinEvent(PlayerJoinEvent e) {
 		// sprache
 		Player p = e.getPlayer();
-		DesignTool.playerHasDtOn.put(p.getUniqueId(), false);
 		p.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
 		// p.teleport(new Location(Bukkit.getWorld("world"), 0, 30, 0));
 		String lang = DBConnection.getLanguage(p);

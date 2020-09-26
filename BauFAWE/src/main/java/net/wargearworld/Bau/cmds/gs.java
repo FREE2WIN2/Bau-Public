@@ -7,10 +7,13 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.TimeZone;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -27,16 +30,30 @@ import net.minecraft.server.v1_15_R1.IChatBaseComponent.ChatSerializer;
 import net.wargearworld.Bau.Main;
 import net.wargearworld.Bau.MessageHandler;
 import net.wargearworld.Bau.HikariCP.DBConnection;
+import net.wargearworld.Bau.Player.BauPlayer;
 import net.wargearworld.Bau.Plots.Plots;
 import net.wargearworld.Bau.Tools.GUI;
+import net.wargearworld.Bau.World.BauWorld;
 import net.wargearworld.Bau.World.WorldManager;
 import net.wargearworld.Bau.utils.ClickAction;
 import net.wargearworld.Bau.utils.CoordGetter;
 import net.wargearworld.Bau.utils.HelperMethods;
 import net.wargearworld.Bau.utils.JsonCreater;
+import net.wargearworld.CommandManager.ArgumentList;
+import net.wargearworld.CommandManager.CommandHandel;
+import net.wargearworld.CommandManager.CommandNode;
+import net.wargearworld.CommandManager.ParseState;
+import net.wargearworld.CommandManager.Arguments.DynamicListArgument;
+import net.wargearworld.CommandManager.Arguments.DynamicListGetter;
+import net.wargearworld.CommandManager.Arguments.IntegerArgument;
+import net.wargearworld.CommandManager.Arguments.StringArgument;
 import net.minecraft.server.v1_15_R1.PacketPlayOutChat;
 import net.minecraft.server.v1_15_R1.PlayerConnection;
 
+import static net.wargearworld.CommandManager.Nodes.ArgumentNode.argument;
+import static net.wargearworld.CommandManager.Nodes.LiteralNode.literal;
+import static net.wargearworld.CommandManager.Nodes.OptionalNode.optional;
+import static net.wargearworld.CommandManager.Nodes.InvisibleNode.invisible;
 public class gs implements CommandExecutor {
 
 	public static File logFile;
@@ -44,6 +61,8 @@ public class gs implements CommandExecutor {
 	private HashSet<UUID> secondWarnNewPlot = new HashSet<>();
 	private HashSet<UUID> blocked = new HashSet<>();
 
+	
+	private CommandHandel commandHandle;
 	public gs() {
 		logFile = new File(Main.getPlugin().getDataFolder(), "GsMemberedLog.txt");
 		if (!logFile.exists()) {
@@ -54,6 +73,87 @@ public class gs implements CommandExecutor {
 				e.printStackTrace();
 			}
 		}
+		CommandNode timeAdd = argument("Zeit", new IntegerArgument());
+		CommandNode playersToAdd = argument("Spieler", new DynamicListArgument("Spieler", new DynamicListGetter<String>() {
+			
+			@Override
+			public Collection<String> getList(ParseState state) {
+				List<String> out = new ArrayList<>();
+				BauWorld world = WorldManager.get(state.getPlayer().getWorld());
+				for(Player p: Bukkit.getOnlinePlayers()) {
+					if(!world.isAuthorized(p.getUniqueId())) {
+						out.add(p.getName());
+					}
+				}
+				return out;
+			}
+		}));
+		Predicate<ArgumentList> owner = s ->{return WorldManager.get(s.getPlayer().getWorld()).isOwner(s.getPlayer());};
+		commandHandle = new CommandHandel("gs", Main.prefix);
+		commandHandle.setCallback(s->{tp(s);});
+		
+		commandHandle.addSubNode(literal("new")
+				.setCallback(s->{newPlot(s.getPlayer(), 1);})
+				.addSubNode(invisible(optional(argument("UUID1",new StringArgument())))
+						.setRequirement(s->{return s.getString("UUID1").equals(s.getPlayer().getUniqueId().toString());})
+						.setCallback(s->{newPlot(s.getPlayer(), 2);})
+						.addSubNode(optional(argument("UUID2",new StringArgument()))
+								.setRequirement(s->{return s.getString("UUID2").equals(s.getPlayer().getUniqueId().toString());})
+								.setCallback(s->{newPlot(s.getPlayer(), 3);}))));
+		
+		commandHandle.addSubNode(literal("info").setCallback(s->{WorldManager.get(s.getPlayer().getWorld()).showInfo(s.getPlayer());}));
+		commandHandle.addSubNode(literal("list").setCallback(s->{sendMemberedGS(s);}));
+		
+		commandHandle.addSubNode(literal("tp")
+				.addSubNode(argument("Spielername", new StringArgument())
+						.setCallback(s->{tp(s);})));
+		
+		commandHandle.addSubNode(literal("add")
+				.setRequirement(owner)
+				.addSubNode(playersToAdd
+						.setCallback(s->{})
+						.addSubNode(optional(timeAdd).setCallback(s->{addTemp(s);}))));
+		commandHandle.addSubNode(literal("addtemp")
+				.setRequirement(owner)
+				.addSubNode(playersToAdd
+						.setCallback(s->{})
+						.addSubNode(optional(timeAdd).setCallback(s->{addTemp(s);}))));
+	}
+
+	private void sendMemberedGS(ArgumentList s) {
+		Player p = s.getPlayer();
+		ArrayList<String> memberedPlots = new ArrayList<>();
+		memberedPlots.add(p.getName());
+		memberedPlots.addAll(DBConnection.getMemberedPlots(p.getUniqueId()));
+		PlayerConnection pConn = ((CraftPlayer) p).getHandle().playerConnection;
+		p.sendMessage(MessageHandler.getInstance().getString(p, "listGsHeading"));
+		for (String string : memberedPlots) {
+			/* s == PlayerName */
+			String hover = MessageHandler.getInstance().getString(p, "listGsHover").replace("%r", string);
+			String name = string;
+			String txt = "{\"text\":\"§7[§6" + name
+					+ "§7]\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/gs tp " + name
+					+ "\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"" + hover + "\"}}}";
+			IChatBaseComponent txtc = ChatSerializer.a(txt);
+			PacketPlayOutChat txtp = new PacketPlayOutChat(txtc);
+			pConn.sendPacket(txtp);
+		}
+		p.sendMessage("§7----------------------------");
+	}
+
+	private void addTemp(ArgumentList s) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void tp(ArgumentList s) {
+		Player p = s.getPlayer();
+		String name = s.getString("Spielername");
+		if(name == null) {
+			WorldManager.getWorld(p.getUniqueId()).spawn(p);
+		}else {
+			WorldManager.getWorld(name).spawn(p);
+		}
 	}
 
 	@Override
@@ -62,32 +162,32 @@ public class gs implements CommandExecutor {
 		Player p = (Player) sender;
 		if (args.length == 0) {
 			// gs -> tp zum own gs
-			p.teleport(CoordGetter.getTeleportLocation(WorldManager.loadWorld(p.getUniqueId().toString()),
-					Plots.getJoinPlot(p.getUniqueId())));
-			return true;
+//			p.teleport(CoordGetter.getTeleportLocation(WorldManager.loadWorld(p.getUniqueId().toString()),
+//					Plots.getJoinPlot(p.getUniqueId())));
+//			return true;
 		} else if (args.length == 1) {
-			if (args[0].equalsIgnoreCase("list")) {
-				// gs list
-				ArrayList<String> memberedPlots = new ArrayList<>();
-				memberedPlots.add(p.getName());
-				memberedPlots.addAll(DBConnection.getMemberedPlots(p.getUniqueId()));
-				sendMemberedGs(p, memberedPlots);
-				return true;
-
-			}
-			if (args[0].equalsIgnoreCase("info")) {
-				// bau info
-				// open gui
-				GUI.showMember(p);
-				Main.send(p, "timeShow", p.getWorld().getTime() + "");
-				return true;
-
-			}
-			if (args[0].equalsIgnoreCase("new")) {
-				/* erste WArnung, dass GS gelöscht wird -> einschreiben in Liste */
-				newPlot(p, 1);
-				return true;
-			}
+//			if (args[0].equalsIgnoreCase("list")) {
+//				// gs list
+//				ArrayList<String> memberedPlots = new ArrayList<>();
+//				memberedPlots.add(p.getName());
+//				memberedPlots.addAll(DBConnection.getMemberedPlots(p.getUniqueId()));
+//				sendMemberedGs(p, memberedPlots);
+//				return true;
+//
+//			}
+//			if (args[0].equalsIgnoreCase("info")) {
+//				// bau info
+//				// open gui
+//				GUI.showMember(p);
+//				Main.send(p, "timeShow", p.getWorld().getTime() + "");
+//				return true;
+//
+//			}
+//			if (args[0].equalsIgnoreCase("new")) {
+//				/* erste WArnung, dass GS gelöscht wird -> einschreiben in Liste */
+//				newPlot(p, 1);
+//				return true;
+//			}
 		} else if (args.length == 2) {
 			switch (args[0].toLowerCase()) {
 			case "time":

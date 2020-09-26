@@ -279,4 +279,20 @@ public class DBConnection {
 			return null;
 		}
 	}
+
+	public static Set<UUID> getMembers(int id) {
+		Set<UUID> out = new HashSet<>();
+		try (Connection conn = DataSource.getConnection()) {
+			PreparedStatement statement = conn
+					.prepareStatement("SELECT UUID FROM Player,Player_has_Plot WHERE Plot_PlotID = ? AND Player_UUID = Player.UUID");
+			statement.setInt(1, id);
+			ResultSet rs = statement.executeQuery();
+			while(rs.next()) {
+				out.add(UUID.fromString(rs.getString(1)));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return out;
+	}
 }

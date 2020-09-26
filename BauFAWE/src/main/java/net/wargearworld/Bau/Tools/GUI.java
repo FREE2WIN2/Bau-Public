@@ -26,6 +26,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import net.wargearworld.Bau.Main;
 import net.wargearworld.Bau.MessageHandler;
 import net.wargearworld.Bau.HikariCP.DBConnection;
+import net.wargearworld.Bau.Player.BauPlayer;
 import net.wargearworld.Bau.WorldEdit.WorldGuardHandler;
 import net.wargearworld.Bau.utils.ClickAction;
 import net.wargearworld.Bau.utils.ItemStackCreator;
@@ -114,7 +115,7 @@ public class GUI implements CommandExecutor, Listener {
 		String dtName;
 		ItemStack dst = new ItemStack(Material.WOODEN_SHOVEL);
 		ItemMeta dtIM = observer.getItemMeta();
-		if (DesignTool.playerHasDtOn.get(p.getUniqueId())) {
+		if (BauPlayer.getBauPlayer(p).getDT()) {
 			dtName = MessageHandler.getInstance().getString(p, "dtItemOn");
 			dtIM.addEnchant(Enchantment.SILK_TOUCH, 1, true);
 			dtIM.addItemFlags(ItemFlag.HIDE_ENCHANTS);

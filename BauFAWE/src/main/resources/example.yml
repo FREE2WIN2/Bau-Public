@@ -1,50 +1,14 @@
-coordinates:
-  tbs:
-    paste: 
+middle:
     # remember that the North-Position may have the same distance to the TestBlock faing to North 
     # like the South_Position to the TB facing to South! (else you will get some messy stuff)
     # normal plots have a higher prio than 10!
-      N: #standard for other paste-actions(e.g. pasting the floor)
+  N: #standard for other paste-actions(e.g. pasting the floor)
         plot1: -101 8 17   #plotID = name of the region -> First make region over the single plots, then over all plots
         plot2: -209 8 17
         plot3: -317 8 17
-      S:
-        plot1: -101 8 16   #plotID = name of the region -> First make region over the single plots, then over all plots
-        plot2: -209 8 16
-        plot3: -317 8 16
-    front:
-      N:
-        plot1: -101 8 41   #plotID = name of the region -> First make region over the single plots, then over all plots
-        plot2: -209 8 41
-        plot3: -317 8 41
-      S:
-        plot1: -101 8 -8   #plotID = name of the region -> First make region over the single plots, then over all plots
-        plot2: -209 8 -8
-        plot3: -317 8 -8
-    sizes:
-      1:
-        x: 23
-        y: 23
-        z: 23
-        shields: 8
-      2:
-        x: 45
-        y: 32
-        z: 33
-        shields: 12
-      3:
-        x: 67
-        y: 41
-        z: 37
-        shields: 16
-  spawn: plot2
-  teleport:
-    plot1: -100.5 8 17.0   #plotID = name of the region -> First make region over the single plots, then over all plots
-    plot2: -208.5 8 17.0
-    plot3: -316.5 8 17.0
-    testplot1: -100.5 8 17.0   #plotID = name of the region -> First make region over the single plots, then over all plots
-    testplot2: -208.5 8 17.0
-    testplot3: -316.5 8 17.0
+
+spawn: plot2
+
 
 plotreset:
   pasteGround: true
@@ -52,8 +16,7 @@ plotreset:
     plot1: ground #copied from paste N!!
     plot2: ground
     plot3: ground
-countplots: 4
-counttestblockspertier:
-  1: 3
-  2: 2
-  3: 2
+plots:
+  plot1: default
+  plot2: default
+  plot3: default

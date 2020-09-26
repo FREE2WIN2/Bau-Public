@@ -1,15 +1,19 @@
 package net.wargearworld.Bau.Tools;
 
-import java.util.HashSet;
-import java.util.UUID;
+import static net.wargearworld.CommandManager.Nodes.ArgumentNode.argument;
+import static net.wargearworld.CommandManager.Nodes.InvisibleNode.invisible;
+import static net.wargearworld.CommandManager.Nodes.LiteralNode.literal;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -18,50 +22,89 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import net.wargearworld.Bau.Main;
 import net.wargearworld.Bau.MessageHandler;
+import net.wargearworld.Bau.Player.BauPlayer;
 import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlock.Facing;
 import net.wargearworld.Bau.WorldEdit.Schematic;
 import net.wargearworld.Bau.WorldEdit.WorldEditHandler;
+import net.wargearworld.Bau.WorldEdit.WorldGuardHandler;
 import net.wargearworld.Bau.utils.ClickAction;
 import net.wargearworld.Bau.utils.CoordGetter;
 import net.wargearworld.Bau.utils.JsonCreater;
 import net.wargearworld.Bau.utils.Scheduler;
+import net.wargearworld.CommandManager.ArgumentList;
+import net.wargearworld.CommandManager.CommandHandel;
+import net.wargearworld.CommandManager.Arguments.StringArgument;
 
-public class PlotResetter implements CommandExecutor {
-	private static HashSet<UUID> playerBlockedDelete = new HashSet<>();
+public class PlotResetter implements TabExecutor {
+
+	private CommandHandel commandHandle;
+
+	public PlotResetter() {
+//		new CommandManager(MessageHandler.getInstance());
+		commandHandle = new CommandHandel("plotreset", Main.prefix);
+		commandHandle.setCallback(s -> {
+			String rgID = WorldGuardHandler.getPlotId(s.getPlayer().getLocation());
+			resetRegion(rgID, s.getPlayer(), false);
+		});
+
+		commandHandle.addSubNode(invisible(argument("plotID", new StringArgument())
+				.addSubNode(argument("UUID", new StringArgument()).setCallback(s -> {
+					resetRegion(s.getString(s.getString("plotID")), s.getPlayer(), true);
+				}).setRequirement(s -> {
+					return s.getPlayer().getUniqueId().toString().equals(s.getString("UUID"));
+				}))));
+
+		commandHandle.addSubNode(literal("undo").setCallback(s -> {
+			undo(s);
+		}));
+
+	}
+
+	private void undo(ArgumentList s) {
+		Player p = s.getPlayer();
+		BauPlayer player = BauPlayer.getBauPlayer(p);
+		if (player.getCurrentPlot().undo(p.getWorld())) {
+			// TODO msg
+		} else {
+			// TODO msg
+		}
+	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String string, String[] args) {
-		if (sender instanceof Player && args.length == 2) {
+		if (sender instanceof Player) {
 			Player p = (Player) sender;
-			if (!args[1].equals(p.getUniqueId().toString())) {
-				Main.send(p, "error");
-				return true;
-			}
-
-			if (p.getWorld().getName().equals(p.getUniqueId().toString()) || p.hasPermission("admin")) {
-				resetRegion(args[0], p, true);
-				return true;
-			}
+			return commandHandle.execute(p, MessageHandler.getInstance().getLanguage(p), args);
 		}
 		return false;
+	}
+	
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command arg1,
+			String arg2, String[] args) {
+		List<String> out = new ArrayList<>();
+		Player p = (Player) sender;
+		commandHandle.tabComplete(p, MessageHandler.getInstance().getLanguage(p), args,out);
+		return out;
 	}
 
 	public static void resetRegion(String rgID, Player p, boolean confirmed) {
 //		int rgIDint = Integer.parseInt(rgID.replace("plot", ""));
 		if (!confirmed) {
-			JsonCreater creater1 = new JsonCreater(
-					Main.prefix + MessageHandler.getInstance().getString(p, "delePlotConfirmation", rgID.replace("plot", "")));
+			JsonCreater creater1 = new JsonCreater(Main.prefix
+					+ MessageHandler.getInstance().getString(p, "delePlotConfirmation", rgID.replace("plot", "")));
 			JsonCreater creater2 = new JsonCreater(
-					MessageHandler.getInstance().getString(p, "deletePlotHere",rgID.replace("plot", "")));
-			creater2.addHoverEvent(MessageHandler.getInstance().getString(p, "delePlotHover", rgID.replace("plot", "")));
-			creater2.addClickEvent("/delcon " + rgID + " " + p.getUniqueId(), ClickAction.RUN_COMMAND);
+					MessageHandler.getInstance().getString(p, "deletePlotHere", rgID.replace("plot", "")));
+			creater2.addHoverEvent(
+					MessageHandler.getInstance().getString(p, "delePlotHover", rgID.replace("plot", "")));
+			creater2.addClickEvent("/plotreset " + rgID + " " + p.getUniqueId(), ClickAction.RUN_COMMAND);
 			creater1.addJson(creater2).send(p);
 		} else {
-			if (playerBlockedDelete.contains(p.getUniqueId()) && !p.hasPermission("bau.delete.bypass")) {
-				p.sendMessage(MessageHandler.getInstance().getString(p, "deletePlotAntiSpaw"));
-				return;
-			}
-			playerBlockedDelete.add(p.getUniqueId());
+//			if (playerBlockedDelete.contains(p.getUniqueId()) && !p.hasPermission("bau.delete.bypass")) {
+//				p.sendMessage(MessageHandler.getInstance().getString(p, "deletePlotAntiSpaw"));
+//				return;
+//			}
+//			playerBlockedDelete.add(p.getUniqueId());
 			Main.send(p, "delePlot", rgID.replace("plot", ""));
 			// für jede Zeile rgid festlegen
 			ProtectedRegion rg = WorldGuard.getInstance().getPlatform().getRegionContainer()
@@ -117,18 +160,9 @@ public class PlotResetter implements CommandExecutor {
 							scheduler.cancel();
 						}
 					}, 0, 1));
-
-			// spamschutz für nicht VIP und Supporter und builder
-			if (!(p.hasPermission("bau.delete.bypass"))) {
-				Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(), new Runnable() {
-
-					@Override
-					public void run() {
-						playerBlockedDelete.remove(p.getUniqueId());
-					}
-				}, 20 * 60 * 2);
-			}
 		}
 	}
+
+	
 
 }

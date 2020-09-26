@@ -1,8 +1,5 @@
 package net.wargearworld.Bau.Tools;
 
-import java.util.HashMap;
-import java.util.UUID;
-
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
@@ -19,15 +16,15 @@ import org.bukkit.inventory.EquipmentSlot;
 
 import net.wargearworld.Bau.Main;
 import net.wargearworld.Bau.MessageHandler;
+import net.wargearworld.Bau.Player.BauPlayer;
 import net.wargearworld.Bau.Scoreboard.ScoreBoardBau;
 import net.wargearworld.Bau.WorldEdit.WorldGuardHandler;
 
 public class DesignTool implements Listener, CommandExecutor {
-	public static HashMap<UUID, Boolean> playerHasDtOn = new HashMap<>();
 
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void interactBlock(PlayerInteractEvent event) {
-		if(event.getHand() == null) {
+		if (event.getHand() == null) {
 			return;
 		}
 		if (!event.getHand().equals(EquipmentSlot.HAND)) {
@@ -41,22 +38,26 @@ public class DesignTool implements Listener, CommandExecutor {
 		if (again == null || event.getMaterial() == null) {
 			return;
 		}
-		if(again.getType().equals(event.getMaterial())) {
+		if (again.getType().equals(event.getMaterial()) || again.getType() == Material.BARRIER
+				|| again.getRelative(event.getBlockFace()).isEmpty()) {
 			return;
 		}
 		Player p = event.getPlayer();
-		if (playerHasDtOn.get(event.getPlayer().getUniqueId()) == true && again != null) {
-			if (WorldGuardHandler.isInBuildRegion(again.getLocation()) && !again.getType().equals(Material.BARRIER)) {
-				if (!p.isSneaking()&&!again.getRelative(event.getBlockFace()).isEmpty()) {
-					again.setType(event.getMaterial());
-					event.setCancelled(true);
-				}
-				
-			}
+
+		if (p.isSneaking()) {
+			return;
+		}
+		if (!WorldGuardHandler.isInBuildRegion(again.getLocation()))
+			return;
+
+		BauPlayer player = BauPlayer.getBauPlayer(p);
+		if (player.getDT()) {
+			again.setType(event.getMaterial());
+			event.setCancelled(true);
 		}
 
 	}
-	
+
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onblockPlace(BlockPlaceEvent event) {
 		Block again = event.getBlockAgainst();
@@ -64,21 +65,21 @@ public class DesignTool implements Listener, CommandExecutor {
 			return;
 		}
 		Player p = event.getPlayer();
-		if (playerHasDtOn.get(p.getUniqueId()) == true && again != null) {
-			if (WorldGuardHandler.isInBuildRegion(again.getLocation()) && !again.getType().equals(Material.BARRIER)) {
-				if (!p.isSneaking()) {
-					again.setBlockData(event.getBlockPlaced().getBlockData());
-					event.setCancelled(true);
-				}
+		if (p.isSneaking())
+			return;
+		if (!WorldGuardHandler.isInBuildRegion(again.getLocation()) || again.getType() == Material.BARRIER)
+			return;
+		if (BauPlayer.getBauPlayer(p).getDT()) {
+			again.setBlockData(event.getBlockPlaced().getBlockData());
+			event.setCancelled(true);
 
-			}
 		}
 	}
 
-	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String String, String[] args) {
 		Player p = (Player) sender;
+		BauPlayer player = BauPlayer.getBauPlayer(p);
 		if (args.length == 1) {
 			if (args[0].equalsIgnoreCase("on") || args[0].equalsIgnoreCase("an")) {
 				dton(p);
@@ -88,7 +89,7 @@ public class DesignTool implements Listener, CommandExecutor {
 				return true;
 			}
 		} else if (args.length == 0) {
-			if (playerHasDtOn.get(p.getUniqueId())) {
+			if (player.getDT()) {
 				dtoff(p);
 				return true;
 			} else {
@@ -100,13 +101,15 @@ public class DesignTool implements Listener, CommandExecutor {
 	}
 
 	private void dtoff(Player p) {
-		playerHasDtOn.put(p.getUniqueId(), false);
+		BauPlayer player = BauPlayer.getBauPlayer(p);
+		player.setDT(false);
 		p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "dtOff"));
 		ScoreBoardBau.cmdUpdate(p);
 	}
 
 	private void dton(Player p) {
-		playerHasDtOn.put(p.getUniqueId(), true);
+		BauPlayer player = BauPlayer.getBauPlayer(p);
+		player.setDT(true);
 		p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "dtOn"));
 		ScoreBoardBau.cmdUpdate(p);
 	}

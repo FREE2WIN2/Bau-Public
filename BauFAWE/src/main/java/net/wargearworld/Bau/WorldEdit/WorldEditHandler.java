@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import com.sk89q.worldedit.EmptyClipboardException;
@@ -132,7 +133,7 @@ public class WorldEditHandler {
 
 	public static void pasteground(Schematic schem, String rgID, Player p, boolean ignoreAir) {
 		BlockVector3 at = CoordGetter.getTBSPastePosition(rgID, schem.getFacing(), p.getWorld().getName());
-		pasteAsync(new ClipboardHolder(schem.getClip()), at, p, ignoreAir, 1, false, false);
+		pasteAsync(new ClipboardHolder(schem.getClip()), at, p.getWorld(), ignoreAir);
 
 	}
 
@@ -247,6 +248,105 @@ public class WorldEditHandler {
 			}
 
 		}, 0, ticksPerPasteInterval));
+	}
+
+	/**
+	 * @param clipboard             -> Clipboard to paste
+	 * @param x                     -> x-coordinate of paste-position
+	 * @param y                     -> y-coordinate of paste-position
+	 * @param z                     -> z-coordinate of paste-position
+	 * @param p                     -> player which paste something
+	 * @param ignoreAir             -> true if paste -a
+	 *                              used to normal worldeditOperation
+	 */
+	public static void pasteAsync(ClipboardHolder clipboardHolder, BlockVector3 at, org.bukkit.World w, boolean ignoreAir) {
+
+		/* Get Clipboard out of the ClipboardHolder with the transform */
+
+		FlattenedClipboardTransform result = FlattenedClipboardTransform.transform(clipboardHolder.getClipboard(),
+				clipboardHolder.getTransform());
+		Clipboard clipboard = result.getClip(result.getTransformedRegion());
+		/* offset from origin pasteloc and new pasteloc -> have to be added */
+
+		if (clipboard == null) {
+			System.err.println("Clipboard TBS -> null");
+			return;
+		}
+
+		BlockVector3 offset = at.subtract(clipboard.getOrigin());
+		BlockVector3 min = clipboard.getMinimumPoint();
+		BlockVector3 max = clipboard.getMaximumPoint();
+		World world = BukkitAdapter.adapt(w);
+		String originRegion = WorldGuardHandler.getPlotId(clipboard.getOrigin().add(offset), world);
+
+		Scheduler animation = new Scheduler();
+		int xmin = min.getX();
+		int xmax = max.getX();
+		int ymin = min.getY();
+		int ymax = max.getY();
+		int zmin = min.getZ();
+		int zmax = max.getZ();
+
+		animation.setX(xmin);
+		animation.setY(ymin);
+		animation.setZ(zmin);
+		animation.setTask(Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), new Runnable() {
+
+			@Override
+			public void run() {
+				int blockChanged = 0;
+				int xmins = animation.getX();
+				int ymins = animation.getY();
+				int zmins = animation.getZ();
+				for (int x = xmins; x <= xmax; x++) {
+					for (int y = ymins; y <= ymax; y++) {
+						for (int z = zmins; z <= zmax; z++) {
+
+							if (blockChanged > maxBlockChangePerTick) {
+								animation.setX(x);
+								animation.setY(y);
+								animation.setZ(z);
+								return;
+							}
+
+							/* set block in world out of schematic */
+
+							BlockVector3 blockLoc = BlockVector3.at(x, y, z);
+							if (WorldGuardHandler.getPlotId(blockLoc.add(offset), world).equals(originRegion)) {
+								if (!(clipboard.getFullBlock(blockLoc).getBlockType().getMaterial().isAir()
+										&& ignoreAir)) {
+									try {
+										world.setBlock(blockLoc.add(offset), clipboard.getFullBlock(blockLoc));
+										blockChanged++;
+									} catch (WorldEditException e) {
+										e.printStackTrace();
+									}
+								}
+							} else {
+								blockChanged++;
+							}
+
+						}
+						zmins = zmin;
+					}
+					ymins = ymin;
+				}
+				/* all loops are over -> pasting is done */
+				animation.cancel();
+			}
+
+		}, 0, 1));
+	}
+
+	
+	 public static void pasteground(Schematic schematic, Location at) {
+		 BlockVector3 at3 = BlockVector3.at(at.getBlockX(), at.getBlockY(), at.getBlockZ());
+		 pasteAsync(new ClipboardHolder(schematic.getClip()), at3, at.getWorld(), true);
+	}
+
+	public static void pasteAsync(ClipboardHolder clipboardHolder, Location at, boolean ignoreAir) {
+		 BlockVector3 at3 = BlockVector3.at(at.getBlockX(), at.getBlockY(), at.getBlockZ());
+		 pasteAsync(clipboardHolder, at3, at.getWorld(), ignoreAir);
 	}
 
 }

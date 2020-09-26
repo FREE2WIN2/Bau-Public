@@ -1,8 +1,8 @@
 MySQL:
-  database: 'pluginData'
-  host: 'localhost'
-  user: 'BauPlugin'
-  password: 'r0gltuXNFEqKDCy3'
+  database:
+  host:
+  user:
+  password:
 
 worldEdit:
   maxBlockPerSecond: 5000

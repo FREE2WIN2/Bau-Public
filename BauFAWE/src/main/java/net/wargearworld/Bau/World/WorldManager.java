@@ -26,6 +26,14 @@ public class WorldManager {
 	public static BauWorld get(World world) {
 		return worlds.get(world.getUID());
 	}
+	public static BauWorld getWorld(UUID uniqueId) {//players UUID
+		World world = loadWorld(uniqueId.toString());
+		return get(world);
+	}
+	public static BauWorld getWorld(String name) {
+		String uuid = DBConnection.getUUID(name);
+		return getWorld(UUID.fromString(uuid));
+	}
 	
 	public static String templateName = Main.getPlugin().getCustomConfig().getString("plottemplate");
 
@@ -157,6 +165,9 @@ public class WorldManager {
 			}
 		}, 20 * 60, 20 * 60);
 	}
+	
+
+	
 
 	
 

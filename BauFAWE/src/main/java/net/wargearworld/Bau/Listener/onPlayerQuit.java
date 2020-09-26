@@ -8,9 +8,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import net.wargearworld.Bau.Player.BauPlayer;
 import net.wargearworld.Bau.Scoreboard.ScoreBoardBau;
 import net.wargearworld.Bau.Tools.AutoCannonReloader;
-import net.wargearworld.Bau.Tools.DesignTool;
 import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlockSlaveCore;
 import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlockEditor.TestBlockEditorCore;
 
@@ -23,9 +23,10 @@ public void onPlayerLeaveevent(PlayerQuitEvent e) {
 	Player p = e.getPlayer();
 	onPlayerMove.playersLastPlot.remove(p.getUniqueId());
 	ScoreBoardBau.getS(p).cancel();
-	DesignTool.playerHasDtOn.remove(p.getUniqueId());
 	AutoCannonReloader.deleteRecord(p);
 	TestBlockSlaveCore.playersTestBlockSlave.remove(p.getUniqueId());
 	TestBlockEditorCore.playersTestBlockEditor.remove(p.getUniqueId());
+	
+	BauPlayer.remove(p.getUniqueId());
 }
 }
