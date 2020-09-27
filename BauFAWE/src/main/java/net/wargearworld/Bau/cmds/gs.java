@@ -136,9 +136,7 @@ public class gs implements CommandExecutor {
 		commandHandle.addSubNode(literal("remove")
 				.setRequirement(owner)
 				.addSubNode(members
-						.setCallback(s->{})
-						.addSubNode(optional(timeAdd)
-								.setCallback(s->{WorldManager.get(s.getPlayer().getWorld()).addTemp(s.getString("Spieler"),s.getInt("Zeit"));}))));
+						.setCallback(s->{WorldManager.get(s.getPlayer().getWorld()).removeMember(UUID.fromString(DBConnection.getUUID(s.getString("Spieler"))),false);})));
 	}
 
 	private void tp(ArgumentList s) {

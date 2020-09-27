@@ -207,7 +207,7 @@ public class BauWorld {
 		}
 	}
 	
-	private void removeMember(UUID member, boolean mail) {
+	public void removeMember(UUID member, boolean mail) {
 		//TODO
 	}
 
@@ -232,4 +232,5 @@ public class BauWorld {
 
 		}
 	}
+
 }

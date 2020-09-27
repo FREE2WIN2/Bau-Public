@@ -52,7 +52,7 @@ public class HelperMethods {
 
 	
 	public static String getTime() {
-		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy' 'HH:mm:ss");
+		SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy' 'HH:mm:ss");
 		Date date = new Date();
 		String time = "[" + formatter.format(date) + "]";
 		return time;
