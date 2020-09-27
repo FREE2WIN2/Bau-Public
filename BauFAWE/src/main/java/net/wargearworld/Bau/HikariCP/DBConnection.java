@@ -4,7 +4,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -280,19 +284,37 @@ public class DBConnection {
 		}
 	}
 
-	public static Set<UUID> getMembers(int id) {
-		Set<UUID> out = new HashSet<>();
+	public static Map<UUID, Date> getMembers(int id) {
+		Map<UUID,Date> out = new HashMap<>();
 		try (Connection conn = DataSource.getConnection()) {
 			PreparedStatement statement = conn
-					.prepareStatement("SELECT UUID FROM Player,Player_has_Plot WHERE Plot_PlotID = ? AND Player_UUID = Player.UUID");
+					.prepareStatement("SELECT UUID,addedTo FROM Player,Player_has_Plot WHERE Plot_PlotID = ? AND Player_UUID = Player.UUID");
 			statement.setInt(1, id);
 			ResultSet rs = statement.executeQuery();
 			while(rs.next()) {
-				out.add(UUID.fromString(rs.getString(1)));
+				out.put(UUID.fromString(rs.getString(1)),rs.getDate(2));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return out;
+	}
+
+	public static boolean addMember(int id, UUID memberUUID, Date to) {
+		try (Connection conn = DataSource.getConnection()) {
+			PreparedStatement statement = conn
+					.prepareStatement("INSERT INTO `Player_has_Plot`(`Plot_PlotID`, `Player_UUID`, addedTo) VALUES (?,?,?)");
+			statement.setInt(1, id);
+			statement.setString(2, memberUUID.toString());
+			if(to == null) {
+				statement.setNull(3, Types.DATE);
+			}else {
+				statement.setDate(3, new java.sql.Date(to.getTime()));
+			}
+			return statement.executeUpdate() == 1;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 }

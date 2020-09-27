@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.wargearworld.Bau.HikariCP.DBConnection;
+import net.wargearworld.Bau.Player.BauPlayer;
 import net.wargearworld.StringGetter.IStringGetter;
 import net.wargearworld.StringGetter.Language;
 
@@ -114,5 +115,9 @@ public class MessageHandler implements IStringGetter {
 	@Override
 	public Language getLanguage(UUID uuid) {
 		return playersLanguage.get(uuid);
+	}
+
+	public String getString(BauPlayer p, String name,String...args) {
+		return getString(p.getUuid(), name,args);
 	}
 }

@@ -3,6 +3,7 @@ package net.wargearworld.Bau.Player;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -11,12 +12,19 @@ import org.bukkit.Location;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
+import net.minecraft.server.v1_15_R1.IChatBaseComponent;
+import net.minecraft.server.v1_15_R1.PacketPlayOutChat;
+import net.minecraft.server.v1_15_R1.PlayerConnection;
+import net.minecraft.server.v1_15_R1.IChatBaseComponent.ChatSerializer;
 import net.wargearworld.Bau.Main;
+import net.wargearworld.Bau.MessageHandler;
 import net.wargearworld.Bau.HikariCP.DBConnection;
 import net.wargearworld.Bau.World.Plot;
 import net.wargearworld.Bau.World.WorldManager;
+import net.wargearworld.CommandManager.ArgumentList;
 
 public class BauPlayer {
 	private static HashMap<UUID, BauPlayer> players = new HashMap<>();
@@ -122,6 +130,37 @@ public class BauPlayer {
 
 	public boolean getDT() {
 		return config.getBoolean("dt");
+	}
+
+	public void sendMemberedGS() {
+		Player p = getBukkitPlayer();
+		if(p== null)
+			return;
+		
+		ArrayList<String> memberedPlots = new ArrayList<>();
+		memberedPlots.add(p.getName());
+		memberedPlots.addAll(DBConnection.getMemberedPlots(p.getUniqueId()));
+		PlayerConnection pConn = ((CraftPlayer) p).getHandle().playerConnection;
+		p.sendMessage(MessageHandler.getInstance().getString(p, "listGsHeading"));
+		for (String string : memberedPlots) {
+			/* s == PlayerName */
+			String hover = MessageHandler.getInstance().getString(p, "listGsHover").replace("%r", string);
+			String name = string;
+			String txt = "{\"text\":\"§7[§6" + name
+					+ "§7]\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/gs tp " + name
+					+ "\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"" + hover + "\"}}}";
+			IChatBaseComponent txtc = ChatSerializer.a(txt);
+			PacketPlayOutChat txtp = new PacketPlayOutChat(txtc);
+			pConn.sendPacket(txtp);
+		}
+		p.sendMessage("§7----------------------------");
+	}
+
+	public void sendMessage(String message) {
+		Player p = getBukkitPlayer();
+		if(p== null)
+			return;
+		p.sendMessage(message);
 	}
 
 	

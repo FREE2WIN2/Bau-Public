@@ -88,6 +88,20 @@ public class gs implements CommandExecutor {
 				return out;
 			}
 		}));
+		CommandNode members = argument("Mitglied", new DynamicListArgument("Mitglied", new DynamicListGetter<String>() {
+			
+			@Override
+			public Collection<String> getList(ParseState state) {
+				List<String> out = new ArrayList<>();
+				BauWorld world = WorldManager.get(state.getPlayer().getWorld());
+				for(Player p: Bukkit.getOnlinePlayers()) {
+					if(world.isAuthorized(p.getUniqueId())&&!world.isOwner(p)) {
+						out.add(p.getName());
+					}
+				}
+				return out;
+			}
+		}));
 		Predicate<ArgumentList> owner = s ->{return WorldManager.get(s.getPlayer().getWorld()).isOwner(s.getPlayer());};
 		commandHandle = new CommandHandel("gs", Main.prefix);
 		commandHandle.setCallback(s->{tp(s);});
@@ -102,7 +116,7 @@ public class gs implements CommandExecutor {
 								.setCallback(s->{newPlot(s.getPlayer(), 3);}))));
 		
 		commandHandle.addSubNode(literal("info").setCallback(s->{WorldManager.get(s.getPlayer().getWorld()).showInfo(s.getPlayer());}));
-		commandHandle.addSubNode(literal("list").setCallback(s->{sendMemberedGS(s);}));
+		commandHandle.addSubNode(literal("list").setCallback(s->{BauPlayer.getBauPlayer(s.getPlayer()).sendMemberedGS();}));
 		
 		commandHandle.addSubNode(literal("tp")
 				.addSubNode(argument("Spielername", new StringArgument())
@@ -111,39 +125,20 @@ public class gs implements CommandExecutor {
 		commandHandle.addSubNode(literal("add")
 				.setRequirement(owner)
 				.addSubNode(playersToAdd
-						.setCallback(s->{})
-						.addSubNode(optional(timeAdd).setCallback(s->{addTemp(s);}))));
+						.setCallback(s->{WorldManager.get(s.getPlayer().getWorld()).add(s.getString("Spieler"),null);})
+						.addSubNode(optional(timeAdd)
+								.setCallback(s->{WorldManager.get(s.getPlayer().getWorld()).addTemp(s.getString("Spieler"),s.getInt("Zeit"));}))));
 		commandHandle.addSubNode(literal("addtemp")
 				.setRequirement(owner)
 				.addSubNode(playersToAdd
+						.addSubNode(optional(timeAdd)
+								.setCallback(s->{WorldManager.get(s.getPlayer().getWorld()).addTemp(s.getString("Spieler"),s.getInt("Zeit"));}))));
+		commandHandle.addSubNode(literal("remove")
+				.setRequirement(owner)
+				.addSubNode(members
 						.setCallback(s->{})
-						.addSubNode(optional(timeAdd).setCallback(s->{addTemp(s);}))));
-	}
-
-	private void sendMemberedGS(ArgumentList s) {
-		Player p = s.getPlayer();
-		ArrayList<String> memberedPlots = new ArrayList<>();
-		memberedPlots.add(p.getName());
-		memberedPlots.addAll(DBConnection.getMemberedPlots(p.getUniqueId()));
-		PlayerConnection pConn = ((CraftPlayer) p).getHandle().playerConnection;
-		p.sendMessage(MessageHandler.getInstance().getString(p, "listGsHeading"));
-		for (String string : memberedPlots) {
-			/* s == PlayerName */
-			String hover = MessageHandler.getInstance().getString(p, "listGsHover").replace("%r", string);
-			String name = string;
-			String txt = "{\"text\":\"§7[§6" + name
-					+ "§7]\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/gs tp " + name
-					+ "\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"" + hover + "\"}}}";
-			IChatBaseComponent txtc = ChatSerializer.a(txt);
-			PacketPlayOutChat txtp = new PacketPlayOutChat(txtc);
-			pConn.sendPacket(txtp);
-		}
-		p.sendMessage("§7----------------------------");
-	}
-
-	private void addTemp(ArgumentList s) {
-		// TODO Auto-generated method stub
-		
+						.addSubNode(optional(timeAdd)
+								.setCallback(s->{WorldManager.get(s.getPlayer().getWorld()).addTemp(s.getString("Spieler"),s.getInt("Zeit"));}))));
 	}
 
 	private void tp(ArgumentList s) {
@@ -193,35 +188,35 @@ public class gs implements CommandExecutor {
 			case "time":
 				setTime(p, Integer.parseInt(args[1]));
 				break;
-			case "addtemp":
-				p.sendMessage(Main.prefix
-						+ MessageHandler.getInstance().getString(p, "wrongCommand").replace("%r", "gs addtemp <Spieler> <Zeit(h)>"));
-				break;
-			case "tempadd":
-				p.sendMessage(Main.prefix
-						+ MessageHandler.getInstance().getString(p, "wrongCommand").replace("%r", "gs tempadd <Spieler> <Zeit(h)>"));
-				break;
+//			case "addtemp":
+//				p.sendMessage(Main.prefix
+//						+ MessageHandler.getInstance().getString(p, "wrongCommand").replace("%r", "gs addtemp <Spieler> <Zeit(h)>"));
+//				break;
+//			case "tempadd":
+//				p.sendMessage(Main.prefix
+//						+ MessageHandler.getInstance().getString(p, "wrongCommand").replace("%r", "gs tempadd <Spieler> <Zeit(h)>"));
+//				break;
 			case "remove":
 				removeMember(p, args[1]);
 				// bau remove [PlayerName]
 				break;
-			case "add":
-				addMember(p, args[1]);
-				// Befehle: /bau add [PlayerName]
-				break;
-			case "tp":
-				// if (conn.isMember(p, args[1]) || p.hasPermission("moderator")) {
-				if ((DBConnection.isMember(p.getUniqueId(), args[1]) || p.hasPermission("moderator"))
-						&& DBConnection.hasOwnPlots(args[1])) {
-					String plotID = DBConnection.getUUID(args[1]); // == UUID of the Owner
-					p.teleport(CoordGetter.getTeleportLocation(WorldManager.loadWorld(plotID),
-							Plots.getJoinPlot(UUID.fromString(plotID))));
-
-				} else {
-					p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "noPlotMember"));
-				}
-				// bau tp [Playername]
-				break;
+//			case "add":
+//				addMember(p, args[1]);
+//				// Befehle: /bau add [PlayerName]
+//				break;
+//			case "tp":
+//				// if (conn.isMember(p, args[1]) || p.hasPermission("moderator")) {
+//				if ((DBConnection.isMember(p.getUniqueId(), args[1]) || p.hasPermission("moderator"))
+//						&& DBConnection.hasOwnPlots(args[1])) {
+//					String plotID = DBConnection.getUUID(args[1]); // == UUID of the Owner
+//					p.teleport(CoordGetter.getTeleportLocation(WorldManager.loadWorld(plotID),
+//							Plots.getJoinPlot(UUID.fromString(plotID))));
+//
+//				} else {
+//					p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "noPlotMember"));
+//				}
+//				// bau tp [Playername]
+//				break;
 			case "delete":
 				if (p.hasPermission("admin")) {
 					deletePlot(p, args[1], false);
@@ -247,16 +242,16 @@ public class gs implements CommandExecutor {
 					Main.send(p, "wrongCommand", "gs time set <time>");
 				}
 				break;
-			case "add":
-			case "addtemp":
-			case "tempadd":
-				addMemberTemp(p, args[1], Integer.parseInt(args[2]));
-				break;
-			case "new":
-				if (args[1].equals(p.getUniqueId().toString()) && args[2].equals(p.getUniqueId().toString())) {
-					newPlot(p, 3);
-				}
-				break;
+//			case "add":
+//			case "addtemp":
+//			case "tempadd":
+//				addMemberTemp(p, args[1], Integer.parseInt(args[2]));
+//				break;
+//			case "new":
+//				if (args[1].equals(p.getUniqueId().toString()) && args[2].equals(p.getUniqueId().toString())) {
+//					newPlot(p, 3);
+//				}
+//				break;
 			}
 			return true;
 		} else {
@@ -318,51 +313,6 @@ public class gs implements CommandExecutor {
 			}
 		} else {
 			Main.send(p, "YouCantRemoveYourself");
-		}
-	}
-
-	public boolean addMember(Player p, String playerName) {
-		if (Plots.getPlot(p.getUniqueId()).isMember(UUID.fromString(DBConnection.getUUID(playerName)))) {
-			p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "alreadyMember").replace("%r", playerName));
-			return false;
-		} else {
-			String memberUUID = DBConnection.getUUID(playerName);
-			if (Plots.getPlot(p.getUniqueId()).addMember(memberUUID)) {
-				p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "plotMemberAdded").replace("%r", playerName));
-				writeLog(playerName + "("+memberUUID+") added to " + p.getName() + "'s("+p.getUniqueId().toString()+") plot at " + HelperMethods.getTime());
-				return true;
-			} else {
-				p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "error"));
-				return false;
-			}
-		}
-	}
-
-	public void addMemberTemp(Player p, String playerName, int time) {
-		if (DBConnection.isMember(UUID.fromString(DBConnection.getUUID(playerName)), p.getName())) {
-			Main.send(p, "alreadyMember", playerName);
-		} else {
-			String uuidMember = DBConnection.getUUID(playerName);
-			if (Plots.getPlot(p.getUniqueId()).addMember(uuidMember)) {
-				Main.send(p, "memberTempAdded", playerName, "" + time);
-
-				FileConfiguration config = Main.getPlugin().getTempAddConfig();
-				Long Time;
-				SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmm");
-				Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Europe/Berlin"));
-				calendar.add(Calendar.HOUR_OF_DAY, time);
-				Date date = calendar.getTime();
-				Time = Long.parseLong(formatter.format(date));
-				config.set(p.getUniqueId().toString() + "." + uuidMember, Time);
-				try {
-					config.save(Main.getPlugin().getTempAddConfigFile());
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				writeLog(playerName + "("+uuidMember+") tempadded for " + time + " hours to " + p.getName() + "'s("+p.getUniqueId().toString()+") plot at " + HelperMethods.getTime());
-			} else {
-				p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "error"));
-			}
 		}
 	}
 

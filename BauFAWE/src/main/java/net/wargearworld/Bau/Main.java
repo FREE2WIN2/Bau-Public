@@ -31,6 +31,7 @@ import net.wargearworld.Bau.Listener.onPlayerMove;
 import net.wargearworld.Bau.Listener.onPlayerQuit;
 import net.wargearworld.Bau.Listener.onPlayerRespawn;
 import net.wargearworld.Bau.Listener.onPlayerTeleport;
+import net.wargearworld.Bau.Player.BauPlayer;
 import net.wargearworld.Bau.Plots.Plots;
 import net.wargearworld.Bau.TabCompleter.TntReloaderTC;
 import net.wargearworld.Bau.TabCompleter.gsTC;
@@ -273,6 +274,14 @@ public class Main extends JavaPlugin {
 	}
 
 	public static void send(Player p, boolean otherPrefix, String prefix, String messageKey, String... args) {
+		String message = prefix + MessageHandler.getInstance().getString(p, messageKey);
+		for (String rep : args) {
+			message = message.replaceFirst("%r", rep);
+		}
+		p.sendMessage(message);
+	}
+
+	public static void send(BauPlayer p, String messageKey, String... args) {
 		String message = prefix + MessageHandler.getInstance().getString(p, messageKey);
 		for (String rep : args) {
 			message = message.replaceFirst("%r", rep);
