@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -18,6 +19,7 @@ import net.wargearworld.Bau.utils.Loc;
 public class WorldTemplate {
 	private static HashMap<String,WorldTemplate> templates;
 	public static void load() {
+		templates = new HashMap<>();
 		File dir = new File(Main.getPlugin().getDataFolder(),"worldConfigs");
 		for(File file: dir.listFiles()) {
 			WorldTemplate template = new WorldTemplate(file);
@@ -34,6 +36,8 @@ public class WorldTemplate {
 	
 	private File configFile;
 	private FileConfiguration config;
+	private File worldguardDir;
+	private File worldDir;
 	private String name;
 	
 	private List<PlotPattern> plots;
@@ -41,6 +45,8 @@ public class WorldTemplate {
 
 	private WorldTemplate(File configFile) {
 		name = configFile.getName().split("\\.")[0];
+		worldguardDir = new File(Bukkit.getPluginManager().getPlugin("WorldGuard").getDataFolder(),"worlds/" + name);
+		worldDir = new File(Bukkit.getWorldContainer(), name);
 		this.configFile = configFile;
 		config = new YamlConfiguration();
 		try {
@@ -53,6 +59,15 @@ public class WorldTemplate {
 	public String getName() {
 		return name;
 	}
+	
+	public File getWorldDir() {
+		return worldDir;
+	}
+	
+	public File getWorldguardDir() {
+		return worldguardDir;
+	}
+	
 	public FileConfiguration getConfig() {
 		return config;
 	}
@@ -61,6 +76,7 @@ public class WorldTemplate {
 		if(plots == null) {
 			plots = new ArrayList<>();
 			for(String id:config.getConfigurationSection("plots").getValues(false).keySet()) {
+				System.out.println(id);
 				Loc middleNorth = Loc.getByString(config.getString("middle." + id));
 				PlotType type = getType(id);
 				Schematic ground = new Schematic(Main.schempath + "/TestBlockSklave", config.getString("plotreset.schemfiles." + id), Facing.NORTH);
@@ -76,6 +92,8 @@ public class WorldTemplate {
 		}
 		return spawnPlotID;
 	}
+	
+	
 	
 //	public PlotType getType(Plot plot) {
 //		return PlotType.valueOf(config.getString("plots." + plot.getId()).toUpperCase());

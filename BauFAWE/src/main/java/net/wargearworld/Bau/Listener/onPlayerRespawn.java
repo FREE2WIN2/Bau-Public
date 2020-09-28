@@ -7,8 +7,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import net.wargearworld.Bau.Plots.Plots;
-import net.wargearworld.Bau.utils.CoordGetter;
+import net.wargearworld.Bau.World.WorldManager;
+
 
 public class onPlayerRespawn implements Listener {
 	public onPlayerRespawn(JavaPlugin plugin) {
@@ -16,7 +16,7 @@ public class onPlayerRespawn implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onPlayerLeaveevent(PlayerRespawnEvent e) {
-		e.setRespawnLocation(CoordGetter.getTeleportLocation(e.getPlayer().getWorld(), Plots.getJoinPlot(e.getPlayer().getUniqueId())));
+	public void onPlayerRespawnevent(PlayerRespawnEvent e) {
+		WorldManager.get(e.getPlayer().getWorld()).spawn(e.getPlayer());
 	}
 }

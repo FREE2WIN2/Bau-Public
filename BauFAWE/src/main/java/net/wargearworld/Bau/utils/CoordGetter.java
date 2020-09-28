@@ -1,6 +1,5 @@
 package net.wargearworld.Bau.utils;
 
-import java.util.UUID;
 
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -10,7 +9,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import com.sk89q.worldedit.math.BlockVector3;
 
 import net.wargearworld.Bau.Main;
-import net.wargearworld.Bau.Plots.Plots;
 import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlock.Facing;
 
 public class CoordGetter {
@@ -34,10 +32,11 @@ public class CoordGetter {
 	}
 
 	public static YamlConfiguration getConfigOfWorld(String worldName) {
-		if (worldName.contains("test")) {
-			return Plots.getConfig(Main.getPlugin().getCustomConfig().getString("test.template"));
-		}
-		return Plots.getConfigOfPlot(UUID.fromString(worldName));
+//		if (worldName.contains("test")) {
+//			return Plots.getConfig(Main.getPlugin().getCustomConfig().getString("test.template"));
+//		}
+//		return Plots.getConfigOfPlot(UUID.fromString(worldName));
+		return null;
 	}
 
 	public static BlockVector3 getMiddleRegionTB(String plotID, Facing facing, String worldName) {

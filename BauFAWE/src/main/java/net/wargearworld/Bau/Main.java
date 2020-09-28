@@ -32,9 +32,7 @@ import net.wargearworld.Bau.Listener.onPlayerQuit;
 import net.wargearworld.Bau.Listener.onPlayerRespawn;
 import net.wargearworld.Bau.Listener.onPlayerTeleport;
 import net.wargearworld.Bau.Player.BauPlayer;
-import net.wargearworld.Bau.Plots.Plots;
 import net.wargearworld.Bau.TabCompleter.TntReloaderTC;
-import net.wargearworld.Bau.TabCompleter.gsTC;
 import net.wargearworld.Bau.TabCompleter.particlesTC;
 import net.wargearworld.Bau.TabCompleter.tbsTC;
 import net.wargearworld.Bau.Tools.AutoCannonReloader;
@@ -59,6 +57,7 @@ import net.wargearworld.Bau.cmds.ds;
 import net.wargearworld.Bau.cmds.gs;
 import net.wargearworld.Bau.cmds.stats;
 import net.wargearworld.Bau.cmds.tnt;
+import net.wargearworld.CommandManager.CommandManager;
 
 public class Main extends JavaPlugin {
 	private static Main plugin;
@@ -80,12 +79,10 @@ public class Main extends JavaPlugin {
 
 		registerCommands();
 		registerListener();
-
-		gs.startCheckForTempAdd();
+		WorldManager.startCheckForTempAddRemoves();
 		WorldManager.checkForWorldsToUnload();
 		new DataSource();
-		new MessageHandler();
-		new Plots();
+		new CommandManager(new MessageHandler());
 		new CompassBar();
 		DefaultTestBlock.generateDefaultTestBlocks();
 		schempath = customConfig.getString("schempath");
@@ -121,8 +118,8 @@ public class Main extends JavaPlugin {
 	}
 
 	private void registerCommands() {
-		getCommand("gs").setExecutor(new gs());
-		getCommand("gs").setTabCompleter(new gsTC());
+		new gs();
+
 		getCommand("tnt").setExecutor(new tnt());
 		getCommand("gui").setExecutor(new GUI());
 		getCommand("tbs").setExecutor(TestBlockSlaveCore.getInstance());

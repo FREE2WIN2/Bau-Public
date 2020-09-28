@@ -16,7 +16,10 @@ import java.util.UUID;
 
 import org.bukkit.entity.Player;
 
+import com.sun.source.doctree.StartElementTree;
+
 import net.wargearworld.Bau.World.WorldManager;
+import net.wargearworld.Bau.World.WorldTemplate;
 
 public class DBConnection {
 	public DBConnection() {
@@ -48,7 +51,7 @@ public class DBConnection {
 		String uuid = getUUID(playerName);
 		try (Connection conn = DataSource.getConnection()) {
 			PreparedStatement statement = conn
-					.prepareStatement("SELECT * FROM `Plot` WHERE `PlotID` = ?");
+					.prepareStatement("SELECT * FROM `Plot` WHERE `owner` = ?");
 			statement.setString(1, uuid);
 			ResultSet rs = statement.executeQuery();
 			boolean out = rs.next();
@@ -60,19 +63,6 @@ public class DBConnection {
 		}
 	}
 
-	public static boolean registerNewPlot(UUID owner) {
-		String uuid = owner.toString();
-		try (Connection conn = DataSource.getConnection()) {
-			PreparedStatement statement = conn
-					.prepareStatement("INSERT INTO `Plot`(`PlotID`,template) VALUES (?,?)");
-			statement.setString(1, uuid);
-			statement.setString(2, WorldManager.templateName);
-			return statement.executeUpdate() == 1;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
 
 	public static boolean addMember(UUID owner, String memberName) {
 		
@@ -316,5 +306,48 @@ public class DBConnection {
 			e.printStackTrace();
 			return false;
 		}
+	}
+
+	public static boolean setTemplate(int id, WorldTemplate template) {
+		try (Connection conn = DataSource.getConnection()) {
+			PreparedStatement statement = conn
+					.prepareStatement("UPDATE `Plot` SET template = ? WHERE ID = ?");
+			statement.setString(1, template.getName());
+			statement.setInt(2, id);
+			return statement.executeUpdate() == 1;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	public static boolean registerNewPlot(String worldName, String ownerUUID) {
+		try (Connection conn = DataSource.getConnection()) {
+			PreparedStatement statement = conn
+					.prepareStatement("INSERT INTO `Plot`(name,owner,template) VALUES (?,?,?)");
+			statement.setString(1, worldName);
+			statement.setString(2, ownerUUID);
+			statement.setString(3, WorldManager.template.getName());
+			System.out.println(statement);
+			return statement.executeUpdate() == 1;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	public static int getID(String worldName, String owner) {
+		try (Connection conn = DataSource.getConnection()) {
+			PreparedStatement statement = conn
+					.prepareStatement("SELECT ID FROM `Plot` WHERE owner = ? AND name = ?");
+			statement.setString(1, owner);
+			statement.setString(2, worldName);
+			ResultSet rs = statement.executeQuery();
+			if(rs.next())
+				return rs.getInt(1);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return 0;
 	}
 }

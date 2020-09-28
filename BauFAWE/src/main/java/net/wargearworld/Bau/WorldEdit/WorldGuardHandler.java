@@ -1,8 +1,6 @@
 package net.wargearworld.Bau.WorldEdit;
 
-import java.util.UUID;
 import java.util.List;
-import java.util.Map.Entry;
 
 import org.bukkit.Location;
 
@@ -10,13 +8,9 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
-
-import net.wargearworld.Bau.HikariCP.DBConnection;
-import net.wargearworld.Bau.World.WorldManager;
 
 public class WorldGuardHandler {
 	static RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
@@ -56,32 +50,6 @@ public class WorldGuardHandler {
 		return regions.getApplicableRegionsIDs(location).size() > 1;
 	}
 
-	public static boolean addPlayerToAllRegions(String worldName, String playerUUID) {
-		RegionManager regions = container.get(BukkitAdapter.adapt(WorldManager.loadWorld(worldName)));
-		for (Entry<String, ProtectedRegion> rg : regions.getRegions().entrySet()) {
-			if (rg.getValue().getPriority() > 10) {
-				DefaultDomain member = rg.getValue().getMembers();
-				member.addPlayer(UUID.fromString(playerUUID));
-				rg.getValue().setMembers(member);
-			}
-		}
-		return true;
-	}
-
-	public static boolean removeMemberFromAllRegions(String worldName, UUID playerUUID) {
-		RegionManager regions = container.get(BukkitAdapter.adapt(WorldManager.loadWorld(worldName)));
-		for (Entry<String, ProtectedRegion> rg : regions.getRegions().entrySet()) {
-			if (rg.getValue().getPriority() > 10) {
-				DefaultDomain member = rg.getValue().getMembers();
-
-				member.removePlayer(DBConnection.getName(playerUUID.toString()));
-
-				member.removePlayer(playerUUID);
-				rg.getValue().setMembers(member);
-			}
-		}
-		return true;
-	}
 
 	public static ProtectedRegion getBuildRegion(Location loc) {
 		RegionManager regions = container.get(BukkitAdapter.adapt(loc.getWorld()));
@@ -90,19 +58,6 @@ public class WorldGuardHandler {
 			return regions.getRegion(ids.get(0));
 		}
 		return regions.getRegion(ids.get(1));
-
-	}
-
-	
-	public static void addOwnerToAllRegions(UUID uniqueId) {
-		RegionManager regions = container.get(BukkitAdapter.adapt(WorldManager.loadWorld(uniqueId.toString())));
-		for (Entry<String, ProtectedRegion> rg : regions.getRegions().entrySet()) {
-			if (rg.getValue().getPriority() > 10) {
-				DefaultDomain owner = rg.getValue().getOwners();
-				owner.addPlayer(uniqueId);
-				rg.getValue().setOwners(owner);
-			}
-		}
 
 	}
 }
