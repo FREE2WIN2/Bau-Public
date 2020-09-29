@@ -1,7 +1,6 @@
 package net.wargearworld.Bau.Listener;
 
 
-import net.wargearworld.Bau.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -14,6 +13,8 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.json.simple.parser.ParseException;
+
+import net.wargearworld.Bau.Main;
 
 public class SignListener implements Listener {
     public SignListener(JavaPlugin plugin) {

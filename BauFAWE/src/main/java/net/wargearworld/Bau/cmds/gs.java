@@ -3,7 +3,6 @@ package net.wargearworld.Bau.cmds;
 import static net.wargearworld.CommandManager.Nodes.ArgumentNode.argument;
 import static net.wargearworld.CommandManager.Nodes.InvisibleNode.invisible;
 import static net.wargearworld.CommandManager.Nodes.LiteralNode.literal;
-import static net.wargearworld.CommandManager.Nodes.OptionalNode.optional;
 import static net.wargearworld.CommandManager.Requirements.PermissionRequirement.permission;
 
 import java.io.File;
@@ -12,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.function.Predicate;
 
@@ -98,10 +96,10 @@ CommandNode worlds = argument("Worlds", new DynamicListArgument("Worlds", new Dy
 		
 		commandHandle.addSubNode(literal("new")
 				.setCallback(s->{newPlot(s.getPlayer(), 1);})
-				.addSubNode(invisible(optional(argument("UUID1",new StringArgument())))
+				.addSubNode(invisible(argument("UUID1",new StringArgument()))
 						.setRequirement(s->{return s.getString("UUID1").equals(s.getPlayer().getUniqueId().toString());})
 						.setCallback(s->{newPlot(s.getPlayer(), 2);})
-						.addSubNode(optional(argument("UUID2",new StringArgument()))
+						.addSubNode(argument("UUID2",new StringArgument())
 								.setRequirement(s->{return s.getString("UUID2").equals(s.getPlayer().getUniqueId().toString());})
 								.setCallback(s->{newPlot(s.getPlayer(), 3);}))));
 		
@@ -111,27 +109,30 @@ CommandNode worlds = argument("Worlds", new DynamicListArgument("Worlds", new Dy
 		commandHandle.addSubNode(literal("tp")
 				.addSubNode(argument("Spielername", new StringArgument())
 						.setCallback(s->{tp(s);})));
-		
+		/* gs add <Spieler> [Zeit]*/
 		commandHandle.addSubNode(literal("add")
 				.setRequirement(owner)
 				.addSubNode(playersToAdd
 						.setCallback(s->{WorldManager.get(s.getPlayer().getWorld()).add(s.getString("Spieler"),null);})
-						.addSubNode(optional(timeAdd)
+						.addSubNode(timeAdd
 								.setCallback(s->{WorldManager.get(s.getPlayer().getWorld()).addTemp(s.getString("Spieler"),s.getInt("Zeit"));}))));
+		/* gs addTemp <Spieler> [Zeit]*/
 		commandHandle.addSubNode(literal("addtemp")
 				.setRequirement(owner)
 				.addSubNode(playersToAdd
-						.addSubNode(optional(timeAdd)
+						.addSubNode(timeAdd
 								.setCallback(s->{WorldManager.get(s.getPlayer().getWorld()).addTemp(s.getString("Spieler"),s.getInt("Zeit"));}))));
+		/* gs remove <Spieler>*/
 		commandHandle.addSubNode(literal("remove")
 				.setRequirement(owner)
 				.addSubNode(members
 						.setCallback(s->{getWorld(s).removeMember(UUID.fromString(DBConnection.getUUID(s.getString("Spieler"))));})));
+		/* gs time [Zeit]*/
 		commandHandle.addSubNode(literal("time")
 				.addSubNode(argument("Zeit",new IntegerArgument(1,24000))
 						.setRequirement(authorised)
 						.setCallback(s->{getWorld(s).setTime(s.getInt("Zeit"));Main.send(s.getPlayer(), "time", "" + s.getInt("Zeit"));})));
-		
+		/* gs delete <World>*/
 		commandHandle.addSubNode(literal("delete")
 				.setRequirement(permission("bau.delete.bypass")).addSubNode(worlds.setCallback(s->{deletePlot(s);})));
 

@@ -102,7 +102,6 @@ public abstract class BauWorld {
 
 	public void spawn(Player p) {
 		Plot plot = plots.get(template.getSpawnPlotID());
-		System.out.println(plot.getTeleportPoint());
 		p.teleport(plot.getTeleportPoint());
 		onPlayerMove.playersLastPlot.put(p.getUniqueId(), plot.getId());
 	}
@@ -164,7 +163,7 @@ public abstract class BauWorld {
 		}
 
 		try (FileWriter writer = new FileWriter(logFile, true)) {
-			writer.write(message);
+			writer.write(message + "\n");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

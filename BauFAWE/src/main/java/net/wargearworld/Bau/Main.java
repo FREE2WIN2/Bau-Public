@@ -20,6 +20,7 @@ import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 
+import net.wargearworld.Bau.Communication.DatabaseCommunication;
 import net.wargearworld.Bau.HikariCP.DataSource;
 import net.wargearworld.Bau.Listener.ClickListener;
 import net.wargearworld.Bau.Listener.ExplosioneventListener;
@@ -85,6 +86,7 @@ public class Main extends JavaPlugin {
 		new CommandManager(new MessageHandler());
 		new CompassBar();
 		DefaultTestBlock.generateDefaultTestBlocks();
+		DatabaseCommunication.startRecieve();
 		schempath = customConfig.getString("schempath");
 	
 //		doTests();

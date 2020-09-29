@@ -1,7 +1,7 @@
 package net.wargearworld.Bau;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.UUID;
@@ -25,22 +25,22 @@ public class MessageHandler implements IStringGetter {
 	}
 
 	public static HashMap<UUID, Language> playersLanguage = new HashMap<>();
-	private static Properties english;
-	private static Properties german;
+	private HashMap<Language, Properties> props;
 
 	public MessageHandler() {
 		instance = this;
-		try {
-			english = new Properties();
-			InputStream in = MessageHandler.class.getResourceAsStream("/language_en.properties");
-			english.load(in);
-			in.close();
-			german = new Properties();
-			in = MessageHandler.class.getResourceAsStream("/language_de.properties");
-			german.load(in);
-			in.close();
-		} catch (IOException e) {
-			e.printStackTrace();
+		props = new HashMap<>();
+		for (Language lang : Language.values()) {
+			try {
+				Properties prop = new Properties();
+				InputStreamReader in = new InputStreamReader(MessageHandler.class.getResourceAsStream(
+						"/langPacks/language_" + lang.name().toLowerCase() + ".properties"), "UTF-8");
+				prop.load(in);
+				props.put(lang, prop);
+				in.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -50,31 +50,15 @@ public class MessageHandler implements IStringGetter {
 
 	@Override
 	public String getString(UUID uuid, String name, String... args) {
-		String message;
-		if (playersLanguage.containsKey(uuid)) {
-			if (playersLanguage.get(uuid).equals(Language.EN)) {
-				message = english.getProperty(name);
-			}else {
-				message = german.getProperty(name);
-			}
-		} else {
-			if (Language.valueOf(DBConnection.getLanguage(uuid.toString()).toUpperCase()) == Language.EN) {
-				message = english.getProperty(name);
-			}else {
-				message = german.getProperty(name);
-			}
-		}
+		Language lang = playersLanguage.get(uuid);
+		if (lang == null)
+			lang = Language.valueOf(DBConnection.getLanguage(uuid.toString()).toUpperCase());
+		String message = props.get(lang).getProperty(name);
 		// standard
-		for(String a:args) {
+		for (String a : args) {
 			message = message.replaceFirst("%r", a);
 		}
 		return message;
-	}
-
-
-	@SuppressWarnings("deprecation")
-	public void sendHotBar(Player p, String key, String... args) {
-		p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(getString(p, key, args)));
 	}
 
 	public Language getLanguage(Player p) {
@@ -93,12 +77,7 @@ public class MessageHandler implements IStringGetter {
 
 	@Override
 	public String getString(Language lang, String name, String... args) {
-		String message;
-		if (lang == Language.EN) {
-			message = english.getProperty(name);
-		} else {
-			message = german.getProperty(name);
-		}
+		String message = props.get(lang).getProperty(name);
 		for (String a : args) {
 			message = message.replaceFirst("%r", a);
 		}
@@ -110,12 +89,26 @@ public class MessageHandler implements IStringGetter {
 		return playersLanguage.get(uuid);
 	}
 
-	public String getString(BauPlayer p, String name,String...args) {
-		return getString(p.getUuid(), name,args);
+	public String getString(BauPlayer p, String name, String... args) {
+		return getString(p.getUuid(), name, args);
 	}
 
 	@Override
 	public String getString(Player p, String name, String... args) {
 		return getString(p.getUniqueId(), name, args);
+	}
+	/* Sending Messages */
+	@SuppressWarnings("deprecation")
+	public void sendHotBar(Player p, String key, String... args) {
+		p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(getString(p, key, args)));
+	}
+	public void send(Player p, String key, String... args) {
+		p.sendMessage(getStringWithPrefix(p, key, args));
+	}
+	public void send(BauPlayer p, String key, String... args) {
+		Player player = p.getBukkitPlayer();
+		if(player == null)
+			return;
+		player.sendMessage(Main.prefix + getString(player, key, args));
 	}
 }

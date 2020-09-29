@@ -3,8 +3,8 @@ package net.wargearworld.Bau.Tools.TestBlockSlave;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
-import java.util.function.BiFunction;
 import java.util.Set;
+import java.util.function.BiFunction;
 
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;

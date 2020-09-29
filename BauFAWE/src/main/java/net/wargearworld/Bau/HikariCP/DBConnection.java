@@ -5,9 +5,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
@@ -354,6 +356,21 @@ public class DBConnection {
 			while(rs.next()) {
 				out.put(UUID.fromString(rs.getString(2)), rs.getString(1));
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return out;
+	}
+
+	public static List<String> getWorldName(int teamID) {
+		List<String> out = new ArrayList<>();
+		try (Connection conn = DataSource.getConnection()) {
+			PreparedStatement statement = conn
+					.prepareStatement("SELECT name FROM `Plot` WHERE owner = ?");
+			statement.setString(1, teamID + "");
+			ResultSet rs = statement.executeQuery();
+			while(rs.next())
+				out.add(rs.getString(1));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
