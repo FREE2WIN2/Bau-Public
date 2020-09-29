@@ -16,8 +16,6 @@ import java.util.UUID;
 
 import org.bukkit.entity.Player;
 
-import com.sun.source.doctree.StartElementTree;
-
 import net.wargearworld.Bau.World.WorldManager;
 import net.wargearworld.Bau.World.WorldTemplate;
 
@@ -83,17 +81,12 @@ public class DBConnection {
 		}
 	}
 	
-	public static boolean removeMember(UUID uuidOwner, String memberName) {
-		UUID memberUUID = UUID.fromString(getUUID(memberName));
-		return removeMember(uuidOwner, memberUUID);
-	}
-
-	public static boolean removeMember(UUID owner, UUID memberUUID) {
+	public static boolean removeMember(int id, UUID member) {
 		try (Connection conn = DataSource.getConnection()) {
 			PreparedStatement statement = conn
 					.prepareStatement("DELETE FROM `Player_has_Plot` WHERE `Player_UUID` = ? AND Plot_PlotID = ?");
-			statement.setString(1, memberUUID.toString());
-			statement.setString(2, owner.toString());
+			statement.setString(1, member.toString());
+			statement.setInt(2, id);
 			return statement.executeUpdate() == 1;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -328,7 +321,6 @@ public class DBConnection {
 			statement.setString(1, worldName);
 			statement.setString(2, ownerUUID);
 			statement.setString(3, WorldManager.template.getName());
-			System.out.println(statement);
 			return statement.executeUpdate() == 1;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -349,5 +341,22 @@ public class DBConnection {
 			e.printStackTrace();
 		}
 		return 0;
+	}
+
+	public static Map<UUID,String> getAllNotAddedPlayers(int worldID) {
+		Map<UUID,String> out = new HashMap<>();
+		try (Connection conn = DataSource.getConnection()) {
+			PreparedStatement statement = conn
+					.prepareStatement("SELECT name,UUID FROM `Player` LEFT JOIN Player_has_Plot ON UUID = Player_UUID AND Plot_PlotID = ? WHERE Player_UUID IS NULL");
+			statement.setInt(1, worldID);
+			System.out.println(statement);
+			ResultSet rs = statement.executeQuery();
+			while(rs.next()) {
+				out.put(UUID.fromString(rs.getString(2)), rs.getString(1));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return out;
 	}
 }

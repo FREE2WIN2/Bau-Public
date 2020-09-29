@@ -13,6 +13,8 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import net.wargearworld.Bau.Main;
 import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlock.Facing;
+import net.wargearworld.Bau.World.Plots.PlotPattern;
+import net.wargearworld.Bau.World.Plots.PlotType;
 import net.wargearworld.Bau.WorldEdit.Schematic;
 import net.wargearworld.Bau.utils.Loc;
 
@@ -76,10 +78,9 @@ public class WorldTemplate {
 		if(plots == null) {
 			plots = new ArrayList<>();
 			for(String id:config.getConfigurationSection("plots").getValues(false).keySet()) {
-				System.out.println(id);
 				Loc middleNorth = Loc.getByString(config.getString("middle." + id));
 				PlotType type = getType(id);
-				Schematic ground = new Schematic(Main.schempath + "/TestBlockSklave", config.getString("plotreset.schemfiles." + id), Facing.NORTH);
+				Schematic ground = new Schematic("/TestBlockSklave", config.getString("plotreset.schemfiles." + id) + ".schem", Facing.NORTH);
 				plots.add(new PlotPattern(middleNorth, ground, type, id));
 			}
 		}

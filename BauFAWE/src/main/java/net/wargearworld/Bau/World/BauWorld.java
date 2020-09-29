@@ -3,21 +3,15 @@ package net.wargearworld.Bau.World;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TimeZone;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -29,16 +23,14 @@ import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import net.wargearworld.Bau.Main;
-import net.wargearworld.Bau.MessageHandler;
 import net.wargearworld.Bau.HikariCP.DBConnection;
 import net.wargearworld.Bau.Listener.onPlayerMove;
-import net.wargearworld.Bau.Player.BauPlayer;
-import net.wargearworld.Bau.utils.ClickAction;
+import net.wargearworld.Bau.World.Plots.Plot;
+import net.wargearworld.Bau.World.Plots.PlotPattern;
 import net.wargearworld.Bau.utils.HelperMethods;
-import net.wargearworld.Bau.utils.JsonCreater;
 import net.wargearworld.Bau.utils.MethodResult;
 
-public class BauWorld {
+public abstract class BauWorld {
 	private UUID worldUUID;
 
 	private int id;
@@ -46,18 +38,15 @@ public class BauWorld {
 	private HashMap<String, Plot> plots;
 	private RegionManager regionManager;
 	private WorldTemplate template;
-
-//	private File configFile;
-//	private FileConfiguration config;
 	private File logFile;
-	private String owner; // cpuld be an team!
-
 	private Map<UUID, Date> members;
 
-	public BauWorld(int id, String owner, World world) {
-		this.name = world.getName();
+	public BauWorld(int id, World world) {
+		System.out.println(world);
+		this.name = world.getName().split("_",2)[1];
+		System.out.println(name);
 		this.id = id;
-
+		this.worldUUID = world.getUID();
 		regionManager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(world));
 		String templateName = DBConnection.getTemplate(id);
 		template = WorldTemplate.getTemplate(templateName);
@@ -67,11 +56,8 @@ public class BauWorld {
 			plots.put(plotPattern.getID(), plotPattern.toPlot(this));
 		}
 
-//		configFile = new File(Main.getPlugin().getDataFolder(), "worlds/" + world.getName() + "/settings.yml");
-		// TODO inf this File not Exists!
-//		config = new YamlConfiguration();
 		
-		logFile = new File(Main.getPlugin().getDataFolder(),"worlds" + id + "/logs.txt");
+		logFile = new File(Main.getPlugin().getDataFolder(),"worlds/" + world.getName() + "/logs.txt");
 		try {
 			if (!logFile.exists())
 				if(!logFile.getParentFile().exists())
@@ -82,10 +68,13 @@ public class BauWorld {
 			e.printStackTrace();
 		}
 
-		members = DBConnection.getMembers(id);
+		members = loadMembers();
 		checkForTimeoutMembership();
 	}
 
+	protected abstract Map<UUID, Date> loadMembers();
+
+	
 	public String getName() {
 		return name;
 	}
@@ -104,7 +93,7 @@ public class BauWorld {
 	}
 
 	public World getWorld() {
-		return Bukkit.getWorld(name);
+		return Bukkit.getWorld(worldUUID);
 	}
 
 	public RegionManager getRegionManager() {
@@ -113,85 +102,36 @@ public class BauWorld {
 
 	public void spawn(Player p) {
 		Plot plot = plots.get(template.getSpawnPlotID());
-		System.out.println(p==null);
-		System.out.println(plot == null);
+		System.out.println(plot.getTeleportPoint());
 		p.teleport(plot.getTeleportPoint());
 		onPlayerMove.playersLastPlot.put(p.getUniqueId(), plot.getId());
 	}
 
-	public boolean isAuthorized(UUID uuid) {
-		return owner.equalsIgnoreCase(uuid.toString()) || members.keySet().contains(uuid);
+	public abstract boolean isAuthorized(UUID uuid);
+		
+	protected Map<UUID, Date> getMembers() {
+		return members;
 	}
 
-	public void showInfo(Player p) {
-		boolean isOwner = owner.equals(p.getUniqueId().toString());
-		Set<String> memberlist = DBConnection.getMember(p.getUniqueId().toString());
-		Main.send(p, "memberListHeader", getName(p.getWorld()));
-		for (String memberUUID : memberlist) {
-			String memberName = DBConnection.getName(memberUUID);
-			String hover = MessageHandler.getInstance().getString(p, "memberHoverRemove").replace("%r", memberName);
-			JsonCreater remove = new JsonCreater("§7[§6" + memberName + "§7]");
-			if (isOwner) {
-				remove.addClickEvent("/gs remove " + memberName, ClickAction.SUGGEST_COMMAND).addHoverEvent(hover);
-			}
-			remove.send(p);
-		}
-		if (isOwner) {
-			new JsonCreater("§a[+]§r  ").addClickEvent("/gs add ", ClickAction.SUGGEST_COMMAND)
-					.addHoverEvent(MessageHandler.getInstance().getString(p, "addMemberHover")).send(p);
-		}
-		Main.send(p, "timeShow", p.getWorld().getTime() + "");
-	}
+	public abstract void showInfo(Player p);
+
 
 	public String getName(World w) {
+		//TODO woaders
 		if (w.getName().contains("test")) {
-			return w.getName();
+			return name;
 		} else {
-			return DBConnection.getName(w.getName());
+			return DBConnection.getName(name );
 		}
 	}
 
-	public boolean isOwner(Player player) {
-		return owner.equals(player.getUniqueId().toString());
-	}
+	public abstract boolean isOwner(Player player);
 
-	public void addTemp(String playerName, int time) {
-		BauPlayer p = BauPlayer.getBauPlayer(UUID.fromString(owner));
-		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Europe/Berlin"));
-		calendar.add(Calendar.HOUR_OF_DAY, time);
-		Date to = calendar.getTime();
-		if (add(playerName, to) == MethodResult.SUCCESS) {
-			Main.send(p, "memberTempAdded", playerName, "" + time);
-			log(WorldAction.ADD, playerName, playerName, time + "");
-		}
-	}
+	public abstract void addTemp(String playerName, int time); 
 
-	public MethodResult add(String playerName, Date to) {
-		BauPlayer p = BauPlayer.getBauPlayer(UUID.fromString(owner));
-		UUID uuidMember = UUID.fromString(DBConnection.getUUID(playerName));
-		if (!isAuthorized(uuidMember)) {
-			members.put(uuidMember, to);
-			if (DBConnection.addMember(id, uuidMember, to)) {
-				addPlayerToAllRegions(uuidMember);
-				if (to == null) {
-					log(WorldAction.ADD, uuidMember.toString(), playerName);
-				}
-				p.sendMessage(Main.prefix
-						+ MessageHandler.getInstance().getString(p, "plotMemberAdded").replace("%r", playerName));
+	public abstract MethodResult add(String playerName, Date to);
 
-				return MethodResult.SUCCESS;
-			} else {
-				p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "error"));
-				return MethodResult.ERROR;
-			}
-		} else {
-			p.sendMessage(
-					Main.prefix + MessageHandler.getInstance().getString(p, "alreadyMember").replace("%r", playerName));
-			return MethodResult.FAILURE;
-		}
-	}
-
-	private void addPlayerToAllRegions(UUID uuidMember) {
+	protected void addPlayerToAllRegions(UUID uuidMember) {
 		for (ProtectedRegion region : regionManager.getRegions().values()) {
 			DefaultDomain members = region.getMembers();
 			members.addPlayer(uuidMember);
@@ -204,7 +144,7 @@ public class BauWorld {
 		}
 	}
 
-	private void removeMemberFromAllRegions(UUID uuidMember) {
+	protected void removeMemberFromAllRegions(UUID uuidMember) {
 		for (ProtectedRegion region : regionManager.getRegions().values()) {
 			DefaultDomain members = region.getMembers();
 			members.removePlayer(uuidMember);
@@ -217,7 +157,7 @@ public class BauWorld {
 		}
 	}
 
-	private void log(WorldAction action, String... args) {
+	protected void log(WorldAction action, String... args) {
 		String message = HelperMethods.getTime() + action.getMessage();
 		for (String a : args) {
 			message = message.replace("%r", a);
@@ -243,38 +183,7 @@ public class BauWorld {
 		getWorld().setTime(time);
 	}
 
-	public void removeMember(UUID member) {
-		UUID ownerUUID = UUID.fromString(owner);
-		Player ownerPlayer = Bukkit.getPlayer(ownerUUID);
-		if (!member.toString().equals(this.owner)) {
-			if (DBConnection.removeMember(UUID.fromString(this.owner), member)) {
-				removeMemberFromAllRegions(member);
-				String name = DBConnection.getName(member.toString());
-				members.remove(member);
-				log(WorldAction.REMOVE, member.toString(), name);
-				Player memberPlayer = Bukkit.getPlayer(member);
-				if (memberPlayer != null) {
-					Main.send(memberPlayer, "plotMemberRemove_memberMsg", DBConnection.getName(owner));
-					if (WorldManager.get(memberPlayer.getWorld()) == this) {
-						memberPlayer.performCommand("gs");
-					}
-				}
-				if (ownerPlayer != null) {
-					Main.send(ownerPlayer, "plotMemberRemoved", name);
-				} else {
-					DBConnection.addMail("plugin: BAU", owner,
-							MessageHandler.getInstance().getString(ownerUUID, "plotMemberRemoved").replace("%r", name));
-				}
-			} else {
-				if (ownerPlayer != null) {
-					Main.send(ownerPlayer, "error");
-				}
-			}
-		} else {
-			if (ownerPlayer != null)
-				Main.send(ownerPlayer, "YouCantRemoveYourself");
-		}
-	}
+	public abstract void removeMember(UUID member);
 
 	public boolean newWorld() {
 		removeAllMembers();
@@ -321,7 +230,7 @@ public class BauWorld {
 		}
 	}
 	
-	private enum WorldAction {
+	protected enum WorldAction {
 		ADD, ADDTEMP, REMOVE, NEW, DELETE;
 
 		protected String getMessage() {
@@ -347,9 +256,6 @@ public class BauWorld {
 		return worldUUID;
 	}
 
-	public String getOwner() {
-		return owner;
-	}
-
+	protected abstract String getOwner();
 
 }

@@ -37,7 +37,7 @@ public class onPlayerJoin implements Listener {
 		MessageHandler.playersLanguage.put(p.getUniqueId(), Language.valueOf(lang.toUpperCase()));
 		// has own gs?
 		String path = Bukkit.getWorldContainer().getAbsolutePath();
-		File gs = new File(path + "/" + p.getName());
+		File gs = new File(path + "/" + p.getUniqueId() + "_" + p.getName());
 		System.out.println("gs exists: " + gs.exists());
 		System.out.println("hasOWnPlot" + DBConnection.hasOwnPlots(p.getUniqueId().toString()));
 		if (!DBConnection.hasOwnPlots(p.getUniqueId().toString()) && !gs.exists()) {

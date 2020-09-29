@@ -1,4 +1,4 @@
-package net.wargearworld.Bau.World;
+package net.wargearworld.Bau.World.Plots;
 
 import org.bukkit.Location;
 

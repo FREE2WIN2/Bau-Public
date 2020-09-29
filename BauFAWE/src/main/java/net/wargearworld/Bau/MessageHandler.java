@@ -48,31 +48,29 @@ public class MessageHandler implements IStringGetter {
 		return getString(p.getUniqueId(), name);
 	}
 
-	public String getString(String uuid, String name) {
-		return getString(UUID.fromString(uuid), name);
-	}
-
-	public String getString(UUID uuid, String name) {
+	@Override
+	public String getString(UUID uuid, String name, String... args) {
+		String message;
 		if (playersLanguage.containsKey(uuid)) {
 			if (playersLanguage.get(uuid).equals(Language.EN)) {
-				return english.getProperty(name);
+				message = english.getProperty(name);
+			}else {
+				message = german.getProperty(name);
 			}
 		} else {
 			if (Language.valueOf(DBConnection.getLanguage(uuid.toString()).toUpperCase()) == Language.EN) {
-				return english.getProperty(name);
+				message = english.getProperty(name);
+			}else {
+				message = german.getProperty(name);
 			}
 		}
 		// standard
-		return german.getProperty(name);
+		for(String a:args) {
+			message = message.replaceFirst("%r", a);
+		}
+		return message;
 	}
 
-	public String getString(Player p, String name, String... args) {
-		String msg = getString(p, name);
-		for (String a : args) {
-			msg = msg.replaceFirst("%r", a);
-		}
-		return msg;
-	}
 
 	@SuppressWarnings("deprecation")
 	public void sendHotBar(Player p, String key, String... args) {
@@ -86,11 +84,6 @@ public class MessageHandler implements IStringGetter {
 	@Override
 	public String getStringWithPrefix(Player p, String name, String... args) {
 		return Main.prefix + getString(p, name, args);
-	}
-
-	@Override
-	public String getString(UUID uuid, String name, String... args) {
-		return Main.prefix + getString(uuid, name, args);
 	}
 
 	@Override
@@ -119,5 +112,10 @@ public class MessageHandler implements IStringGetter {
 
 	public String getString(BauPlayer p, String name,String...args) {
 		return getString(p.getUuid(), name,args);
+	}
+
+	@Override
+	public String getString(Player p, String name, String... args) {
+		return getString(p.getUniqueId(), name, args);
 	}
 }

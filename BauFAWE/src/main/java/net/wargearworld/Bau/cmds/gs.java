@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.function.Predicate;
 
@@ -64,14 +65,8 @@ public class gs implements TabExecutor {
 			
 			@Override
 			public Collection<String> getList(ParseState state) {
-				List<String> out = new ArrayList<>();
 				BauWorld world = WorldManager.get(state.getPlayer().getWorld());
-				for(Player p: Bukkit.getOnlinePlayers()) {
-					if(!world.isAuthorized(p.getUniqueId())) {
-						out.add(p.getName());
-					}
-				}
-				return out;
+				return DBConnection.getAllNotAddedPlayers(world.getId()).values();
 			}
 		}));
 		CommandNode members = argument("Mitglied", new DynamicListArgument("Mitglied", new DynamicListGetter<String>() {

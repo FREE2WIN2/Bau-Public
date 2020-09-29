@@ -1,9 +1,10 @@
-package net.wargearworld.Bau.World;
+package net.wargearworld.Bau.World.Plots;
 
 import org.bukkit.Location;
 
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
+import net.wargearworld.Bau.World.BauWorld;
 import net.wargearworld.Bau.WorldEdit.Schematic;
 import net.wargearworld.Bau.utils.Loc;
 

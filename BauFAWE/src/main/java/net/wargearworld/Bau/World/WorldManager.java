@@ -36,12 +36,12 @@ public class WorldManager {
 
 	public final static WorldTemplate template = WorldTemplate.getTemplate(Main.getPlugin().getCustomConfig().getString("plottemplate"));
 	public static World loadWorld(String worldName, String owner) {
-		if (Bukkit.getWorld(worldName) == null) {
+		if (Bukkit.getWorld(owner  + "_" + worldName) == null) {
 			int id = DBConnection.getID(worldName,owner);
 			if(id == 0)
 				createWorldDir(worldName, owner);
 			
-			WorldCreator wc = new WorldCreator(worldName);
+			WorldCreator wc = new WorldCreator(owner + "_" + worldName);
 			wc.type(WorldType.NORMAL);
 			World w = Bukkit.getServer().createWorld(wc);
 			w.setStorm(false);
@@ -49,7 +49,7 @@ public class WorldManager {
 			w.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
 			w.setGameRule(GameRule.DO_MOB_SPAWNING, false);
 
-			worlds.put(w.getUID(), new BauWorld(DBConnection.getID(worldName,owner), owner, w));
+			worlds.put(w.getUID(), new PlayerWorld(DBConnection.getID(worldName,owner), owner, w));
 			return w;
 		} else {
 			return Bukkit.getWorld(worldName);
@@ -72,7 +72,7 @@ public class WorldManager {
 
 	public static void createWorldDir(String worldName, String ownerUUID) {
 		// File neu = new File(path + "/Worlds/" + uuid);
-		File neu = new File(Bukkit.getWorldContainer(), worldName);
+		File neu = new File(Bukkit.getWorldContainer(), ownerUUID + "_" + worldName);
 		neu.mkdirs();
 		neu.setExecutable(true, false);
 		neu.setReadable(true, false);
@@ -80,7 +80,7 @@ public class WorldManager {
 		copyFolder_raw(template.getWorldDir(), neu);
 		DBConnection.registerNewPlot(worldName,ownerUUID);
 		// worldguard regionen
-		File worldGuardWorldDir = new File(Bukkit.getWorldContainer(), "plugins/WorldGuard/worlds/" + worldName);
+		File worldGuardWorldDir = new File(Bukkit.getWorldContainer(), "plugins/WorldGuard/worlds/" + ownerUUID + "_" + worldName);
 		copyFolder_raw(template.getWorldguardDir(), worldGuardWorldDir);
 	}
 

@@ -16,15 +16,14 @@ import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import net.minecraft.server.v1_15_R1.IChatBaseComponent;
+import net.minecraft.server.v1_15_R1.IChatBaseComponent.ChatSerializer;
 import net.minecraft.server.v1_15_R1.PacketPlayOutChat;
 import net.minecraft.server.v1_15_R1.PlayerConnection;
-import net.minecraft.server.v1_15_R1.IChatBaseComponent.ChatSerializer;
 import net.wargearworld.Bau.Main;
 import net.wargearworld.Bau.MessageHandler;
 import net.wargearworld.Bau.HikariCP.DBConnection;
-import net.wargearworld.Bau.World.Plot;
 import net.wargearworld.Bau.World.WorldManager;
-import net.wargearworld.CommandManager.ArgumentList;
+import net.wargearworld.Bau.World.Plots.Plot;
 
 public class BauPlayer {
 	private static HashMap<UUID, BauPlayer> players = new HashMap<>();
@@ -58,6 +57,7 @@ public class BauPlayer {
 		config = new YamlConfiguration();
 		try {
 		if(!configFile.exists()) {
+			configFile.getParentFile().mkdirs();
 			configFile.createNewFile();
 			Files.copy(BauPlayer.class.getResourceAsStream("playerDefaults.yml"), configFile.toPath());
 		}
