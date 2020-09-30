@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import net.wargearworld.GUI_API.GUI_API;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -85,6 +86,7 @@ public class Main extends JavaPlugin {
 		new DataSource();
 		new CommandManager(new MessageHandler());
 		new CompassBar();
+		new GUI_API(this,MessageHandler.getInstance());
 		DefaultTestBlock.generateDefaultTestBlocks();
 		DatabaseCommunication.startRecieve();
 		schempath = customConfig.getString("schempath");

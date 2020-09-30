@@ -39,6 +39,13 @@
 			<scope>compile</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>net.wargearworld</groupId>
+			<artifactId>GUIAPI</artifactId>
+			<version>0.0.1</version>
+			<scope>compile</scope>
+		</dependency>
+
 		<!--This adds the Spigot API artifact to the build -->
 		<dependency>
 			<groupId>com.destroystokyo.paper</groupId>

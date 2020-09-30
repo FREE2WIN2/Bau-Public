@@ -32,34 +32,34 @@ public class PluginMessage {
 			List<TeamWorld> worlds = WorldManager.getTeamWorlds(teamID);
 			switch (subChannel) {
 			case "Members":
-				if (args[0].equals("addMember")) {
-					for (TeamWorld world : worlds) {
-						world.addMember(memberUUID);
-					}
-				} else if (args[0].equals("removeMember")) {
-					for (TeamWorld world : worlds) {
-						world.removeMember(memberUUID);
-					}
-				}else if (args[0].equals("setLeader")) {
-					for (TeamWorld world : worlds) {
-						world.setLeader(memberUUID);
-					}
-				}
-				break;
-			case "Leaders":
-				if (args[0].equals("addLeader")) {
-					for (TeamWorld world : worlds) {
-						world.addLeader(memberUUID);
-					}
-				} else if (args[0].equals("removeLeader")) {
-					for (TeamWorld world : worlds) {
-						world.removeMember(memberUUID);
-					}
-				}else if (args[0].equals("setMember")) {
-					for (TeamWorld world : worlds) {
-						world.setMember(memberUUID);
-					}
-				}
+//				if (args[0].equals("addMember")) {
+//					for (TeamWorld world : worlds) {
+//						world.addMember(memberUUID);
+//					}
+//				} else if (args[0].equals("removeMember")) {
+//					for (TeamWorld world : worlds) {
+//						world.removeMember(memberUUID);
+//					}
+//				}else if (args[0].equals("setLeader")) {
+//					for (TeamWorld world : worlds) {
+//						world.setLeader(memberUUID);
+//					}
+//				}
+//				break;
+//			case "Leaders":
+//				if (args[0].equals("addLeader")) {
+//					for (TeamWorld world : worlds) {
+//						world.addLeader(memberUUID);
+//					}
+//				} else if (args[0].equals("removeLeader")) {
+//					for (TeamWorld world : worlds) {
+//						world.removeMember(memberUUID);
+//					}
+//				}else if (args[0].equals("setMember")) {
+//					for (TeamWorld world : worlds) {
+//						world.setMember(memberUUID);
+//					}
+//				}
 				break;
 			}
 			
