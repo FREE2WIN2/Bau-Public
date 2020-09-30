@@ -50,6 +50,7 @@ import net.wargearworld.Bau.Tools.Particles.ParticlesGUI;
 import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlockSlaveCore;
 import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlock.DefaultTestBlock;
 import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlockEditor.TestBlockEditorCore;
+import net.wargearworld.Bau.World.WorldGUI;
 import net.wargearworld.Bau.World.WorldManager;
 import net.wargearworld.Bau.WorldEdit.SaWE;
 import net.wargearworld.Bau.WorldEdit.WorldEditPreCommand;
@@ -87,6 +88,7 @@ public class Main extends JavaPlugin {
 		new CommandManager(new MessageHandler());
 		new CompassBar();
 		new GUI_API(this,MessageHandler.getInstance());
+		new WorldGUI(this);
 		DefaultTestBlock.generateDefaultTestBlocks();
 		DatabaseCommunication.startRecieve();
 		schempath = customConfig.getString("schempath");

@@ -50,6 +50,8 @@ commands:
      usage: /<command>
    clear:
      description: Resets your inventory
+   worlds:
+     description: Resets your worlds
      
      
 permissions:
