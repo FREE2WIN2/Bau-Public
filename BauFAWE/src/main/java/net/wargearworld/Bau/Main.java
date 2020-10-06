@@ -85,7 +85,7 @@ public class Main extends JavaPlugin {
 		WorldManager.startCheckForTempAddRemoves();
 		WorldManager.checkForWorldsToUnload();
 		new DataSource();
-		new CommandManager(new MessageHandler());
+
 		new CompassBar();
 		new GUI_API(this,MessageHandler.getInstance());
 		new WorldGUI(this);

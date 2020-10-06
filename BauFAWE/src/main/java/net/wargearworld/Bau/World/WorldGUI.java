@@ -31,7 +31,7 @@ public class WorldGUI implements TabExecutor, Listener {
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 		plugin.getCommand("worlds").setExecutor(this);
 		plugin.getCommand("worlds").setTabCompleter(this);
-		handle = new CommandHandel("worlds", Main.prefix);
+		handle = new CommandHandel("worlds", Main.prefix,Main.getPlugin());
 
 		handle.setCallback(s -> {
 			openMain(s.getPlayer());

@@ -38,6 +38,7 @@ public class tnt implements CommandExecutor {
 							MessageHandler.getInstance().getString(p,"tntTitleSmall").replace("%r", rgID.replace("plot", "")), 1,
 							1, 60);
 				}
+				p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "tntDeniedMessage"));
 			} else {
 				rg.setFlag(Main.TntExplosion, State.ALLOW);
 				for (Player a : p.getWorld().getPlayers()) {
@@ -46,6 +47,7 @@ public class tnt implements CommandExecutor {
 							MessageHandler.getInstance().getString(p,"tntTitleSmall").replace("%r", rgID.replace("plot", "")), 1,
 							1, 60);
 				}
+				p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "tntAllowedMessage"));
 			}
 			
 			return true;

@@ -91,7 +91,7 @@ CommandNode worlds = argument("Worlds", new DynamicListArgument("Worlds", new Dy
 		}));
 		Predicate<ArgumentList> owner = s ->{return WorldManager.get(s.getPlayer().getWorld()).isOwner(s.getPlayer());};
 		Predicate<ArgumentList> authorised = s ->{return getWorld(s).isAuthorized(s.getPlayer().getUniqueId()) || s.getPlayer().hasPermission("moderator");};
-		commandHandle = new CommandHandel("gs", Main.prefix);
+		commandHandle = new CommandHandel("gs", Main.prefix,Main.getPlugin());
 		commandHandle.setCallback(s->{tp(s);});
 		
 		commandHandle.addSubNode(literal("new")

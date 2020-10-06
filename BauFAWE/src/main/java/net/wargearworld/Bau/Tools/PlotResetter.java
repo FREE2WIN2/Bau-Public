@@ -41,7 +41,7 @@ public class PlotResetter implements TabExecutor {
 
 	public PlotResetter() {
 //		new CommandManager(MessageHandler.getInstance());
-		commandHandle = new CommandHandel("plotreset", Main.prefix);
+		commandHandle = new CommandHandel("plotreset", Main.prefix,Main.getPlugin());
 		commandHandle.setCallback(s -> {
 			String rgID = WorldGuardHandler.getPlotId(s.getPlayer().getLocation());
 			resetRegion(rgID, s.getPlayer(), false);

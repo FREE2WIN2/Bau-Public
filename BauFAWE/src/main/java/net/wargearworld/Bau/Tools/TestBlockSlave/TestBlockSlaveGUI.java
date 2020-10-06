@@ -15,9 +15,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import main.java.net.wesjd.anvilgui.AnvilGUI;
-import main.java.net.wesjd.anvilgui.AnvilGUI.Builder;
-import main.java.net.wesjd.anvilgui.AnvilGUI.Response;
 import net.wargearworld.Bau.Main;
 import net.wargearworld.Bau.MessageHandler;
 import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlock.CustomTestBlock;
@@ -180,23 +177,23 @@ public class TestBlockSlaveGUI implements Listener {
 	}
 	
 	public static void ChooseNameInv(Player p,int tier) {
-		
-		Builder builder = new Builder();
-		BiFunction<Player, String, AnvilGUI.Response> function = new BiFunction<Player, String, AnvilGUI.Response>() {
-			
-			@Override
-			public Response apply(Player t, String u) {
-				return AnvilGUI.Response.text(" ");
-			}
-		};
-		builder.plugin(Main.getPlugin()).onComplete(function).text(" ").title(MessageHandler.getInstance().getString(p, "tbs_gui_anvilTitle"));
-		if(tier == 1) {
-			builder.item(Banner.ONE.create(DyeColor.ORANGE, DyeColor.BLACK, "§rUnnamed"));
-		}else if(tier ==2) {
-			builder.item(Banner.TWO.create(DyeColor.ORANGE, DyeColor.BLACK, "§rUnnamed"));
-		}else if(tier == 3) {
-			builder.item(Banner.THREE.create(DyeColor.ORANGE, DyeColor.BLACK, "§rUnnamed"));
-		}
-		builder.open(p);
+
+//		Builder builder = new Builder();
+//		BiFunction<Player, String, AnvilGUI.Response> function = new BiFunction<Player, String, AnvilGUI.Response>() {
+//
+//			@Override
+//			public Response apply(Player t, String u) {
+//				return AnvilGUI.Response.text(" ");
+//			}
+//		};
+//		builder.plugin(Main.getPlugin()).onComplete(function).text(" ").title(MessageHandler.getInstance().getString(p, "tbs_gui_anvilTitle"));
+//		if(tier == 1) {
+//			builder.item(Banner.ONE.create(DyeColor.ORANGE, DyeColor.BLACK, "§rUnnamed"));
+//		}else if(tier ==2) {
+//			builder.item(Banner.TWO.create(DyeColor.ORANGE, DyeColor.BLACK, "§rUnnamed"));
+//		}else if(tier == 3) {
+//			builder.item(Banner.THREE.create(DyeColor.ORANGE, DyeColor.BLACK, "§rUnnamed"));
+//		}
+//		builder.open(p);
 	}
 }

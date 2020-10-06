@@ -2,6 +2,10 @@ package net.wargearworld.Bau.Tools;
 
 import java.util.Set;
 
+import net.wargearworld.GUI_API.Executor;
+import net.wargearworld.GUI_API.GUI.ArgumentList;
+import net.wargearworld.GUI_API.GUI.ChestGUI;
+import net.wargearworld.GUI_API.Items.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -35,238 +39,135 @@ import net.wargearworld.Bau.utils.JsonCreater;
 
 public class GUI implements CommandExecutor, Listener {
 
-	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String string, String[] args) {
-		Inventory inv;
-		if (sender instanceof Player) {
-			Player p = (Player) sender;
-			inv = inventarErstellen(p);
-			p.openInventory(inv);
-		}
-		return true;
-	}
+    @Override
+    public boolean onCommand(CommandSender sender, Command cmd, String string, String[] args) {
+        Inventory inv;
+        if (sender instanceof Player) {
+            Player p = (Player) sender;
+            openGUI(p);
+        }
+        return true;
+    }
 
-	@SuppressWarnings("deprecation")
-	public Inventory inventarErstellen(Player p) {
-		String worldname = getName(p.getWorld());
-		String inventoryName = MessageHandler.getInstance().getString(p, "inventoryName").replace("%r", worldname);
+    public void openGUI(Player p) {
+        MessageHandler msgHandler = MessageHandler.getInstance();
+        String worldname = getName(p.getWorld());
+        String inventoryName = MessageHandler.getInstance().getString(p, "inventoryName").replace("%r", worldname);
 
-		Inventory inv = Bukkit.createInventory(null, 45, inventoryName);
-//erstes item: tnt
-		ItemStack tntIS = new ItemStack(Material.TNT);
-		ItemMeta tntIM = tntIS.getItemMeta();
-		ProtectedRegion rg = WorldGuardHandler.getRegion(p.getLocation());
-		if (rg.getFlag(Main.TntExplosion) == State.DENY) {
-			tntIM.setDisplayName(MessageHandler.getInstance().getString(p, "tntDenied"));
+        ChestGUI gui = new ChestGUI(45, inventoryName);
 
-		} else {
-			tntIM.setDisplayName(MessageHandler.getInstance().getString(p, "tntAllowed"));
-			tntIM.addEnchant(Enchantment.PROTECTION_EXPLOSIONS, 1, true);
-			tntIM.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-		}
-		tntIS.setItemMeta(tntIM);
+        Executor<ArgumentList> tntExecutor = s -> {
+            Player player = s.getPlayer();
+            player.performCommand("tnt");
+            player.closeInventory();
+        };
+        Item tntActiveItem = ItemBuilder.build(tntExecutor, Material.TNT, 1, ItemType.DEFAULT, msgHandler.getString(p, "tntAllowed"))
+                .addEnchantment(Enchantment.PROTECTION_EXPLOSIONS, 1).addItemFLags(ItemFlag.HIDE_ENCHANTS);
 
-//barriers
-		// playerHead
-		ItemStack playerHeadItem = new ItemStack(Material.AIR);
-		ItemStack Barrier1IS = new ItemStack(Material.AIR);
-		playerHeadItem = new ItemStack(Material.PLAYER_HEAD);
-		SkullMeta sm = (SkullMeta) playerHeadItem.getItemMeta();
-		sm.setOwner(worldname);
-		sm.setDisplayName(MessageHandler.getInstance().getString(p, "guiMember").replace("%r", worldname));
-		playerHeadItem.setItemMeta(sm);
+        Item tntNotActiveItem = ItemBuilder.build(tntExecutor, Material.TNT, 1, ItemType.DEFAULT, msgHandler.getString(p, "tntDenied"));
 
-		// delete
-		if (rg.getOwners().contains(p.getUniqueId()) || p.getUniqueId().toString().equals(p.getWorld().getName())
-				|| p.hasPermission("admin")) {
-			Barrier1IS = ItemStackCreator.createNewItemStack(Material.BARRIER,
-					MessageHandler.getInstance().getString(p, "deletePlot"));
+        HeadItem playerHead = new HeadItem(msgHandler.getString(p, "guiMember").replace("%r", worldname), 1);
+        playerHead.setOwner(p.getName());
+        playerHead.setExecutor(s -> {
+            s.getPlayer().performCommand("gs info");
+            s.getPlayer().closeInventory();
+        });
 
-		}
-		// TestBlockSklave->Wolle
+        Item reset = ItemBuilder.build(s -> {
+            Player player = s.getPlayer();
+            player.closeInventory();
+            String rgID = WorldGuardHandler.getPlotId(player.getLocation());
+            PlotResetter.resetRegion(rgID, player, false);
+        }, Material.BARRIER, 1, ItemType.DEFAULT, msgHandler.getString(p, "deletePlot"));
 
-		// enderpearls
-		ItemStack enderPearl1IS = ItemStackCreator.createNewItemStack(Material.ENDER_PEARL,
-				MessageHandler.getInstance().getString(p, "gui_teleporter"));
+        DefaultItem guiItem = new DefaultItem(Material.NETHER_STAR, "§6GUI", 1);
 
-		// torch f�r sl
-		ItemStack stoplagIS;
-		if (Stoplag.getStatus(p.getLocation())) {
-			stoplagIS = ItemStackCreator.createNewItemStack(Material.REDSTONE,
-					MessageHandler.getInstance().getString(p, "torchOff"));
-		} else {
-			stoplagIS = ItemStackCreator.createNewItemStack(Material.GUNPOWDER,
-					MessageHandler.getInstance().getString(p, "torchOn"));
-		}
+        DefaultItem debugStick = new DefaultItem(new ItemStack(Material.DEBUG_STICK), s -> {});
+        debugStick.setCancelled(false);
 
-		ItemStack observer = ItemStackCreator.createNewItemStack(Material.OBSERVER,
-				MessageHandler.getInstance().getString(p, "tbs_gui_trail"));
+        Item teleporter = new DefaultItem(Material.ENDER_PEARL,msgHandler.getString(p,"gui_teleporter"),1).setExecutor(s->{PlotTeleporter.openInv(s.getPlayer());});
 
-		// NetherStar
-		ItemStack guiItem = ItemStackCreator.createNewItemStack(Material.NETHER_STAR, "§6GUI");
+        Executor<ArgumentList> stoplag = s->{
+            Player player = s.getPlayer();
+            player.closeInventory();
+        player.performCommand("sl");};
+        Item stoplagOff = new DefaultItem(Material.REDSTONE,msgHandler.getString(p, "torchOff"),1).setExecutor(stoplag);
+        Item stoplagOn = new DefaultItem(Material.GUNPOWDER,msgHandler.getString(p, "torchOn"),1).setExecutor(stoplag);
 
-		// DS
-		ItemStack ds = new ItemStack(Material.DEBUG_STICK);
+        Item trailGUI = new DefaultItem(Material.OBSERVER,msgHandler.getString(p,"tbs_gui_trail"),1).setExecutor(s->{s.getPlayer().performCommand("trail gui");});
 
-		// TBS
-		ItemStack TestMaterialIS = ItemStackCreator.createNewItemStack(Material.WHITE_WOOL,
-				MessageHandler.getInstance().getString(p, "testBlockSklaveGui"));
+        Item testBlockSlave = new DefaultItem(Material.WHITE_WOOL,msgHandler.getString(p,"testBlockSklaveGui"),1).setExecutor(s->{s.getPlayer().performCommand("tbs");});
 
-		// DT
-		String dtName;
-		ItemStack dst = new ItemStack(Material.WOODEN_SHOVEL);
-		ItemMeta dtIM = observer.getItemMeta();
-		if (BauPlayer.getBauPlayer(p).getDT()) {
-			dtName = MessageHandler.getInstance().getString(p, "dtItemOn");
-			dtIM.addEnchant(Enchantment.SILK_TOUCH, 1, true);
-			dtIM.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-		} else {
-			dtName = MessageHandler.getInstance().getString(p, "dtItemOff");
-		}
-		dtIM.setDisplayName(dtName);
-		dst.setItemMeta(dtIM);
+        Material ferzuenerMaterial =  Material.valueOf(Main.getPlugin().getCustomConfig().getString("fernzuender"));
+        Item fernzuenderItem = new DefaultItem(ferzuenerMaterial,msgHandler.getString(p,"fernzuender"),1);
+        fernzuenderItem.setCancelled(false);
 
-		// FZ
-		ItemStack fz = ItemStackCreator.createNewItemStack(
-				Material.valueOf(Main.getPlugin().getCustomConfig().getString("fernzuender")),
-				MessageHandler.getInstance().getString(p, "fernzuender"));
+        Item cannonReloaderItem = new DefaultItem(AutoCannonReloader.toolMaterial,msgHandler.getString(p,"cannonReloader_guiName"),1);
+        cannonReloaderItem.setCancelled(false);
 
-		ItemStack CannonReloader = ItemStackCreator.createNewItemStack(AutoCannonReloader.toolMaterial,
-				MessageHandler.getInstance().getString(p, "cannonReloader_guiName"));
+        Item designToolOn = new DefaultItem(Material.WOODEN_SHOVEL,msgHandler.getString(p, "dtItemOn"),1).setExecutor(s->{s.getPlayer().performCommand("dt");s.getPlayer().closeInventory();});
+        Item designToolOff = new DefaultItem(Material.WOODEN_SHOVEL,msgHandler.getString(p, "dtItemOff"),1).setExecutor(s->{s.getPlayer().performCommand("dt");s.getPlayer().closeInventory();});
+        designToolOff.addEnchantment(Enchantment.SILK_TOUCH, 1).addItemFLags(ItemFlag.HIDE_ENCHANTS);
+        /* Set Items into GUI */
 
-		// Particles
+        gui.setItem(0, guiItem);
+        gui.setItem(8, guiItem);
+        gui.setItem(36, guiItem);
+        gui.setItem(44, guiItem);
 
-		/* setItems */
-		inv.setItem(0, guiItem);
-		inv.setItem(8, guiItem);
-		inv.setItem(36, guiItem);
-		inv.setItem(44, guiItem);
+        gui.setItem(19, s -> {
+            ProtectedRegion rg = WorldGuardHandler.getRegion(s.getPlayer().getLocation());
+            return (rg.getFlag(Main.TntExplosion) == State.DENY);
+        }, tntNotActiveItem);
+        gui.setItem(19, s -> {
+            ProtectedRegion rg = WorldGuardHandler.getRegion(s.getPlayer().getLocation());
+            return (rg.getFlag(Main.TntExplosion) == State.ALLOW);
+        }, tntActiveItem);
 
-		inv.setItem(3, observer);
-		inv.setItem(5, TestMaterialIS);
-		inv.setItem(11, fz);
-		inv.setItem(13, Barrier1IS);
-		inv.setItem(15, CannonReloader);
-		inv.setItem(19, tntIS);
-		inv.setItem(22, playerHeadItem);
-		inv.setItem(25, stoplagIS);
-		inv.setItem(29, ds);
-		inv.setItem(31, enderPearl1IS);
+        gui.setItem(13, reset);
 
-		inv.setItem(33, dst);
 
-		inv.setItem(39, ItemStackCreator.createNewItemStack(Material.MELON_SEEDS,
-				MessageHandler.getInstance().getString(p, "gui_particles")));
-		inv.setItem(41, TntChest.getTNTChest());
-		// close DBConnection
-		return inv;
-	}
+        gui.setItem(3, trailGUI);
+        gui.setItem(5, testBlockSlave);
+        gui.setItem(11, fernzuenderItem);
+        gui.setItem(15, cannonReloaderItem);
+        gui.setItem(22, playerHead);
+        gui.setItem(25,s->{return Stoplag.getStatus(p.getLocation());}, stoplagOff);
+        gui.setItem(25,s->{return !Stoplag.getStatus(p.getLocation());}, stoplagOn);
+        gui.setItem(29, debugStick);
+        gui.setItem(31, teleporter);
 
-	@EventHandler
-	public void onInventoryclick(InventoryClickEvent event) {
-		Player p = (Player) event.getWhoClicked();
-		Inventory pInv = p.getOpenInventory().getTopInventory();
-		String invName = p.getOpenInventory().getTitle();
-		ItemStack clicked = event.getCurrentItem();
-		if (clicked != null) {
-			if (clicked.getType().equals(Material.NETHER_STAR)
-					|| clicked.getType()
-							.equals(Material.valueOf(Main.getPlugin().getCustomConfig().getString("fernzuender")))
-					|| clicked.getType().equals(AutoCannonReloader.toolMaterial)
-					|| clicked.getType() == Material.CHEST) {
-				return;
-			}
-			if (clicked.hasItemMeta()) {
-				if (!pInv.getType().equals(InventoryType.CREATIVE)) {
-					String worldname;
-					if (p.getWorld().getName().contains("test")) {
-						worldname = p.getWorld().getName();
-					} else {
-						worldname = DBConnection.getName(p.getWorld().getName());
-					}
-					if (invName
-							.equals(MessageHandler.getInstance().getString(p, "inventoryName").replace("%r", worldname))
-							&& event.getClickedInventory().equals(pInv)) {
-						event.setCancelled(true);
-						inventoryGUI(p, pInv, clicked);
-					}
+        gui.setItem(33,s->{return BauPlayer.getBauPlayer(s.getPlayer()).getDT();}, designToolOn);
+        gui.setItem(33,s->{return !BauPlayer.getBauPlayer(s.getPlayer()).getDT();}, designToolOff);
 
-				}
-			}
-		}
+        gui.setItem(39, new DefaultItem(Material.MELON_SEEDS, msgHandler.getString(p, "gui_particles"), 1));
+        gui.setItem(41, new DefaultItem(TntChest.getTNTChest(), s -> {}));
+    }
+    public static void showMember(Player p) {
+        boolean isOwner = p.getWorld().getName().equals(p.getUniqueId().toString());
+        Set<String> memberlist = DBConnection.getMember(p.getUniqueId().toString());
+        Main.send(p, "memberListHeader", getName(p.getWorld()));
+        for (String memberUUID : memberlist) {
+            String memberName = DBConnection.getName(memberUUID);
+            String hover = MessageHandler.getInstance().getString(p, "memberHoverRemove").replace("%r", memberName);
+            JsonCreater remove = new JsonCreater("§7[§6" + memberName + "§7]");
+            if (isOwner) {
+                remove.addClickEvent("/gs remove " + memberName, ClickAction.SUGGEST_COMMAND).addHoverEvent(hover);
+            }
+            remove.send(p);
+        }
+        if (isOwner) {
+            new JsonCreater("§a[+]§r  ").addClickEvent("/gs add ", ClickAction.SUGGEST_COMMAND)
+                    .addHoverEvent(MessageHandler.getInstance().getString(p, "addMemberHover")).send(p);
+        }
 
-	}
+    }
 
-	private void inventoryGUI(Player p, Inventory pInv, ItemStack clicked) {
-		String tntdenied = MessageHandler.getInstance().getString(p, "tntDenied");
-		String tntallowed = MessageHandler.getInstance().getString(p, "tntAllowed");
-		String clickedName = clicked.getItemMeta().getDisplayName();
-		String reset = MessageHandler.getInstance().getString(p, "deletePlot");
-		String tp1 = MessageHandler.getInstance().getString(p, "gui_teleporter");
-		String testBlockSklaveGui = MessageHandler.getInstance().getString(p, "testBlockSklaveGui");
-		String trailgui = MessageHandler.getInstance().getString(p, "tbs_gui_trail");
-		String dtItemOn = MessageHandler.getInstance().getString(p, "dtItemOff");
-		String dtItemOff = MessageHandler.getInstance().getString(p, "dtItemOn");
-		if (clickedName.equals(tntallowed)) {
-			p.closeInventory();
-			p.performCommand("tnt");
-			p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "tntDeniedMessage"));
-		} else if (clickedName.equals(tntdenied)) {
-			p.closeInventory();
-			p.performCommand("tnt");
-			p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "tntAllowedMessage"));
-		} else if (clickedName.equals(reset)) {
-			p.closeInventory();
-			String rgID = WorldGuardHandler.getPlotId(p.getLocation());
-			PlotResetter.resetRegion(rgID, p, false);
-		} else if (clickedName.equals(tp1)) {
-			PlotTeleporter.openInv(p);
-		} else if (clickedName.equals(MessageHandler.getInstance().getString(p, "gui_particles"))) {
-			p.performCommand("particles gui");
-		} else if (clicked.getType().equals(Material.PLAYER_HEAD)) {
-			p.closeInventory();
-			p.performCommand("gs info");
-		} else if (clickedName.equals(testBlockSklaveGui)) {
-			p.performCommand("tbs");
-		} else if (clickedName.equals(MessageHandler.getInstance().getString(p, "torchOn"))
-				|| clickedName.equals(MessageHandler.getInstance().getString(p, "torchOff"))) {
-			// stoplag
-			p.closeInventory();
-			p.performCommand("sl");
-		} else if (clickedName.equals(trailgui)) {
-			p.performCommand("trail gui");
-		} else if (clickedName.equals(dtItemOff) || clickedName.equals(dtItemOn)) {
-			p.performCommand("dt");
-			p.closeInventory();
-		}
-
-	}
-
-	public static void showMember(Player p) {
-		boolean isOwner = p.getWorld().getName().equals(p.getUniqueId().toString());
-		Set<String> memberlist = DBConnection.getMember(p.getUniqueId().toString());
-		Main.send(p, "memberListHeader", getName(p.getWorld()));
-		for (String memberUUID : memberlist) {
-			String memberName = DBConnection.getName(memberUUID);
-			String hover = MessageHandler.getInstance().getString(p, "memberHoverRemove").replace("%r", memberName);
-			JsonCreater remove = new JsonCreater("§7[§6" + memberName + "§7]");
-			if (isOwner) {
-				remove.addClickEvent("/gs remove " + memberName, ClickAction.SUGGEST_COMMAND).addHoverEvent(hover);
-			}
-			remove.send(p);
-		}
-		if (isOwner) {
-			new JsonCreater("§a[+]§r  ").addClickEvent("/gs add ", ClickAction.SUGGEST_COMMAND)
-					.addHoverEvent(MessageHandler.getInstance().getString(p, "addMemberHover")).send(p);
-		}
-
-	}
-
-	public static String getName(World w) {
-		if (w.getName().contains("test")) {
-			return w.getName();
-		} else {
-			return WorldManager.getWorld(w.getUID()).getName();
-		}
-	}
+    public static String getName(World w) {
+        if (w.getName().contains("test")) {
+            return w.getName();
+        } else {
+            return WorldManager.getWorld(w.getUID()).getName();
+        }
+    }
 }

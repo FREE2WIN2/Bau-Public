@@ -52,7 +52,7 @@ public class Stoplag implements Listener, TabExecutor {
 		instance = this;
 		Bukkit.getPluginManager().registerEvents(this, Main.getPlugin());
 		Main.getPlugin().getCommand("sl").setExecutor(this);
-		commandHandle = new CommandHandel("sl", Main.prefix);
+		commandHandle = new CommandHandel("sl", Main.prefix,Main.getPlugin());
 
 		commandHandle.setCallback(s -> {
 			toggleSL(s);

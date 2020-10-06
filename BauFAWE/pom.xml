@@ -21,6 +21,7 @@
 		<version.worldedit>7.1.0</version.worldedit>
 		<version.worldguard>7.0.2</version.worldguard>
 		<version.spigot-api>1.15.2-R0.1-SNAPSHOT</version.spigot-api>
+		<version.thedepencyplugin>1.2.0</version.thedepencyplugin>
 		<!-- Plugin Versions -->
 		<version.maven-shade-plugin>3.2.3</version.maven-shade-plugin>
 
@@ -33,17 +34,10 @@
 	<dependencies>
 
 		<dependency>
-			<groupId>com.github.WesJD</groupId>
-			<artifactId>AnvilGUI</artifactId>
-			<version>1.0</version>
-			<scope>compile</scope>
-		</dependency>
-
-		<dependency>
 			<groupId>net.wargearworld</groupId>
-			<artifactId>GUI-API</artifactId>
-			<version>1.2</version>
-			<scope>compile</scope>
+			<artifactId>TheDependencyPlugin</artifactId>
+			<version>${version.thedepencyplugin}</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<!--This adds the Spigot API artifact to the build -->
@@ -67,19 +61,7 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>com.zaxxer</groupId>
-			<artifactId>HikariCP</artifactId>
-			<version>3.4.5</version>
-			<scope>compile</scope>
-		</dependency>
 
-		<dependency>
-			<groupId>net.wargearworld</groupId>
-			<artifactId>CommandFramework</artifactId>
-			<version>1.0</version>
-			<scope>compile</scope>
-		</dependency>
 	</dependencies>
 
 
