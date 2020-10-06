@@ -16,6 +16,8 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
 
+import javax.sql.rowset.CachedRowSet;
+
 import org.bukkit.entity.Player;
 
 import net.wargearworld.Bau.World.WorldManager;
