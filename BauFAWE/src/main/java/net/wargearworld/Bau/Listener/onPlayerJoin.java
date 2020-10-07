@@ -2,6 +2,7 @@ package net.wargearworld.Bau.Listener;
 
 import java.io.File;
 
+import net.wargearworld.Bau.Player.BauPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -32,22 +33,22 @@ public class onPlayerJoin implements Listener {
 		// sprache
 		Player p = e.getPlayer();
 		p.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
-		// p.teleport(new Location(Bukkit.getWorld("world"), 0, 30, 0));
-		String lang = DBConnection.getLanguage(p);
+		BauPlayer player = BauPlayer.getBauPlayer(p);
+		String lang = player.getDbPlayer().getCountryCode();
 		MessageHandler.playersLanguage.put(p.getUniqueId(), Language.valueOf(lang.toUpperCase()));
 		// has own gs?
 		String path = Bukkit.getWorldContainer().getAbsolutePath();
 		File gs = new File(path + "/" + p.getUniqueId() + "_" + p.getName());
 		System.out.println("gs exists: " + gs.exists());
-		System.out.println("hasOWnPlot" + DBConnection.hasOwnPlots(p.getUniqueId().toString()));
-		if (!DBConnection.hasOwnPlots(p.getUniqueId().toString()) && !gs.exists()) {
+		System.out.println("hasOWnPlot" + player.getDbPlayer().getPlots().isEmpty());
+			String uuidString = p.getUniqueId().toString();
+		if (player.getDbPlayer().getPlots().isEmpty() && !gs.exists()) {
 			// Bukkit.createWorld((WorldCreator) WorldCreator.name("test").createWorld());
 			// wenn nicht-> erstellen und hinteleportieren
-			String uuid = p.getUniqueId().toString();
-			WorldManager.createWorldDir(p.getName(),uuid);
+			WorldManager.createWorldDir(p.getName(),uuidString);
 			p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "plotGenerating"));
 		}
-		World world = WorldManager.loadWorld(p.getName(),p.getUniqueId().toString());
+		World world = WorldManager.loadWorld(p.getName(),uuidString);
 		BauWorld bauWorld = WorldManager.get(world);
 		bauWorld.spawn(p);
 		// wenn ja-> teleportieren

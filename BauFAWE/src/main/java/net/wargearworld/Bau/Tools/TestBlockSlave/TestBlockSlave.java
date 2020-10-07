@@ -23,7 +23,6 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 
 import net.wargearworld.Bau.Main;
 import net.wargearworld.Bau.MessageHandler;
-import net.wargearworld.Bau.HikariCP.DataSource;
 import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlock.CustomTestBlock;
 import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlock.EmptyTestBlock;
 import net.wargearworld.Bau.Tools.TestBlockSlave.TestBlock.Facing;
@@ -68,7 +67,7 @@ public class TestBlockSlave {
 
 	private HashSet<CustomTestBlock> readTestBlocks(int tier) {
 		HashSet<CustomTestBlock> outSet = new HashSet<>();
-		try (Connection conn = DataSource.getConnection()) {
+		/*try (Connection conn = DataSource.getConnection()) {
 			PreparedStatement statement = conn.prepareStatement(
 					"SELECT * FROM TestBlock,Player WHERE Player.UUID = ? AND TestBlock.tier = ? AND Player.UUID = TestBlock.owner");
 			statement.setString(1, owner.getUniqueId().toString());
@@ -82,7 +81,7 @@ public class TestBlockSlave {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
+		}*/
 		return outSet;
 	}
 
@@ -191,7 +190,7 @@ public class TestBlockSlave {
 	}
 
 	private void putTestBlockToDatabase(CustomTestBlock block) {
-		try (Connection conn = DataSource.getConnection()) {
+		/*try (Connection conn = DataSource.getConnection()) {
 			PreparedStatement statement = conn.prepareStatement(
 					"INSERT INTO `TestBlock`(`owner`, `schemName`, `name`, `tier`, `richtung`, `favorite`) VALUES (?,?,?,?,?,?)");
 			statement.setString(1, owner.getUniqueId().toString());
@@ -203,7 +202,7 @@ public class TestBlockSlave {
 			statement.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
+		}*/
 	}
 
 	private void saveRegionAsBlock(int tier, Facing facing, String plotID, String name,Type type) {
@@ -274,7 +273,7 @@ public class TestBlockSlave {
 	}
 
 	private boolean deleteTestBlockFromDatabase(int tier, String name) {
-		try (Connection conn = DataSource.getConnection()) {
+		/*try (Connection conn = DataSource.getConnection()) {
 			PreparedStatement statement = conn
 					.prepareStatement("DELETE FROM TestBlock WHERE owner = ? AND tier = ? AND name = ?");
 			statement.setString(1, owner.getUniqueId().toString());
@@ -283,7 +282,7 @@ public class TestBlockSlave {
 			return statement.executeUpdate() == 1;
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
+		}*/
 		return false;
 	}
 
@@ -319,7 +318,7 @@ public class TestBlockSlave {
 	}
 
 	private boolean updateFavToDataBase(boolean fav, int tier, String name) {
-		try (Connection conn = DataSource.getConnection()) {
+		/*try (Connection conn = DataSource.getConnection()) {
 			PreparedStatement statement = conn
 					.prepareStatement("UPDATE TestBlock SET favorite = ? WHERE owner = ? AND tier = ? AND name = ?");
 			statement.setBoolean(1, fav);
@@ -329,7 +328,7 @@ public class TestBlockSlave {
 			return statement.executeUpdate() == 1;
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
+		}*/
 		return false;
 	}
 	/* Show ManageMent Inventory */

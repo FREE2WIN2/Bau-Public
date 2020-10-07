@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import net.wargearworld.Bau.HikariCP.DBConnection;
+import net.wargearworld.Bau.World.Plots.Plot;
+import net.wargearworld.db.model.PlotTemplate;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -44,7 +47,7 @@ public class WorldTemplate {
 	
 	private List<PlotPattern> plots;
 	private String spawnPlotID;
-
+	private PlotTemplate dbTemplate;
 	private WorldTemplate(File configFile) {
 		name = configFile.getName().split("\\.")[0];
 		worldguardDir = new File(Bukkit.getPluginManager().getPlugin("WorldGuard").getDataFolder(),"worlds/" + name);
@@ -56,6 +59,8 @@ public class WorldTemplate {
 		} catch (IOException | InvalidConfigurationException e) {
 			e.printStackTrace();
 		}
+
+		dbTemplate = DBConnection.getTemplate(name);
 	}
 	
 	public String getName() {
@@ -93,15 +98,12 @@ public class WorldTemplate {
 		}
 		return spawnPlotID;
 	}
-	
-	
-	
-//	public PlotType getType(Plot plot) {
-//		return PlotType.valueOf(config.getString("plots." + plot.getId()).toUpperCase());
-//	}
 
 	public PlotType getType(String plotID) {
 		return PlotType.valueOf(config.getString("plots." + plotID).toUpperCase());
 	}
 
+	public PlotTemplate getdbTemplate() {
+		return dbTemplate;
+	}
 }

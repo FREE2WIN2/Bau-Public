@@ -1,12 +1,10 @@
 package net.wargearworld.Bau.World;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.UUID;
+import java.util.*;
 
+import net.wargearworld.Bau.World.Plots.PlotPattern;
+import net.wargearworld.db.model.Plot;
+import net.wargearworld.db.model.PlotMember;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -22,25 +20,32 @@ import net.wargearworld.Bau.utils.MethodResult;
 public class PlayerWorld extends BauWorld {
 
 	UUID owner;
-
-	public PlayerWorld(int id, String owner, World world) {
-		super(id, world);
+	private Plot dbPlot;
+	public PlayerWorld(long id, String owner, World world) {
+		super(world);
+		dbPlot = DBConnection.getPlot(id);
 		this.owner = UUID.fromString(owner);
+		setTemplate(dbPlot.getTemplate().getName());
+		plots = new HashMap<>();
+		for (PlotPattern plotPattern : getTemplate().getPlots()) {
+			plots.put(plotPattern.getID(), plotPattern.toPlot(this));
+		}
 		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	protected Map<UUID, Date> loadMembers() {
-		return DBConnection.getMembers(getId());
+		return null;
+//		return DBConnection.getMembers(getId());
 	}
 
 	@Override
 	public void showInfo(Player p) {
 		boolean isOwner = isOwner(p);
-		Set<String> memberlist = DBConnection.getMember(p.getUniqueId().toString());
-		Main.send(p, "memberListHeader", getName(p.getWorld()));
-		for (String memberUUID : memberlist) {
-			String memberName = DBConnection.getName(memberUUID);
+		Set<PlotMember> members = dbPlot.getMembers();
+		Main.send(p, "memberListHeader", getName());
+		for (PlotMember plotMember : members) {
+			String memberName = plotMember.getMember().getName();
 			String hover = MessageHandler.getInstance().getString(p, "memberHoverRemove").replace("%r", memberName);
 			JsonCreater remove = new JsonCreater("§7[§6" + memberName + "§7]");
 			if (isOwner) {
@@ -79,9 +84,9 @@ public class PlayerWorld extends BauWorld {
 
 	@Override
 	public void removeMember(UUID member) {
-		Player ownerPlayer = Bukkit.getPlayer(owner);
+		/*Player ownerPlayer = Bukkit.getPlayer(owner);
 		if (!member.toString().equals(this.owner)) {
-			if (DBConnection.removeMember(super.getId(), member)) {
+			if (DBConnection.removeMember(dbPlot.getId(), member)) {
 				removeMemberFromAllRegions(member);
 				String name = DBConnection.getName(member.toString());
 				super.getMembers().remove(member);
@@ -107,17 +112,23 @@ public class PlayerWorld extends BauWorld {
 		} else {
 			if (ownerPlayer != null)
 				Main.send(ownerPlayer, "YouCantRemoveYourself");
-		}
+		}*/
+	}
+
+	@Override
+	public void setTemplate(String templateName) {
+		WorldTemplate template = WorldTemplate.getTemplate(templateName);
+		super.setTemplate(template);
 	}
 
 	@Override
 	public MethodResult add(String playerName, Date to) {
 
-		BauPlayer p = BauPlayer.getBauPlayer(owner);
+		/*BauPlayer p = BauPlayer.getBauPlayer(owner);
 		UUID uuidMember = UUID.fromString(DBConnection.getUUID(playerName));
 		if (!isAuthorized(uuidMember)) {
 			getMembers().put(uuidMember, to);
-			if (DBConnection.addMember(getId(), uuidMember, to)) {
+			if (DBConnection.addMember(dbPlot.getId(), uuidMember, to)) {
 				addPlayerToAllRegions(uuidMember);
 				if (to == null) {
 					log(WorldAction.ADD, uuidMember.toString(), playerName);
@@ -133,8 +144,8 @@ public class PlayerWorld extends BauWorld {
 		} else {
 			p.sendMessage(
 					Main.prefix + MessageHandler.getInstance().getString(p, "alreadyMember").replace("%r", playerName));
+		}*/
 			return MethodResult.FAILURE;
-		}
 	}
 
 	@Override

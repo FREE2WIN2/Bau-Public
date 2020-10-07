@@ -22,7 +22,6 @@ import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 
 import net.wargearworld.Bau.Communication.DatabaseCommunication;
-import net.wargearworld.Bau.HikariCP.DataSource;
 import net.wargearworld.Bau.Listener.ClickListener;
 import net.wargearworld.Bau.Listener.ExplosioneventListener;
 import net.wargearworld.Bau.Listener.SignListener;
@@ -82,11 +81,10 @@ public class Main extends JavaPlugin {
 
 		registerCommands();
 		registerListener();
-		WorldManager.startCheckForTempAddRemoves();
-		WorldManager.checkForWorldsToUnload();
-		new DataSource();
-
+/*		WorldManager.startCheckForTempAddRemoves();
+		WorldManager.checkForWorldsToUnload();*/
 		new CompassBar();
+		CommandManager.registerPlugin(this,MessageHandler.getInstance());
 		new GUI_API(this,MessageHandler.getInstance());
 		new WorldGUI(this);
 		DefaultTestBlock.generateDefaultTestBlocks();

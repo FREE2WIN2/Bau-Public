@@ -142,25 +142,8 @@ public class GUI implements CommandExecutor, Listener {
 
         gui.setItem(39, new DefaultItem(Material.MELON_SEEDS, msgHandler.getString(p, "gui_particles"), 1));
         gui.setItem(41, new DefaultItem(TntChest.getTNTChest(), s -> {}));
-    }
-    public static void showMember(Player p) {
-        boolean isOwner = p.getWorld().getName().equals(p.getUniqueId().toString());
-        Set<String> memberlist = DBConnection.getMember(p.getUniqueId().toString());
-        Main.send(p, "memberListHeader", getName(p.getWorld()));
-        for (String memberUUID : memberlist) {
-            String memberName = DBConnection.getName(memberUUID);
-            String hover = MessageHandler.getInstance().getString(p, "memberHoverRemove").replace("%r", memberName);
-            JsonCreater remove = new JsonCreater("§7[§6" + memberName + "§7]");
-            if (isOwner) {
-                remove.addClickEvent("/gs remove " + memberName, ClickAction.SUGGEST_COMMAND).addHoverEvent(hover);
-            }
-            remove.send(p);
-        }
-        if (isOwner) {
-            new JsonCreater("§a[+]§r  ").addClickEvent("/gs add ", ClickAction.SUGGEST_COMMAND)
-                    .addHoverEvent(MessageHandler.getInstance().getString(p, "addMemberHover")).send(p);
-        }
 
+        gui.open(p);
     }
 
     public static String getName(World w) {

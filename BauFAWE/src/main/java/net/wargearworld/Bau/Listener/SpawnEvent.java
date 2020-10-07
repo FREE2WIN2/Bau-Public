@@ -122,8 +122,8 @@ public class SpawnEvent implements Listener {
 			}
 			FileWriter fw = new FileWriter(f, true);
 			String time = HelperMethods.getTime();
-			fw.write(time + " " + world.getName() + " " + size + "Entities Entfernt! ->"
-					+ DBConnection.getName(world.getName()) + "\n");
+			/* TODO fw.write(time + " " + world.getName() + " " + size + "Entities Entfernt! ->"
+					+ DBConnection.getName(world.getName()) + "\n");*/
 			fw.flush();
 			fw.close();
 		} catch (IOException e) {

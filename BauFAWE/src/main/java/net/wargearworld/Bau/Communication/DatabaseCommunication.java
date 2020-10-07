@@ -4,13 +4,26 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Stack;
 
+import net.wargearworld.Bau.HikariCP.DBConnection;
+import net.wargearworld.db.model.Plot;
+import net.wargearworld.db.model.Plot_;
+import net.wargearworld.db.model.PluginCommunication;
+import net.wargearworld.db.model.PluginCommunication_;
+import net.wargearworld.thedependencyplugin.DependencyProvider;
 import org.bukkit.Bukkit;
 
 import net.wargearworld.Bau.Main;
-import net.wargearworld.Bau.HikariCP.DataSource;
+import org.hibernate.criterion.Order;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import javax.sql.DataSource;
 
 
 public class DatabaseCommunication {
@@ -19,48 +32,37 @@ public class DatabaseCommunication {
 	public static int repeatDelay = 5*20; // 5Sekunden Delay
 	
 	public static void sendMessage(String reciever, String subchannel, String command) {
-		try (Connection conn = DataSource.getConnection()) {
-			String sql = "INSERT INTO `PluginCommunication`(`senderPlugin`, `recieverPlugin`, `subchannel`, `command`) VALUES (?,?,?,?)";
-			PreparedStatement statement = conn.prepareStatement(sql);
-			statement.setString(1, nameOfMe);
-			statement.setString(2, reciever);
-			statement.setString(3, subchannel);
-			statement.setString(4, command);
-			statement.executeUpdate();
-		} catch (SQLException ex) {
-			ex.printStackTrace();
-		}
+		PluginCommunication communication = new PluginCommunication();
+		communication.setCommand(command);
+		communication.setReceiver(reciever);
+		communication.setSubChannel(subchannel);
+		communication.setSender(nameOfMe);
+		DBConnection.persist(communication);
 	}
 
 	public static Stack<PluginMessage> readMessages() {
 		Stack<PluginMessage> out = new Stack<>();
-		try (Connection conn = DataSource.getConnection()) {
-			String sql = "SELECT * FROM `PluginCommunication` WHERE recieverPlugin = ?";
-			PreparedStatement statement = conn.prepareStatement(sql);
-			statement.setString(1, nameOfMe);
-			ResultSet rs = statement.executeQuery();
-			while (rs.next()) {
-				int id = rs.getInt("messageID");
-				String from = rs.getString("senderPlugin");
-				String subChannel = rs.getString("subchannel");
-				String command = rs.getString("command");
-				out.add(new PluginMessage(id, from, subChannel, command));
-			}
-		} catch (SQLException ex) {
-			ex.printStackTrace();
+
+		EntityManager em = DependencyProvider.getEntityManager();
+		CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+		CriteriaQuery<PluginCommunication> criteriaQuery = criteriaBuilder.createQuery(PluginCommunication.class);
+		Root root = criteriaQuery.from(PluginCommunication.class);
+
+		criteriaQuery.where(criteriaBuilder.notEqual(root.get(PluginCommunication_.sender),nameOfMe));
+		criteriaQuery.orderBy(criteriaBuilder.asc(root.get(PluginCommunication_.id.getName())));
+
+		Query query = em.createQuery(criteriaQuery);
+		List<PluginCommunication> list = query.getResultList();
+
+		for(PluginCommunication communication:list){
+			out.add(new PluginMessage(communication));
 		}
 		return out;
 	}
 
-	public static void deleteMessage(int id) {
-		try (Connection conn = DataSource.getConnection()) {
-			String sql = "DELETE FROM PluginCommunication WHERE messageID = ?";
-			PreparedStatement statement = conn.prepareStatement(sql);
-			statement.setInt(1, id);
-			statement.executeUpdate();
-		} catch (SQLException ex) {
-			ex.printStackTrace();
-		}
+	public static void deleteMessage(Long id) {
+		PluginCommunication communication = DependencyProvider.getEntityManager().find(PluginCommunication.class,id);
+		DBConnection.remove(communication);
 	}
 	
 	public static void startRecieve() {

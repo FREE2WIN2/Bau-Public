@@ -17,7 +17,7 @@ public class TeamWorld extends BauWorld{
 	private Set<UUID> leaders;
 	private Set<UUID> members;
 	public TeamWorld(int id, World world, int teamID) {
-		super(id, world);
+		super(world);
 		this.teamID = teamID;
 	}
 
@@ -61,6 +61,11 @@ public class TeamWorld extends BauWorld{
 	public void removeMember(UUID member) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void setTemplate(String templateName) {
+
 	}
 
 	@Override

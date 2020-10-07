@@ -33,30 +33,20 @@ import net.wargearworld.Bau.utils.MethodResult;
 public abstract class BauWorld {
 	private UUID worldUUID;
 
-	private int id;
+
 	private String name;
-	private HashMap<String, Plot> plots;
+	HashMap<String, Plot> plots;
 	private RegionManager regionManager;
 	private WorldTemplate template;
 	private File logFile;
 	private Map<UUID, Date> members;
 
-	public BauWorld(int id, World world) {
+	public BauWorld( World world) {
 		System.out.println(world);
 		this.name = world.getName().split("_",2)[1];
 		System.out.println(name);
-		this.id = id;
 		this.worldUUID = world.getUID();
 		regionManager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(world));
-		String templateName = DBConnection.getTemplate(id);
-		template = WorldTemplate.getTemplate(templateName);
-
-		plots = new HashMap<>();
-		for (PlotPattern plotPattern : template.getPlots()) {
-			plots.put(plotPattern.getID(), plotPattern.toPlot(this));
-		}
-
-		
 		logFile = new File(Main.getPlugin().getDataFolder(),"worlds/" + world.getName() + "/logs.txt");
 		try {
 			if (!logFile.exists())
@@ -69,7 +59,7 @@ public abstract class BauWorld {
 		}
 
 		members = loadMembers();
-		checkForTimeoutMembership();
+//		checkForTimeoutMembership();
 	}
 
 	protected abstract Map<UUID, Date> loadMembers();
@@ -79,9 +69,6 @@ public abstract class BauWorld {
 		return name;
 	}
 
-	public int getId() {
-		return id;
-	}
 
 	public Plot getPlot(String plotID) {
 		return plots.get(plotID);
@@ -113,16 +100,6 @@ public abstract class BauWorld {
 	}
 
 	public abstract void showInfo(Player p);
-
-
-	public String getName(World w) {
-		//TODO woaders
-		if (w.getName().contains("test")) {
-			return name;
-		} else {
-			return DBConnection.getName(name );
-		}
-	}
 
 	public abstract boolean isOwner(Player player);
 
@@ -194,9 +171,13 @@ public abstract class BauWorld {
 		regionManager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(world));
 		return true;
 	}
-	public void setTemplate(String templateName) {
-		this.template = WorldTemplate.getTemplate(templateName);
-		DBConnection.setTemplate(id,template);
+	public abstract void setTemplate(String templateName);
+
+	public WorldTemplate getTemplate() {
+		return template;
+	}
+	protected void setTemplate(WorldTemplate template) {
+		this.template = template;
 	}
 
 	public void removeAllMembers() {
@@ -228,7 +209,9 @@ public abstract class BauWorld {
 			e.printStackTrace();
 		}
 	}
-	
+
+
+
 	protected enum WorldAction {
 		ADD, ADDTEMP, REMOVE, NEW, DELETE;
 

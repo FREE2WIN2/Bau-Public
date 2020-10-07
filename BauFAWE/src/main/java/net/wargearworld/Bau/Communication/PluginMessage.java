@@ -5,18 +5,19 @@ import java.util.UUID;
 
 import net.wargearworld.Bau.World.TeamWorld;
 import net.wargearworld.Bau.World.WorldManager;
+import net.wargearworld.db.model.PluginCommunication;
 
 public class PluginMessage {
-	int ID;
+	Long ID;
 	String from;
 	String subChannel;
 	String command;
 
-	public PluginMessage(int id, String from, String subChannel, String command) {
-		this.ID = id;
-		this.from = from;
-		this.subChannel = subChannel;
-		this.command = command;
+	public PluginMessage(PluginCommunication communication) {
+		this.ID = communication.getId();
+		this.from = communication.getSender();
+		this.subChannel = communication.getSubChannel();
+		this.command = communication.getCommand();
 	}
 
 	public void operate() {
@@ -29,7 +30,7 @@ public class PluginMessage {
 			String[] args = command.split(" ");
 			int teamID = Integer.parseInt(args[2]);
 			UUID memberUUID = UUID.fromString(args[1]);
-			List<TeamWorld> worlds = WorldManager.getTeamWorlds(teamID);
+			//List<TeamWorld> worlds = WorldManager.getTeamWorlds(teamID);
 			switch (subChannel) {
 			case "Members":
 //				if (args[0].equals("addMember")) {

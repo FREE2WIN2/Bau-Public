@@ -3,7 +3,7 @@ version: 2.0
 author: FREE2WIN
 main: net.wargearworld.Bau.Main
 api-version: 1.15
-depend: [WorldEdit,WorldGuard]
+depend: [WorldEdit,WorldGuard, TheDependencyPlugin]
 description: Bauplugin
 commands:
    stats:

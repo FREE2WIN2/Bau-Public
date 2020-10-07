@@ -36,6 +36,7 @@ import net.wargearworld.CommandManager.Arguments.DynamicListArgument;
 import net.wargearworld.CommandManager.Arguments.DynamicListGetter;
 import net.wargearworld.CommandManager.Arguments.IntegerArgument;
 import net.wargearworld.CommandManager.Arguments.StringArgument;
+import net.wargearworld.CommandManager.ArgumentType;
 public class gs implements TabExecutor {
 
 	public static File logFile;
@@ -64,7 +65,8 @@ public class gs implements TabExecutor {
 			@Override
 			public Collection<String> getList(ParseState state) {
 				BauWorld world = WorldManager.get(state.getPlayer().getWorld());
-				return DBConnection.getAllNotAddedPlayers(world.getId()).values();
+				return null;
+				//TODO return DBConnection.getAllNotAddedPlayers(world.getId()).values();
 			}
 		}));
 		CommandNode members = argument("Mitglied", new DynamicListArgument("Mitglied", new DynamicListGetter<String>() {
@@ -86,7 +88,7 @@ CommandNode worlds = argument("Worlds", new DynamicListArgument("Worlds", new Dy
 			
 			@Override
 			public Collection<String> getList(ParseState state) {
-				return DBConnection.getAllWorlds();
+				return DBConnection.getAllWorlds(); //TODO
 			}
 		}));
 		Predicate<ArgumentList> owner = s ->{return WorldManager.get(s.getPlayer().getWorld()).isOwner(s.getPlayer());};
@@ -126,7 +128,7 @@ CommandNode worlds = argument("Worlds", new DynamicListArgument("Worlds", new Dy
 		commandHandle.addSubNode(literal("remove")
 				.setRequirement(owner)
 				.addSubNode(members
-						.setCallback(s->{getWorld(s).removeMember(UUID.fromString(DBConnection.getUUID(s.getString("Spieler"))));})));
+						.setCallback(s->{getWorld(s).removeMember(DBConnection.getPlayer(s.getString("Spieler")).getUuid());})));
 		/* gs time [Zeit]*/
 		commandHandle.addSubNode(literal("time")
 				.addSubNode(argument("Zeit",new IntegerArgument(1,24000))
@@ -148,7 +150,7 @@ CommandNode worlds = argument("Worlds", new DynamicListArgument("Worlds", new Dy
 		if(name == null) {
 			WorldManager.getWorld(p.getName(),p.getUniqueId().toString()).spawn(p);
 		}else {
-			WorldManager.getWorld(name).spawn(p);
+			//WorldManager.getWorld(name).spawn(p);
 		}
 	}
 
@@ -200,10 +202,10 @@ CommandNode worlds = argument("Worlds", new DynamicListArgument("Worlds", new Dy
 	}
 
 	public void deletePlot(ArgumentList s) {
-		BauWorld world = WorldManager.getWorld(s.getString("Worlds"));
+		/*BauWorld world = WorldManager.getWorld(s.getString("Worlds"));
 		if (world.newWorld()) {
 			Main.send(s.getPlayer(), "gsDeleted", s.getString("worlds"));
-		}
+		}*/
 	}
 
 	
