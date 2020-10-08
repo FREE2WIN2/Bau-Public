@@ -16,9 +16,9 @@ import com.sk89q.worldedit.regions.RegionOperationException;
 
 import net.wargearworld.bau.tools.testBlockSlave.TestBlockSlaveCore;
 import net.wargearworld.bau.tools.testBlockSlave.testBlock.Facing;
-import net.wargearworld.bau.tools.testBlockSlave.testBlockEditor.Iterators.FrontIterator;
-import net.wargearworld.bau.tools.testBlockSlave.testBlockEditor.Iterators.RoofIterator;
-import net.wargearworld.bau.tools.testBlockSlave.testBlockEditor.Iterators.SideIterator;
+import net.wargearworld.bau.tools.testBlockSlave.testBlockEditor.iterators.FrontIterator;
+import net.wargearworld.bau.tools.testBlockSlave.testBlockEditor.iterators.RoofIterator;
+import net.wargearworld.bau.tools.testBlockSlave.testBlockEditor.iterators.SideIterator;
 import net.wargearworld.bau.utils.CoordGetter;
 
 public class ShieldModule {
