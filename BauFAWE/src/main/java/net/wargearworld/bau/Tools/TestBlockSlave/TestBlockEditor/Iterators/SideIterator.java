@@ -1,4 +1,4 @@
-package net.wargearworld.bau.tools.testBlockSlave.testBlockEditor.Iterators;
+package net.wargearworld.bau.tools.testBlockSlave.testBlockEditor.iterators;
 
 import java.util.Iterator;
 
