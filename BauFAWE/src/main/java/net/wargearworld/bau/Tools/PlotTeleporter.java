@@ -1,5 +1,12 @@
 package net.wargearworld.bau.tools;
 
+import net.wargearworld.GUI_API.GUI.ChestGUI;
+import net.wargearworld.GUI_API.GUI.GUI;
+import net.wargearworld.GUI_API.Items.DefaultItem;
+import net.wargearworld.bau.world.BauWorld;
+import net.wargearworld.bau.world.WorldManager;
+import net.wargearworld.bau.world.plots.Plot;
+import net.wargearworld.bau.world.plots.PlotType;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -18,25 +25,30 @@ import net.wargearworld.bau.scoreboard.ScoreBoardBau;
 import net.wargearworld.bau.utils.CoordGetter;
 import net.wargearworld.bau.utils.ItemStackCreator;
 
-public class PlotTeleporter implements Listener {
+public class PlotTeleporter {
 
 	public static void openInv(Player p) {
-		Inventory inv = Bukkit.createInventory(null, 18, MessageHandler.getInstance().getString(p, "gui_teleporter"));
+		GUI gui = new ChestGUI(18, MessageHandler.getInstance().getString(p, "gui_teleporter"));
 		// 2pearls
-		int countOfNormalPlots = CoordGetter.getConfigOfWorld(p.getWorld().getName()).getInt("countplots");
+
+		BauWorld world = WorldManager.get(p.getWorld());
+
+		int countOfNormalPlots = world.getAmountOfPlots(PlotType.DEFAULT);
 		int index = 0;
 		for (int i = 1; i <= countOfNormalPlots; i++) {
 			ItemStack teleportNormal = ItemStackCreator.createNewItemStack(Material.ENDER_PEARL,
 					MessageHandler.getInstance().getString(p, "teleportNormalPlot", "" + i));
 			teleportNormal.setAmount(i);
-			inv.setItem(index, teleportNormal);
+			gui.setItem(index, new DefaultItem(teleportNormal,s->{
+				p.teleport(getLocation(p, p.getWorld(), s.getClicked()));
+				ScoreBoardBau.cmdUpdate(p);}));
 			index++;
 		}
 
-		ConfigurationSection section = CoordGetter.getConfigOfWorld(p.getWorld().getName()).getConfigurationSection("counttestblockspertier");
-		int[] countOfTestBlocks = new int[3];
-		for(int i = 1;i<=3;i++) {
-			countOfTestBlocks[i-1] = section.getInt(""+i);
+		int[] countOfTestBlocks = {0,0,0};
+		for(Plot plot:world.getPlots(PlotType.TEST)){
+			int tier = world.getTemplate().getTier(plot.getId());
+			countOfTestBlocks[tier-1] = countOfTestBlocks[tier-1] + 1;
 		}
 		index = 9;
 		for (int tier = 1; tier <= 3; tier++) {
@@ -44,44 +56,21 @@ public class PlotTeleporter implements Listener {
 				ItemStack teleportTest = ItemStackCreator.createNewItemStack(Material.ENDER_EYE,
 						MessageHandler.getInstance().getString(p, "teleportTestPlot", "" + i, "" + tier));
 				teleportTest.setAmount(tier);
-				inv.setItem(index, teleportTest);
+				gui.setItem(index, new DefaultItem(teleportTest,s->{
+					p.teleport(getLocation(p, p.getWorld(), s.getClicked()));
+					ScoreBoardBau.cmdUpdate(p);}));
 				index++;
+				}
 			}
-		}
-
-		p.openInventory(inv);
+		gui.open(p);
 	}
 
-	@EventHandler
-	public void onInvClick(InventoryClickEvent event) {
-		if (event.getClickedInventory() == null) {
-			return;
-		}
-		if (event.getSlotType() == SlotType.OUTSIDE) {
-			return;
-		}
-		ItemStack item = event.getCurrentItem();
-		if (item == null) {
-			return;
-		}
-		if (!item.hasItemMeta()) {
-			return;
-		}
 
-		Player p = (Player) event.getWhoClicked();
-		if (!event.getView().getTitle().equals(MessageHandler.getInstance().getString(p, "gui_teleporter"))) {
-			return;
-		}
-		event.setCancelled(true);
-		p.teleport(getLocation(p, p.getWorld(), item));
-		ScoreBoardBau.cmdUpdate(p);
+	private static Location getLocation(Player p, World w, ItemStack item) {
+		return WorldManager.get(w).getPlot(getPlotId(p,item)).getTeleportPoint();
 	}
 
-	private Location getLocation(Player p, World w, ItemStack item) {
-		return CoordGetter.getTeleportLocation(w, getPlotId(p, item));
-	}
-
-	private String getPlotId(Player p, ItemStack item) {
+	private static String getPlotId(Player p, ItemStack item) {
 		if (item.getType() == Material.ENDER_PEARL) {
 			switch (item.getAmount()) {
 			case 1:
@@ -95,10 +84,11 @@ public class PlotTeleporter implements Listener {
 			}
 			return "plot2";
 		} else if (item.getType() == Material.ENDER_EYE) {
-			ConfigurationSection section = CoordGetter.getConfigOfWorld(p.getWorld().getName()).getConfigurationSection("counttestblockspertier");
-			int[] countOfTestBlocks = new int[3];
-			for(int i = 1;i<=3;i++) {
-				countOfTestBlocks[i-1] = section.getInt(""+i);
+			int[] countOfTestBlocks = {0,0,0};
+			BauWorld world = WorldManager.get(p.getWorld());
+			for(Plot plot:world.getPlots(PlotType.TEST)){
+				int tier = world.getTemplate().getTier(plot.getId());
+				countOfTestBlocks[tier-1] = countOfTestBlocks[tier-1] + 1;
 			}
 			for (int tier = 1; tier <= 3; tier++) {
 				for (int i = 1; i <= countOfTestBlocks[tier-1]; i++) {
@@ -108,7 +98,6 @@ public class PlotTeleporter implements Listener {
 					}
 				}
 			}
-
 		}
 		return "plot2";
 	}

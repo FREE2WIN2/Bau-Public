@@ -8,6 +8,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
+import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.db.model.*;
 import net.wargearworld.thedependencyplugin.DependencyProvider;
 
@@ -41,7 +42,7 @@ public class DBConnection {
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<Plot> criteriaQuery = criteriaBuilder.createQuery(Plot.class);
         Root<Plot> root = criteriaQuery.from(Plot.class);
-        criteriaQuery.where(criteriaBuilder.equal(root.get(Plot_.name), name),criteriaBuilder.equal(root.get(Plot_.owner),getPlayer(owner)));
+        criteriaQuery.where(criteriaBuilder.equal(root.get(Plot_.name), name),criteriaBuilder.equal(root.get(Plot_.owner),BauPlayer.getBauPlayer(owner).getDbPlayer()));
         Query query = em.createQuery(criteriaQuery);
         return (Plot) query.getSingleResult();
     }
@@ -72,7 +73,6 @@ public class DBConnection {
     }
 
     public static PlotTemplate getTemplate(String name) {
-        System.out.println(name);
         EntityManager em = DependencyProvider.getEntityManager();
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<PlotTemplate> criteriaQuery = criteriaBuilder.createQuery(PlotTemplate.class);
@@ -80,5 +80,13 @@ public class DBConnection {
         criteriaQuery.where(criteriaBuilder.equal(root.get(PlotTemplate_.name), name));
         Query query = em.createQuery(criteriaQuery);
         return (PlotTemplate) query.getSingleResult();
+    }
+
+    public static void sendMail(String sender, Player receiver, String message){
+        Mail mail = new Mail();
+        mail.setMessage(message);
+        mail.setReceiver(receiver);
+        mail.setSender(sender);
+        DBConnection.persist(mail);
     }
 }

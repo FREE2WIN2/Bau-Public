@@ -58,6 +58,11 @@ public class TeamWorld extends BauWorld{
 	}
 
 	@Override
+	public void checkForTimeoutMembership() {
+
+	}
+
+	@Override
 	public void removeMember(UUID member) {
 		// TODO Auto-generated method stub
 		

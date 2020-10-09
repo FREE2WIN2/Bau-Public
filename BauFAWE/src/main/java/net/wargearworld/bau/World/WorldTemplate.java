@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import net.wargearworld.bau.hikariCP.DBConnection;
+import net.wargearworld.bau.world.plots.Plot;
 import net.wargearworld.db.model.PlotTemplate;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -99,10 +100,16 @@ public class WorldTemplate {
 	}
 
 	public PlotType getType(String plotID) {
-		return PlotType.valueOf(config.getString("plots." + plotID).toUpperCase());
+		return PlotType.valueOf(config.getString("plots." + plotID).split(" ")[0].toUpperCase());
+	}
+
+	public int getTier(String plotID) {
+		return Integer.parseInt(config.getString("plots." + plotID).split(" ")[1]);
 	}
 
 	public PlotTemplate getdbTemplate() {
 		return dbTemplate;
 	}
+
+
 }

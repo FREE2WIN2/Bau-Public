@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import net.wargearworld.GUI_API.GUI_API;
+import net.wargearworld.bau.world.WorldManager;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -80,8 +81,8 @@ public class Main extends JavaPlugin {
 
 		registerCommands();
 		registerListener();
-/*		WorldManager.startCheckForTempAddRemoves();
-		WorldManager.checkForWorldsToUnload();*/
+		WorldManager.startCheckForTempAddRemoves();
+		WorldManager.checkForWorldsToUnload();
 		new CompassBar();
 		CommandManager.registerPlugin(this,MessageHandler.getInstance());
 		new GUI_API(this,MessageHandler.getInstance());
@@ -117,7 +118,6 @@ public class Main extends JavaPlugin {
 		pm.registerEvents(new ParticlesGUI(), this);
 		pm.registerEvents(new TestBlockEditorCore(), this);
 		pm.registerEvents(new SaWE(),this);
-		pm.registerEvents(new PlotTeleporter(), this);
 	}
 
 	private void registerCommands() {

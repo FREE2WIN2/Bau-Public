@@ -11,6 +11,9 @@ public class TestPlot extends Plot{
 	protected TestPlot(ProtectedRegion region, String id, Location middleNorth, Schematic ground) {
 		super(region, id, middleNorth, ground);
 	}
-
+	@Override
+	public PlotType getType() {
+		return PlotType.TEST;
+	}
 
 }
