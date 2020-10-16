@@ -177,17 +177,12 @@ public class WorldManager {
     }
 
     public static void checkForWorldsToUnload() {
-        Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), new Runnable() {
-
-            @Override
-            public void run() {
+        Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), ()-> {
                 for (World w : Bukkit.getServer().getWorlds()) {
                     if (w.getPlayers().size() == 0 && !w.getName().equals("world")) {
                         undloadWorld(w);
                     }
                 }
-
-            }
         }, 20 * 60, 20 * 60);
     }
 

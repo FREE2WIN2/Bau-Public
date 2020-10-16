@@ -133,4 +133,7 @@ public abstract class Plot {
 		Location out = middleNorth.clone();//clone
 		return out.subtract(0.5, 0, 0);
 	}
+
+	public abstract PlotType getType();
+
 }

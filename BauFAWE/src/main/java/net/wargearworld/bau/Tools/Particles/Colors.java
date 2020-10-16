@@ -1,13 +1,22 @@
 package net.wargearworld.bau.tools.particles;
 
+import net.wargearworld.CommandManager.ArgumentType;
+import net.wargearworld.CommandManager.Arguments.EnumArgument;
+import net.wargearworld.CommandManager.Arguments.EnumArgumentInterface;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
+import org.w3c.dom.Entity;
 
-public enum Colors {
+import java.util.ArrayList;
+import java.util.List;
+
+public enum Colors implements EnumArgumentInterface<Colors> {
 
 	AQUA, BLACK, BLUE, BROWN, CYAN, FUCHSIA, GRAY, GREEN, LIGHT_BLUE, LIGHT_GRAY, LIME,MAGENTA, MAROON, NAVY, OLIVE, ORANGE,PINK, PURPLE, RED, SILVER, TEAL, WHITE,
 	YELLOW;
-	
+
+
+
 	public Color getColor() {
 		switch (this) {
 		case AQUA:
@@ -58,5 +67,46 @@ public enum Colors {
 			return Color.YELLOW;
 		}
 		return null;
+	}
+
+	@Override
+	public Colors fromString(String s) {
+		return Colors.valueOf(s.toUpperCase());
+	}
+
+	@Override
+	public String getTypeName() {
+		return "Color";
+	}
+
+	@Override
+	public String[] getPossibleOptions() {
+		List<String> outlist = new ArrayList<>();
+		for(Colors color:Colors.values()){
+			outlist.add(color.name());
+		}
+		return outlist.toArray(new String[outlist.size()]);
+	}
+
+	static public EnumArgument<Colors> asArgument(){
+		return new EnumArgument<Colors>(new EnumArgumentInterface<Colors>() {
+
+			@Override
+			public Colors fromString(String s) {
+				return Colors.valueOf(s.toUpperCase());
+			}
+
+			@Override
+			public String getTypeName() {
+				return "ShowMode";///TODO: make bilingual
+			}
+
+			@Override
+			public String[] getPossibleOptions() {
+				return getPossibleOptions();
+			}
+
+		});
+
 	}
 }

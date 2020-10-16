@@ -12,6 +12,10 @@ public class DefaultPlot extends Plot {
 		super(region, id, middleNorth, ground);
 	}
 
-	
+	@Override
+	public PlotType getType() {
+		return PlotType.DEFAULT;
+	}
+
 
 }

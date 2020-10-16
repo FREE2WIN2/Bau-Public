@@ -9,6 +9,7 @@ import net.wargearworld.GUI_API.GUI_API;
 import net.wargearworld.bau.world.WorldManager;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.block.data.type.Bed;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -35,14 +36,12 @@ import net.wargearworld.bau.listener.onPlayerRespawn;
 import net.wargearworld.bau.listener.onPlayerTeleport;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.tabCompleter.TntReloaderTC;
-import net.wargearworld.bau.tabCompleter.particlesTC;
 import net.wargearworld.bau.tabCompleter.tbsTC;
 import net.wargearworld.bau.tools.AutoCannonReloader;
 import net.wargearworld.bau.tools.CompassBar;
 import net.wargearworld.bau.tools.DesignTool;
 import net.wargearworld.bau.tools.GUI;
 import net.wargearworld.bau.tools.PlotResetter;
-import net.wargearworld.bau.tools.PlotTeleporter;
 import net.wargearworld.bau.tools.Stoplag;
 import net.wargearworld.bau.tools.TntChest;
 import net.wargearworld.bau.tools.particles.Particles;
@@ -114,7 +113,6 @@ public class Main extends JavaPlugin {
 		pm.registerEvents(new TntChest(), this);
 		pm.registerEvents(new GUI(), this);
 		pm.registerEvents(AutoCannonReloader.getInstance(), this);
-		pm.registerEvents(Particles.getInstance(), this);
 		pm.registerEvents(new ParticlesGUI(), this);
 		pm.registerEvents(new TestBlockEditorCore(), this);
 		pm.registerEvents(new SaWE(),this);
@@ -122,7 +120,7 @@ public class Main extends JavaPlugin {
 
 	private void registerCommands() {
 		new gs();
-
+		new Particles();
 		getCommand("tnt").setExecutor(new tnt());
 		getCommand("gui").setExecutor(new GUI());
 		getCommand("tbs").setExecutor(TestBlockSlaveCore.getInstance());
@@ -135,8 +133,6 @@ public class Main extends JavaPlugin {
 		getCommand("stats").setExecutor(new stats());
 		getCommand("delcon").setExecutor(new PlotResetter());
 		getCommand("baureload").setExecutor(new Bau());
-		getCommand("particles").setExecutor(Particles.getInstance());
-		getCommand("particles").setTabCompleter(new particlesTC());
 		getCommand("tr").setExecutor(AutoCannonReloader.getInstance());
 		getCommand("tr").setTabCompleter(new TntReloaderTC());
 		getCommand("clear").setExecutor(new clear());

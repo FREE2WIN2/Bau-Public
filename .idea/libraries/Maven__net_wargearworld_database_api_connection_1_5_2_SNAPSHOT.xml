@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: net.wargearworld:database-api-connection:1.5.2-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/net/wargearworld/database-api-connection/1.5.2-SNAPSHOT/database-api-connection-1.5.2-20201011.134756-26.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/net/wargearworld/database-api-connection/1.5.2-SNAPSHOT/database-api-connection-1.5.2-20201011.134756-26-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/net/wargearworld/database-api-connection/1.5.2-SNAPSHOT/database-api-connection-1.5.2-20201011.134756-26-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

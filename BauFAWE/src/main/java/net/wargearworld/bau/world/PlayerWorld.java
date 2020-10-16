@@ -1,10 +1,13 @@
 package net.wargearworld.bau.world;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import net.wargearworld.bau.world.plots.PlotPattern;
+import net.wargearworld.db.model.Mail;
 import net.wargearworld.db.model.Plot;
 import net.wargearworld.db.model.PlotMember;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -145,6 +148,44 @@ public class PlayerWorld extends BauWorld {
 					Main.prefix + MessageHandler.getInstance().getString(p, "alreadyMember").replace("%r", playerName));
 		}*/
 			return MethodResult.FAILURE;
+	}
+
+	@Override
+	public void checkForTimeoutMembership() {
+		LocalDateTime now = LocalDateTime.now();
+			for (PlotMember member : dbPlot.getMembers()) {
+				if (member.getAddedTo() != null && member.getAddedTo().isBefore(now)) {
+					removeMember(member);
+				}
+			}
+	}
+
+
+	private void removeMember(PlotMember member){
+		dbPlot.getMembers().remove(member);
+		DBConnection.persist(dbPlot);
+		memberRemoved(member.getMember().getUuid().toString(),member.getMember().getName());
+	}
+
+	private void memberRemoved(String uuid, String name){
+		Player ownerPlayer = Bukkit.getPlayer(owner);
+		Player memberPlayer = Bukkit.getPlayer(UUID.fromString(uuid));
+		if (memberPlayer != null) {
+			Main.send(memberPlayer, "plotMemberRemove_memberMsg", getName());
+			if (WorldManager.get(memberPlayer.getWorld()) == this) {
+				memberPlayer.performCommand("gs");
+			}
+		}
+		if (ownerPlayer != null) {
+			Main.send(ownerPlayer, "plotMemberRemoved", name);
+		} else {
+			/* Send new Mail */
+			String message = MessageHandler.getInstance().getString(owner, "plotMemberRemoved",name);
+			net.wargearworld.db.model.Player receiver = BauPlayer.getBauPlayer(owner).getDbPlayer();
+			String sender = "plugin: BAU";
+			DBConnection.sendMail(sender,receiver,message);
+		}
+		log(WorldAction.REMOVE, uuid, name);
 	}
 
 	@Override
