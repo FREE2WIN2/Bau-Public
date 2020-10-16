@@ -1,8 +1,5 @@
 package net.wargearworld.bau.tools.particles;
 
-import net.wargearworld.GUI_API.GUI.ChestGUI;
-import net.wargearworld.GUI_API.Items.DefaultItem;
-import net.wargearworld.GUI_API.Items.Item;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -22,10 +19,6 @@ public class ParticlesGUI implements Listener {
 	}
 
 	private static Inventory createParticlesGUI(Player p) {
-		MessageHandler msgHandler = MessageHandler.getInstance();
-		ChestGUI gui = new ChestGUI(9,"§6Particles§7GUI");
-		Item clipOn = new DefaultItem(Material.MAP,"Turn Clip ON");
-
 		Inventory inv = Bukkit.createInventory(null, 9, "§6Particles§7GUI");
 		ItemStack toggleOn = ItemStackCreator.createNewItemStack(Material.GLASS_BOTTLE,
 				MessageHandler.getInstance().getString(p, "particles_gui_toggleOn"));
