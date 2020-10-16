@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.wargearworld</groupId>
 	<artifactId>Bau-FAWE</artifactId>
-	<version>2.0</version>
+	<version>3.0-SNAPSHOT</version>
 	<name>Bau-FAWE</name>
 	<description>Bau-Plugin for MC Server WargearWorld.net</description>
 
