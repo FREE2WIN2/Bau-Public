@@ -1,11 +1,14 @@
 package net.wargearworld.bau.tools.particles;
 
+import net.wargearworld.bau.player.BauPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import com.sk89q.worldedit.EmptyClipboardException;
@@ -22,88 +25,104 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.worldedit.FlattenedClipboardTransform;
 import net.wargearworld.bau.utils.Scheduler;
+import org.bukkit.scheduler.BukkitTask;
 
+import java.util.UUID;
+import static net.wargearworld.bau.player.BauPlayer.getBauPlayer;
 public class ParticlesShow {
 
 	private Color clipboardColor;
 	private Color selectionColor;
-	private boolean active;
-	private Scheduler scheduler;
-	private Player player;
+	private boolean clipboardActive;
+	private boolean selectionActive;
+	private BukkitTask task;
+	private UUID uuid;
 	private Particle particle;
 
 	public ParticlesShow(Player p) {
-		String uuid = p.getUniqueId().toString();
-		player = p;
-		scheduler = new Scheduler();
+		BauPlayer player = BauPlayer.getBauPlayer(p);
+		uuid = player.getUuid();
 		particle = Particle.REDSTONE;
-		if (!Particles.particleConfig.contains(uuid)) {
+		FileConfiguration config = player.getConfig();
+		if (!config.contains("particles")) {
 			clipboardColor = Particles.defaultClipboardColor;
 			selectionColor = Particles.defaultSelectionColor;
-			active = Particles.defaultState;
-			saveClipboardColor();
-			saveSelectionColor();
-			saveActive();
+			clipboardActive = Particles.defaultStateClipboard;
+			selectionActive = Particles.defaultStateSelection;
+			saveClipboardColor(player);
+			saveSelectionColor(player);
+			saveActive(player);
 		} else {
-			clipboardColor = Particles.readColor(uuid + ".clipboard");
-			selectionColor = Particles.readColor(uuid + ".selection");
-			active = Particles.particleConfig.getBoolean(uuid + ".active");
+			clipboardColor = readColor(config.getString("particles.clipboard.color"));
+			selectionColor = readColor(config.getString("particles.selection.color"));
+			clipboardActive = config.getBoolean("particles.clipboard.active");
+			selectionActive = config.getBoolean("particles.selection.active");
 		}
 
 	}
 
-	private void saveActive() {
-		Particles.particleConfig.set(player.getUniqueId().toString() + ".active", active);
-		Particles.saveConfig();
+	public static Color readColor(String arg) {
+		String[] args = arg.split(" ");
+		int r = Integer.parseInt(args[0]);
+		int g = Integer.parseInt(args[1]);
+		int b = Integer.parseInt(args[2]);
+		return Color.fromRGB(r, g, b);
+	}
+	private void saveActive(BauPlayer player) {
+		player.getConfig().set("particles.clipboard.active", clipboardActive);
+		player.getConfig().set("particles.selection.active", selectionActive);
+		player.saveConfig();
 	}
 
-	private void saveSelectionColor() {
+	private void saveSelectionColor(BauPlayer player) {
 		int r = selectionColor.getRed();
 		int g = selectionColor.getGreen();
 		int b = selectionColor.getBlue();
-		Particles.particleConfig.set(player.getUniqueId().toString() + ".selection", r + " " + g + " " + b);
-		Particles.saveConfig();
-
+		player.getConfig().set("particles.selection.color", r + " " + g + " " + b);
+		player.saveConfig();
 	}
 
-	private void saveClipboardColor() {
+	private void saveClipboardColor(BauPlayer player) {
 		int r = clipboardColor.getRed();
 		int g = clipboardColor.getGreen();
 		int b = clipboardColor.getBlue();
-		Particles.particleConfig.set(player.getUniqueId().toString() + ".clipboard", r + " " + g + " " + b);
-		Particles.saveConfig();
+		player.getConfig().set("particles.clipboard.color", r + " " + g + " " + b);
+		player.saveConfig();
 	}
 
 	/* setter */
 
 	public void setSelectionColor(int r, int g, int b) {
 		selectionColor = Color.fromRGB(r, g, b);
-		saveSelectionColor();
+		saveSelectionColor(getBauPlayer(uuid));
 	}
 
 	public void setSelectionColor(Color color) {
 		selectionColor = color;
-		saveSelectionColor();
+		saveSelectionColor(getBauPlayer(uuid));
 	}
 
 	public void setClipboardColor(int r, int g, int b) {
 		clipboardColor = Color.fromRGB(r, g, b);
-		saveClipboardColor();
+		saveClipboardColor(getBauPlayer(uuid));
 	}
 
 	public void setClipboardColor(Color color) {
 		clipboardColor = color;
-		saveClipboardColor();
+		saveClipboardColor(getBauPlayer(uuid));
 	}
 
-	public void setactive(boolean active) {
-		this.active = active;
-		saveActive();
-		if (active && player.getEquipment().getItemInMainHand().getType().equals(Material.WOODEN_AXE)) {
+	public void setClipboardActive(boolean active) {
+		this.clipboardActive = active;
+		saveActive(getBauPlayer(uuid));
 			showParticles();
-		}
 	}
 
+	public void setSelectionActive(boolean active) {
+		this.selectionActive = active;
+		saveActive(getBauPlayer(uuid));
+			showParticles();
+	}
 	/* getter */
 
 	public Color getClipboardColor() {
@@ -114,29 +133,27 @@ public class ParticlesShow {
 		return selectionColor;
 	}
 
-	public boolean isActive() {
-		return active;
+	public boolean isClipboardActive() {
+		return clipboardActive;
 	}
 
+	public boolean isSelectionActive() {
+		return selectionActive;
+	}
 	/* show particles */
 
 	public void showParticles() {
-		if (!active) {
+		if(task != null)
 			return;
-		}
-//		if (scheduler.getTask() >= 0) {
-//			return;
-//		}
-
+		Player player = getBauPlayer(uuid).getBukkitPlayer();
 		BukkitPlayer p = BukkitAdapter.adapt(player);
 		LocalSession session = WorldEdit.getInstance().getSessionManager().get(p);
 
-		scheduler.setTask(Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), new Runnable() {
+		task = Bukkit.getScheduler().runTaskTimer(Main.getPlugin(), new Runnable() {
 
 			@Override
 			public void run() {
-				if (!active||player.getEquipment().getItemInMainHand().getType()!=Material.WOODEN_AXE) {
-					stopParticles();
+				if (player.getEquipment().getItemInMainHand().getType()!=Material.WOODEN_AXE) {
 					return;
 				}
 				ClipboardHolder clipboardHolder = null;
@@ -144,35 +161,43 @@ public class ParticlesShow {
 
 				/* Clipboard */
 
-				try {
-					clipboardHolder = session.getClipboard();
-					FlattenedClipboardTransform transformed = FlattenedClipboardTransform
-							.transform(clipboardHolder.getClipboard(), clipboardHolder.getTransform());
-					Clipboard clipboard = transformed.getClip(transformed.getTransformedRegion());
-					Location loc = player.getLocation();
-					BlockVector3 offset = BlockVector3.at(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ())
-							.subtract(clipboard.getOrigin());
-					show(clipboard.getMinimumPoint().add(offset), clipboard.getMaximumPoint().add(offset),
-							clipboardColor);
-				} catch (EmptyClipboardException e) {
-				}
+					if(clipboardActive) {
+						try {
+							clipboardHolder = session.getClipboard();
+							FlattenedClipboardTransform transformed = FlattenedClipboardTransform
+									.transform(clipboardHolder.getClipboard(), clipboardHolder.getTransform());
+							Clipboard clipboard = transformed.getClip(transformed.getTransformedRegion());
+							Location loc = player.getLocation();
+							BlockVector3 offset = BlockVector3.at(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ())
+									.subtract(clipboard.getOrigin());
+							show(clipboard.getMinimumPoint().add(offset), clipboard.getMaximumPoint().add(offset),
+									clipboardColor);
+						} catch (EmptyClipboardException e) {
+						}
+					}
 
 				/* Selection */
-				try {
-					if (session.getSelectionWorld() == null) {
-						return;
+				if(selectionActive) {
+					try {
+						if (session.getSelectionWorld() == null) {
+							return;
+						}
+						if (session.getSelection(session.getSelectionWorld()) != null) {
+							selection = session.getSelection(session.getSelectionWorld());
+							show(selection.getMinimumPoint(), selection.getMaximumPoint(), selectionColor);
+						}
+					} catch (IncompleteRegionException e) {
 					}
-					if (session.getSelection(session.getSelectionWorld()) != null) {
-						selection = session.getSelection(session.getSelectionWorld());
-						show(selection.getMinimumPoint(), selection.getMaximumPoint(), selectionColor);
-					}
-				} catch (IncompleteRegionException e) {
 				}
 			}
-		}, 0, 20 * 1));
+		}, 0, 15 * 1);
 	}
 
 	private void show(BlockVector3 min, BlockVector3 max, Color color) {
+		Player player = getBauPlayer(uuid).getBukkitPlayer();
+		if(player == null)
+		return;
+
 		DustOptions options = new DustOptions(color, 1.0f);
 		int count = 1;
 		int xmin = min.getBlockX();
@@ -199,12 +224,6 @@ public class ParticlesShow {
 			player.spawnParticle(particle, xmax, ymin, z, count, 0, 0, 0, 0, options);
 			player.spawnParticle(particle, xmax, ymax, z, count, 0, 0, 0, 0, options);
 		}
-	}
-
-	/* stop show particles */
-
-	public void stopParticles() {
-		scheduler.cancel();
 	}
 
 }

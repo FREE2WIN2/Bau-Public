@@ -61,7 +61,7 @@ public class BauPlayer {
             if (!configFile.exists()) {
                 configFile.getParentFile().mkdirs();
                 configFile.createNewFile();
-                Files.copy(BauPlayer.class.getResourceAsStream("playerDefaults.yml"), configFile.toPath());
+                Files.copy(DefaultPlayer.configFile.toPath(), configFile.toPath());
             }
             config.load(configFile);
         } catch (IOException | InvalidConfigurationException e) {
@@ -82,7 +82,7 @@ public class BauPlayer {
         return dbPlayer.getName();
     }
 
-    private void save() {
+    public void saveConfig() {
         try {
             config.save(configFile);
         } catch (IOException e) {
@@ -94,12 +94,12 @@ public class BauPlayer {
 
     public void setSLPaste(boolean active) {
         config.set("stoplag.paste", active);
-        save();
+        saveConfig();
     }
 
     public void setSLPasteTime(Integer time) {
         config.set("stoplag.pastetime", time);
-        save();
+        saveConfig();
     }
 
     public boolean getPasteState() {
@@ -123,7 +123,7 @@ public class BauPlayer {
 
     public void setDT(boolean on) {
         config.set("dt", on);
-        save();
+        saveConfig();
     }
 
     public boolean getDT() {
@@ -165,5 +165,13 @@ public class BauPlayer {
 
     public net.wargearworld.db.model.Player getDbPlayer() {
         return dbPlayer;
+    }
+
+    public FileConfiguration getConfig() {
+        return config;
+    }
+
+    public File getConfigFile() {
+        return configFile;
     }
 }
