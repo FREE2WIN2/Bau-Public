@@ -3,3 +3,11 @@ stoplag:
   pastetime: 5
   
 dt: false
+
+particles:
+  clipboard:
+    active: true
+    color: 255 85 85 #rgb
+  selection:
+    active: true
+    color: 85 255 85 #rgb

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import net.wargearworld.GUI_API.GUI_API;
+import net.wargearworld.bau.player.DefaultPlayer;
 import net.wargearworld.bau.world.WorldManager;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -148,6 +149,9 @@ public class Main extends JavaPlugin {
 
 		Particles.particlesConfigFile = createConfigFile("particles.yml");
 		Particles.particleConfig = createConfig(Particles.particlesConfigFile);
+
+		DefaultPlayer.configFile =createConfigFile("playerDefaults.yml");
+				DefaultPlayer.config = createConfig(DefaultPlayer.configFile);
 	}
 
 	public static File createConfigFile(String string) {

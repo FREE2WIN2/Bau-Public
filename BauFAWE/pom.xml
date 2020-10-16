@@ -21,7 +21,7 @@
 		<version.worldedit>7.1.0</version.worldedit>
 		<version.worldguard>7.0.2</version.worldguard>
 		<version.spigot-api>1.15.2-R0.1-SNAPSHOT</version.spigot-api>
-		<version.thedepencyplugin>1.3.2</version.thedepencyplugin>
+		<version.thedepencyplugin>1.3.3-SNAPSHOT</version.thedepencyplugin>
 		<!-- Plugin Versions -->
 		<version.maven-shade-plugin>3.2.3</version.maven-shade-plugin>
 
