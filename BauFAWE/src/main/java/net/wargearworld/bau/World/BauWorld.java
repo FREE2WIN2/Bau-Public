@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
-import java.util.Map.Entry;
 
 import net.wargearworld.bau.world.plots.PlotType;
 import org.bukkit.Bukkit;
@@ -32,11 +31,9 @@ public abstract class BauWorld {
 
     private String name;
     HashMap<String, Plot> plots;
-    private RegionManager regionManager;
+    protected RegionManager regionManager;
     private WorldTemplate template;
     private File logFile;
-    private Map<UUID, Date> members;
-
     public BauWorld(World world) {
         this.name = world.getName().split("_", 2)[1];
         this.worldUUID = world.getUID();
@@ -51,12 +48,7 @@ public abstract class BauWorld {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        members = loadMembers();
-//		checkForTimeoutMembership();
     }
-
-    protected abstract Map<UUID, Date> loadMembers();
 
     public String getName() {
         return name;
@@ -86,10 +78,6 @@ public abstract class BauWorld {
     }
 
     public abstract boolean isAuthorized(UUID uuid);
-
-    protected Map<UUID, Date> getMembers() {
-        return members;
-    }
 
     public abstract void showInfo(Player p);
 
@@ -147,7 +135,7 @@ public abstract class BauWorld {
     public abstract void removeMember(UUID member);
 
     public boolean newWorld() {
-        removeAllMembers();
+        removeAllMembersFromRegions();
         regionManager = null;
         World world = WorldManager.createNewWorld(this);
         this.worldUUID = world.getUID();
@@ -167,35 +155,10 @@ public abstract class BauWorld {
         this.template = template;
     }
 
-    public void removeAllMembers() {
-        for (UUID member : members.keySet()) {
-            for (ProtectedRegion region : regionManager.getRegions().values()) {
-                DefaultDomain members = region.getMembers();
-                members.removePlayer(member);
-                region.setMembers(members);
-            }
-        }
-        try {
-            regionManager.saveChanges();
-        } catch (StorageException e) {
-            e.printStackTrace();
-        }
-    }
+    public abstract void removeAllMembersFromRegions();
 
-    public void addAllMembers() {
-        for (UUID member : members.keySet()) {
-            for (ProtectedRegion region : regionManager.getRegions().values()) {
-                DefaultDomain members = region.getMembers();
-                members.addPlayer(member);
-                region.setMembers(members);
-            }
-        }
-        try {
-            regionManager.saveChanges();
-        } catch (StorageException e) {
-            e.printStackTrace();
-        }
-    }
+
+    public abstract void addAllMembersToRegions();
 
     public Collection<Plot> getPlots(PlotType type) {
         List<Plot> out = new ArrayList<>();
@@ -216,6 +179,8 @@ public abstract class BauWorld {
         }
         return out;
     }
+
+    public abstract long getId();
 
     protected enum WorldAction {
         ADD, ADDTEMP, REMOVE, NEW, DELETE;
@@ -245,4 +210,5 @@ public abstract class BauWorld {
 
     protected abstract String getOwner();
 
+    public abstract boolean isMember(UUID member);
 }

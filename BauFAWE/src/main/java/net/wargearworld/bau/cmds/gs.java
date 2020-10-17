@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Predicate;
 
+import net.wargearworld.bau.world.PlayerWorld;
+import net.wargearworld.db.model.Plot;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -65,8 +67,11 @@ public class gs implements TabExecutor {
 			@Override
 			public Collection<String> getList(ParseState state) {
 				BauWorld world = WorldManager.get(state.getPlayer().getWorld());
-				return null;
-				//TODO return DBConnection.getAllNotAddedPlayers(world.getId()).values();
+				if(world instanceof PlayerWorld) {
+					Plot plot = DBConnection.getPlot(world.getId());
+					return DBConnection.getAllNotAddedPlayers(plot);
+				}
+				return new ArrayList<>();
 			}
 		}));
 		CommandNode members = argument("Mitglied", new DynamicListArgument("Mitglied", new DynamicListGetter<String>() {
@@ -150,7 +155,11 @@ CommandNode worlds = argument("Worlds", new DynamicListArgument("Worlds", new Dy
 		if(name == null) {
 			WorldManager.getWorld(p.getName(),p.getUniqueId().toString()).spawn(p);
 		}else {
-			//WorldManager.getWorld(name).spawn(p);
+			net.wargearworld.db.model.Player owner = DBConnection.getPlayer(name);
+			if(owner == null){
+				return; //TODO error
+			}
+			WorldManager.getWorld(name,owner.getUuid().toString()).spawn(p);
 		}
 	}
 

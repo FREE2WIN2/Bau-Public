@@ -22,13 +22,6 @@ public class TeamWorld extends BauWorld{
 	}
 
 	@Override
-	protected Map<UUID, Date> loadMembers() {
-		Map<UUID,Date> out = new HashMap<>();
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public boolean isAuthorized(UUID uuid) {
 		return leaders.contains(uuid) || members.contains(uuid);
 	}
@@ -74,9 +67,29 @@ public class TeamWorld extends BauWorld{
 	}
 
 	@Override
+	public void removeAllMembersFromRegions() {
+
+	}
+
+	@Override
+	public void addAllMembersToRegions() {
+
+	}
+
+	@Override
+	public long getId() {
+		return teamID;
+	}
+
+	@Override
 	protected String getOwner() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public boolean isMember(UUID member) {
+		return false;
 	}
 
 }

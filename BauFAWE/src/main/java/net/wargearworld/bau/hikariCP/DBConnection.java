@@ -4,9 +4,7 @@ import java.util.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.db.model.*;
@@ -41,19 +39,22 @@ public class DBConnection {
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<Plot> criteriaQuery = criteriaBuilder.createQuery(Plot.class);
         Root<Plot> root = criteriaQuery.from(Plot.class);
-        criteriaQuery.where(criteriaBuilder.equal(root.get(Plot_.name), name),criteriaBuilder.equal(root.get(Plot_.owner),BauPlayer.getBauPlayer(owner).getDbPlayer()));
+        criteriaQuery.where(criteriaBuilder.equal(root.get(Plot_.name), name), criteriaBuilder.equal(root.get(Plot_.owner), BauPlayer.getBauPlayer(owner).getDbPlayer()));
         Query query = em.createQuery(criteriaQuery);
         return (Plot) query.getSingleResult();
     }
 
-    public static void persist(Object obj){
+    public static void persist(Object obj) {
         em.getTransaction().begin();
-        em.persist(obj);
-        em.merge(obj);
+        if (em.contains(obj)) {
+            em.merge(obj);
+        } else {
+            em.persist(obj);
+        }
         em.getTransaction().commit();
     }
 
-    public static void update(Object obj){
+    public static void update(Object obj) {
         em.getTransaction().begin();
         em.merge(obj);
         em.getTransaction().commit();
@@ -82,11 +83,44 @@ public class DBConnection {
         return (PlotTemplate) query.getSingleResult();
     }
 
-    public static void sendMail(String sender, Player receiver, String message){
+    public static void sendMail(String sender, Player receiver, String message) {
         Mail mail = new Mail();
         mail.setMessage(message);
         mail.setReceiver(receiver);
         mail.setSender(sender);
         DBConnection.persist(mail);
+    }
+
+    public static Collection<String> getAllNotAddedPlayers(Plot plot) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Player> cq = cb.createQuery(Player.class);
+        Root<Player> pr = cq.from(Player.class);
+        Join join = pr.join(Player_.MEMBERED_PLOTS, JoinType.LEFT);
+        join.on(cb.equal(join.get(PlotMember_.PLOT), plot.getId()));
+        cq.select(pr.get(Player_.NAME));
+        cq.where(cb.isNull(join.get(PlotMember_.MEMBER)));
+        Query query = em.createQuery(cq);
+
+        return query.getResultList();
+    }
+
+    public static void addMail(String sender, Player receiver, String message) {
+        Mail mail = new Mail();
+        mail.setSender(sender);
+        mail.setReceiver(receiver);
+        mail.setMessage(message);
+        persist(mail);
+    }
+
+    public static void persist(Object... objects) {
+        for(Object obj:objects){
+            System.out.println(obj.getClass().getName());
+            if(em.contains(obj)){
+                em.merge(obj);
+            }else{
+                em.persist(obj);
+            }
+        }
+        em.flush();
     }
 }
