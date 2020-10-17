@@ -69,6 +69,7 @@ public class GUI implements CommandExecutor, Listener {
         }, Material.BARRIER, 1, ItemType.DEFAULT, msgHandler.getString(p, "deletePlot"));
 
         DefaultItem guiItem = new DefaultItem(Material.NETHER_STAR, "§6GUI", 1);
+        guiItem.setCancelled(false);
 
         DefaultItem debugStick = new DefaultItem(new ItemStack(Material.DEBUG_STICK), s -> {});
         debugStick.setCancelled(false);
@@ -128,8 +129,8 @@ public class GUI implements CommandExecutor, Listener {
         gui.setItem(33,s->{return BauPlayer.getBauPlayer(s.getPlayer()).getDT();}, designToolOn);
         gui.setItem(33,s->{return !BauPlayer.getBauPlayer(s.getPlayer()).getDT();}, designToolOff);
 
-        gui.setItem(39, new DefaultItem(Material.MELON_SEEDS, msgHandler.getString(p, "gui_particles"), 1));
-        gui.setItem(41, new DefaultItem(TntChest.getTNTChest(), s -> {}));
+        gui.setItem(39, new DefaultItem(Material.MELON_SEEDS, msgHandler.getString(p, "gui_particles"), s->{s.getPlayer().performCommand("particles gui");}));
+        gui.setItem(41, new DefaultItem(TntChest.getTNTChest(), s -> {}).setCancelled(false));
 
         gui.open(p);
     }
