@@ -171,7 +171,7 @@ public class Particles implements TabExecutor, Listener {
 		}
 	}
 
-	private void setActive(ParticleContent content, boolean active, Player player) {
+	protected static void setActive(ParticleContent content, boolean active, Player player) {
 		ParticlesShow particleShow = playersParticlesShow.get(player.getUniqueId());
 		if(content == ParticleContent.SELECTION){
 		particleShow.setSelectionActive(active);
@@ -236,8 +236,8 @@ public class Particles implements TabExecutor, Listener {
 		playersParticlesShow.remove(event.getPlayer().getUniqueId());
 	}
 
-	public static Color readColor(String path) {
-		String[] args = particleConfig.getString(path).split(" ");
+	public static Color readColor(String arg) {
+		String[] args = arg.split(" ");
 		int r = Integer.parseInt(args[0]);
 		int g = Integer.parseInt(args[1]);
 		int b = Integer.parseInt(args[2]);

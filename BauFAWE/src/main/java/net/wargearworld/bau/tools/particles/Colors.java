@@ -10,7 +10,7 @@ import org.w3c.dom.Entity;
 import java.util.ArrayList;
 import java.util.List;
 
-public enum Colors implements EnumArgumentInterface<Colors> {
+public enum Colors {
 
 	AQUA, BLACK, BLUE, BROWN, CYAN, FUCHSIA, GRAY, GREEN, LIGHT_BLUE, LIGHT_GRAY, LIME,MAGENTA, MAROON, NAVY, OLIVE, ORANGE,PINK, PURPLE, RED, SILVER, TEAL, WHITE,
 	YELLOW;
@@ -69,18 +69,7 @@ public enum Colors implements EnumArgumentInterface<Colors> {
 		return null;
 	}
 
-	@Override
-	public Colors fromString(String s) {
-		return Colors.valueOf(s.toUpperCase());
-	}
-
-	@Override
-	public String getTypeName() {
-		return "Color";
-	}
-
-	@Override
-	public String[] getPossibleOptions() {
+	public static String[] getPossibleOptions() {
 		List<String> outlist = new ArrayList<>();
 		for(Colors color:Colors.values()){
 			outlist.add(color.name());
@@ -98,12 +87,12 @@ public enum Colors implements EnumArgumentInterface<Colors> {
 
 			@Override
 			public String getTypeName() {
-				return "ShowMode";///TODO: make bilingual
+				return "Color";///TODO: make bilingual
 			}
 
 			@Override
 			public String[] getPossibleOptions() {
-				return getPossibleOptions();
+				return Colors.getPossibleOptions();
 			}
 
 		});
