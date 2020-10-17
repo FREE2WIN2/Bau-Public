@@ -114,7 +114,6 @@ public class Main extends JavaPlugin {
 		pm.registerEvents(new TntChest(), this);
 		pm.registerEvents(new GUI(), this);
 		pm.registerEvents(AutoCannonReloader.getInstance(), this);
-		pm.registerEvents(new ParticlesGUI(), this);
 		pm.registerEvents(new TestBlockEditorCore(), this);
 		pm.registerEvents(new SaWE(),this);
 	}
