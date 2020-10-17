@@ -163,7 +163,7 @@ public class PlayerWorld extends BauWorld {
 
 	private void removeMember(PlotMember member){
 		dbPlot.getMembers().remove(member);
-		DBConnection.persist(dbPlot);
+		DBConnection.update(dbPlot);
 		memberRemoved(member.getMember().getUuid().toString(),member.getMember().getName());
 	}
 

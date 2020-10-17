@@ -131,7 +131,7 @@ public abstract class Plot {
 	
 	public Location getTeleportPoint() {
 		Location out = middleNorth.clone();//clone
-		return out.subtract(0.5, 0, 0);
+		return out.add(0.5, 0, 0);
 	}
 
 	public abstract PlotType getType();

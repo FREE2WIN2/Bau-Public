@@ -22,7 +22,7 @@ public class DatabaseCommunication {
 
 	private static final String NAME_OF_ME = "Bau";
 	public static int repeatDelay = 5*20; // 5Sekunden Delay
-	
+
 	public static void sendMessage(String reciever, String subchannel, String command) {
 		PluginCommunication communication = new PluginCommunication();
 		communication.setCommand(command);
