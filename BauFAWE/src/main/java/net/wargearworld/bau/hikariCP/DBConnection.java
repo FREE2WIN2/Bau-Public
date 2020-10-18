@@ -114,7 +114,6 @@ public class DBConnection {
 
     public static void persist(Object... objects) {
         for(Object obj:objects){
-            System.out.println(obj.getClass().getName());
             if(em.contains(obj)){
                 em.merge(obj);
             }else{
