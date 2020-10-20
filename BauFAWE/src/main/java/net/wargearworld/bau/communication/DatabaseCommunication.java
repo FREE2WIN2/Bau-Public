@@ -58,12 +58,13 @@ public class DatabaseCommunication {
 	}
 	
 	public static void startRecieve() {
+		/*
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), ()->{
 			
 				for (PluginMessage message : readMessages()) {
 					message.operate();
 				}
-		}, 0, repeatDelay);
+		}, 0, repeatDelay);*/
 	}
 
 	public static void sendACK(String receiever, String subChannel, String command) {

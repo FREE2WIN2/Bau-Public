@@ -1,8 +1,6 @@
 package net.wargearworld.bau.world;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -90,6 +88,11 @@ public class TeamWorld extends BauWorld{
 	@Override
 	public boolean isMember(UUID member) {
 		return false;
+	}
+
+	@Override
+	public Set<String> getMemberNames() {
+		return null;
 	}
 
 }

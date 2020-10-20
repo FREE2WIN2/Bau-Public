@@ -9,6 +9,7 @@ import java.util.List;
 import net.wargearworld.bau.hikariCP.DBConnection;
 import net.wargearworld.bau.world.plots.Plot;
 import net.wargearworld.db.model.PlotTemplate;
+import net.wargearworld.thedependencyplugin.DependencyProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -21,7 +22,9 @@ import net.wargearworld.bau.world.plots.PlotType;
 import net.wargearworld.bau.worldedit.Schematic;
 import net.wargearworld.bau.utils.Loc;
 
-public class WorldTemplate {
+import javax.persistence.EntityManager;
+
+  public class WorldTemplate {
 	private static HashMap<String,WorldTemplate> templates;
 	public static void load() {
 		templates = new HashMap<>();
@@ -44,10 +47,9 @@ public class WorldTemplate {
 	private File worldguardDir;
 	private File worldDir;
 	private String name;
-	
+	private long id;
 	private List<PlotPattern> plots;
 	private String spawnPlotID;
-	private PlotTemplate dbTemplate;
 	private WorldTemplate(File configFile) {
 		name = configFile.getName().split("\\.")[0];
 		worldguardDir = new File(Bukkit.getPluginManager().getPlugin("WorldGuard").getDataFolder(),"worlds/" + name);
@@ -59,8 +61,7 @@ public class WorldTemplate {
 		} catch (IOException | InvalidConfigurationException e) {
 			e.printStackTrace();
 		}
-
-		dbTemplate = DBConnection.getTemplate(name);
+		this.id = DBConnection.getTemplateId(name);
 	}
 	
 	public String getName() {
@@ -107,9 +108,7 @@ public class WorldTemplate {
 		return Integer.parseInt(config.getString("plots." + plotID).split(" ")[1]);
 	}
 
-	public PlotTemplate getdbTemplate() {
-		return dbTemplate;
-	}
-
-
-}
+	  public long getId() {
+		  return id;
+	  }
+  }

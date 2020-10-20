@@ -211,4 +211,6 @@ public abstract class BauWorld {
     protected abstract String getOwner();
 
     public abstract boolean isMember(UUID member);
+
+    public abstract Set<String> getMemberNames();
 }
