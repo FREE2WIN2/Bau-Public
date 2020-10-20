@@ -172,9 +172,9 @@ public class PlayerWorld extends BauWorld {
                 plotMember.setAddedTo(new Timestamp(to.getTime()).toLocalDateTime());
             }
             dbPlot.addMember(plotMember);
+            em.getTransaction().begin();
             em.merge(dbPlot);
-            em.persist(plotMember);
-            em.close();
+            em.getTransaction().commit();
             addPlayerToAllRegions(uuidMember);
             if (to == null) {
                 log(WorldAction.ADD, uuidMember.toString(), playerName);
@@ -193,14 +193,18 @@ public class PlayerWorld extends BauWorld {
     @Override
     public void checkForTimeoutMembership() {
         LocalDateTime now = LocalDateTime.now();
+        Set<UUID> uuidsToRemove = new HashSet<>();
         EntityManager em = DependencyProvider.getEntityManager();
         Plot dbPlot = em.find(Plot.class, plotID);
         for (PlotMember member : dbPlot.getMembers()) {
             if (member.getAddedTo() != null && member.getAddedTo().isBefore(now)) {
-                removeMember(member.getMember().getUuid());
+                uuidsToRemove.add(member.getMember().getUuid());
             }
         }
         em.close();
+        for(UUID uid:uuidsToRemove){
+            removeMember(uid);
+        }
     }
 
     @Override
