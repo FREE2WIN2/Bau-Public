@@ -11,6 +11,9 @@ import java.util.UUID;
 
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.db.model.Plot;
+import net.wargearworld.db.model.PlotMember;
+import net.wargearworld.db.model.PlotTemplate;
+import net.wargearworld.thedependencyplugin.DependencyProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.World;
@@ -20,6 +23,8 @@ import org.bukkit.entity.Player;
 
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.hikariCP.DBConnection;
+
+import javax.persistence.EntityManager;
 
 public class WorldManager {
 
@@ -41,7 +46,16 @@ public class WorldManager {
     public static BauWorld getWorld(UUID worldUUID) {
         return worlds.get(worldUUID);
     }
-	
+
+    /**
+     * @param worldName -> name which has the File(owner_name)
+     * @return BauWorld
+     */
+    public static BauWorld getWorld(String worldName) {
+        String[] split = worldName.split("_");
+        return getWorld(split[1], split[0]);
+    }
+
 	/*public static List<TeamWorld> getTeamWorlds(int teamID) {
 		//owner = teamID
 		//name?
@@ -107,12 +121,15 @@ public class WorldManager {
         neu.setWritable(true, false);
         copyFolder_raw(template.getWorldDir(), neu);
 
+        EntityManager em = DependencyProvider.getEntityManager();
+        PlotTemplate dbTemplate = em.find(PlotTemplate.class, template.getId());
         Plot plot = new Plot();
         plot.setDefault(false);
         plot.setName(worldName);
-        plot.setTemplate(template.getdbTemplate());
-        plot.setOwner(BauPlayer.getBauPlayer(UUID.fromString(ownerUUID)).getDbPlayer());
-        DBConnection.persist(plot);
+        plot.setTemplate(dbTemplate);
+        plot.setOwner(em.find(net.wargearworld.db.model.Player.class,UUID.fromString(ownerUUID)));
+        em.persist(plot);
+        em.close();
         // worldguard regionen
         File worldGuardWorldDir = new File(Bukkit.getWorldContainer(),
                 "plugins/WorldGuard/worlds/" + ownerUUID + "_" + worldName);
@@ -121,11 +138,24 @@ public class WorldManager {
 
     public static boolean deleteWorld(World w) {
         Bukkit.getServer().unloadWorld(w, true);
-        if (!w.getName().contains("test") && !w.getName().contains("world")) {
-            worlds.remove(w.getUID());
-        }
+        BauWorld world = worlds.get(w);
+
         if (w.getWorldFolder().exists()) {
-            if (deleteDir(w.getWorldFolder())) { //TODO db remove&& DBConnection.deleteGs(w.getName())
+            if (deleteDir(w.getWorldFolder())) { //TODO check if world ist instacne of PlayerWorld
+                if (world instanceof PlayerWorld) {
+                    EntityManager em = DependencyProvider.getEntityManager();
+                    Plot plot = em.find(Plot.class, world.getId());
+                    for(PlotMember plotMember: plot.getMembers()){
+                        plot.removeMember(plotMember);
+                    }
+                    plot.setTemplate(em.find(PlotTemplate.class, template.getId()));
+                    em.merge(plot);
+                    em.close();
+                }
+                if (!w.getName().contains("test") && !w.getName().contains("world")) {
+                    worlds.remove(w.getUID());
+                }
+
                 File file = new File(Bukkit.getWorldContainer(), "plugins/WorldGuard/worlds/" + w.getName());
                 file.delete();
                 return true;
@@ -177,12 +207,12 @@ public class WorldManager {
     }
 
     public static void checkForWorldsToUnload() {
-        Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), ()-> {
-                for (World w : Bukkit.getServer().getWorlds()) {
-                    if (w.getPlayers().size() == 0 && !w.getName().equals("world")) {
-                        undloadWorld(w);
-                    }
+        Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), () -> {
+            for (World w : Bukkit.getServer().getWorlds()) {
+                if (w.getPlayers().size() == 0 && !w.getName().equals("world")) {
+                    undloadWorld(w);
                 }
+            }
         }, 20 * 60, 20 * 60);
     }
 
@@ -211,5 +241,6 @@ public class WorldManager {
         }, 0, 1 * 20 * 60);
 
     }
+
 
 }

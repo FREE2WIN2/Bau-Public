@@ -116,7 +116,7 @@ public abstract class BauWorld {
     protected void log(WorldAction action, String... args) {
         String message = HelperMethods.getTime() + action.getMessage();
         for (String a : args) {
-            message = message.replace("%r", a);
+            message = message.replaceFirst("%r", a);
         }
 
         try (FileWriter writer = new FileWriter(logFile, true)) {
@@ -188,7 +188,7 @@ public abstract class BauWorld {
         protected String getMessage() {
             switch (this) {
                 case ADD:
-                    return "add %r(Name:%r)";
+                    return "add %r(Name: %r)";
                 case ADDTEMP:
                     return ADD.getMessage() + " for %r hours";
                 case DELETE:
@@ -211,4 +211,6 @@ public abstract class BauWorld {
     protected abstract String getOwner();
 
     public abstract boolean isMember(UUID member);
+
+    public abstract Set<String> getMemberNames();
 }

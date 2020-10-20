@@ -3,6 +3,7 @@ package net.wargearworld.bau.listener;
 import java.io.File;
 
 import net.wargearworld.bau.player.BauPlayer;
+import net.wargearworld.thedependencyplugin.DependencyProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -20,6 +21,8 @@ import net.wargearworld.bau.world.BauWorld;
 import net.wargearworld.bau.world.WorldManager;
 import net.wargearworld.bau.utils.ItemStackCreator;
 import net.wargearworld.StringGetter.Language;
+
+import javax.persistence.EntityManager;
 
 public class onPlayerJoin implements Listener {
 
@@ -39,9 +42,10 @@ public class onPlayerJoin implements Listener {
 		String path = Bukkit.getWorldContainer().getAbsolutePath();
 		File gs = new File(path + "/" + p.getUniqueId() + "_" + p.getName());
 		System.out.println("gs exists: " + gs.exists());
-		System.out.println("hasOWnPlot" + !player.getDbPlayer().getPlots().isEmpty());
+		EntityManager em = DependencyProvider.getEntityManager();
+		System.out.println("hasOWnPlot" + !player.hasPlots());
 			String uuidString = p.getUniqueId().toString();
-		if (player.getDbPlayer().getPlots().isEmpty() && !gs.exists()) {
+		if (player.hasPlots() && !gs.exists()) {
 			// Bukkit.createWorld((WorldCreator) WorldCreator.name("test").createWorld());
 			// wenn nicht-> erstellen und hinteleportieren
 			WorldManager.createWorldDir(p.getName(),uuidString);

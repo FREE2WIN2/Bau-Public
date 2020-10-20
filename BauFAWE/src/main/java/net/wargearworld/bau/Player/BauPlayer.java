@@ -1,13 +1,17 @@
 package net.wargearworld.bau.player;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.UUID;
-
+import net.minecraft.server.v1_15_R1.IChatBaseComponent;
+import net.minecraft.server.v1_15_R1.IChatBaseComponent.ChatSerializer;
+import net.minecraft.server.v1_15_R1.PacketPlayOutChat;
+import net.minecraft.server.v1_15_R1.PlayerConnection;
+import net.wargearworld.StringGetter.Language;
+import net.wargearworld.bau.Main;
+import net.wargearworld.bau.MessageHandler;
+import net.wargearworld.bau.hikariCP.DBConnection;
+import net.wargearworld.bau.world.WorldManager;
+import net.wargearworld.bau.world.plots.Plot;
 import net.wargearworld.db.model.PlotMember;
+import net.wargearworld.thedependencyplugin.DependencyProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -16,15 +20,14 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
-import net.minecraft.server.v1_15_R1.IChatBaseComponent;
-import net.minecraft.server.v1_15_R1.IChatBaseComponent.ChatSerializer;
-import net.minecraft.server.v1_15_R1.PacketPlayOutChat;
-import net.minecraft.server.v1_15_R1.PlayerConnection;
-import net.wargearworld.bau.Main;
-import net.wargearworld.bau.MessageHandler;
-import net.wargearworld.bau.hikariCP.DBConnection;
-import net.wargearworld.bau.world.WorldManager;
-import net.wargearworld.bau.world.plots.Plot;
+import javax.persistence.EntityManager;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.UUID;
 
 public class BauPlayer {
     private static HashMap<UUID, BauPlayer> players = new HashMap<>();
@@ -49,9 +52,9 @@ public class BauPlayer {
     }
 
     private UUID uuid;
-    private net.wargearworld.db.model.Player dbPlayer;
     FileConfiguration config;
     File configFile;
+    private Language language;
 
     private BauPlayer(UUID uuid) {
         this.uuid = uuid;
@@ -67,7 +70,7 @@ public class BauPlayer {
         } catch (IOException | InvalidConfigurationException e) {
             e.printStackTrace();
         }
-        dbPlayer = DBConnection.getPlayer(uuid);
+        this.language = Language.valueOf(getDbPlayer().getCountryCode().toUpperCase());
     }
 
     public UUID getUuid() {
@@ -79,7 +82,7 @@ public class BauPlayer {
     }
 
     public String getName() {
-        return dbPlayer.getName();
+        return getDbPlayer().getName();
     }
 
     public void saveConfig() {
@@ -136,8 +139,8 @@ public class BauPlayer {
             return;
 
         ArrayList<net.wargearworld.db.model.Plot> memberedPlots = new ArrayList<>();
-        memberedPlots.addAll(dbPlayer.getPlots());
-        for (PlotMember member : dbPlayer.getMemberedPlots()) {
+        memberedPlots.addAll(getDbPlayer().getPlots());
+        for (PlotMember member : getDbPlayer().getMemberedPlots()) {
             memberedPlots.add(member.getPlot());
         }
         PlayerConnection pConn = ((CraftPlayer) p).getHandle().playerConnection;
@@ -164,7 +167,7 @@ public class BauPlayer {
     }
 
     public net.wargearworld.db.model.Player getDbPlayer() {
-        return dbPlayer;
+        return DBConnection.getPlayer(uuid);
     }
 
     public FileConfiguration getConfig() {
@@ -173,5 +176,25 @@ public class BauPlayer {
 
     public File getConfigFile() {
         return configFile;
+    }
+
+    public Language getLanguage() {
+        return language;
+    }
+
+    public Set<net.wargearworld.db.model.Plot> getdbPlots(){
+        EntityManager em = DependencyProvider.getEntityManager();
+        net.wargearworld.db.model.Player dbPlayer = em.find(net.wargearworld.db.model.Player.class,uuid);
+        Set<net.wargearworld.db.model.Plot> plots = dbPlayer.getPlots();
+        em.close();
+        return plots;
+    }
+    public boolean hasPlots(){
+        EntityManager em = DependencyProvider.getEntityManager();
+        net.wargearworld.db.model.Player dbPlayer = em.find(net.wargearworld.db.model.Player.class,uuid);
+        Set<net.wargearworld.db.model.Plot> plots = dbPlayer.getPlots();
+        boolean hasPlots = !plots.isEmpty();
+        em.close();
+        return hasPlots;
     }
 }

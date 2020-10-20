@@ -6,6 +6,8 @@ import static net.wargearworld.CommandManager.Nodes.LiteralNode.literal;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.protection.flags.StateFlag;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -163,7 +165,8 @@ public class Stoplag implements Listener, TabExecutor {
 		if (world == null || regionID == null) {
 			return false;
 		}
-		WorldManager.get(world).getPlot(regionID).setSL(on);
+		StateFlag.State stateFlag = on? StateFlag.State.ALLOW:StateFlag.State.DENY;
+		WorldGuardHandler.getRegion(regionID, BukkitAdapter.adapt(world)).setFlag(Main.stoplag, stateFlag);
 		for (Player player : world.getPlayers()) {
 			ScoreBoardBau.cmdUpdate(player);
 		}
@@ -184,9 +187,7 @@ public class Stoplag implements Listener, TabExecutor {
 		if (regionID == null || world == null) {
 			return false;
 		}
-
-		BauWorld bWorld = WorldManager.get(world);
-		return bWorld.getPlot(regionID).getSL();
+		return WorldGuardHandler.getRegion(regionID, BukkitAdapter.adapt(world)).getFlag(Main.stoplag) == StateFlag.State.ALLOW;
 	}
 
 	/* easier acess */

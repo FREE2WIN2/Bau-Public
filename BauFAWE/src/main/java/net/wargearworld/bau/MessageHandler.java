@@ -52,7 +52,7 @@ public class MessageHandler implements IStringGetter {
 	public String getString(UUID uuid, String name, String... args) {
 		Language lang = playersLanguage.get(uuid);
 		if (lang == null)
-			lang = Language.valueOf(DBConnection.getLanguage(uuid.toString()).toUpperCase());
+			lang = DBConnection.getLanguage(uuid);
 		String message = props.get(lang).getProperty(name);
 		// standard
 		for (String a : args) {
