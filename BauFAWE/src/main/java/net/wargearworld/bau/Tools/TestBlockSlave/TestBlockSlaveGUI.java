@@ -5,6 +5,10 @@ import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import net.wargearworld.GUI_API.GUI.AnvilGUI;
+import net.wargearworld.GUI_API.GUI.ChestGUI;
+import net.wargearworld.GUI_API.GUI.Slot;
+import net.wargearworld.GUI_API.Items.DefaultItem;
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
@@ -101,13 +105,13 @@ public class TestBlockSlaveGUI implements Listener {
 		return inv;
 	}
 
-	public static Inventory tbManager(HashMap<Integer, HashSet<CustomTestBlock>> tbs, Player p) {
+	public static Inventory tbManager(HashMap<Integer, Set<CustomTestBlock>> tbs, Player p) {
 
 		Inventory inv = Bukkit.createInventory(null, 45,
 				MessageHandler.getInstance().getString(p, "tbs_tbManagerInv").replace("%r", p.getName()));
 		ItemStack whiteBanner = ItemStackCreator.createNewItemStack(Material.WHITE_BANNER, " ");
 
-		for (Entry<Integer, HashSet<CustomTestBlock>> entry : tbs.entrySet()) {
+		for (Entry<Integer, Set<CustomTestBlock>> entry : tbs.entrySet()) {
 			int index = (entry.getKey()-1) * 18;
 
 			for (CustomTestBlock block : entry.getValue()) {
@@ -138,10 +142,10 @@ public class TestBlockSlaveGUI implements Listener {
 		return inv;
 	}
 
-	public static Inventory showAllNonFavorites(HashMap<Integer, HashSet<CustomTestBlock>> tbs, Player p) {
+	public static Inventory showAllNonFavorites(HashMap<Integer, Set<CustomTestBlock>> tbs, Player p) {
 		Inventory inv = Bukkit.createInventory(null, 27, MessageHandler.getInstance().getString(p, "tbs_gui_addFavoriteInv"));
 		ItemStack whiteBanner = ItemStackCreator.createNewItemStack(Material.WHITE_BANNER, " ");
-		for (Entry<Integer, HashSet<CustomTestBlock>> entry : tbs.entrySet()) {
+		for (Entry<Integer, Set<CustomTestBlock>> entry : tbs.entrySet()) {
 			int index = (entry.getKey() * 9) - 9;
 
 			for (CustomTestBlock block : entry.getValue()) {
@@ -176,22 +180,14 @@ public class TestBlockSlaveGUI implements Listener {
 	
 	public static void ChooseNameInv(Player p,int tier) {
 
-//		Builder builder = new Builder();
-//		BiFunction<Player, String, AnvilGUI.Response> function = new BiFunction<Player, String, AnvilGUI.Response>() {
-//
-//			@Override
-//			public Response apply(Player t, String u) {
-//				return AnvilGUI.Response.text(" ");
-//			}
-//		};
-//		builder.plugin(Main.getPlugin()).onComplete(function).text(" ").title(MessageHandler.getInstance().getString(p, "tbs_gui_anvilTitle"));
-//		if(tier == 1) {
-//			builder.item(Banner.ONE.create(DyeColor.ORANGE, DyeColor.BLACK, "§rUnnamed"));
-//		}else if(tier ==2) {
-//			builder.item(Banner.TWO.create(DyeColor.ORANGE, DyeColor.BLACK, "§rUnnamed"));
-//		}else if(tier == 3) {
-//			builder.item(Banner.THREE.create(DyeColor.ORANGE, DyeColor.BLACK, "§rUnnamed"));
-//		}
-//		builder.open(p);
+		AnvilGUI gui = new AnvilGUI(MessageHandler.getInstance().getString(p, "tbs_gui_anvilTitle"), " ");
+		if(tier == 1) {
+			gui.setItem(Slot.INPUT_LEFT,new DefaultItem(Banner.ONE.create(DyeColor.ORANGE, DyeColor.BLACK, "§rUnnamed"),s->{}));
+		}else if(tier ==2) {
+			gui.setItem(Slot.INPUT_LEFT,new DefaultItem(Banner.TWO.create(DyeColor.ORANGE, DyeColor.BLACK, "§rUnnamed"),s->{}));
+		}else if(tier == 3) {
+			gui.setItem(Slot.INPUT_LEFT,new DefaultItem(Banner.THREE.create(DyeColor.ORANGE, DyeColor.BLACK, "§rUnnamed"),s->{}));
+		}
+		gui.open(p);
 	}
 }

@@ -122,6 +122,7 @@ public class WorldManager {
         copyFolder_raw(template.getWorldDir(), neu);
 
         EntityManager em = DependencyProvider.getEntityManager();
+        em.getTransaction().begin();
         PlotTemplate dbTemplate = em.find(PlotTemplate.class, template.getId());
         Plot plot = new Plot();
         plot.setDefault(false);
@@ -129,6 +130,7 @@ public class WorldManager {
         plot.setTemplate(dbTemplate);
         plot.setOwner(em.find(net.wargearworld.db.model.Player.class,UUID.fromString(ownerUUID)));
         em.persist(plot);
+        em.getTransaction().commit();
         em.close();
         // worldguard regionen
         File worldGuardWorldDir = new File(Bukkit.getWorldContainer(),

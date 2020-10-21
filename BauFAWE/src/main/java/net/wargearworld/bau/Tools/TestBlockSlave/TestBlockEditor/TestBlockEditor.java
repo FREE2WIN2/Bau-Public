@@ -1,10 +1,10 @@
 package net.wargearworld.bau.tools.testBlockSlave.testBlockEditor;
 
-import java.util.ConcurrentModificationException;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
+import net.wargearworld.bau.player.BauPlayer;
+import net.wargearworld.bau.utils.CoordGetter;
+import net.wargearworld.bau.world.plots.Plot;
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
@@ -28,7 +28,6 @@ import net.wargearworld.bau.tools.testBlockSlave.testBlock.TestBlockType;
 import net.wargearworld.bau.tools.testBlockSlave.testBlock.Type;
 import net.wargearworld.bau.worldedit.WorldGuardHandler;
 import net.wargearworld.bau.utils.Banner;
-import net.wargearworld.bau.utils.CoordGetter;
 import net.wargearworld.bau.utils.ItemStackCreator;
 import net.wargearworld.bau.utils.Scheduler;
 
@@ -41,7 +40,7 @@ public class TestBlockEditor {
 	 */
 
 	private Set<ShieldModule> modules;
-	private Player owner;
+	private UUID owner;
 	private ShieldPosition choosedPosition;
 	private Facing facing;
 	private int tier;
@@ -50,11 +49,14 @@ public class TestBlockEditor {
 	public TestBlockEditor(Player owner) {
 		this.modules = new HashSet<>();
 		this.choosedPosition = null;
-		this.owner = owner;
+		this.owner = owner.getUniqueId();
 		save = false;
 	}
 
 	public void openMainInv() {
+		Player ownerPlayer = Bukkit.getPlayer(owner);
+		Objects.requireNonNull(ownerPlayer);
+
 		Inventory inv = Bukkit.createInventory(null, 54, "§7TestBlock-§6Editor");
 		int[] woolPos = { 10, 11, 12, 13, 14, 19, 23, 28, 32, 37, 38, 39, 40, 41 };
 		/* Wool */
@@ -64,7 +66,7 @@ public class TestBlockEditor {
 		}
 		/* Components */
 		for (ShieldPosition pos : ShieldPosition.values()) {
-			inv.setItem(pos.getPositionInGUI(), pos.getPlaceholderItem(owner));
+			inv.setItem(pos.getPositionInGUI(), pos.getPlaceholderItem(ownerPlayer));
 		}
 		/* Modules */
 		for (ShieldModule module : modules) {
@@ -72,48 +74,57 @@ public class TestBlockEditor {
 		}
 		/* Other Actions */
 		inv.setItem(17, ItemStackCreator.createNewItemStack(Material.WOODEN_AXE,
-				MessageHandler.getInstance().getString(owner, "tbs_editor_mainInv_save")));
+				MessageHandler.getInstance().getString(ownerPlayer, "tbs_editor_mainInv_save")));
 		inv.setItem(35, ItemStackCreator.createNewItemStack(Material.WHITE_WOOL,
-				MessageHandler.getInstance().getString(owner, "tbs_editor_mainInv_show")));
+				MessageHandler.getInstance().getString(ownerPlayer, "tbs_editor_mainInv_show")));
 		inv.setItem(53, ItemStackCreator.createNewItemStack(Material.BARRIER,
-				MessageHandler.getInstance().getString(owner, "tbs_editor_mainInv_reset")));
+				MessageHandler.getInstance().getString(ownerPlayer, "tbs_editor_mainInv_reset")));
 
-		owner.openInventory(inv);
+		ownerPlayer.openInventory(inv);
 	}
 
 	public void openChooseTypeInv() {
-		Inventory inv = Bukkit.createInventory(null, 9, MessageHandler.getInstance().getString(owner, "tbs_editor_chooseTypeInv"));
+		Player ownerPlayer = Bukkit.getPlayer(owner);
+		Objects.requireNonNull(ownerPlayer);
+
+		Inventory inv = Bukkit.createInventory(null, 9, MessageHandler.getInstance().getString(ownerPlayer, "tbs_editor_chooseTypeInv"));
 		inv.setItem(1, ShieldType.MASSIVE.getItem());
 		inv.setItem(2, ShieldType.SAND.getItem());
 		inv.setItem(3, ShieldType.SPIKE.getItem());
 		inv.setItem(4, ItemStackCreator.createNewItemStack(Material.BARRIER,
-				MessageHandler.getInstance().getString(owner, "tbs_editor_removeType")));
+				MessageHandler.getInstance().getString(ownerPlayer, "tbs_editor_removeType")));
 		inv.setItem(5, ShieldType.ARTOX.getItem());
 		inv.setItem(6, ShieldType.ARTILLERY.getItem());
 		inv.setItem(7, ShieldType.BACKSTAB.getItem());
-		owner.openInventory(inv);
+		ownerPlayer.openInventory(inv);
 	}
 
 	public void openFacingInv() {
+		Player ownerPlayer = Bukkit.getPlayer(owner);
+		Objects.requireNonNull(ownerPlayer);
+
 		ItemStack isN = Banner.N.create(DyeColor.WHITE, DyeColor.BLACK,
-				MessageHandler.getInstance().getString(owner, "facingNorth"));
+				MessageHandler.getInstance().getString(ownerPlayer, "facingNorth"));
 		// süden
 		ItemStack isS = Banner.S.create(DyeColor.WHITE, DyeColor.BLACK,
-				MessageHandler.getInstance().getString(owner, "facingSouth"));
+				MessageHandler.getInstance().getString(ownerPlayer, "facingSouth"));
 		// setzen
-		Inventory inv = Bukkit.createInventory(null, 9, MessageHandler.getInstance().getString(owner, "tbs_editor_facingInv"));
+		Inventory inv = Bukkit.createInventory(null, 9, MessageHandler.getInstance().getString(ownerPlayer, "tbs_editor_facingInv"));
 		inv.setItem(2, isN);
 		inv.setItem(6, isS);
-		owner.openInventory(inv);
+		ownerPlayer.openInventory(inv);
 	}
 
 	public void openTierInv() {
-		String inventoryName = MessageHandler.getInstance().getString(owner, "tbs_editor_tierInv");
+		Player ownerPlayer = Bukkit.getPlayer(owner);
+		Objects.requireNonNull(ownerPlayer);
+
+		String inventoryName = MessageHandler.getInstance().getString(ownerPlayer, "tbs_editor_tierInv");
 		Inventory inv = Bukkit.createInventory(null, 9, inventoryName);
 		inv.setItem(2, Banner.ONE.create(DyeColor.WHITE, DyeColor.BLACK, "§rTier I"));
 		inv.setItem(4, Banner.TWO.create(DyeColor.WHITE, DyeColor.BLACK, "§rTier II"));
 		inv.setItem(6, Banner.THREE.create(DyeColor.WHITE, DyeColor.BLACK, "§rTier III/IV"));
-		owner.openInventory(inv);
+		ownerPlayer.openInventory(inv);
 	}
 
 	public void addModule(ShieldModule module) {
@@ -173,10 +184,12 @@ public class TestBlockEditor {
 	public void visualize() {
 
 		/* Save bigger region to UndoManager */
+		Player ownerPlayer = Objects.requireNonNull(Bukkit.getPlayer(owner));
+
 		TestBlockSlave slave = TestBlockSlaveCore.getSlave(owner);
 		Region rg = calcUndoRegion();
-		slave.getUndoManager().addUndo(rg, CoordGetter.locToVec(owner.getLocation()),
-				BukkitAdapter.adapt(owner.getWorld()));
+		slave.getUndoManager().addUndo(rg, CoordGetter.locToVec(ownerPlayer.getLocation()),
+				BukkitAdapter.adapt(ownerPlayer.getWorld()));
 
 		/* Paste classic TB (without saving!) */
 		ChooseTestBlock tb = new ChooseTestBlock();
@@ -191,8 +204,8 @@ public class TestBlockEditor {
 			@Override
 			public void run() {
 				/* visualizing single modules */
-				String plotID = WorldGuardHandler.getPlotId(owner.getLocation());
-				World world = owner.getWorld();
+				Plot plot = BauPlayer.getBauPlayer(owner).getCurrentPlot();
+				World world = ownerPlayer.getWorld();
 				Iterator<ShieldModule> iter = modules.iterator();
 				Scheduler scheduler = new Scheduler();
 
@@ -201,7 +214,7 @@ public class TestBlockEditor {
 					@Override
 					public void run() {
 						if (iter.hasNext()) {
-							iter.next().visualize(plotID, world, tier, facing);
+							iter.next().visualize(plot, world, tier, facing);
 
 						} else {
 							scheduler.cancel();
@@ -216,7 +229,7 @@ public class TestBlockEditor {
 	}
 
 	private Region calcUndoRegion() {
-		Region normal = TestBlockSlaveCore.getTBRegion(tier, WorldGuardHandler.getPlotId(owner.getLocation()), facing,owner.getWorld().getName());
+		Region normal = TestBlockSlaveCore.getTBRegion(tier, BauPlayer.getBauPlayer(owner).getCurrentPlot(), facing);
 		int shieldSize = TestBlockSlaveCore.getMaxShieldSizeOfTier(tier);
 		BlockVector3 min = BlockVector3.at(-shieldSize, 0, -shieldSize);
 		BlockVector3 max = BlockVector3.at(shieldSize, shieldSize, shieldSize);

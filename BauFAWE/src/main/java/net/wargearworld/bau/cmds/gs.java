@@ -12,7 +12,6 @@ import java.util.*;
 import java.util.function.Predicate;
 
 import net.wargearworld.bau.world.PlayerWorld;
-import net.wargearworld.db.model.Plot;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -106,16 +105,16 @@ public class gs implements TabExecutor {
 
         commandHandle.addSubNode(literal("new")
                 .setCallback(s -> {
-                    newPlot(s.getPlayer(), 1);
+                    newPlot(s.getPlayer(), 1, s);
                 })
                 .addSubNode(invisible(argument("UUID1",dynamicList("UUID1", s->{return List.of(s.getPlayer().getUniqueId().toString());}))
                         .setCallback(s -> {
-                            newPlot(s.getPlayer(), 2);
+                            newPlot(s.getPlayer(), 2,s);
                         })
                         .addSubNode(
                                 argument("UUID2",dynamicList("UUID2", s->{return List.of(s.getPlayer().getUniqueId().toString());}))
                                 .setCallback(s -> {
-                                    newPlot(s.getPlayer(), 3);
+                                    newPlot(s.getPlayer(), 3,s);
                                 })))));
 
         commandHandle.addSubNode(literal("info").setCallback(s -> {
@@ -205,20 +204,20 @@ public class gs implements TabExecutor {
         return commandHandle.execute(p, MessageHandler.getInstance().getLanguage(p), args);
     }
 
-    private void newPlot(Player p, int argsLength) {
+    private void newPlot(Player p, int argsLength, ArgumentList s) {
         UUID uuid = p.getUniqueId();
         if (blocked.contains(uuid)) {
             Main.send(p, "gs_newPlotGeneration_antiSpam");
             return;
         }
-        if (secondWarnNewPlot.contains(uuid) && argsLength == 3) {
+        if (secondWarnNewPlot.contains(uuid) && argsLength == 3 && p.getUniqueId().toString().equals(s.getString("UUID2"))) {
             Main.send(p, "gs_newPlotGenerating");
             BauWorld world = WorldManager.get(p.getWorld());
             world.newWorld();
             secondWarnNewPlot.remove(uuid);
             firstWarnNewPlot.remove(uuid);
             blocked.add(uuid);
-        } else if (firstWarnNewPlot.contains(uuid) && argsLength == 2) {
+        } else if (firstWarnNewPlot.contains(uuid) && argsLength == 2&& p.getUniqueId().toString().equals(s.getString("UUID1"))) {
             JsonCreater jsonMsg = new JsonCreater(Main.prefix + MessageHandler.getInstance().getString(p, "gs_newPlot_secondWarn"));
             JsonCreater jsonMsgClick = new JsonCreater(MessageHandler.getInstance().getString(p, "gs_newPlot_secondWarn_click"));
             jsonMsgClick.addHoverEvent(MessageHandler.getInstance().getString(p, "gs_newPlot_secondWarn_clickHover"));

@@ -16,7 +16,7 @@ public class WorldEditPreCommand implements Listener{
 		String command = event.getMessage();
 		Player p = event.getPlayer();
 		BauPlayer player = BauPlayer.getBauPlayer(p);
-		if (command.startsWith("//paste")&&player.getPasteState()) {
+		if ((command.startsWith("//paste")||(command.startsWith("//move"))||(command.startsWith("//stack")))&&player.getPasteState()) {
 			Stoplag.getInstance().setStatusTemp(p.getLocation(), true, player.getPasteTime());
 		}
 

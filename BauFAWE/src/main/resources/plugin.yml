@@ -36,7 +36,7 @@ commands:
       usage: /<command>
       description: Gives you an TNT Chest
       aliases: [tntchest]
-   delcon:
+   plotreset:
       description: delete Plot.
    baureload:
       description: handling

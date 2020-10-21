@@ -1,6 +1,7 @@
 package net.wargearworld.bau.worldedit;
 
 import java.util.Stack;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -20,7 +21,7 @@ public class UndoManager {
 
 	Stack<Clipboard> undos;
 	
-	public UndoManager(Player p) {
+	public UndoManager(UUID uuid) {
 		undos = new Stack<>();
 	}
 	

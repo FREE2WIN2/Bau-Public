@@ -111,4 +111,8 @@ public class MessageHandler implements IStringGetter {
 			return;
 		player.sendMessage(Main.prefix + getString(player, key, args));
 	}
+
+    public void send(UUID owner, String key, String... args) {
+		send(BauPlayer.getBauPlayer(owner),key,args);
+    }
 }

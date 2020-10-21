@@ -131,7 +131,7 @@ public class Main extends JavaPlugin {
 		getCommand("debugstick").setExecutor(new ds());
 		getCommand("chest").setExecutor(new TntChest());
 		getCommand("stats").setExecutor(new stats());
-		getCommand("delcon").setExecutor(new PlotResetter());
+		getCommand("plotreset").setExecutor(new PlotResetter());
 		getCommand("baureload").setExecutor(new Bau());
 		getCommand("tr").setExecutor(AutoCannonReloader.getInstance());
 		getCommand("tr").setTabCompleter(new TntReloaderTC());

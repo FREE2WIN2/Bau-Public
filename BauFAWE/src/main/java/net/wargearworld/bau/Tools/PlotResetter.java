@@ -4,9 +4,20 @@ import static net.wargearworld.CommandManager.Nodes.ArgumentNode.argument;
 import static net.wargearworld.CommandManager.Nodes.InvisibleNode.invisible;
 import static net.wargearworld.CommandManager.Nodes.LiteralNode.literal;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.awt.datatransfer.Clipboard;
+import java.util.*;
 
+import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
+import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
+import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.regions.Region;
+import net.wargearworld.bau.utils.*;
+import net.wargearworld.bau.world.BauWorld;
+import net.wargearworld.bau.world.WorldManager;
+import net.wargearworld.bau.world.plots.Plot;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -27,142 +38,132 @@ import net.wargearworld.bau.tools.testBlockSlave.testBlock.Facing;
 import net.wargearworld.bau.worldedit.Schematic;
 import net.wargearworld.bau.worldedit.WorldEditHandler;
 import net.wargearworld.bau.worldedit.WorldGuardHandler;
-import net.wargearworld.bau.utils.ClickAction;
-import net.wargearworld.bau.utils.CoordGetter;
-import net.wargearworld.bau.utils.JsonCreater;
-import net.wargearworld.bau.utils.Scheduler;
 import net.wargearworld.CommandManager.ArgumentList;
 import net.wargearworld.CommandManager.CommandHandel;
 import net.wargearworld.CommandManager.Arguments.StringArgument;
+import org.bukkit.scheduler.BukkitTask;
 
 public class PlotResetter implements TabExecutor {
 
-	private CommandHandel commandHandle;
+    private CommandHandel commandHandle;
 
-	public PlotResetter() {
+    public PlotResetter() {
 //		new CommandManager(MessageHandler.getInstance());
-		commandHandle = new CommandHandel("plotreset", Main.prefix,Main.getPlugin());
-		commandHandle.setCallback(s -> {
-			String rgID = WorldGuardHandler.getPlotId(s.getPlayer().getLocation());
-			resetRegion(rgID, s.getPlayer(), false);
-		});
+        commandHandle = new CommandHandel("plotreset", Main.prefix, Main.getPlugin());
+        commandHandle.setCallback(s -> {
+            resetRegion(s.getPlayer(), false);
+        });
+        commandHandle.addSubNode(literal("undo").setCallback(s -> {
+            undo(s);
+        }));
 
-		commandHandle.addSubNode(invisible(argument("plotID", new StringArgument())
-				.addSubNode(argument("UUID", new StringArgument()).setCallback(s -> {
-					resetRegion(s.getString(s.getString("plotID")), s.getPlayer(), true);
-				}).setRequirement(s -> {
-					return s.getPlayer().getUniqueId().toString().equals(s.getString("UUID"));
-				}))));
+        commandHandle.addSubNode(
+                invisible(
+                        argument("UUID", new StringArgument())
+                                .setCallback(s -> {
+                                    if (s.getString("UUID").equalsIgnoreCase("undo")) {
+                                        undo(s);
+                                    } else {
+                                        resetRegion(s.getPlayer(), true);
+                                    }
+                                })));
 
-		commandHandle.addSubNode(literal("undo").setCallback(s -> {
-			undo(s);
-		}));
 
-	}
+    }
 
-	private void undo(ArgumentList s) {
-		Player p = s.getPlayer();
-		BauPlayer player = BauPlayer.getBauPlayer(p);
-		if (player.getCurrentPlot().undo(p.getWorld())) {
-			// TODO msg
-		} else {
-			// TODO msg
-		}
-	}
+    private void undo(ArgumentList s) {
+        Player p = s.getPlayer();
+        BauPlayer player = BauPlayer.getBauPlayer(p);
+        Plot plot = player.getCurrentPlot();
+        if (player.getCurrentPlot().undo(p.getWorld())) {
+            MessageHandler.getInstance().send(s.getPlayer(), "plotreset_undo", plot.getId().replace("plot", ""));
+        } else {
+            MessageHandler.getInstance().send(s.getPlayer(), "plotreset_noUndo", plot.getId().replace("plot", ""));
+        }
+    }
 
-	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String string, String[] args) {
-		if (sender instanceof Player) {
-			Player p = (Player) sender;
-			return commandHandle.execute(p, MessageHandler.getInstance().getLanguage(p), args);
-		}
-		return false;
-	}
-	
-	@Override
-	public List<String> onTabComplete(CommandSender sender, Command arg1,
-			String arg2, String[] args) {
-		List<String> out = new ArrayList<>();
-		Player p = (Player) sender;
-		commandHandle.tabComplete(p, MessageHandler.getInstance().getLanguage(p), args,out);
-		return out;
-	}
+    @Override
+    public boolean onCommand(CommandSender sender, Command cmd, String string, String[] args) {
+        if (sender instanceof Player) {
+            Player p = (Player) sender;
+            return commandHandle.execute(p, MessageHandler.getInstance().getLanguage(p), args);
+        }
+        return false;
+    }
 
-	public static void resetRegion(String rgID, Player p, boolean confirmed) {
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command arg1,
+                                      String arg2, String[] args) {
+        List<String> out = new ArrayList<>();
+        Player p = (Player) sender;
+        commandHandle.tabComplete(p, MessageHandler.getInstance().getLanguage(p), args, out);
+        return out;
+    }
+
+    public static void resetRegion(Player p, boolean confirmed) {
 //		int rgIDint = Integer.parseInt(rgID.replace("plot", ""));
-		if (!confirmed) {
-			JsonCreater creater1 = new JsonCreater(Main.prefix
-					+ MessageHandler.getInstance().getString(p, "delePlotConfirmation", rgID.replace("plot", "")));
-			JsonCreater creater2 = new JsonCreater(
-					MessageHandler.getInstance().getString(p, "deletePlotHere", rgID.replace("plot", "")));
-			creater2.addHoverEvent(
-					MessageHandler.getInstance().getString(p, "delePlotHover", rgID.replace("plot", "")));
-			creater2.addClickEvent("/plotreset " + rgID + " " + p.getUniqueId(), ClickAction.RUN_COMMAND);
-			creater1.addJson(creater2).send(p);
-		} else {
-//			if (playerBlockedDelete.contains(p.getUniqueId()) && !p.hasPermission("bau.delete.bypass")) {
-//				p.sendMessage(MessageHandler.getInstance().getString(p, "deletePlotAntiSpaw"));
-//				return;
-//			}
-//			playerBlockedDelete.add(p.getUniqueId());
-			Main.send(p, "delePlot", rgID.replace("plot", ""));
-			// für jede Zeile rgid festlegen
-			ProtectedRegion rg = WorldGuard.getInstance().getPlatform().getRegionContainer()
-					.get(BukkitAdapter.adapt(p.getWorld())).getRegion(rgID);
+        BauPlayer bauPlayer = BauPlayer.getBauPlayer(p);
+        Plot current = bauPlayer.getCurrentPlot();
+        String rgID = current.getId();
+        if (!confirmed) {
+            JsonCreater creater1 = new JsonCreater(Main.prefix
+                    + MessageHandler.getInstance().getString(p, "delePlotConfirmation", rgID.replace("plot", "")));
+            JsonCreater creater2 = new JsonCreater(
+                    MessageHandler.getInstance().getString(p, "deletePlotHere", rgID.replace("plot", "")));
+            creater2.addHoverEvent(
+                    MessageHandler.getInstance().getString(p, "delePlotHover", rgID.replace("plot", "")));
+            creater2.addClickEvent("/plotreset " + p.getUniqueId(), ClickAction.RUN_COMMAND);
+            creater1.addJson(creater2).send(p);
+        } else {
+            Main.send(p, "delePlot", rgID.replace("plot", ""));
+            // für jede Zeile rgid festlegen
+            ProtectedRegion rg = Objects.requireNonNull(WorldGuard.getInstance().getPlatform().getRegionContainer()
+                    .get(BukkitAdapter.adapt(p.getWorld()))).getRegion(rgID);
 
-			int xmin = rg.getMinimumPoint().getBlockX();
-			int xmax = rg.getMaximumPoint().getBlockX();
-			int ymax = rg.getMaximumPoint().getBlockY();// ganz oben
-			int ymin = rg.getMinimumPoint().getBlockY();// ganz unten
-			int zmin = rg.getMinimumPoint().getBlockZ();
-			int zmax = rg.getMaximumPoint().getBlockZ();
+            current.reset(p.getWorld());
+            /* reset*/
+            calcBlocks(rg.getMinimumPoint(), rg.getMaximumPoint(), p.getWorld(),current);
+        }
+    }
 
-			Scheduler scheduler = new Scheduler();
-			scheduler.setX(xmin);
-			scheduler.setY(ymin);
-			scheduler.setZ(zmin);
+    private static void calcBlocks(BlockVector3 minimumPoint, BlockVector3 maximumPoint, World world, Plot current) {
+        List<Block> list = new LinkedList<>();
+        Bukkit.getScheduler().runTaskAsynchronously(Main.getPlugin(), () -> {
+            for (int x = minimumPoint.getBlockX(); x <= maximumPoint.getBlockX(); x++) {
+                for (int y = minimumPoint.getBlockY(); y <= maximumPoint.getBlockY(); y++) {
+                    for (int z = minimumPoint.getBlockZ(); z <= maximumPoint.getBlockZ(); z++) {
+                        Block b = world.getBlockAt(x, y, z);
+                        if (b.getType() != Material.AIR) {
+                            list.add(b);
+                        }
+                    }
+                }
+            }
+            remove(list, world,current);
+        });
+    }
 
-			World world = p.getWorld();
-			// paste
-			String schemName = CoordGetter.getConfigOfWorld(p.getWorld().getName())
-					.getString("plotreset.schemfiles." + rgID) + ".schem";
-			WorldEditHandler.pasteground(new Schematic("TestBlockSklave", schemName, Facing.NORTH), rgID, p, true);
+    private static void remove(List<Block> list, World world, Plot current) {
+        Iterator<Block> iterator = list.iterator();
+        int maxBlockChangePerTick = WorldEditHandler.maxBlockChangePerTick;
 
-			int maxBlockChangePerTick = WorldEditHandler.maxBlockChangePerTick;
-			scheduler.setTask(
-					Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), new Runnable() {
+        Scheduler scheduler = new Scheduler();
+        current.setSL(true);
+        scheduler.setTask(
+                Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), () -> {
+                    int blockcount = 0;
+                    while (iterator.hasNext()) {
+                        Block b = iterator.next();
+                        blockcount++;
+                        b.setType(Material.AIR, false);
 
-						@Override
-						public void run() {
-							int xmins = scheduler.getX();
-							int ymins = scheduler.getY();
-							int zmins = scheduler.getZ();
-							int blockcount = 0;
-							for (int x = xmins; x <= xmax; x++) {
-								for (int y = ymins; y <= ymax; y++) {
-									for (int z = zmins; z <= zmax; z++) {
-										Block b = world.getBlockAt(x, y, z);
-										blockcount++;
-										if (!b.getType().equals(Material.AIR)) {
-											b.setType(Material.AIR, false);
-										}
-										if (blockcount == maxBlockChangePerTick) {
-											scheduler.setX(x);
-											scheduler.setY(y);
-											scheduler.setZ(z);
-											return;
-										}
-									}
-									zmins = zmin;
-								}
-								ymins = ymin;
-							}
-							scheduler.cancel();
-						}
-					}, 0, 1));
-		}
-	}
-
-	
+                        if (blockcount == maxBlockChangePerTick) {
+                            return;
+                        }
+                    }
+                    scheduler.cancel();
+                    current.setSL(false);
+                }, 0, 1));
+    }
 
 }

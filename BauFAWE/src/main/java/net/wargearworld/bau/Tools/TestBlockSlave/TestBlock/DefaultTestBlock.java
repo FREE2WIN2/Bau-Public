@@ -5,7 +5,7 @@ import java.util.HashMap;
 import net.wargearworld.bau.tools.testBlockSlave.ChooseTestBlock;
 import net.wargearworld.bau.worldedit.Schematic;
 
-public class DefaultTestBlock implements TestBlock {
+public class DefaultTestBlock implements ITestBlock {
 
 	public static HashMap<String, DefaultTestBlock> defaultTestBlocks = new HashMap<>();
 	

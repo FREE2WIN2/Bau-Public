@@ -1,25 +1,26 @@
 package net.wargearworld.bau.tools.testBlockSlave.testBlock;
 
+import net.wargearworld.bau.world.plots.Plot;
 import org.bukkit.World;
 
 import com.sk89q.worldedit.regions.Region;
 
 import net.wargearworld.bau.worldedit.Schematic;
 
-public class EmptyTestBlock implements TestBlock {
+public class EmptyTestBlock implements ITestBlock {
 
 	private String name;
 	private int tier;
 	private Region region;
-	private String plotID;
+	private Plot plot;
 	private Facing facing;
 	private World world;
 	private Type type;
 
-	public EmptyTestBlock(int tier, Region region, String regionID, Facing facing, World world,Type type) {
+	public EmptyTestBlock(int tier, Region region, Plot plot, Facing facing, World world,Type type) {
 		this.facing = facing;
 		this.region = region;
-		this.plotID = regionID;
+		this.plot = plot;
 		this.tier = tier;
 		this.setWorld(world);
 		this.type = type;
@@ -48,8 +49,8 @@ public class EmptyTestBlock implements TestBlock {
 		return region;
 	}
 
-	public String getPlotID() {
-		return plotID;
+	public Plot getPlot() {
+		return plot;
 	}
 
 	public Facing getfacing() {
@@ -72,8 +73,8 @@ public class EmptyTestBlock implements TestBlock {
 		this.region = region;
 	}
 
-	public void setPlotID(String plotID) {
-		this.plotID = plotID;
+	public void setPlot(Plot plot) {
+		this.plot = plot;
 	}
 
 	public void setFacing(Facing facing) {
@@ -92,4 +93,5 @@ public class EmptyTestBlock implements TestBlock {
 	public void setWorld(World world) {
 		this.world = world;
 	}
+
 }
