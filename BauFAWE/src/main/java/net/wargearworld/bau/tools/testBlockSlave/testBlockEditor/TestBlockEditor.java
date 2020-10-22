@@ -46,10 +46,10 @@ public class TestBlockEditor {
 	private int tier;
 	private boolean save;
 
-	public TestBlockEditor(Player owner) {
+	public TestBlockEditor(UUID owner) {
 		this.modules = new HashSet<>();
 		this.choosedPosition = null;
-		this.owner = owner.getUniqueId();
+		this.owner = owner;
 		save = false;
 	}
 
@@ -168,8 +168,9 @@ public class TestBlockEditor {
 
 	public void save(ChooseTestBlock chooseTB) {
 		chooseTB.setType(Type.SHIELDS).setTestBlockType(TestBlockType.NEW);
-		TestBlockSlaveCore.getSlave(owner).setChooseTB(chooseTB);
-		TestBlockSlaveCore.getSlave(owner).showParticle();
+		TestBlockSlave slave = BauPlayer.getBauPlayer(owner).getTestBlockSlave();
+		slave.setChooseTB(chooseTB);
+		slave.showParticle();
 		save = false;
 	}
 
@@ -186,7 +187,7 @@ public class TestBlockEditor {
 		/* Save bigger region to UndoManager */
 		Player ownerPlayer = Objects.requireNonNull(Bukkit.getPlayer(owner));
 
-		TestBlockSlave slave = TestBlockSlaveCore.getSlave(owner);
+		TestBlockSlave slave = BauPlayer.getBauPlayer(owner).getTestBlockSlave();
 		Region rg = calcUndoRegion();
 		slave.getUndoManager().addUndo(rg, CoordGetter.locToVec(ownerPlayer.getLocation()),
 				BukkitAdapter.adapt(ownerPlayer.getWorld()));

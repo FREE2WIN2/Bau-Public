@@ -8,6 +8,9 @@ import net.wargearworld.StringGetter.Language;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.hikariCP.DBConnection;
+import net.wargearworld.bau.tools.AutoCannonReloader;
+import net.wargearworld.bau.tools.testBlockSlave.TestBlockSlave;
+import net.wargearworld.bau.tools.testBlockSlave.testBlockEditor.TestBlockEditor;
 import net.wargearworld.bau.world.BauWorld;
 import net.wargearworld.bau.world.WorldManager;
 import net.wargearworld.bau.world.plots.Plot;
@@ -57,6 +60,11 @@ public class BauPlayer {
     File configFile;
     private Language language;
 
+    //TODO save Tools in it
+    /* Tools */
+    private TestBlockSlave testBlockSlave;
+    private TestBlockEditor testBlockEditor;
+    private AutoCannonReloader cannonReloader;
     private BauPlayer(UUID uuid) {
         this.uuid = uuid;
         configFile = new File(Main.getPlugin().getDataFolder(), "users/" + uuid.toString() + "/settings.yml");
@@ -199,4 +207,21 @@ public class BauPlayer {
         return hasPlots;
     }
 
+    public TestBlockSlave getTestBlockSlave() {
+        if (testBlockSlave == null)
+            testBlockSlave = new TestBlockSlave(uuid);
+        return testBlockSlave;
+    }
+
+    public TestBlockEditor getTestBlockEditor() {
+        if (testBlockEditor == null)
+            testBlockEditor = new TestBlockEditor(uuid);
+        return testBlockEditor;
+    }
+
+    public AutoCannonReloader getCannonReloader() {
+        if(cannonReloader == null)
+            cannonReloader = new AutoCannonReloader();
+        return cannonReloader;
+    }
 }

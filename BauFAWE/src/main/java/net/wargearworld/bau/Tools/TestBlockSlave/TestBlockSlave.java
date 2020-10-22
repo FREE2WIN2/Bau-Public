@@ -149,7 +149,7 @@ public class TestBlockSlave {
 		Player ownerPlayer = Bukkit.getPlayer(owner);
 		Plot plot = Objects.requireNonNull(BauPlayer.getBauPlayer(owner).getCurrentPlot());
 		/* paste */
-
+		MessageHandler.getInstance().send(ownerPlayer,"tbs_paste_undoMessage");
 		WorldEditHandler.pasteTestBlock(block.getSchematic(), facing, plot, ownerPlayer, saveUndo);
 		last = block;
 		lastFacing = facing;

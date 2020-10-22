@@ -115,7 +115,9 @@ public class PlotResetter implements TabExecutor {
             creater2.addClickEvent("/plotreset " + p.getUniqueId(), ClickAction.RUN_COMMAND);
             creater1.addJson(creater2).send(p);
         } else {
-            Main.send(p, "delePlot", rgID.replace("plot", ""));
+            String plotName = rgID.replace("plot", "");
+            Main.send(p, "delePlot", plotName);
+            Main.send(p,"delePlot_undo",plotName);
             // für jede Zeile rgid festlegen
             ProtectedRegion rg = Objects.requireNonNull(WorldGuard.getInstance().getPlatform().getRegionContainer()
                     .get(BukkitAdapter.adapt(p.getWorld()))).getRegion(rgID);
@@ -127,43 +129,46 @@ public class PlotResetter implements TabExecutor {
     }
 
     private static void calcBlocks(BlockVector3 minimumPoint, BlockVector3 maximumPoint, World world, Plot current) {
+        boolean sl = current.getSL();
+        Bukkit.getScheduler().runTaskTimerAsynchronously(Main.getPlugin(), () -> {
         List<Block> list = new LinkedList<>();
-        Bukkit.getScheduler().runTaskAsynchronously(Main.getPlugin(), () -> {
+        int maxBlockChangePerTick = WorldEditHandler.maxBlockChangePerTick;
+        int blockCount = 0;
             for (int x = minimumPoint.getBlockX(); x <= maximumPoint.getBlockX(); x++) {
                 for (int y = minimumPoint.getBlockY(); y <= maximumPoint.getBlockY(); y++) {
                     for (int z = minimumPoint.getBlockZ(); z <= maximumPoint.getBlockZ(); z++) {
                         Block b = world.getBlockAt(x, y, z);
                         if (b.getType() != Material.AIR) {
                             list.add(b);
+                            blockCount++;
+                        }
+                        if(blockCount == maxBlockChangePerTick){
+                            remove(new LinkedList<>(list),current,sl);
+                            list = new LinkedList<>();
                         }
                     }
                 }
             }
-            remove(list, world,current);
-        });
+            remove(list, current,sl);
+        },0,1);
     }
 
-    private static void remove(List<Block> list, World world, Plot current) {
-        Iterator<Block> iterator = list.iterator();
-        int maxBlockChangePerTick = WorldEditHandler.maxBlockChangePerTick;
+    private static void remove(List<Block> list, Plot current,boolean stoplag) {
 
         Scheduler scheduler = new Scheduler();
+        if(!stoplag){
         current.setSL(true);
+        }
         scheduler.setTask(
-                Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), () -> {
-                    int blockcount = 0;
-                    while (iterator.hasNext()) {
-                        Block b = iterator.next();
-                        blockcount++;
+                Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.getPlugin(), () -> {
+                    for(Block b:list) {
                         b.setType(Material.AIR, false);
-
-                        if (blockcount == maxBlockChangePerTick) {
-                            return;
-                        }
+                    }
+                    if(!stoplag){
+                        current.setSL(false);
                     }
                     scheduler.cancel();
-                    current.setSL(false);
-                }, 0, 1));
+                }, 0));
     }
 
 }
