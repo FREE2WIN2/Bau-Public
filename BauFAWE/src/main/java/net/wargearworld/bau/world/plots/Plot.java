@@ -134,6 +134,28 @@ public abstract class Plot {
 		return out.add(0.5, 0, 0);
 	}
 
+	/**
+	 *
+	 * @return The Paste Position for Things in Direction North (Lays in South)
+	 */
+	public Location getPasteN() {
+		Location out = middleNorth.clone();//clone
+		return out.add(0, 0, 23);
+	}
+
+	/**
+	 *
+	 * @return The Paste Position for Things in Direction South (Lays in North)
+	 */
+	public Location getPasteS() {
+		Location out = middleNorth.clone();//clone
+		return out.add(0, 0, -24);
+	}
+
+	public Schematic getGround() {
+		return ground;
+	}
+
 	public abstract PlotType getType();
 
 }

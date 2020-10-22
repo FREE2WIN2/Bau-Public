@@ -1,24 +1,41 @@
 package net.wargearworld.bau.tools.testBlockSlave.testBlock;
 
 import org.bukkit.DyeColor;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import net.wargearworld.bau.worldedit.Schematic;
 import net.wargearworld.bau.utils.Banner;
 
-public class CustomTestBlock implements TestBlock {
+import java.util.UUID;
+
+public class CustomTestBlock implements ITestBlock {
 
 	/*
 	 * This is a TestBlock out of the personal .yml of the Player.
 	 * 
 	 */
 
-	private String owner;
+	private UUID owner;
 	private Schematic schematic;
 	private String Name;
 	private int tier;
 	private boolean favorite;
+	private long id;
+
+	public CustomTestBlock(UUID owner, String name, Facing facing, int tier) {
+		this.owner = owner;
+		this.Name = name;
+		this.tier = tier;
+		this.schematic = new Schematic(this.owner + "/TestBlockSklave", name + ".schem", facing);
+		this.favorite = false;
+	}
+
+	public static CustomTestBlock fromDb(net.wargearworld.db.model.TestBlock block) {
+		CustomTestBlock tb = new CustomTestBlock(block.getOwner().getUuid(),block.getName(), block.getName(),Facing.valueOf(block.getDirection().name()), block.getTier(), block.getFavorite(),block.getId());
+		return tb;
+	}
+
+
 	/**
 	 * Creates a new TestBlock
 	 * 
@@ -28,26 +45,20 @@ public class CustomTestBlock implements TestBlock {
 	 * @param Name      -> Name of the TestBlock
 	 * @param tier      -> int-value of the tier
 	 */
-	public CustomTestBlock(String owner, String schemName, String Name, String face, int tier, boolean favorite) {
+	public CustomTestBlock(UUID owner, String schemName, String Name, Facing face, int tier, boolean favorite, long id) {
 		this.owner = owner;
-		this.schematic = new Schematic(owner + "/TestBlockSklave", schemName, Facing.getByShort(face.toUpperCase()));
+		this.schematic = new Schematic(owner + "/TestBlockSklave", schemName, face);
 		this.Name = Name;
 		this.tier = tier;
 		this.favorite = favorite;
-	}
-	public CustomTestBlock(Player owner, String name, Facing facing, int tier) {
-		this.owner = owner.getUniqueId().toString();
-		this.Name = name;
-		this.tier = tier;
-		this.schematic = new Schematic(this.owner + "/TestBlockSklave", name + ".schem", facing);
-		this.favorite = false;
+		this.id = id;
 	}
 
- 	public int getTier() {
+    public int getTier() {
 		return tier;
 	}
 
-	public String getOwner() {
+	public UUID getOwner() {
 		return owner;
 	}
 
@@ -86,5 +97,11 @@ public class CustomTestBlock implements TestBlock {
 		return null;
 	}
 
+	public long getId() {
+		return id;
+	}
 
+	public void setId(int id) {
+		this.id = id;
+	}
 }

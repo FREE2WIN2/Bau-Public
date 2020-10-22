@@ -25,6 +25,7 @@ import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 
 import com.sk89q.worldedit.math.BlockVector3;
@@ -239,7 +240,13 @@ public class Stoplag implements Listener, TabExecutor {
 		e.setCancelled(getStatus(e.getBlock().getLocation()));
 	}
 
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void entityPrime(ExplosionPrimeEvent e) {
+		e.setCancelled(getStatus(e.getEntity().getLocation()));
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void entityExplode(EntityExplodeEvent e) {
 		e.setCancelled(getStatus(e.getEntity().getLocation()));
 	}
 

@@ -2,12 +2,12 @@ package net.wargearworld.bau.tools.testBlockSlave;
 
 import net.wargearworld.bau.tools.testBlockSlave.testBlock.DefaultTestBlock;
 import net.wargearworld.bau.tools.testBlockSlave.testBlock.Facing;
-import net.wargearworld.bau.tools.testBlockSlave.testBlock.TestBlock;
+import net.wargearworld.bau.tools.testBlockSlave.testBlock.ITestBlock;
 import net.wargearworld.bau.tools.testBlockSlave.testBlock.TestBlockType;
 import net.wargearworld.bau.tools.testBlockSlave.testBlock.Type;
 
 public class ChooseTestBlock {
-	private TestBlock block;
+	private ITestBlock block;
 	private Facing facing;
 	private Type type;
 	private int tier;
@@ -37,7 +37,7 @@ public class ChooseTestBlock {
 		this.facing = facing;
 		return this;
 	}	
-	public ChooseTestBlock setTestBlock(TestBlock block) {
+	public ChooseTestBlock setTestBlock(ITestBlock block) {
 		this.block = block;
 		return this;
 	}
@@ -61,7 +61,7 @@ public class ChooseTestBlock {
 	}
 	
 	
-	public TestBlock getTestBlock() {
+	public ITestBlock getTestBlock() {
 		if(block !=null) {
 			return block;
 		}

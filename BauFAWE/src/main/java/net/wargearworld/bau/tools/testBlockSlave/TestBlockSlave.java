@@ -1,9 +1,15 @@
 package net.wargearworld.bau.tools.testBlockSlave;
 
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 import java.util.Map.Entry;
 
+import net.wargearworld.bau.player.BauPlayer;
+import net.wargearworld.bau.utils.CoordGetter;
+import net.wargearworld.bau.world.plots.Plot;
+import net.wargearworld.db.model.TestBlock;
+import net.wargearworld.db.model.TestBlock_;
+import net.wargearworld.db.model.enums.schematic.SchematicDirection;
+import net.wargearworld.thedependencyplugin.DependencyProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -22,16 +28,21 @@ import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.tools.testBlockSlave.testBlock.CustomTestBlock;
 import net.wargearworld.bau.tools.testBlockSlave.testBlock.EmptyTestBlock;
 import net.wargearworld.bau.tools.testBlockSlave.testBlock.Facing;
-import net.wargearworld.bau.tools.testBlockSlave.testBlock.TestBlock;
+import net.wargearworld.bau.tools.testBlockSlave.testBlock.ITestBlock;
 import net.wargearworld.bau.tools.testBlockSlave.testBlock.TestBlockType;
 import net.wargearworld.bau.tools.testBlockSlave.testBlock.Type;
 import net.wargearworld.bau.worldedit.UndoManager;
 import net.wargearworld.bau.worldedit.WorldEditHandler;
 import net.wargearworld.bau.worldedit.WorldGuardHandler;
 import net.wargearworld.bau.utils.ClickAction;
-import net.wargearworld.bau.utils.CoordGetter;
 import net.wargearworld.bau.utils.JsonCreater;
 import net.wargearworld.bau.utils.Scheduler;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 public class TestBlockSlave {
 
@@ -40,9 +51,9 @@ public class TestBlockSlave {
 	 * testblocks and you can open the editor over him and save own testblocks.
 	 * 
 	 */
-	private Player owner;
-	private HashMap<Integer, HashSet<CustomTestBlock>> testblocks;
-	private TestBlock last;
+	private UUID owner;
+	private HashMap<Integer, Set<CustomTestBlock>> testblocks;
+	private ITestBlock last;
 	private Facing lastFacing;
 	private UndoManager undoManager;
 	private Scheduler saveTBParticles;
@@ -50,7 +61,7 @@ public class TestBlockSlave {
 	private ChooseTestBlock chooseTB;
 	/* init */
 
-	public TestBlockSlave(Player owner) {
+	public TestBlockSlave(UUID owner) {
 		this.owner = owner;
 		testblocks = new HashMap<>();
 		testblocks.put(1, readTestBlocks(1));
@@ -61,29 +72,27 @@ public class TestBlockSlave {
 		saveTBParticles = new Scheduler();
 	}
 
-	private HashSet<CustomTestBlock> readTestBlocks(int tier) {
+	private Set<CustomTestBlock> readTestBlocks(int tier) {
 		HashSet<CustomTestBlock> outSet = new HashSet<>();
-		/*try (Connection conn = DataSource.getConnection()) {
-			PreparedStatement statement = conn.prepareStatement(
-					"SELECT * FROM TestBlock,Player WHERE Player.UUID = ? AND TestBlock.tier = ? AND Player.UUID = TestBlock.owner");
-			statement.setString(1, owner.getUniqueId().toString());
-			statement.setInt(2, tier);
-			ResultSet rs = statement.executeQuery();
-			while (rs.next()) {
+		EntityManager em = DependencyProvider.getEntityManager();
+		net.wargearworld.db.model.Player dbPlayer = (net.wargearworld.db.model.Player) em.find(net.wargearworld.db.model.Player.class,owner);
 
-				outSet.add(new CustomTestBlock(rs.getString("owner"), rs.getString("schemName"), rs.getString("name"),
-						rs.getString("richtung"), tier, rs.getBoolean("favorite")));
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery cq = cb.createQuery(net.wargearworld.db.model.TestBlock.class);
+		Root root = cq.from(net.wargearworld.db.model.TestBlock.class);
+		cq.where(cb.equal(root.get(TestBlock_.OWNER),dbPlayer),cb.equal(root.get(TestBlock_.TIER),tier));
 
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}*/
+		Query query = em.createQuery(cq);
+		List<net.wargearworld.db.model.TestBlock> testBlocks = query.getResultList();
+		for(net.wargearworld.db.model.TestBlock block:testBlocks){
+			outSet.add(CustomTestBlock.fromDb(block));
+		}
 		return outSet;
 	}
 
 	private HashSet<CustomTestBlock> readFavs() {
 		HashSet<CustomTestBlock> favs = new HashSet<>();
-		for (Entry<Integer, HashSet<CustomTestBlock>> tbs : testblocks.entrySet()) {
+		for (Entry<Integer, Set<CustomTestBlock>> tbs : testblocks.entrySet()) {
 			for (CustomTestBlock block : tbs.getValue()) {
 				if (block.isFavorite()) {
 					favs.add(block);
@@ -94,12 +103,13 @@ public class TestBlockSlave {
 	}
 
 	public void openGUI() {
-		owner.openInventory(TestBlockSlaveGUI.tbsStartInv(owner, readFavs()));
+		Player ownerPlayer = Bukkit.getPlayer(owner);
+		ownerPlayer.openInventory(TestBlockSlaveGUI.tbsStartInv(ownerPlayer, readFavs()));
 	}
 
 	/* Getter */
 
-	public TestBlock getlastTestBlock() {
+	public ITestBlock getlastTestBlock() {
 		return last;
 	}
 
@@ -135,11 +145,12 @@ public class TestBlockSlave {
 
 	/* paste a testBlock */
 
-	public void pasteBlock(TestBlock block, Facing facing, boolean saveUndo) {
-		String rgID = WorldGuardHandler.getPlotId(owner.getLocation());
+	public void pasteBlock(ITestBlock block, Facing facing, boolean saveUndo) {
+		Player ownerPlayer = Bukkit.getPlayer(owner);
+		Plot plot = Objects.requireNonNull(BauPlayer.getBauPlayer(owner).getCurrentPlot());
 		/* paste */
 
-		WorldEditHandler.pasteTestBlock(block.getSchematic(), facing, rgID, owner, saveUndo);
+		WorldEditHandler.pasteTestBlock(block.getSchematic(), facing, plot, ownerPlayer, saveUndo);
 		last = block;
 		lastFacing = facing;
 
@@ -151,33 +162,33 @@ public class TestBlockSlave {
 
 	public void undo() {
 		/* Undo last TB */
-
+		BauPlayer bauPlayer = BauPlayer.getBauPlayer(owner);
 		Clipboard undo = undoManager.getUndo();
 		if (undo == null) {
-			Main.send(owner, "tbs_noUndo");
+			MessageHandler.getInstance().send(bauPlayer, "tbs_noUndo");
 			return;
 		}
-		WorldEditHandler.pasteAsync(new ClipboardHolder(undo), undo.getOrigin(), owner, false, 1, false, true);
-		Main.send(owner, "tbs_undo");
+		WorldEditHandler.pasteAsync(new ClipboardHolder(undo), undo.getOrigin(), bauPlayer.getBukkitPlayer(), false, 1, false, true);
+		MessageHandler.getInstance().send(bauPlayer, "tbs_undo");
 	}
 
 	/* Adding TestBlocks */
 
 	public boolean addNewCustomTestBlock(String name) {
 		int tier = newTBToSave.getTier();
-		String plotID = newTBToSave.getPlotID();
+		Plot plot = newTBToSave.getPlot();
 		Facing facing = newTBToSave.getfacing();
 		Type type = newTBToSave.getType();
 		if (testblocks.get(tier).size() == 9) {
-			Main.send(owner, "tbs_tooManyBlocks", "" + tier);
+			MessageHandler.getInstance().send(owner, "tbs_tooManyBlocks", "" + tier);
 			return false;
 		}
 		if (nameExists(tier, name)) {
-			Main.send(owner, "tbs_nameNotFree", "" + tier, name);
+			MessageHandler.getInstance().send(owner, "tbs_nameNotFree", "" + tier, name);
 			return false;
 		}
-		saveRegionAsBlock(tier, facing, plotID, name,type);
-		HashSet<CustomTestBlock> adding = testblocks.get(tier);
+		saveRegionAsBlock(tier, facing, plot, name,type);
+		Set<CustomTestBlock> adding = testblocks.get(tier);
 		CustomTestBlock block = new CustomTestBlock(owner, name, facing, tier);
 		adding.add(block);
 		testblocks.put(tier, adding);
@@ -186,23 +197,26 @@ public class TestBlockSlave {
 	}
 
 	private void putTestBlockToDatabase(CustomTestBlock block) {
-		/*try (Connection conn = DataSource.getConnection()) {
-			PreparedStatement statement = conn.prepareStatement(
-					"INSERT INTO `TestBlock`(`owner`, `schemName`, `name`, `tier`, `richtung`, `favorite`) VALUES (?,?,?,?,?,?)");
-			statement.setString(1, owner.getUniqueId().toString());
-			statement.setString(2, block.getName() + ".schem");
-			statement.setString(3, block.getName());
-			statement.setInt(4, block.getTier());
-			statement.setString(5, block.getSchematic().getFacing().getFace());
-			statement.setBoolean(6, block.isFavorite());
-			statement.executeUpdate();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}*/
+		EntityManager em = DependencyProvider.getEntityManager();
+		em.getTransaction().begin();
+
+		net.wargearworld.db.model.TestBlock tb = new net.wargearworld.db.model.TestBlock();
+		tb.setName(block.getName());
+		tb.setTier(block.getTier());
+		tb.setFavorite(block.isFavorite());
+		tb.setDirection(SchematicDirection.valueOf(block.getSchematic().getFacing().name()));
+		tb.setOwner(em.find(net.wargearworld.db.model.Player.class,block.getOwner()));
+
+		em.persist(tb);
+		em.getTransaction().commit();
+		em.close();
 	}
 
-	private void saveRegionAsBlock(int tier, Facing facing, String plotID, String name,Type type) {
-		Region rg = TestBlockSlaveCore.getTBRegion(tier, plotID, facing,owner.getWorld().getName());
+	private void saveRegionAsBlock(int tier, Facing facing, Plot plot, String name, Type type) {
+		Player ownerPlayer = Bukkit.getPlayer(owner);
+		if(ownerPlayer == null) return;
+
+		Region rg = TestBlockSlaveCore.getTBRegion(tier, plot, facing);
 		if(type.equals(Type.SHIELDS)) {
 			int shielsSize = TestBlockSlaveCore.getMaxShieldSizeOfTier(tier);
 			try {
@@ -211,21 +225,21 @@ public class TestBlockSlave {
 			}
 		}
 		Clipboard board = WorldEditHandler.createClipboardOutOfRegion(rg,
-				CoordGetter.getTBSPastePosition(plotID, facing, owner.getWorld().getName()), BukkitAdapter.adapt(owner.getWorld()));
+				CoordGetter.getTBSPastePosition(plot, facing), BukkitAdapter.adapt(ownerPlayer.getWorld()));
 		WorldEditHandler.saveClipboardAsSchematic(
-				Main.schempath + "/" + owner.getUniqueId().toString() + "/TestBlockSklave", name + ".schem", board);
+				Main.schempath + "/" + owner.toString() + "/TestBlockSklave", name + ".schem", board);
 
 	}
 
-	public boolean setTestBlockToFavorite(TestBlock tb) {
+	public boolean setTestBlockToFavorite(ITestBlock tb) {
 		if (readFavs().size() == 9) {
-			Main.send(owner, "tbs_tooManyFavorites", "fa");
+			MessageHandler.getInstance().send(owner, "tbs_tooManyFavorites", "fa");
 		}
 		if (tb instanceof CustomTestBlock) {
 			CustomTestBlock block = (CustomTestBlock) tb;
 			block.setFavorite(true);
 			updateFavToDataBase(true, block.getTier(), block.getName());
-			Main.send(owner, "tbs_favAdded", block.getName());
+			MessageHandler.getInstance().send(owner, "tbs_favAdded", block.getName());
 			return true;
 		}
 		return false;
@@ -238,16 +252,16 @@ public class TestBlockSlave {
 
 	/* Removing TestBlocks */
 
-	public boolean removeFavorite(TestBlock tb) {
+	public boolean removeFavorite(ITestBlock tb) {
 		if (tb instanceof CustomTestBlock) {
 			CustomTestBlock block = (CustomTestBlock) tb;
 			if (!block.isFavorite()) {
-				Main.send(owner, "tbs_blockIsNoFavorite");
+				MessageHandler.getInstance().send(owner, "tbs_blockIsNoFavorite");
 				return false;
 			}
 			block.setFavorite(false);
 			updateFavToDataBase(false, block.getTier(), block.getName());
-			Main.send(owner, "tbs_favRemoved", block.getName());
+			MessageHandler.getInstance().send(owner, "tbs_favRemoved", block.getName());
 			return true;
 		}
 		return false;
@@ -255,37 +269,40 @@ public class TestBlockSlave {
 	}
 
 	public boolean deleteTestBlock(int tier, String name) {
-		HashSet<CustomTestBlock> blocks = testblocks.get(tier);
+		Set<CustomTestBlock> blocks = testblocks.get(tier);
 		if (!deleteTestBlockFromDatabase(tier, name)) {
 			return false;
 		}
-		TestBlock tb = getBlockOutOfName(name, tier);
+		ITestBlock tb = getBlockOutOfName(name, tier);
 		if (!blocks.remove(tb)) {
 			return false;
 		}
 		tb.getSchematic().getFile().delete();
-		Main.send(owner, "tbs_tbDeleted", "" + tier, name);
+		MessageHandler.getInstance().send(owner, "tbs_tbDeleted", "" + tier, name);
 		return true;
 	}
 
 	private boolean deleteTestBlockFromDatabase(int tier, String name) {
-		/*try (Connection conn = DataSource.getConnection()) {
-			PreparedStatement statement = conn
-					.prepareStatement("DELETE FROM TestBlock WHERE owner = ? AND tier = ? AND name = ?");
-			statement.setString(1, owner.getUniqueId().toString());
-			statement.setInt(2, tier);
-			statement.setString(3, name);
-			return statement.executeUpdate() == 1;
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}*/
-		return false;
+		EntityManager em = DependencyProvider.getEntityManager();
+		em.getTransaction().begin();
+		net.wargearworld.db.model.Player dbPlayer = em.find(net.wargearworld.db.model.Player.class,owner);
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<TestBlock> cq = cb.createQuery(TestBlock.class);
+		Root<TestBlock> root = cq.from(TestBlock.class);
+
+		cq.where(cb.equal(root.get(TestBlock_.OWNER),dbPlayer), cb.equal(root.get(TestBlock_.NAME),name), cb.equal(root.get(TestBlock_.TIER),tier));
+		Query query = em.createQuery(cq);
+		TestBlock tb = (TestBlock) query.getSingleResult();
+		em.remove(tb);
+		em.getTransaction().commit();
+		em.close();
+		return true;
 	}
 
 	/* Helper Methods */
 
 	public CustomTestBlock getBlockOutOfBanner(ItemStack itemStack) {
-		for (Entry<Integer, HashSet<CustomTestBlock>> testBlockEntries : testblocks.entrySet()) {
+		for (Entry<Integer, Set<CustomTestBlock>> testBlockEntries : testblocks.entrySet()) {
 			for (CustomTestBlock block : testBlockEntries.getValue()) {
 				if (block.getBanner().equals(itemStack)) {
 					return block;
@@ -295,7 +312,7 @@ public class TestBlockSlave {
 		return null;
 	}
 
-	private TestBlock getBlockOutOfName(String name, int tier) {
+	private ITestBlock getBlockOutOfName(String name, int tier) {
 		for (CustomTestBlock block : testblocks.get(tier)) {
 			if (block.getName().equals(name)) {
 				return block;
@@ -314,56 +331,70 @@ public class TestBlockSlave {
 	}
 
 	private boolean updateFavToDataBase(boolean fav, int tier, String name) {
-		/*try (Connection conn = DataSource.getConnection()) {
-			PreparedStatement statement = conn
-					.prepareStatement("UPDATE TestBlock SET favorite = ? WHERE owner = ? AND tier = ? AND name = ?");
-			statement.setBoolean(1, fav);
-			statement.setString(2, owner.getUniqueId().toString());
-			statement.setInt(3, tier);
-			statement.setString(4, name);
-			return statement.executeUpdate() == 1;
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}*/
-		return false;
+		EntityManager em = DependencyProvider.getEntityManager();
+		em.getTransaction().begin();
+		net.wargearworld.db.model.Player dbPlayer = em.find(net.wargearworld.db.model.Player.class,owner);
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<TestBlock> cq = cb.createQuery(TestBlock.class);
+		Root<TestBlock> root = cq.from(TestBlock.class);
+
+		cq.where(cb.equal(root.get(TestBlock_.OWNER),dbPlayer), cb.equal(root.get(TestBlock_.NAME),name), cb.equal(root.get(TestBlock_.TIER),tier));
+		Query query = em.createQuery(cq);
+		TestBlock tb = (TestBlock) query.getSingleResult();
+		tb.setFavorite(fav);
+		em.merge(tb);
+		em.getTransaction().commit();
+		em.close();
+		return true;
 	}
 	/* Show ManageMent Inventory */
 
 	public void showTBManager() {
-		owner.openInventory(TestBlockSlaveGUI.tbManager(testblocks, owner));
+		Player ownerPlayer  = Bukkit.getPlayer(owner);
+		if(ownerPlayer == null) return;
+		ownerPlayer.openInventory(TestBlockSlaveGUI.tbManager(testblocks, ownerPlayer));
 	}
 
 	public void openAddFavoriteInv() {
-		owner.openInventory(TestBlockSlaveGUI.showAllNonFavorites(testblocks, owner));
+		Player ownerPlayer  = Bukkit.getPlayer(owner);
+		if(ownerPlayer == null) return;
+		ownerPlayer.openInventory(TestBlockSlaveGUI.showAllNonFavorites(testblocks, ownerPlayer));
 	}
 
 	public void startSavingNewTB() {
+		Player ownerPlayer  = Bukkit.getPlayer(owner);
+		if(ownerPlayer == null) return;
 		startNewChoose();
 		chooseTB.setTestBlockType(TestBlockType.NEW);
-		owner.openInventory(TestBlockSlaveGUI.tierInv(owner));
+		ownerPlayer.openInventory(TestBlockSlaveGUI.tierInv(ownerPlayer));
 
 	}
 
 	public void savingNewTBName() {
+		Player ownerPlayer  = Bukkit.getPlayer(owner);
+		if(ownerPlayer == null) return;
 		saveTBParticles.cancel();
 		/* Anvil Inv opening */
-		TestBlockSlaveGUI.ChooseNameInv(owner, chooseTB.getTier());
+		TestBlockSlaveGUI.ChooseNameInv(ownerPlayer, chooseTB.getTier());
 	}
 
 	public void saveNewCustomTB(String name) {
-
+		Player ownerPlayer  = Bukkit.getPlayer(owner);
+	if(ownerPlayer == null) return;
 		/* Save */
 		name = name.replaceFirst(" ","");
 		name = name.replace(" ", "_");
+		MessageHandler msgHandler = MessageHandler.getInstance();
+
 		boolean isValid = checkIfValid(name);
 		if(!isValid) {
-			Main.send(owner, "tbs_saveOwnTB_invalidName");
-			Main.send(owner, "tbs_saveOwnTB_invalidLetters");
+			msgHandler.send(ownerPlayer, "tbs_saveOwnTB_invalidName");
+			msgHandler.send(ownerPlayer, "tbs_saveOwnTB_invalidLetters");
 			return;
 		}
 		if (addNewCustomTestBlock(name)) {
 			/* Message to player */
-			Main.send(owner, "tbs_saveOwnTB_success", "" + newTBToSave.getTier(), name);
+			msgHandler.send(ownerPlayer, "tbs_saveOwnTB_success", "" + newTBToSave.getTier(), name);
 		}
 	}
 
@@ -378,23 +409,26 @@ public class TestBlockSlave {
 	}
 
 	public void showParticle() {
+		Player ownerPlayer = Bukkit.getPlayer(owner);
+		if(ownerPlayer == null) return;
+
 		JsonCreater creator = new JsonCreater(MessageHandler.getInstance().getString(owner, "tbs_gui_confirmRegion"));
 		JsonCreater click = new JsonCreater(MessageHandler.getInstance().getString(owner, "tbs_gui_confirmRegionConfirm"));
 		click.addHoverEvent(MessageHandler.getInstance().getString(owner, "tbs_gui_confirmRegionHover"))
-				.addClickEvent("/tbs confirmRegion " + owner.getUniqueId(), ClickAction.RUN_COMMAND);
+				.addClickEvent("/tbs confirmRegion " + owner, ClickAction.RUN_COMMAND);
 		JsonCreater cancel = new JsonCreater(MessageHandler.getInstance().getString(owner, "tbs_gui_confirmRegionCancel"));
 		cancel.addHoverEvent(MessageHandler.getInstance().getString(owner, "tbs_gui_confirmRegionCancelHover"))
-				.addClickEvent("/tbs confirmRegionCancel " + owner.getUniqueId(), ClickAction.RUN_COMMAND);
+				.addClickEvent("/tbs confirmRegionCancel " + owner, ClickAction.RUN_COMMAND);
 
-		creator.addJson(click).addJson(cancel).send(owner);
+		creator.addJson(click).addJson(cancel).send(ownerPlayer);
 
-		String plotID = WorldGuardHandler.getPlotId(owner.getLocation());
+		Plot plot = BauPlayer.getBauPlayer(owner).getCurrentPlot();
 
 		/* currentSelection: New_TB_TIER_FACING_TYPE */
 
 		Facing facing = chooseTB.getFacing();
 		int tier = chooseTB.getTier();
-		Region rg = TestBlockSlaveCore.getTBRegion(tier, plotID, facing,owner.getWorld().getName());
+		Region rg = TestBlockSlaveCore.getTBRegion(tier, plot, facing);
 		BlockVector3 min = rg.getMinimumPoint();
 		BlockVector3 max = rg.getMaximumPoint();
 		if (chooseTB.getType().equals(Type.SHIELDS)) {
@@ -404,13 +438,13 @@ public class TestBlockSlave {
 		}
 		BlockVector3 minVector = min;
 		BlockVector3 maxVector = max;
-		newTBToSave = new EmptyTestBlock(tier, new CuboidRegion(min, max), plotID, facing, owner.getWorld(),chooseTB.getType());
+		newTBToSave = new EmptyTestBlock(tier, new CuboidRegion(min, max), plot, facing, ownerPlayer.getWorld(),chooseTB.getType());
 		saveTBParticles.cancel();
 		saveTBParticles.setTask(Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), new Runnable() {
 
 			@Override
 			public void run() {
-				TestBlockSlaveParticles.showTBParticlesShield(owner, minVector, maxVector);
+				TestBlockSlaveParticles.showTBParticlesShield(ownerPlayer, minVector, maxVector);
 			}
 		}, 0, 20));
 
@@ -423,9 +457,9 @@ public class TestBlockSlave {
 	public void cancelSave() {
 		if (saveTBParticles.isRunning()) {
 			saveTBParticles.cancel();
-			Main.send(owner, "tbs_save_canceled");
+			MessageHandler.getInstance().send(owner, "tbs_save_canceled");
 		} else {
-			Main.send(owner, "tbs_save_NoSaveToCancel");
+			MessageHandler.getInstance().send(owner, "tbs_save_NoSaveToCancel");
 		}
 	}
 }

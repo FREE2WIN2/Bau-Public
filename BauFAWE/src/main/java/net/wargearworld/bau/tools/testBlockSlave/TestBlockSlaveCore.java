@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.UUID;
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import net.wargearworld.bau.utils.CoordGetter;
+import net.wargearworld.bau.world.plots.Plot;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -27,13 +30,12 @@ import com.sk89q.worldedit.regions.Region;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.tools.testBlockSlave.testBlock.Facing;
-import net.wargearworld.bau.tools.testBlockSlave.testBlock.TestBlock;
+import net.wargearworld.bau.tools.testBlockSlave.testBlock.ITestBlock;
 import net.wargearworld.bau.tools.testBlockSlave.testBlock.TestBlockType;
 import net.wargearworld.bau.tools.testBlockSlave.testBlock.Type;
 import net.wargearworld.bau.tools.testBlockSlave.testBlockEditor.TestBlockEditorCore;
 import net.wargearworld.bau.utils.Banner;
 import net.wargearworld.bau.utils.ClickAction;
-import net.wargearworld.bau.utils.CoordGetter;
 import net.wargearworld.bau.utils.JsonCreater;
 
 public class TestBlockSlaveCore implements CommandExecutor, Listener {
@@ -42,19 +44,20 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 	public static HashMap<UUID, TestBlockSlave> playersTestBlockSlave = new HashMap<>();
 	private static TestBlockSlaveCore instance;
 
+
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmds, String string, String[] args) {
 		Player p = (Player) sender;
 		if (args.length == 0) {
-			getSlave(p).openGUI();
+			getSlave(p.getUniqueId()).openGUI();
 			return true;
 		} else if (args.length == 1) {
 			if (args[0].equalsIgnoreCase("last")) {
-				TestBlockSlave slave = getSlave(p);
+				TestBlockSlave slave = getSlave(p.getUniqueId());
 				slave.pasteBlock(slave.getlastTestBlock(), slave.getLastFacing(),true);
 				return true;
 			} else if (args[0].equalsIgnoreCase("undo")) {
-				getSlave(p).undo();
+				getSlave(p.getUniqueId()).undo();
 				return true;
 			} else {
 				return false;
@@ -68,13 +71,13 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 				if (!args1[0].equals(p.getUniqueId().toString())) {
 					return false;
 				}
-				getSlave(p).deleteTestBlock(Integer.parseInt(args1[1]), args1[2]);
+				getSlave(p.getUniqueId()).deleteTestBlock(Integer.parseInt(args1[1]), args1[2]);
 				return true;
 			} else if (args[0].equals("confirmRegion") && args[1].equals(p.getUniqueId().toString())) {
-				getSlave(p).savingNewTBName();
+				getSlave(p.getUniqueId()).savingNewTBName();
 				return true;
 			} else if (args[0].equals("confirmRegionCancel") && args[1].equals(p.getUniqueId().toString())) {
-				getSlave(p).cancelSave();
+				getSlave(p.getUniqueId()).cancelSave();
 				return true;
 			}
 			return false;
@@ -104,7 +107,7 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 				} else {
 					return false;
 				}
-				getSlave(p).pasteBlock(chooseTB.getTestBlock(), chooseTB.getFacing(),true);
+				getSlave(p.getUniqueId()).pasteBlock(chooseTB.getTestBlock(), chooseTB.getFacing(),true);
 				/* paste */
 				return true;
 			}
@@ -210,12 +213,12 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 
 	private void tbManagerInv(Player p, ItemStack clicked) {
 		/* open Next Inv */
-		getSlave(p).startNewChoose(clicked);
+		getSlave(p.getUniqueId()).startNewChoose(clicked);
 		p.openInventory(TestBlockSlaveGUI.tbManagerActionInv(p));
 	}
 
 	private void chooseActionToCustomTB(Player p, ItemStack clicked) {
-		TestBlock tb = getSlave(p).getChooseTB().getTestBlock();
+		ITestBlock tb = getSlave(p.getUniqueId()).getChooseTB().getTestBlock();
 		String clickedName = clicked.getItemMeta().getDisplayName();
 		String south = MessageHandler.getInstance().getString(p, "facingSouth");
 		String north = MessageHandler.getInstance().getString(p, "facingNorth");
@@ -258,6 +261,8 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 			p.closeInventory();
 		}
 	}
+
+
 
 	private void MainInventory(Player p, ItemStack clicked) {
 		String close = MessageHandler.getInstance().getString(p, "tbs_gui_close");
@@ -361,11 +366,15 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 
 	}
 
-	public static TestBlockSlave getSlave(Player p) {
-		if (!playersTestBlockSlave.containsKey(p.getUniqueId())) {
-			playersTestBlockSlave.put(p.getUniqueId(), new TestBlockSlave(p));
+	public static TestBlockSlave getSlave(UUID uuid) {
+		if (!playersTestBlockSlave.containsKey(uuid)) {
+			playersTestBlockSlave.put(uuid, new TestBlockSlave(uuid));
 		}
-		return playersTestBlockSlave.get(p.getUniqueId());
+		return playersTestBlockSlave.get(uuid);
+	}
+
+	public static TestBlockSlave getSlave(Player p) {
+		return getSlave(p.getUniqueId());
 	}
 
 	public static TestBlockSlaveCore getInstance() {
@@ -375,9 +384,8 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 		return instance;
 	}
 
-	public static Region getTBRegion(int tier, String plotID, Facing facing,String worldName) {
-
-		BlockVector3 middle = CoordGetter.getMiddleRegionTB(plotID, facing,worldName);
+	public static Region getTBRegion(int tier, Plot plot, Facing facing) {
+		BlockVector3 middle = CoordGetter.getMiddleRegionTB(plot, facing);
 		BlockVector3 sizes = CoordGetter.getMaxSizeOfBlock(tier);
 
 		/* If North -> middle.z = min.z ! */

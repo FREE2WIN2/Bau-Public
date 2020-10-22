@@ -7,22 +7,14 @@ import net.wargearworld.bau.world.BauWorld;
 import net.wargearworld.bau.world.WorldManager;
 import net.wargearworld.bau.world.plots.Plot;
 import net.wargearworld.bau.world.plots.PlotType;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryType.SlotType;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.scoreboard.ScoreBoardBau;
-import net.wargearworld.bau.utils.CoordGetter;
 import net.wargearworld.bau.utils.ItemStackCreator;
 
 public class PlotTeleporter {

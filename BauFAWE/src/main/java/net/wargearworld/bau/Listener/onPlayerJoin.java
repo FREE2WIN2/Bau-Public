@@ -43,9 +43,9 @@ public class onPlayerJoin implements Listener {
 		File gs = new File(path + "/" + p.getUniqueId() + "_" + p.getName());
 		System.out.println("gs exists: " + gs.exists());
 		EntityManager em = DependencyProvider.getEntityManager();
-		System.out.println("hasOWnPlot" + !player.hasPlots());
+		System.out.println("hasOWnPlot" + player.hasPlots());
 			String uuidString = p.getUniqueId().toString();
-		if (player.hasPlots() && !gs.exists()) {
+		if (!player.hasPlots() && !gs.exists()) {
 			// Bukkit.createWorld((WorldCreator) WorldCreator.name("test").createWorld());
 			// wenn nicht-> erstellen und hinteleportieren
 			WorldManager.createWorldDir(p.getName(),uuidString);
