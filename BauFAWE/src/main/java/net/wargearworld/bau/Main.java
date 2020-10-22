@@ -100,6 +100,7 @@ public class Main extends JavaPlugin {
     private void registerCommands() {
         new gs();
         new Particles();
+        new WorldFuscatorIntegration(this);
         getCommand("tnt").setExecutor(new tnt());
         getCommand("gui").setExecutor(new GUI());
         getCommand("tbs").setExecutor(TestBlockSlaveCore.getInstance());

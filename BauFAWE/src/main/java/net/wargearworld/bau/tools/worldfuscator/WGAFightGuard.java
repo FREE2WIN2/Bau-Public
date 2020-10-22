@@ -29,7 +29,17 @@ public class WGAFightGuard implements WorldFuscatorGuard {
         BauWorld bauWorld = WorldManager.get(world);
         Plot minPlot = bauWorld.getPlot(minRgID);
         Plot maxPlot = bauWorld.getPlot(maxRgID);
-        return minPlot.calcWorldFuscator(min) ||maxPlot.calcWorldFuscator(max);
+        if (minPlot == null && maxPlot == null) {
+            return true;
+        }
+        if(minPlot == null){
+            return maxPlot.calcWorldFuscator(max);
+        }
+        if(maxPlot == null){
+            return minPlot.calcWorldFuscator(min);
+        }
+        System.out.println("hasAreaRights:" + (minPlot.calcWorldFuscator(min) || maxPlot.calcWorldFuscator(max)));
+        return minPlot.calcWorldFuscator(min) || maxPlot.calcWorldFuscator(max);
     }
 
     @Override
@@ -40,8 +50,13 @@ public class WGAFightGuard implements WorldFuscatorGuard {
 
         BauWorld bauWorld = WorldManager.get(world);
         Plot plot = bauWorld.getPlot(rgID);
+        if(plot == null){
+            return true;
+        }
+        System.out.println("hasRights:" + plot.calcWorldFuscator(vector3));
         return plot.calcWorldFuscator(vector3);
     }
+
     @Override
     public boolean isThreadSafe() {
         return false;

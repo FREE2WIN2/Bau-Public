@@ -55,6 +55,9 @@ commands:
    waterremover:
      description: toggle Waterremover
      aliases: [wr]
+   worldfuscator:
+     description: toggle WorldFuscator
+     aliases: [wf,blockhider,awdl]
 
 
 permissions:

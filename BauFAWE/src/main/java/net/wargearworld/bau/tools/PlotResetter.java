@@ -130,7 +130,7 @@ public class PlotResetter implements TabExecutor {
 
     private static void calcBlocks(BlockVector3 minimumPoint, BlockVector3 maximumPoint, World world, Plot current) {
         boolean sl = current.getSL();
-        Bukkit.getScheduler().runTaskTimerAsynchronously(Main.getPlugin(), () -> {
+        Bukkit.getScheduler().runTaskAsynchronously(Main.getPlugin(), () -> {
         List<Block> list = new LinkedList<>();
         int maxBlockChangePerTick = WorldEditHandler.maxBlockChangePerTick;
         int blockCount = 0;
@@ -150,7 +150,7 @@ public class PlotResetter implements TabExecutor {
                 }
             }
             remove(list, current,sl);
-        },0,1);
+        });
     }
 
     private static void remove(List<Block> list, Plot current,boolean stoplag) {

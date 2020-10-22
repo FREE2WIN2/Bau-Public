@@ -60,13 +60,12 @@ public class GUI implements CommandExecutor, Listener {
             s.getPlayer().performCommand("gs info");
             s.getPlayer().closeInventory();
         });
-
+        String rgID = WorldGuardHandler.getPlotId(p.getLocation());
         Item reset = ItemBuilder.build(s -> {
             Player player = s.getPlayer();
             player.closeInventory();
-            String rgID = WorldGuardHandler.getPlotId(player.getLocation());
             PlotResetter.resetRegion(player, false);
-        }, Material.BARRIER, 1, ItemType.DEFAULT, msgHandler.getString(p, "deletePlot"));
+        }, Material.BARRIER, 1, ItemType.DEFAULT, msgHandler.getString(p, "deletePlot",rgID.replace("plot","")));
 
         DefaultItem guiItem = new DefaultItem(Material.NETHER_STAR, "§6GUI", 1);
         guiItem.setCancelled(false);

@@ -108,18 +108,16 @@ public class ScoreBoardBau {
         obj.getScore("§3§8§l§m               §r").setScore(6);
         obj.getScore("§6DesignTool: " + getDt()).setScore(5);
         obj.getScore("§4§8§l§m               §r").setScore(4);
-        obj.getScore("§6WaterRemover: " + getWaterRemover(currentPlot)).setScore(3);
+        obj.getScore("§6WorldFuscator: " + getWorldFuscator(currentPlot)).setScore(3);
         obj.getScore("§5§8§l§m               §r").setScore(2);
-        obj.getScore("§6WorldFuscator: " + getWorldFuscator(currentPlot)).setScore(1);
+        obj.getScore("§6WaterRemover: " + getWaterRemover(currentPlot)).setScore(1);
         p.setScoreboard(board);
     }
 
     private String getWorldFuscator(Plot currentPlot) {
         if (currentPlot.isWorldFuscated()) {
-            // System.out.println("dt on");
             return MessageHandler.getInstance().getString(p, "boardOn");
         } else {
-            // System.out.println("dt off");
             return MessageHandler.getInstance().getString(p, "boardOff");
         }
     }

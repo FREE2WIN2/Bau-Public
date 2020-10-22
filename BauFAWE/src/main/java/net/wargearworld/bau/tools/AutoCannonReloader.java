@@ -126,4 +126,8 @@ public class AutoCannonReloader {
     public void remove(Location location, Player p) {
         tntLocations.remove(new Loc(location));
     }
+
+    public int getSize() {
+        return tntLocations.size();
+    }
 }

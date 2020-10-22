@@ -32,9 +32,6 @@ public abstract class Plot {
 
     private Location middleNorth;
     private Schematic ground;
-    private boolean activeWaterRemover;
-    private boolean activeWorldFuscator;
-
     private Clipboard undo; //Undo from Reset
     private WaterRemover waterRemover;
 
@@ -43,7 +40,6 @@ public abstract class Plot {
         this.id = id;
         this.middleNorth = middleNorth;
         this.ground = ground;
-        System.out.println(WaterRemoverListener.waterRemoverFlag);
         setWaterRemover(region.getFlag(WaterRemoverListener.waterRemoverFlag) == State.ALLOW);
     }
 
