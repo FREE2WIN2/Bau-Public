@@ -13,7 +13,12 @@ public class Loc {
 		this.y = y;
 		this.z = z;
 	}
-	public Location toLocation(World world) {
+
+    public Loc(Location location) {
+		this(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+    }
+
+    public Location toLocation(World world) {
 		return new Location(world, x, y, z);
 	}
 	public static Loc getByString( String string) {

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import net.wargearworld.bau.player.BauPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -122,10 +123,7 @@ public class TestBlockEditorCore implements Listener {
 	}
 
 	public static TestBlockEditor getEditor(Player p) {
-		if (!playersTestBlockEditor.containsKey(p.getUniqueId())) {
-			playersTestBlockEditor.put(p.getUniqueId(), new TestBlockEditor(p));
-		}
-		return playersTestBlockEditor.get(p.getUniqueId());
+		return BauPlayer.getBauPlayer(p).getTestBlockEditor();
 	}
 
 }

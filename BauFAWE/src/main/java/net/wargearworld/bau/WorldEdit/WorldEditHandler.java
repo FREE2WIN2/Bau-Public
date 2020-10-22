@@ -104,7 +104,7 @@ public class WorldEditHandler {
     /* undo */
 
     public static void createUndo(Region rg, Player p, BlockVector3 at) {
-        TestBlockSlaveCore.getSlave(p).getUndoManager().addUndo(rg, at, BukkitAdapter.adapt(p.getWorld()));
+        BauPlayer.getBauPlayer(p).getTestBlockSlave().getUndoManager().addUndo(rg, at, BukkitAdapter.adapt(p.getWorld()));
     }
 
     /* Clipboard manipulation */

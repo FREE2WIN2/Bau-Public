@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 
 import net.wargearworld.GUI_API.GUI_API;
 import net.wargearworld.bau.player.DefaultPlayer;
+import net.wargearworld.bau.tools.*;
 import net.wargearworld.bau.world.WorldManager;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -38,13 +39,6 @@ import net.wargearworld.bau.listener.onPlayerTeleport;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.tabCompleter.TntReloaderTC;
 import net.wargearworld.bau.tabCompleter.tbsTC;
-import net.wargearworld.bau.tools.AutoCannonReloader;
-import net.wargearworld.bau.tools.CompassBar;
-import net.wargearworld.bau.tools.DesignTool;
-import net.wargearworld.bau.tools.GUI;
-import net.wargearworld.bau.tools.PlotResetter;
-import net.wargearworld.bau.tools.Stoplag;
-import net.wargearworld.bau.tools.TntChest;
 import net.wargearworld.bau.tools.particles.Particles;
 import net.wargearworld.bau.tools.particles.ParticlesGUI;
 import net.wargearworld.bau.tools.testBlockSlave.TestBlockSlaveCore;
@@ -113,9 +107,9 @@ public class Main extends JavaPlugin {
 		pm.registerEvents(new DesignTool(), this);
 		pm.registerEvents(new TntChest(), this);
 		pm.registerEvents(new GUI(), this);
-		pm.registerEvents(AutoCannonReloader.getInstance(), this);
 		pm.registerEvents(new TestBlockEditorCore(), this);
 		pm.registerEvents(new SaWE(),this);
+		pm.registerEvents(AutoCannonReloaderListener.getInstance(),this);
 	}
 
 	private void registerCommands() {
@@ -133,9 +127,10 @@ public class Main extends JavaPlugin {
 		getCommand("stats").setExecutor(new stats());
 		getCommand("plotreset").setExecutor(new PlotResetter());
 		getCommand("baureload").setExecutor(new Bau());
-		getCommand("tr").setExecutor(AutoCannonReloader.getInstance());
 		getCommand("tr").setTabCompleter(new TntReloaderTC());
 		getCommand("clear").setExecutor(new clear());
+		getCommand("tr").setExecutor(AutoCannonReloaderListener.getInstance());
+		getCommand("tr").setTabCompleter(AutoCannonReloaderListener.getInstance());
 	}
 
 	public void createConfigs() {
