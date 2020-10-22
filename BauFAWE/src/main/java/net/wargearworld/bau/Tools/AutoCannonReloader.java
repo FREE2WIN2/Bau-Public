@@ -1,5 +1,9 @@
 package net.wargearworld.bau.tools;
 
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.utils.Loc;
@@ -40,11 +44,18 @@ public class AutoCannonReloader {
     }
 
     public void deleteRecord(Player p, boolean b) {
-        if(!b){
+        if (!b) {
+            MessageHandler msgHandler = MessageHandler.getInstance();
+            TextComponent tc = new TextComponent(msgHandler.getString(p, "cannonreloader_delete_warning_text"));
+            TextComponent clickTC = new TextComponent(msgHandler.getString(p, "cannonreloader_delete_warning_click"));
+            clickTC.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tr reset confirm"));
+            clickTC.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(msgHandler.getString(p, "cannonreloader_delete_warning_hover")).create()));
 
+            tc.addExtra(clickTC);
+            p.spigot().sendMessage(tc);
             return;
         }
-                recording = false;
+        recording = false;
         tntLocations.clear();
         Main.send(p, true, MessageHandler.getInstance().getString(p, "cannonReloader_prefix"), "cannonReloader_deleteRecord");
     }
@@ -111,7 +122,12 @@ public class AutoCannonReloader {
                     String.valueOf(MAX_TNT));
         }
     }
+
     public void remove(Location location, Player p) {
         tntLocations.remove(new Loc(location));
+    }
+
+    public int getSize() {
+        return tntLocations.size();
     }
 }

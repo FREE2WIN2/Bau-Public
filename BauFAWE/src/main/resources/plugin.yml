@@ -46,14 +46,17 @@ commands:
       usage: /<command> [on|off]
    tr:
      description: tntReload command
-     aliases: [tntReload,cannonReload,cr]
+     aliases: [tntreload,cannonreload,cr]
      usage: /<command>
    clear:
      description: Resets your inventory
    worlds:
      description: Resets your worlds
-     
-     
+   waterremover:
+     description: toggle Waterremover
+     aliases: [wr]
+
+
 permissions:
   bau.*:
     default: op

@@ -56,29 +56,29 @@ public class AutoCannonReloaderListener implements Listener, TabExecutor {
             showhelp(s);
         });
 
-        commandHandel.addSubNode(literal("start")).setCallback(s -> {
+        commandHandel.addSubNode(literal("start").setCallback(s -> {
             start(s);
-        });
-        commandHandel.addSubNode(literal("save")).setCallback(s -> {
+        }));
+        commandHandel.addSubNode(literal("save").setCallback(s -> {
             save(s);
-        });
-        commandHandel.addSubNode(literal("stop")).setCallback(s -> {
+        }));
+        commandHandel.addSubNode(literal("stop").setCallback(s -> {
             stop(s);
-        });
-        commandHandel.addSubNode(literal("reload")).setCallback(s -> {
+        }));
+        commandHandel.addSubNode(literal("reload").setCallback(s -> {
             paste(s);
-        });
-        commandHandel.addSubNode(literal("paste")).setCallback(s -> {
+        }));
+        commandHandel.addSubNode(literal("paste").setCallback(s -> {
             paste(s);
-        });
-        commandHandel.addSubNode(literal("help")).setCallback(s -> {
+        }));
+        commandHandel.addSubNode(literal("help").setCallback(s -> {
             showhelp(s);
-        });
-        commandHandel.addSubNode(literal("reset")).setCallback(s -> {
+        }));
+        commandHandel.addSubNode(literal("reset").setCallback(s -> {
             reset(s, false);
         }).addSubNode(invisible(literal("confirm").setCallback(s -> {
             reset(s, true);
-        })));
+        }))));
     }
 
     private void save(ArgumentList s) {
@@ -95,7 +95,7 @@ public class AutoCannonReloaderListener implements Listener, TabExecutor {
                         autoCannonReloader.save(new Location(world, block.getX(), block.getY(), block.getZ()), p);
                     }
                 }
-
+            p.sendMessage(MessageHandler.getInstance().getString(p,"cannonreloader_regionSaved",autoCannonReloader.getSize()+ ""));
             });
         } catch (IncompleteRegionException e) {
             e.printStackTrace();

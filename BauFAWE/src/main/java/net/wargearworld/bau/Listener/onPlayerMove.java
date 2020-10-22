@@ -1,8 +1,8 @@
 package net.wargearworld.bau.listener;
 
-import java.util.HashMap;
-import java.util.UUID;
-
+import net.wargearworld.bau.Main;
+import net.wargearworld.bau.scoreboard.ScoreBoardBau;
+import net.wargearworld.bau.worldedit.WorldGuardHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -10,8 +10,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import net.wargearworld.bau.scoreboard.ScoreBoardBau;
-import net.wargearworld.bau.worldedit.WorldGuardHandler;
+import java.util.HashMap;
+import java.util.UUID;
 
 public class onPlayerMove implements Listener {
 	public static HashMap<UUID, String> playersLastPlot = new HashMap<>();
@@ -39,7 +39,7 @@ public class onPlayerMove implements Listener {
 			}
 			if (!rgID.equals(playersLastPlot.get(p.getUniqueId())) && !rgID.equals("allplots")) {
 				playersLastPlot.put(p.getUniqueId(), rgID);
-				ScoreBoardBau.cmdUpdate(p);
+				Bukkit.getScheduler().runTaskLater(Main.getPlugin(),()->{ScoreBoardBau.cmdUpdate(p);},1);
 			}
 
 		}
