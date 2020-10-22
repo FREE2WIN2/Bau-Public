@@ -1,11 +1,22 @@
 package net.wargearworld.bau.tools;
 
+import com.sk89q.worldedit.IncompleteRegionException;
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldguard.session.Session;
 import net.wargearworld.CommandManager.ArgumentList;
 import net.wargearworld.CommandManager.CommandHandel;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.player.BauPlayer;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -19,6 +30,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 import static net.wargearworld.CommandManager.Nodes.LiteralNode.literal;
 import static net.wargearworld.CommandManager.Nodes.InvisibleNode.invisible;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -47,6 +59,9 @@ public class AutoCannonReloaderListener implements Listener, TabExecutor {
         commandHandel.addSubNode(literal("start")).setCallback(s -> {
             start(s);
         });
+        commandHandel.addSubNode(literal("save")).setCallback(s -> {
+            save(s);
+        });
         commandHandel.addSubNode(literal("stop")).setCallback(s -> {
             stop(s);
         });
@@ -60,13 +75,36 @@ public class AutoCannonReloaderListener implements Listener, TabExecutor {
             showhelp(s);
         });
         commandHandel.addSubNode(literal("reset")).setCallback(s -> {
-            reset(s,false);
-        }).addSubNode(invisible(literal("confirm").setCallback(s->{reset(s,true);})));
+            reset(s, false);
+        }).addSubNode(invisible(literal("confirm").setCallback(s -> {
+            reset(s, true);
+        })));
+    }
+
+    private void save(ArgumentList s) {
+        Player p = s.getPlayer();
+        LocalSession session = WorldEdit.getInstance().getSessionManager().get(BukkitAdapter.adapt(p));
+        AutoCannonReloader autoCannonReloader = BauPlayer.getBauPlayer(s.getPlayer()).getCannonReloader();
+        autoCannonReloader.deleteRecord(s.getPlayer(), true);
+        try {
+            World world = p.getWorld();
+            Region rg = session.getSelection(BukkitAdapter.adapt(world));
+            Bukkit.getScheduler().runTaskAsynchronously(Main.getPlugin(), () -> {
+                for (BlockVector3 block : rg) {
+                    if (world.getBlockAt(block.getX(), block.getY(), block.getZ()).getType() == Material.TNT) {
+                        autoCannonReloader.save(new Location(world, block.getX(), block.getY(), block.getZ()), p);
+                    }
+                }
+
+            });
+        } catch (IncompleteRegionException e) {
+            e.printStackTrace();
+        }
     }
 
     private void reset(ArgumentList s, boolean b) {
         AutoCannonReloader autoCannonReloader = BauPlayer.getBauPlayer(s.getPlayer()).getCannonReloader();
-        autoCannonReloader.deleteRecord(s.getPlayer(),b);
+        autoCannonReloader.deleteRecord(s.getPlayer(), b);
     }
 
     private void paste(ArgumentList s) {
@@ -145,7 +183,7 @@ public class AutoCannonReloaderListener implements Listener, TabExecutor {
             }
         } else if (a.equals(Action.LEFT_CLICK_AIR) || a.equals(Action.LEFT_CLICK_BLOCK)) {
             /* delete */
-            autoCannonReloader.deleteRecord(p,false);
+            autoCannonReloader.deleteRecord(p, false);
         }
     }
 
