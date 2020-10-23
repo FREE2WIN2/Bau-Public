@@ -184,6 +184,10 @@ public class ParticlesShow {
         }, 0, 15 * 1);
     }
 
+    public void stop(){
+        task.cancel();
+    }
+
     private void show(BlockVector3 min, BlockVector3 max, Color color) {
         Player player = getBauPlayer(uuid).getBukkitPlayer();
         if (player == null)
