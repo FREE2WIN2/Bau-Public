@@ -1,16 +1,10 @@
 package net.wargearworld.bau.tools.particles;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
-
 import net.wargearworld.CommandManager.ArgumentList;
 import net.wargearworld.CommandManager.Arguments.DynamicListArgument;
 import net.wargearworld.CommandManager.CommandHandel;
 import net.wargearworld.CommandManager.CommandNode;
+import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.player.DefaultPlayer;
 import org.bukkit.Bukkit;
@@ -25,7 +19,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import net.wargearworld.bau.Main;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
 import static net.wargearworld.CommandManager.Arguments.IntegerArgument.integer;
 import static net.wargearworld.CommandManager.Nodes.ArgumentNode.argument;
@@ -233,6 +232,8 @@ public class Particles implements TabExecutor, Listener {
 
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event) {
+
+		playersParticlesShow.get(event.getPlayer().getUniqueId()).stop();
 		playersParticlesShow.remove(event.getPlayer().getUniqueId());
 	}
 

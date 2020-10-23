@@ -38,7 +38,7 @@ public class WGAFightGuard implements WorldFuscatorGuard {
         if(maxPlot == null){
             return minPlot.calcWorldFuscator(min);
         }
-        return !minPlot.calcWorldFuscator(min) || !maxPlot.calcWorldFuscator(max);
+        return minPlot.calcWorldFuscator(min) || maxPlot.calcWorldFuscator(max);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class WGAFightGuard implements WorldFuscatorGuard {
         if(plot == null){
             return true;
         }
-        return !plot.calcWorldFuscator(vector3);
+        return plot.calcWorldFuscator(vector3);
     }
 
     @Override

@@ -7,7 +7,6 @@ import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.scoreboard.ScoreBoardBau;
 import net.wargearworld.bau.utils.PacketMapChunk;
 import net.wargearworld.bau.world.plots.Plot;
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -35,12 +34,10 @@ public class WorldFuscatorCommand implements TabExecutor {
             } else {
                 MessageHandler.getInstance().send(s.getPlayer(), "worldfusactor_deactivated", currentPlot.getId().replace("plot", ""));
             }
-            Bukkit.getScheduler().runTaskLater(Main.getPlugin(),()->{
             for (Player p : s.getPlayer().getWorld().getPlayers()) {
                 ScoreBoardBau.getS(p).update();
                 sendChunks(p);
             }
-            },1);
         });
     }
 

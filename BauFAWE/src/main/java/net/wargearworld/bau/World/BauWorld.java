@@ -1,16 +1,5 @@
 package net.wargearworld.bau.world;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.*;
-
-import net.wargearworld.bau.world.plots.PlotType;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
-
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.WorldGuard;
@@ -18,12 +7,21 @@ import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.listener.onPlayerMove;
-import net.wargearworld.bau.world.plots.Plot;
 import net.wargearworld.bau.utils.HelperMethods;
 import net.wargearworld.bau.utils.MethodResult;
+import net.wargearworld.bau.world.plots.Plot;
+import net.wargearworld.bau.world.plots.PlotType;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
 
 public abstract class BauWorld {
     private UUID worldUUID;
@@ -87,7 +85,7 @@ public abstract class BauWorld {
 
     public abstract MethodResult add(String playerName, Date to);
 
-    protected void addPlayerToAllRegions(UUID uuidMember) {
+    public void addPlayerToAllRegions(UUID uuidMember) {
         for (ProtectedRegion region : regionManager.getRegions().values()) {
             DefaultDomain members = region.getMembers();
             members.addPlayer(uuidMember);
@@ -100,7 +98,7 @@ public abstract class BauWorld {
         }
     }
 
-    protected void removeMemberFromAllRegions(UUID uuidMember) {
+    public void removeMemberFromAllRegions(UUID uuidMember) {
         for (ProtectedRegion region : regionManager.getRegions().values()) {
             DefaultDomain members = region.getMembers();
             members.removePlayer(uuidMember);

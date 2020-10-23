@@ -189,7 +189,7 @@ public abstract class Plot {
     }
 
     public boolean calcWorldFuscator(BlockVector3 min) {
-        return region.contains(min) && isWorldFuscated();
+        return !(region.contains(min) && isWorldFuscated());
     }
 
     public boolean isWorldFuscated() {

@@ -86,7 +86,7 @@ public class WorldManager {
                 w.setThundering(false);
                 w.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
                 w.setGameRule(GameRule.DO_MOB_SPAWNING, false);
-                worlds.put(w.getUID(), new PlayerWorld(id, owner, w));
+                worlds.put(w.getUID(), new PlayerWorld(id, UUID.fromString(owner), w));
             }
         }
         return w;
