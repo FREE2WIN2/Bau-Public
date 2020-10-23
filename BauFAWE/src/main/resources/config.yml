@@ -31,5 +31,28 @@ sizes:
     y: 41
     z: 37
     shields: 16
+disallowedcommands:
+  - '//' #all WE Commands
+  - '/schem'
+#  - /gs
+#  - /arena
+#  - /bau
+#  - /hub
+#  - /mw
+#  - /schem list
+#  - /schem load
+#  - /schematic list
+#  - /schematic load
+#  - //schem list
+#  - //schem load
+#  - //schematic list
+#  - //schematic load
+#  - /luckperms
+#  - /lpb
+#  - /lp
+#  - /msg
+#  - /reply
+#  - /r
+#  -
 
   

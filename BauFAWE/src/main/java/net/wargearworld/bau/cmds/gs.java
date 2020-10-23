@@ -1,38 +1,41 @@
 package net.wargearworld.bau.cmds;
 
-import static net.wargearworld.CommandManager.Nodes.ArgumentNode.argument;
-import static net.wargearworld.CommandManager.Arguments.DynamicListArgument.dynamicList;
-import static net.wargearworld.CommandManager.Nodes.InvisibleNode.invisible;
-import static net.wargearworld.CommandManager.Nodes.LiteralNode.literal;
-import static net.wargearworld.CommandManager.Requirements.PermissionRequirement.permission;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.function.Predicate;
-
+import net.wargearworld.CommandManager.ArgumentList;
+import net.wargearworld.CommandManager.Arguments.DynamicListArgument;
+import net.wargearworld.CommandManager.Arguments.DynamicListGetter;
+import net.wargearworld.CommandManager.Arguments.IntegerArgument;
+import net.wargearworld.CommandManager.Arguments.StringArgument;
+import net.wargearworld.CommandManager.CommandHandel;
+import net.wargearworld.CommandManager.CommandNode;
+import net.wargearworld.CommandManager.ParseState;
+import net.wargearworld.bau.Main;
+import net.wargearworld.bau.MessageHandler;
+import net.wargearworld.bau.hikariCP.DBConnection;
+import net.wargearworld.bau.player.BauPlayer;
+import net.wargearworld.bau.utils.ClickAction;
+import net.wargearworld.bau.utils.JsonCreater;
+import net.wargearworld.bau.world.BauWorld;
 import net.wargearworld.bau.world.PlayerWorld;
+import net.wargearworld.bau.world.WorldManager;
+import net.wargearworld.db.model.Plot;
+import net.wargearworld.db.model.PlotMember;
+import net.wargearworld.thedependencyplugin.DependencyProvider;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
-import net.wargearworld.bau.Main;
-import net.wargearworld.bau.MessageHandler;
-import net.wargearworld.bau.hikariCP.DBConnection;
-import net.wargearworld.bau.player.BauPlayer;
-import net.wargearworld.bau.world.BauWorld;
-import net.wargearworld.bau.world.WorldManager;
-import net.wargearworld.bau.utils.ClickAction;
-import net.wargearworld.bau.utils.JsonCreater;
-import net.wargearworld.CommandManager.ArgumentList;
-import net.wargearworld.CommandManager.CommandHandel;
-import net.wargearworld.CommandManager.CommandNode;
-import net.wargearworld.CommandManager.ParseState;
-import net.wargearworld.CommandManager.Arguments.DynamicListArgument;
-import net.wargearworld.CommandManager.Arguments.DynamicListGetter;
-import net.wargearworld.CommandManager.Arguments.IntegerArgument;
-import net.wargearworld.CommandManager.Arguments.StringArgument;
+import javax.persistence.EntityManager;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.function.Predicate;
+
+import static net.wargearworld.CommandManager.Arguments.DynamicListArgument.dynamicList;
+import static net.wargearworld.CommandManager.Nodes.ArgumentNode.argument;
+import static net.wargearworld.CommandManager.Nodes.InvisibleNode.invisible;
+import static net.wargearworld.CommandManager.Nodes.LiteralNode.literal;
+import static net.wargearworld.CommandManager.Requirements.PermissionRequirement.permission;
 
 public class gs implements TabExecutor {
 
@@ -107,15 +110,19 @@ public class gs implements TabExecutor {
                 .setCallback(s -> {
                     newPlot(s.getPlayer(), 1, s);
                 })
-                .addSubNode(invisible(argument("UUID1",dynamicList("UUID1", s->{return List.of(s.getPlayer().getUniqueId().toString());}))
+                .addSubNode(invisible(argument("UUID1", dynamicList("UUID1", s -> {
+                    return List.of(s.getPlayer().getUniqueId().toString());
+                }))
                         .setCallback(s -> {
-                            newPlot(s.getPlayer(), 2,s);
+                            newPlot(s.getPlayer(), 2, s);
                         })
                         .addSubNode(
-                                argument("UUID2",dynamicList("UUID2", s->{return List.of(s.getPlayer().getUniqueId().toString());}))
-                                .setCallback(s -> {
-                                    newPlot(s.getPlayer(), 3,s);
-                                })))));
+                                argument("UUID2", dynamicList("UUID2", s -> {
+                                    return List.of(s.getPlayer().getUniqueId().toString());
+                                }))
+                                        .setCallback(s -> {
+                                            newPlot(s.getPlayer(), 3, s);
+                                        })))));
 
         commandHandle.addSubNode(literal("info").setCallback(s -> {
             getWorld(s).showInfo(s.getPlayer());
@@ -168,7 +175,52 @@ public class gs implements TabExecutor {
                 .setRequirement(permission("bau.delete.bypass")).addSubNode(worlds.setCallback(s -> {
                     deletePlot(s);
                 })));
+        try {
+            /* gs setrights <Spieler> */
+            commandHandle.addSubNode(literal("setrights")
+                    .setRequirement(s -> {
+                        return WorldManager.get(s.getPlayer().getWorld()).isOwner(s.getPlayer());
+                    })
+                    .addSubNode(members.clone().setCallback(s -> {
+                        rights(s, true);
+                    })));
+            /* gs setrights <Spieler> */
+            commandHandle.addSubNode(literal("removerights")
+                    .setRequirement(s -> {
+                        BauWorld bauWorld = WorldManager.get(s.getPlayer().getWorld());
+                        return bauWorld instanceof PlayerWorld && bauWorld.isOwner(s.getPlayer());
+                    })
+                    .addSubNode(members.clone().setCallback(s -> {
+                        rights(s, false);
+                    })));
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+    }
 
+    private void rights(ArgumentList s, boolean b) {
+        String memberName = s.getString("Mitglied");
+        UUID memberUUID = DBConnection.getUUID(memberName);
+        Player p = s.getPlayer();
+        EntityManager em = DependencyProvider.getEntityManager();
+        em.getTransaction().begin();
+        BauWorld bauWorld = WorldManager.get(p.getWorld());
+        long id = bauWorld.getId();
+        Plot dbPlot = em.find(Plot.class, id);
+        net.wargearworld.db.model.Player dbPlayer = em.find(net.wargearworld.db.model.Player.class, memberUUID);
+        PlotMember plotMember = dbPlot.getMember(dbPlayer);
+        plotMember.setRights(b);
+        em.getTransaction().commit();
+        em.close();
+
+
+        if (b) {
+            MessageHandler.getInstance().send(p, "plotrights_setted", memberName);
+            bauWorld.addPlayerToAllRegions(memberUUID);
+        } else {
+            MessageHandler.getInstance().send(p, "plotrights_removed", memberName);
+            bauWorld.addPlayerToAllRegions(memberUUID);
+        }
     }
 
     private BauWorld getWorld(ArgumentList s) {
@@ -217,7 +269,7 @@ public class gs implements TabExecutor {
             secondWarnNewPlot.remove(uuid);
             firstWarnNewPlot.remove(uuid);
             blocked.add(uuid);
-        } else if (firstWarnNewPlot.contains(uuid) && argsLength == 2&& p.getUniqueId().toString().equals(s.getString("UUID1"))) {
+        } else if (firstWarnNewPlot.contains(uuid) && argsLength == 2 && p.getUniqueId().toString().equals(s.getString("UUID1"))) {
             JsonCreater jsonMsg = new JsonCreater(Main.prefix + MessageHandler.getInstance().getString(p, "gs_newPlot_secondWarn"));
             JsonCreater jsonMsgClick = new JsonCreater(MessageHandler.getInstance().getString(p, "gs_newPlot_secondWarn_click"));
             jsonMsgClick.addHoverEvent(MessageHandler.getInstance().getString(p, "gs_newPlot_secondWarn_clickHover"));
@@ -237,10 +289,10 @@ public class gs implements TabExecutor {
     }
 
     public void deletePlot(ArgumentList s) {
-		BauWorld world = WorldManager.getWorld(s.getString("Worlds"));
-		if (world.newWorld()) {
-			Main.send(s.getPlayer(), "gsDeleted", s.getString("worlds"));
-		}
+        BauWorld world = WorldManager.getWorld(s.getString("Worlds"));
+        if (world.newWorld()) {
+            Main.send(s.getPlayer(), "gsDeleted", s.getString("worlds"));
+        }
     }
 
 

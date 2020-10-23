@@ -1,12 +1,15 @@
 package net.wargearworld.bau.world;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.*;
-
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import net.wargearworld.bau.Main;
+import net.wargearworld.bau.MessageHandler;
+import net.wargearworld.bau.hikariCP.DBConnection;
+import net.wargearworld.bau.player.BauPlayer;
+import net.wargearworld.bau.utils.ClickAction;
+import net.wargearworld.bau.utils.JsonCreater;
+import net.wargearworld.bau.utils.MethodResult;
 import net.wargearworld.bau.world.plots.PlotPattern;
 import net.wargearworld.db.model.Plot;
 import net.wargearworld.db.model.PlotMember;
@@ -15,32 +18,28 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-import net.wargearworld.bau.Main;
-import net.wargearworld.bau.MessageHandler;
-import net.wargearworld.bau.hikariCP.DBConnection;
-import net.wargearworld.bau.player.BauPlayer;
-import net.wargearworld.bau.utils.ClickAction;
-import net.wargearworld.bau.utils.JsonCreater;
-import net.wargearworld.bau.utils.MethodResult;
-
 import javax.persistence.EntityManager;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.*;
 
 public class PlayerWorld extends BauWorld {
 
     UUID owner;
     private long plotID;
 
-    public PlayerWorld(long id, String owner, World world) {
+    public PlayerWorld(long id, UUID owner, World world) {
         super(world);
         this.plotID = id;
         EntityManager em = DependencyProvider.getEntityManager();
         Plot dbPlot = em.find(Plot.class, plotID);
-        this.owner = UUID.fromString(owner);
+        this.owner = owner;
         setTemplate(dbPlot.getTemplate().getName());
         plots = new HashMap<>();
         for (PlotPattern plotPattern : getTemplate().getPlots()) {
             plots.put(plotPattern.getID(), plotPattern.toPlot(this));
         }
+        addPlayerToAllRegions(owner);
         em.close();
     }
 
@@ -92,6 +91,23 @@ public class PlayerWorld extends BauWorld {
     @Override
     public boolean isAuthorized(UUID uuid) {
         return owner.equals(uuid) || isMember(uuid);
+    }
+
+    public boolean hasRights(UUID uuid){
+        if(owner.equals(uuid)){
+            return true;
+        }
+        boolean rights = false;
+        EntityManager em = DependencyProvider.getEntityManager();
+        net.wargearworld.db.model.Player dbPlayer = em.find(net.wargearworld.db.model.Player.class,uuid);
+        for(PlotMember plotMember : dbPlayer.getMemberedPlots()){
+            if(plotMember.getPlot().getId() == plotID){
+               rights = plotMember.hasRights();
+               break;
+            }
+        }
+        em.close();
+        return rights;
     }
 
     @Override

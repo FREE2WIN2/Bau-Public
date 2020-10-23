@@ -26,6 +26,7 @@ public class WorldFuscatorIntegration {
     }
 
     public void start() {
+        System.out.println("started");
         engine.start();
     }
 }

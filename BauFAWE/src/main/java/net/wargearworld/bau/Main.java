@@ -16,6 +16,7 @@ import net.wargearworld.bau.tabCompleter.TntReloaderTC;
 import net.wargearworld.bau.tabCompleter.tbsTC;
 import net.wargearworld.bau.tools.*;
 import net.wargearworld.bau.tools.particles.Particles;
+import net.wargearworld.bau.tools.plotrights.PlotRights;
 import net.wargearworld.bau.tools.testBlockSlave.TestBlockSlaveCore;
 import net.wargearworld.bau.tools.testBlockSlave.testBlock.DefaultTestBlock;
 import net.wargearworld.bau.tools.testBlockSlave.testBlockEditor.TestBlockEditorCore;
@@ -99,6 +100,7 @@ public class Main extends JavaPlugin {
         pm.registerEvents(new TestBlockEditorCore(), this);
         pm.registerEvents(new SaWE(), this);
         pm.registerEvents(AutoCannonReloaderListener.getInstance(), this);
+        pm.registerEvents(new PlotRights(), this);
     }
 
     private void registerCommands() {
