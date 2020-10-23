@@ -38,7 +38,7 @@ public class WGAFightGuard implements WorldFuscatorGuard {
         if(maxPlot == null){
             return minPlot.calcWorldFuscator(min);
         }
-        System.out.println("hasAreaRights:" + (minPlot.calcWorldFuscator(min) || maxPlot.calcWorldFuscator(max)));
+        System.out.println("hasAreaRights: " + (minPlot.calcWorldFuscator(min) || maxPlot.calcWorldFuscator(max)));
         return minPlot.calcWorldFuscator(min) || maxPlot.calcWorldFuscator(max);
     }
 
@@ -53,7 +53,7 @@ public class WGAFightGuard implements WorldFuscatorGuard {
         if(plot == null){
             return true;
         }
-        System.out.println("hasRights:" + plot.calcWorldFuscator(vector3));
+        System.out.println("hasRights: " + plot.calcWorldFuscator(vector3));
         return plot.calcWorldFuscator(vector3);
     }
 

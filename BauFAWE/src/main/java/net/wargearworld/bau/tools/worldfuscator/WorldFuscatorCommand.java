@@ -7,13 +7,13 @@ import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.scoreboard.ScoreBoardBau;
 import net.wargearworld.bau.utils.PacketMapChunk;
 import net.wargearworld.bau.world.plots.Plot;
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,18 +21,18 @@ import java.util.List;
 public class WorldFuscatorCommand implements TabExecutor {
     private CommandHandel commandHandel;
 
-    public WorldFuscatorCommand(Main main) {
-        main.getCommand("worldfusactor").setTabCompleter(this);
-        main.getCommand("worldfusactor").setExecutor(this);
-        commandHandel = new CommandHandel("worldfusactor", Main.prefix, Main.getPlugin());
+    public WorldFuscatorCommand(JavaPlugin main) {
+        main.getCommand("worldfuscator").setTabCompleter(this);
+        main.getCommand("worldfuscator").setExecutor(this);
+        commandHandel = new CommandHandel("worldfuscator", Main.prefix, Main.getPlugin());
         commandHandel.setCallback(s -> {
             BauPlayer player = BauPlayer.getBauPlayer(s.getPlayer());
             Plot currentPlot = player.getCurrentPlot();
             currentPlot.setWorldFuscated(!currentPlot.isWorldFuscated());
             if (currentPlot.isWorldFuscated()) {
-                MessageHandler.getInstance().send(s.getPlayer(), "worldfusactor_deactivated", currentPlot.getId().replace("plot", ""));
-            } else {
                 MessageHandler.getInstance().send(s.getPlayer(), "worldfusactor_activated", currentPlot.getId().replace("plot", ""));
+            } else {
+                MessageHandler.getInstance().send(s.getPlayer(), "worldfusactor_deactivated", currentPlot.getId().replace("plot", ""));
             }
             for (Player p : s.getPlayer().getWorld().getPlayers()) {
                 ScoreBoardBau.getS(p).update();
@@ -42,7 +42,7 @@ public class WorldFuscatorCommand implements TabExecutor {
     }
 
     public void sendChunks(Player p) {
-        World world = Bukkit.getWorld("world");
+        World world = p.getWorld();
         for (Chunk chunk : world.getLoadedChunks()) {
             new PacketMapChunk(chunk).send(p);
             world.refreshChunk(chunk.getX(), chunk.getZ());

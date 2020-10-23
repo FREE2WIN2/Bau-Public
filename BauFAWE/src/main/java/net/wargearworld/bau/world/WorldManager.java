@@ -1,7 +1,16 @@
 package net.wargearworld.bau.world;
 
-import static net.wargearworld.bau.utils.HelperMethods.isInt;
+import net.wargearworld.bau.Main;
+import net.wargearworld.bau.hikariCP.DBConnection;
+import net.wargearworld.db.model.Plot;
+import net.wargearworld.db.model.PlotMember;
+import net.wargearworld.db.model.PlotTemplate;
+import net.wargearworld.thedependencyplugin.DependencyProvider;
+import org.bukkit.WorldType;
+import org.bukkit.*;
+import org.bukkit.entity.Player;
 
+import javax.persistence.EntityManager;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -9,22 +18,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.UUID;
 
-import net.wargearworld.bau.player.BauPlayer;
-import net.wargearworld.db.model.Plot;
-import net.wargearworld.db.model.PlotMember;
-import net.wargearworld.db.model.PlotTemplate;
-import net.wargearworld.thedependencyplugin.DependencyProvider;
-import org.bukkit.Bukkit;
-import org.bukkit.GameRule;
-import org.bukkit.World;
-import org.bukkit.WorldCreator;
-import org.bukkit.WorldType;
-import org.bukkit.entity.Player;
-
-import net.wargearworld.bau.Main;
-import net.wargearworld.bau.hikariCP.DBConnection;
-
-import javax.persistence.EntityManager;
+import static net.wargearworld.bau.utils.HelperMethods.isInt;
 
 public class WorldManager {
 
@@ -83,7 +77,7 @@ public class WorldManager {
                 System.out.println(worldName + " " + owner);
                 long id = DBConnection.getPlot(ownerUuid, worldName).getId();
                 if (id == 0)
-                    createWorldDir(worldName, owner);
+                    createWorldDir(worldName, owner, true);
 
                 WorldCreator wc = new WorldCreator(owner + "_" + worldName);
                 wc.type(WorldType.NORMAL);
@@ -112,7 +106,7 @@ public class WorldManager {
         Bukkit.unloadWorld(world, true);
     }
 
-    public static void createWorldDir(String worldName, String ownerUUID) {
+    public static void createWorldDir(String worldName, String ownerUUID, boolean plotExists) {
         // File neu = new File(path + "/Worlds/" + uuid);
         File neu = new File(Bukkit.getWorldContainer(), ownerUUID + "_" + worldName);
         neu.mkdirs();
@@ -120,18 +114,19 @@ public class WorldManager {
         neu.setReadable(true, false);
         neu.setWritable(true, false);
         copyFolder_raw(template.getWorldDir(), neu);
-
-        EntityManager em = DependencyProvider.getEntityManager();
-        em.getTransaction().begin();
-        PlotTemplate dbTemplate = em.find(PlotTemplate.class, template.getId());
-        Plot plot = new Plot();
-        plot.setDefault(false);
-        plot.setName(worldName);
-        plot.setTemplate(dbTemplate);
-        plot.setOwner(em.find(net.wargearworld.db.model.Player.class,UUID.fromString(ownerUUID)));
-        em.persist(plot);
-        em.getTransaction().commit();
-        em.close();
+        if (!plotExists) {
+            EntityManager em = DependencyProvider.getEntityManager();
+            em.getTransaction().begin();
+            PlotTemplate dbTemplate = em.find(PlotTemplate.class, template.getId());
+            Plot plot = new Plot();
+            plot.setDefault(false);
+            plot.setName(worldName);
+            plot.setTemplate(dbTemplate);
+            plot.setOwner(em.find(net.wargearworld.db.model.Player.class, UUID.fromString(ownerUUID)));
+            em.persist(plot);
+            em.getTransaction().commit();
+            em.close();
+        }
         // worldguard regionen
         File worldGuardWorldDir = new File(Bukkit.getWorldContainer(),
                 "plugins/WorldGuard/worlds/" + ownerUUID + "_" + worldName);
@@ -147,7 +142,7 @@ public class WorldManager {
                 if (world instanceof PlayerWorld) {
                     EntityManager em = DependencyProvider.getEntityManager();
                     Plot plot = em.find(Plot.class, world.getId());
-                    for(PlotMember plotMember: plot.getMembers()){
+                    for (PlotMember plotMember : plot.getMembers()) {
                         plot.removeMember(plotMember);
                     }
                     plot.setTemplate(em.find(PlotTemplate.class, template.getId()));
@@ -226,7 +221,7 @@ public class WorldManager {
             p.kickPlayer("GS DELETE");
         }
         deleteWorld(oldWorld);
-        createWorldDir(name, world.getOwner());
+        createWorldDir(name, world.getOwner(), true);
         return loadWorld(name, world.getOwner());
 
     }

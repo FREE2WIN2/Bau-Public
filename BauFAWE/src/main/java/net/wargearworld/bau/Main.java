@@ -20,6 +20,7 @@ import net.wargearworld.bau.tools.testBlockSlave.TestBlockSlaveCore;
 import net.wargearworld.bau.tools.testBlockSlave.testBlock.DefaultTestBlock;
 import net.wargearworld.bau.tools.testBlockSlave.testBlockEditor.TestBlockEditorCore;
 import net.wargearworld.bau.tools.waterremover.WaterRemoverListener;
+import net.wargearworld.bau.tools.worldfuscator.WorldFuscatorCommand;
 import net.wargearworld.bau.tools.worldfuscator.WorldFuscatorIntegration;
 import net.wargearworld.bau.world.WorldGUI;
 import net.wargearworld.bau.world.WorldManager;
@@ -51,6 +52,8 @@ public class Main extends JavaPlugin {
     public static File tempAddConfigFile;
     public static YamlConfiguration tempAddConfig;
 
+    private WorldFuscatorIntegration integration;
+
     @Override
     public void onEnable() {
         super.onEnable();
@@ -68,7 +71,8 @@ public class Main extends JavaPlugin {
         DefaultTestBlock.generateDefaultTestBlocks();
         DatabaseCommunication.startRecieve();
         schempath = customConfig.getString("schempath");
-        new WorldFuscatorIntegration(this);
+       integration =  new WorldFuscatorIntegration(this);
+       integration.start();
 //		doTests();
     }
 
@@ -101,6 +105,7 @@ public class Main extends JavaPlugin {
         new gs();
         new Particles();
         new WorldFuscatorIntegration(this);
+        new WorldFuscatorCommand(this);
         getCommand("tnt").setExecutor(new tnt());
         getCommand("gui").setExecutor(new GUI());
         getCommand("tbs").setExecutor(TestBlockSlaveCore.getInstance());

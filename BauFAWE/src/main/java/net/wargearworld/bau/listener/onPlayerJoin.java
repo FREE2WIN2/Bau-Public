@@ -1,8 +1,13 @@
 package net.wargearworld.bau.listener;
 
-import java.io.File;
-
+import net.wargearworld.StringGetter.Language;
+import net.wargearworld.bau.Main;
+import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.player.BauPlayer;
+import net.wargearworld.bau.scoreboard.ScoreBoardBau;
+import net.wargearworld.bau.utils.ItemStackCreator;
+import net.wargearworld.bau.world.BauWorld;
+import net.wargearworld.bau.world.WorldManager;
 import net.wargearworld.thedependencyplugin.DependencyProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -14,15 +19,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import net.wargearworld.bau.Main;
-import net.wargearworld.bau.MessageHandler;
-import net.wargearworld.bau.scoreboard.ScoreBoardBau;
-import net.wargearworld.bau.world.BauWorld;
-import net.wargearworld.bau.world.WorldManager;
-import net.wargearworld.bau.utils.ItemStackCreator;
-import net.wargearworld.StringGetter.Language;
-
 import javax.persistence.EntityManager;
+import java.io.File;
 
 public class onPlayerJoin implements Listener {
 
@@ -45,10 +43,10 @@ public class onPlayerJoin implements Listener {
 		EntityManager em = DependencyProvider.getEntityManager();
 		System.out.println("hasOWnPlot" + player.hasPlots());
 			String uuidString = p.getUniqueId().toString();
-		if (!player.hasPlots() && !gs.exists()) {
+		if (!gs.exists()) {
 			// Bukkit.createWorld((WorldCreator) WorldCreator.name("test").createWorld());
 			// wenn nicht-> erstellen und hinteleportieren
-			WorldManager.createWorldDir(p.getName(),uuidString);
+			WorldManager.createWorldDir(p.getName(),uuidString,player.hasPlots());
 			p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "plotGenerating"));
 		}
 		World world = WorldManager.loadWorld(p.getName(),uuidString);
