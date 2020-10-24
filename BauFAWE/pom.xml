@@ -2,19 +2,26 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<parent>
+        	<groupId>net.wargearworld.maven</groupId>
+        	<artifactId>wgw-parent</artifactId>
+        	<version>5</version>
+    	</parent>
+	
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.wargearworld</groupId>
 	<artifactId>Bau-FAWE</artifactId>
 	<version>2.0</version>
 	<name>Bau-FAWE</name>
 	<description>Bau-Plugin for MC Server WargearWorld.net</description>
-
+    	
 	<scm>
-		<connection>scm:git@github.com:WargearWorld/Bau.git</connection>
-		<url>https://github.com/WargearWorld/Bau</url>
+        	<connection>scm:git@github.com:WargearWorld/Bau.git</connection>
+        	<url>scm:git:git@github.com:WargearWorld/Bau.git</url>
 		<developerConnection>scm:git:git@github.com:WargearWorld/Bau.git</developerConnection>
-		<tag>HEAD</tag>
-	</scm>
+        	<tag>HEAD</tag>
+   	 </scm>
+
 
 	<properties>
 		<!-- Dependency Versions -->
