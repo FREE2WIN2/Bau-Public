@@ -6,7 +6,7 @@ import net.wargearworld.bau.listener.onPlayerMove;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.tools.Stoplag;
 import net.wargearworld.bau.utils.Scheduler;
-import net.wargearworld.bau.world.plots.Plot;
+import net.wargearworld.bau.world.plot.Plot;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;

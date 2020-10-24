@@ -7,7 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import net.wargearworld.bau.utils.CoordGetter;
-import net.wargearworld.bau.world.plots.Plot;
+import net.wargearworld.bau.world.plot.Plot;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -150,13 +150,13 @@ public class WorldEditHandler {
     }
 
     /**
-     * @param clipboardHolder       -> Clipboard to paste
-     * @param at                    -> paste-position
-     * @param p                     -> player which paste something
-     * @param ignoreAir             -> true if paste -a
-     * @param ticksPerPasteInterval -> Speed of paste: min 1
-     * @param saveUndo              -> Save overwritten Region to undo it
-     * @param tbs                   -> true if paste as testblocksklave, false if it
+     * @param clipboardHolder      Clipboard to paste
+     * @param at                   paste-position
+     * @param p                    player which paste something
+     * @param ignoreAir            true if paste -a
+     * @param ticksPerPasteInterval Speed of paste: min 1
+     * @param saveUndo             Save overwritten Region to undo it
+     * @param tbs                  true if paste as testblocksklave, false if it
      *                              used to normal worldeditOperation
      */
     public static void pasteAsync(ClipboardHolder clipboardHolder, BlockVector3 at, Player p, boolean ignoreAir,
@@ -242,7 +242,7 @@ public class WorldEditHandler {
                     }
                     ymins = ymin;
                 }
-                /* all loops are over -> pasting is done */
+                /* all loops are over pasting is done */
                 animation.cancel();
             }
 
@@ -250,10 +250,10 @@ public class WorldEditHandler {
     }
 
     /**
-     * @param clipboardHolder -> Clipboard to paste
-     * @param at         -> x-coordinate of paste-position
-     * @param w         -> world
-     * @param ignoreAir -> true if paste -a
+     * @param clipboardHolder Clipboard to paste
+     * @param at        x-coordinate of paste-position
+     * @param w        world
+     * @param ignoreAir true if paste -a
      *                  used to normal worldeditOperation
      */
     public static void pasteAsync(ClipboardHolder clipboardHolder, BlockVector3 at, org.bukkit.World w, boolean ignoreAir) {

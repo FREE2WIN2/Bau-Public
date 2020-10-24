@@ -15,7 +15,8 @@ import net.wargearworld.thedependencyplugin.DependencyProvider;
 public class DBConnection {
 
     /**
-     * @param uuid -> The UUID of the Player who wants to know his plots he can join
+     * @param uuid The UUID of the Player who wants to know his plots he can join
+     * @return Player
      */
 
     public static Player getPlayer(UUID uuid) {

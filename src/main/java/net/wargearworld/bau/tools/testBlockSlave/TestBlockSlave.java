@@ -5,7 +5,7 @@ import java.util.Map.Entry;
 
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.utils.CoordGetter;
-import net.wargearworld.bau.world.plots.Plot;
+import net.wargearworld.bau.world.plot.Plot;
 import net.wargearworld.db.model.TestBlock;
 import net.wargearworld.db.model.TestBlock_;
 import net.wargearworld.db.model.enums.schematic.SchematicDirection;

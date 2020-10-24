@@ -17,7 +17,7 @@ import com.sk89q.worldedit.regions.Region;
 import net.wargearworld.bau.utils.*;
 import net.wargearworld.bau.world.BauWorld;
 import net.wargearworld.bau.world.WorldManager;
-import net.wargearworld.bau.world.plots.Plot;
+import net.wargearworld.bau.world.plot.Plot;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;

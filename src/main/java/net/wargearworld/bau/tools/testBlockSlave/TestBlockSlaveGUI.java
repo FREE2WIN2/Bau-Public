@@ -34,8 +34,8 @@ public class TestBlockSlaveGUI implements Listener {
 	 * banner: tier 1 with yellow background add: per personal tb-> add To favorites
 	 * max favs: 9
 	 * 
-	 * save own Block: wodenAxe as symbol: -> stand on the right plot! -> choose
-	 * facing of the given on -> Name into anvil Inventory(Name banner?) -> then
+	 * save own Block: wodenAxe as symbol: stand on the right plot! choose
+	 * facing of the given on Name into anvil Inventory(Name banner?) then
 	 * saving
 	 */
 

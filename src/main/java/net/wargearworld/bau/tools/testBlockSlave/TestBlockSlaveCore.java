@@ -8,7 +8,7 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import net.wargearworld.bau.cmds.Bau;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.utils.CoordGetter;
-import net.wargearworld.bau.world.plots.Plot;
+import net.wargearworld.bau.world.plot.Plot;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;

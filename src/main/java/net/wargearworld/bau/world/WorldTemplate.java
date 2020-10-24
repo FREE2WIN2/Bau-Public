@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import net.wargearworld.bau.hikariCP.DBConnection;
-import net.wargearworld.bau.world.plots.Plot;
+import net.wargearworld.bau.world.plot.Plot;
 import net.wargearworld.db.model.PlotTemplate;
 import net.wargearworld.thedependencyplugin.DependencyProvider;
 import org.bukkit.Bukkit;
@@ -17,8 +17,8 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.tools.testBlockSlave.testBlock.Facing;
-import net.wargearworld.bau.world.plots.PlotPattern;
-import net.wargearworld.bau.world.plots.PlotType;
+import net.wargearworld.bau.world.plot.PlotPattern;
+import net.wargearworld.bau.world.plot.PlotType;
 import net.wargearworld.bau.worldedit.Schematic;
 import net.wargearworld.bau.utils.Loc;
 

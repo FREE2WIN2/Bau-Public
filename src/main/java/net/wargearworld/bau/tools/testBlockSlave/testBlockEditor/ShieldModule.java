@@ -3,7 +3,7 @@ package net.wargearworld.bau.tools.testBlockSlave.testBlockEditor;
 import java.util.Iterator;
 
 import net.wargearworld.bau.utils.CoordGetter;
-import net.wargearworld.bau.world.plots.Plot;
+import net.wargearworld.bau.world.plot.Plot;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;

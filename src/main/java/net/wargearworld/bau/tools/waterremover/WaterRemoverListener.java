@@ -7,7 +7,7 @@ import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.scoreboard.ScoreBoardBau;
 import net.wargearworld.bau.world.WorldManager;
-import net.wargearworld.bau.world.plotss.Plot;
+import net.wargearworld.bau.world.plot.Plot;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

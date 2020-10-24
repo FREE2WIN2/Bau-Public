@@ -113,7 +113,6 @@ public class FlattenedClipboardTransform {
 	 *
 	 * @param original  the original clipboard
 	 * @param transform the transform
-	 * @param offset
 	 * @return a builder
 	 */
 	public static FlattenedClipboardTransform transform(Clipboard original, Transform transform) {

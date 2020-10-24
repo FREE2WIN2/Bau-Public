@@ -10,7 +10,7 @@ import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.utils.ClickAction;
 import net.wargearworld.bau.utils.JsonCreater;
 import net.wargearworld.bau.utils.MethodResult;
-import net.wargearworld.bau.world.plotss.PlotPattern;
+import net.wargearworld.bau.world.plot.PlotPattern;
 import net.wargearworld.db.model.Plot;
 import net.wargearworld.db.model.PlotMember;
 import net.wargearworld.thedependencyplugin.DependencyProvider;

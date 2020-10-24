@@ -39,11 +39,22 @@ public class CustomTestBlock implements ITestBlock {
 	/**
 	 * Creates a new TestBlock
 	 * 
-	 * @param owner     -> UUID of the owner. If the TestBlock is a default one
+	 * @param owner    UUID of the owner. If the TestBlock is a default one
 	 *                  owner is not an empty String!
-	 * @param schemName -> name of the schemfile
-	 * @param Name      -> Name of the TestBlock
-	 * @param tier      -> int-value of the tier
+	 * @param schemName name of the schemfile
+	 * @param Name     Name of the TestBlock
+	 * @param tier     int-value of the tier
+	 */
+
+	/**
+	 *
+	 * @param owner UUID of the owner.
+	 * @param schemName name of the schemfile
+	 * @param Name  Name of the TestBlock
+	 * @param face Facing direction
+	 * @param tier int-value of the tier
+	 * @param favorite bool if fav
+	 * @param id id in database
 	 */
 	public CustomTestBlock(UUID owner, String schemName, String Name, Facing face, int tier, boolean favorite, long id) {
 		this.owner = owner;

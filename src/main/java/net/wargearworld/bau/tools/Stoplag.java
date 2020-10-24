@@ -36,7 +36,7 @@ import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.scoreboard.ScoreBoardBau;
 import net.wargearworld.bau.world.BauWorld;
 import net.wargearworld.bau.world.WorldManager;
-import net.wargearworld.bau.world.plots.Plot;
+import net.wargearworld.bau.world.plot.Plot;
 import net.wargearworld.bau.worldedit.WorldGuardHandler;
 import net.wargearworld.CommandManager.ArgumentList;
 import net.wargearworld.CommandManager.CommandHandel;

@@ -1,6 +1,6 @@
 package net.wargearworld.bau.tools.testBlockSlave.testBlock;
 
-import net.wargearworld.bau.world.plots.Plot;
+import net.wargearworld.bau.world.plot.Plot;
 import org.bukkit.World;
 
 import com.sk89q.worldedit.regions.Region;

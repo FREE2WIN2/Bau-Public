@@ -42,7 +42,7 @@ public class WorldManager {
     }
 
     /**
-     * @param worldName -> name which has the File(owner_name)
+     * @param worldName name which has the File(owner_name)
      * @return BauWorld
      */
     public static BauWorld getWorld(String worldName) {

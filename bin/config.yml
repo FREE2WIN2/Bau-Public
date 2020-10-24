@@ -8,12 +8,12 @@ worldEdit:
   maxBlockPerSecond: 5000
 coordinates:
   paste:
-    plot1: -101 8 17   #plotID = name of the region -> First make region over the single plots, then over all plots
+    plot1: -101 8 17   #plotID = name of the region First make region over the single plots, then over all plots
     plot2: -209 8 17
     plot3: -317 8 17
   spawn: plot2
   teleport:
-    plot1: -100.5 8 17.0   #plotID = name of the region -> First make region over the single plots, then over all plots
+    plot1: -100.5 8 17.0   #plotID = name of the region First make region over the single plots, then over all plots
     plot2: -208.5 8 17.0
     plot3: -316.5 8 17.0
   worldBorder:

@@ -13,7 +13,7 @@ import net.wargearworld.bau.tools.testBlockSlave.TestBlockSlave;
 import net.wargearworld.bau.tools.testBlockSlave.testBlockEditor.TestBlockEditor;
 import net.wargearworld.bau.world.BauWorld;
 import net.wargearworld.bau.world.WorldManager;
-import net.wargearworld.bau.world.plots.Plot;
+import net.wargearworld.bau.world.plot.Plot;
 import net.wargearworld.db.model.PlotMember;
 import net.wargearworld.thedependencyplugin.DependencyProvider;
 import org.bukkit.Bukkit;

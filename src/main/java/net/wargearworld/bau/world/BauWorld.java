@@ -11,8 +11,8 @@ import net.wargearworld.bau.Main;
 import net.wargearworld.bau.listener.onPlayerMove;
 import net.wargearworld.bau.utils.HelperMethods;
 import net.wargearworld.bau.utils.MethodResult;
-import net.wargearworld.bau.world.plots.Plot;
-import net.wargearworld.bau.world.plots.PlotType;
+import net.wargearworld.bau.world.plot.Plot;
+import net.wargearworld.bau.world.plot.PlotType;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
