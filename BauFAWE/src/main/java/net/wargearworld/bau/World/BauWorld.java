@@ -73,6 +73,7 @@ public abstract class BauWorld {
         Plot plot = plots.get(template.getSpawnPlotID());
         p.teleport(plot.getTeleportPoint());
         onPlayerMove.playersLastPlot.put(p.getUniqueId(), plot.getId());
+
     }
 
     public abstract boolean isAuthorized(UUID uuid);
@@ -179,6 +180,8 @@ public abstract class BauWorld {
     }
 
     public abstract long getId();
+
+    public abstract void leave(Player p);
 
     protected enum WorldAction {
         ADD, ADDTEMP, REMOVE, NEW, DELETE;
