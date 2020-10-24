@@ -7,7 +7,8 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import net.wargearworld.bau.world.BauWorld;
 import net.wargearworld.bau.world.WorldManager;
-import net.wargearworld.bau.world.plots.Plot;
+import net.wargearworld.bau.world.plotss.Plot;
+
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 

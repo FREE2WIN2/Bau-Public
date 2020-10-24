@@ -1,6 +1,6 @@
 package net.wargearworld.bau.utils;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import net.wargearworld.bau.world.plots.Plot;
+
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
@@ -10,6 +10,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.tools.testBlockSlave.testBlock.Facing;
+import net.wargearworld.bau.world.plotss.Plot;
 
 public class CoordGetter {
 
