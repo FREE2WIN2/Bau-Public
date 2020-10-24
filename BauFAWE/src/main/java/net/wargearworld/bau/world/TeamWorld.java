@@ -1,13 +1,12 @@
 package net.wargearworld.bau.world;
 
-import java.util.Date;
-import java.util.Set;
-import java.util.UUID;
-
+import net.wargearworld.bau.utils.MethodResult;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-import net.wargearworld.bau.utils.MethodResult;
+import java.util.Date;
+import java.util.Set;
+import java.util.UUID;
 
 public class TeamWorld extends BauWorld{
 
@@ -77,6 +76,11 @@ public class TeamWorld extends BauWorld{
 	@Override
 	public long getId() {
 		return teamID;
+	}
+
+	@Override
+	public void leave(Player p) {
+
 	}
 
 	@Override

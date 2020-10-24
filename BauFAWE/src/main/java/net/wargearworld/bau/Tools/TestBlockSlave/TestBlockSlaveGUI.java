@@ -1,14 +1,12 @@
 package net.wargearworld.bau.tools.testBlockSlave;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import net.wargearworld.GUI_API.GUI.AnvilGUI;
-import net.wargearworld.GUI_API.GUI.ChestGUI;
 import net.wargearworld.GUI_API.GUI.Slot;
 import net.wargearworld.GUI_API.Items.DefaultItem;
+import net.wargearworld.bau.MessageHandler;
+import net.wargearworld.bau.tools.testBlockSlave.testBlock.CustomTestBlock;
+import net.wargearworld.bau.utils.Banner;
+import net.wargearworld.bau.utils.ItemStackCreator;
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
@@ -18,10 +16,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import net.wargearworld.bau.MessageHandler;
-import net.wargearworld.bau.tools.testBlockSlave.testBlock.CustomTestBlock;
-import net.wargearworld.bau.utils.Banner;
-import net.wargearworld.bau.utils.ItemStackCreator;
+import java.util.HashMap;
+import java.util.Map.Entry;
+import java.util.Set;
 
 
 public class TestBlockSlaveGUI implements Listener {
@@ -182,11 +179,11 @@ public class TestBlockSlaveGUI implements Listener {
 
 		AnvilGUI gui = new AnvilGUI(MessageHandler.getInstance().getString(p, "tbs_gui_anvilTitle"), " ");
 		if(tier == 1) {
-			gui.setItem(Slot.INPUT_LEFT,new DefaultItem(Banner.ONE.create(DyeColor.ORANGE, DyeColor.BLACK, "§rUnnamed"),s->{}));
+			gui.setItem(Slot.INPUT_LEFT,new DefaultItem(Banner.ONE.create(DyeColor.ORANGE, DyeColor.BLACK, " "),s->{}));
 		}else if(tier ==2) {
-			gui.setItem(Slot.INPUT_LEFT,new DefaultItem(Banner.TWO.create(DyeColor.ORANGE, DyeColor.BLACK, "§rUnnamed"),s->{}));
+			gui.setItem(Slot.INPUT_LEFT,new DefaultItem(Banner.TWO.create(DyeColor.ORANGE, DyeColor.BLACK, " "),s->{}));
 		}else if(tier == 3) {
-			gui.setItem(Slot.INPUT_LEFT,new DefaultItem(Banner.THREE.create(DyeColor.ORANGE, DyeColor.BLACK, "§rUnnamed"),s->{}));
+			gui.setItem(Slot.INPUT_LEFT,new DefaultItem(Banner.THREE.create(DyeColor.ORANGE, DyeColor.BLACK, " "),s->{}));
 		}
 		gui.open(p);
 	}

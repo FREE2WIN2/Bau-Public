@@ -6,10 +6,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="Bau-FAWE" />
+        <module name="Bau" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="Bau" target="11" />
       <module name="Bau-FAWE" target="11" />
     </bytecodeTargetLevel>
   </component>
