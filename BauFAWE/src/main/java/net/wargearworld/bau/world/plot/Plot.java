@@ -1,4 +1,4 @@
-package net.wargearworld.bau.world.plots;
+package net.wargearworld.bau.world.plot;
 
 import com.sk89q.worldedit.math.BlockVector3;
 import net.wargearworld.bau.tools.waterremover.WaterRemover;
