@@ -1,9 +1,9 @@
 name: PluginBau
 version: 2.0
 author: FREE2WIN
-main: net.wargearworld.Bau.Main
+main: net.wargearworld.bau.Main
 api-version: 1.15
-depend: [WorldEdit,WorldGuard]
+depend: [WorldEdit,WorldGuard, TheDependencyPlugin]
 description: Bauplugin
 commands:
    stats:
@@ -36,7 +36,7 @@ commands:
       usage: /<command>
       description: Gives you an TNT Chest
       aliases: [tntchest]
-   delcon:
+   plotreset:
       description: delete Plot.
    baureload:
       description: handling
@@ -46,14 +46,20 @@ commands:
       usage: /<command> [on|off]
    tr:
      description: tntReload command
-     aliases: [tntReload,cannonReload,cr]
+     aliases: [tntreload,cannonreload,cr]
      usage: /<command>
    clear:
      description: Resets your inventory
    worlds:
      description: Resets your worlds
-     
-     
+   waterremover:
+     description: toggle Waterremover
+     aliases: [wr]
+   worldfuscator:
+     description: toggle WorldFuscator
+     aliases: [wf,blockhider,awdl]
+
+
 permissions:
   bau.*:
     default: op
@@ -66,6 +72,8 @@ permissions:
   bau.delete.bypass:
     default: op
   bau.build.bypass:
+    default: op
+  bau.rights.bypass:
     default: op
     
     
