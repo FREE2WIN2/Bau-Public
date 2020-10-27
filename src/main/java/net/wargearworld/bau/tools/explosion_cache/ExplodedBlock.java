@@ -19,6 +19,6 @@ public class ExplodedBlock {
     public void place(){
         Block b = loc.getBlock();
         loc.getBlock().setType(type);
-        b.setBlockData(blockData,false);
+        b.setBlockData(blockData,true);
     }
 }

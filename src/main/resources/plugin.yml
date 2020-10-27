@@ -58,7 +58,8 @@ commands:
    worldfuscator:
      description: toggle WorldFuscator
      aliases: [wf,blockhider,awdl]
-
+   explosion:
+     aliases: [explo,ex]
 
 permissions:
   bau.*:

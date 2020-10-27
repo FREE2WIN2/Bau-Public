@@ -77,7 +77,7 @@ public class ExplosionCache {
             return;
         }
         boolean sl = Stoplag.getStatus(player.getLocation());
-        Stoplag.getInstance().setStatusTemp(player.getLocation(), true,1);
+        Stoplag.getInstance().setStatusTemp(player.getLocation(), true,2);
         try {
 
             explodedBlocks.pop();
