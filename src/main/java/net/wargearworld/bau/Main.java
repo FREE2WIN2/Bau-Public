@@ -15,6 +15,7 @@ import net.wargearworld.bau.player.DefaultPlayer;
 import net.wargearworld.bau.tabCompleter.TntReloaderTC;
 import net.wargearworld.bau.tabCompleter.tbsTC;
 import net.wargearworld.bau.tools.*;
+import net.wargearworld.bau.tools.explosion_cache.ExplosionCacheListener;
 import net.wargearworld.bau.tools.particles.Particles;
 import net.wargearworld.bau.tools.plotrights.PlotRights;
 import net.wargearworld.bau.tools.testBlockSlave.TestBlockSlaveCore;
@@ -72,8 +73,8 @@ public class Main extends JavaPlugin {
         DefaultTestBlock.generateDefaultTestBlocks();
         DatabaseCommunication.startRecieve();
         schempath = customConfig.getString("schempath");
-       integration =  new WorldFuscatorIntegration(this);
-       integration.start();
+        integration =  new WorldFuscatorIntegration(this);
+        integration.start();
 //		doTests();
     }
 
@@ -88,7 +89,7 @@ public class Main extends JavaPlugin {
         new SpawnEvent(this);
         new onPlayerRespawn(this);
         new WaterRemoverListener(this);
-
+        new ExplosionCacheListener();
         PluginManager pm = Bukkit.getPluginManager();
         pm.registerEvents(TestBlockSlaveCore.getInstance(), this);
         pm.registerEvents(new eventsToCancel(), this);
@@ -176,8 +177,8 @@ public class Main extends JavaPlugin {
             // create a flag with the name "my-custom-flag", defaulting to true
             StateFlag flag = new StateFlag("TntExplosion", true);
             StateFlag stoplag = new StateFlag("stoplag", true);
-            StateFlag waterRemoverFlag = new StateFlag("waterremover", false);
-            StateFlag worldfuscatorFlag = new StateFlag("worldfuscator", false);
+            StateFlag waterRemoverFlag = new StateFlag("waterremover", true);
+            StateFlag worldfuscatorFlag = new StateFlag("worldfuscator", true);
             registry.register(flag);
             registry.register(stoplag);
             registry.register(waterRemoverFlag);

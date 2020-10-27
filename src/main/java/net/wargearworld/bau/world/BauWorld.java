@@ -9,6 +9,7 @@ import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.listener.onPlayerMove;
+import net.wargearworld.bau.tools.explosion_cache.ExplosionCache;
 import net.wargearworld.bau.utils.HelperMethods;
 import net.wargearworld.bau.utils.MethodResult;
 import net.wargearworld.bau.world.plot.Plot;
@@ -33,6 +34,7 @@ public abstract class BauWorld {
     protected RegionManager regionManager;
     private WorldTemplate template;
     private File logFile;
+    private ExplosionCache explosionCache;
     public BauWorld(World world) {
         this.name = world.getName().split("_", 2)[1];
         this.worldUUID = world.getUID();
@@ -47,6 +49,7 @@ public abstract class BauWorld {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        explosionCache = new ExplosionCache();
     }
 
     public String getName() {
@@ -208,6 +211,10 @@ public abstract class BauWorld {
 
     public UUID getWorldUUID() {
         return worldUUID;
+    }
+
+    public ExplosionCache getExplosionCache() {
+        return explosionCache;
     }
 
     protected abstract String getOwner();

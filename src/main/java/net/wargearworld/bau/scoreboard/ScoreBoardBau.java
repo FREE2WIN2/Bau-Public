@@ -95,22 +95,27 @@ public class ScoreBoardBau {
             obj.unregister();
         }
         Plot currentPlot = player.getCurrentPlot();
-        if(currentPlot == null)
+        if (currentPlot == null)
             return;
         obj = board.registerNewObjective(p.getName(), p.getName() + "bbbb", p.getName() + "cccc");
         obj.setDisplayName("§6Time: §c" + getTime());
         obj.setDisplaySlot(DisplaySlot.SIDEBAR);
-        obj.getScore("§6Plot: §c" + currentPlot.getId().replace("plot", "")).setScore(11);
-        obj.getScore("§1§8§l§m               §r").setScore(10);
-        obj.getScore("§6TNT: " + getTNT(currentPlot)).setScore(9);
-        obj.getScore("§2§8§l§m               §r").setScore(8);
-        obj.getScore("§6Stoplag: " + getSl()).setScore(7);
-        obj.getScore("§3§8§l§m               §r").setScore(6);
-        obj.getScore("§6DesignTool: " + getDt()).setScore(5);
-        obj.getScore("§4§8§l§m               §r").setScore(4);
-        obj.getScore("§6WorldFuscator: " + getWorldFuscator(currentPlot)).setScore(3);
-        obj.getScore("§5§8§l§m               §r").setScore(2);
-        obj.getScore("§6WaterRemover: " + getWaterRemover(currentPlot)).setScore(1);
+        obj.getScore("§6Plot: §c" + currentPlot.getId().replace("plot", "")).setScore(10);
+        obj.getScore("§1§8§l§m               §r").setScore(9);
+        obj.getScore("§6TNT: " + getTNT(currentPlot)).setScore(8);
+        obj.getScore("§2§8§l§m               §r").setScore(7);
+        obj.getScore("§6Stoplag: " + getSl()).setScore(6);
+        obj.getScore("§3§8§l§m               §r").setScore(5);
+        obj.getScore("§6Aktive Tools:").setScore(4);
+        if (player.getDT()) {
+            obj.getScore("§aDesignTool").setScore(3);
+        }
+        if (currentPlot.isWorldFuscated()) {
+            obj.getScore("§aWorldFuscator").setScore(2);
+        }
+        if (currentPlot.getWaterRemover() != null) {
+            obj.getScore("§aWaterRemover").setScore(1);
+        }
         p.setScoreboard(board);
     }
 

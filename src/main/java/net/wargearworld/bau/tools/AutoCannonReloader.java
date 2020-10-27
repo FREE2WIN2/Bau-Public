@@ -46,7 +46,7 @@ public class AutoCannonReloader {
     public void deleteRecord(Player p, boolean b) {
         if (!b) {
             MessageHandler msgHandler = MessageHandler.getInstance();
-            TextComponent tc = new TextComponent(msgHandler.getString(p, "cannonreloader_delete_warning_text"));
+            TextComponent tc = new TextComponent(Main.prefix + msgHandler.getString(p, "cannonreloader_delete_warning_text"));
             TextComponent clickTC = new TextComponent(msgHandler.getString(p, "cannonreloader_delete_warning_click"));
             clickTC.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tr reset confirm"));
             clickTC.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(msgHandler.getString(p, "cannonreloader_delete_warning_hover")).create()));
