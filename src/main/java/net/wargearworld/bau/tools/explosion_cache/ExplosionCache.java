@@ -77,7 +77,7 @@ public class ExplosionCache {
             return;
         }
         boolean sl = Stoplag.getStatus(player.getLocation());
-        Stoplag.setStatus(player.getLocation(), !sl);
+        Stoplag.getInstance().setStatusTemp(player.getLocation(), true,1);
         try {
 
             explodedBlocks.pop();
@@ -89,7 +89,6 @@ public class ExplosionCache {
         }
         explodedBlocks.push(new ArrayList<>());
         MessageHandler.getInstance().send(player, "explosion_undoed");
-        Stoplag.setStatus(player.getLocation(), sl);
 
     }
 
