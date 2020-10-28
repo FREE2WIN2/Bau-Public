@@ -45,6 +45,7 @@ public class ExplosionCache {
             }
             explodedBlocks.push(blocks);
             tnts.remove(event.getEntity().getUniqueId());
+            event.blockList().clear();
         }
         Bukkit.getScheduler().runTaskLater(Main.getPlugin(), () -> {
             if (getTnts(event.getLocation().getWorld()) == 0 && !explodedBlocks.peek().isEmpty()) {
@@ -53,17 +54,17 @@ public class ExplosionCache {
                     MessageHandler msgHandler = MessageHandler.getInstance();
                     TextComponent tc = new TextComponent(Main.prefix + msgHandler.getString(player, "explosion_cached"));
                     TextComponent click = new TextComponent(msgHandler.getString(player, "deletePlotHere"));
-                    click.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/explosion undo"));
+                    click.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/explosion redo"));
                     click.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(msgHandler.getString(player, "explosion_hover")).create()));
                     player.spigot().sendMessage(tc, click);
                 }
-                removeUndo(explodedBlocks.size());
+                removeRedo(explodedBlocks.size());
             }
 
         }, 2);
     }
 
-    private void removeUndo(int size) {
+    private void removeRedo(int size) {
         Bukkit.getScheduler().runTaskLater(Main.getPlugin(), () -> {
             if (explodedBlocks.size() >= size) {
                 explodedBlocks.remove(size - 2);
@@ -71,15 +72,12 @@ public class ExplosionCache {
         }, 20 * 60 * 5);
     }
 
-    public void undo(Player player) {
+    public void redo(Player player) {
         if (explodedBlocks.size() == 1) {
-            MessageHandler.getInstance().send(player, "explosion_noUndo");
+            MessageHandler.getInstance().send(player, "explosion_noRedo");
             return;
         }
-        boolean sl = Stoplag.getStatus(player.getLocation());
-        Stoplag.getInstance().setStatusTemp(player.getLocation(), true,2);
         try {
-
             explodedBlocks.pop();
             List<ExplodedBlock> blocks = explodedBlocks.pop();
             for (ExplodedBlock block : blocks) {
@@ -88,7 +86,7 @@ public class ExplosionCache {
         } catch (Exception ex) {
         }
         explodedBlocks.push(new ArrayList<>());
-        MessageHandler.getInstance().send(player, "explosion_undoed");
+        MessageHandler.getInstance().send(player, "explosion_redoed");
 
     }
 

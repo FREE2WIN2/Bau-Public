@@ -285,7 +285,7 @@ public class PlayerWorld extends BauWorld {
     @Override
     public void leave(Player p) {
         Player ownerPlayer = Bukkit.getPlayer(owner);
-        if(ownerPlayer == null)
+        if(ownerPlayer == null|| ownerPlayer == p)
             return;
         MessageHandler.getInstance().send(ownerPlayer,"plot_leaved",p.getName());
     }
@@ -294,7 +294,7 @@ public class PlayerWorld extends BauWorld {
     public void spawn(Player p){
         super.spawn(p);
         Player ownerPlayer = Bukkit.getPlayer(owner);
-        if(ownerPlayer == null)
+        if(ownerPlayer == null || ownerPlayer == p)
             return;
         MessageHandler.getInstance().send(ownerPlayer,"plot_entered",p.getName());
     }

@@ -110,11 +110,11 @@ public class ScoreBoardBau {
         if (player.getDT()) {
             obj.getScore("§aDesignTool").setScore(3);
         }
-        if (currentPlot.isWorldFuscated()) {
-            obj.getScore("§aWorldFuscator").setScore(2);
-        }
         if (currentPlot.getWaterRemover() != null) {
-            obj.getScore("§aWaterRemover").setScore(1);
+            obj.getScore("§aWaterRemover").setScore(2);
+        }
+        if (currentPlot.isWorldFuscated()) {
+            obj.getScore("§aWorldFuscator").setScore(1);
         }
         p.setScoreboard(board);
     }

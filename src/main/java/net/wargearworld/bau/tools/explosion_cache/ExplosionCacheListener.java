@@ -1,5 +1,6 @@
 package net.wargearworld.bau.tools.explosion_cache;
 
+import com.destroystokyo.paper.event.block.BlockDestroyEvent;
 import net.wargearworld.CommandManager.ArgumentList;
 import net.wargearworld.CommandManager.CommandHandel;
 import net.wargearworld.bau.Main;
@@ -34,14 +35,14 @@ public class ExplosionCacheListener implements Listener, TabExecutor {
 
         Bukkit.getPluginManager().registerEvents(this, Main.getPlugin());
         commandHandel = new CommandHandel("explosion", Main.prefix, Main.getPlugin());
-        commandHandel.addSubNode(literal("undo").setCallback(s -> {
-            undo(s);
+        commandHandel.addSubNode(literal("redo").setCallback(s -> {
+            redo(s);
         }));
     }
 
-    private void undo(ArgumentList s) {
+    private void redo(ArgumentList s) {
         Player p = s.getPlayer();
-        WorldManager.get(p.getWorld()).getExplosionCache().undo(p);
+        WorldManager.get(p.getWorld()).getExplosionCache().redo(p);
     }
 
     @Override
@@ -72,6 +73,9 @@ public class ExplosionCacheListener implements Listener, TabExecutor {
         }
         Location loc = event.getLocation();
         BauWorld world = WorldManager.get(loc.getWorld());
+        if(world == null)
+            return;
+        System.out.println("explosion");
         ExplosionCache explosionCache = world.getExplosionCache();
         explosionCache.handleExplode(event);
     }
@@ -86,5 +90,10 @@ public class ExplosionCacheListener implements Listener, TabExecutor {
         ExplosionCache explosionCache = world.getExplosionCache();
         explosionCache.onEntityPrime(event);
     }
+
+   /* @EventHandler
+    public void onBlockDisappear(BlockDestroyEvent event){
+        System.out.println(event.getBlock().getType().name() + " TO " + event.getNewState().getMaterial().name());
+    }*/
 
 }

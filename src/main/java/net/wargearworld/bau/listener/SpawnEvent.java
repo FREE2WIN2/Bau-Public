@@ -37,12 +37,11 @@ public class SpawnEvent implements Listener {
 			e.setCancelled(true);
 			return;
 		}
-		if (e.getLocation().getWorld().getName().contains("test")) {
-
 			if (!(etype == EntityType.PLAYER || etype == EntityType.PRIMED_TNT || etype == EntityType.FALLING_BLOCK
-					|| etype == EntityType.ARROW || etype == EntityType.TRIDENT)) {
+					|| etype == EntityType.ARROW || etype == EntityType.TRIDENT || etype == EntityType.FIREWORK)) {
 				e.setCancelled(true);
 			}
+		if (e.getLocation().getWorld().getName().contains("test")) {
 			return;
 		}
 		if (etype.equals(EntityType.FALLING_BLOCK)) {
@@ -95,12 +94,6 @@ public class SpawnEvent implements Listener {
 					}
 				}, 200);
 				// wann wieder false? ->
-			}
-		} else {
-			if (!(etype == EntityType.PLAYER || etype == EntityType.PRIMED_TNT || etype == EntityType.FALLING_BLOCK
-					|| etype == EntityType.ARROW || etype == EntityType.TRIDENT)) {
-				e.setCancelled(true);
-				return;
 			}
 		}
 	}
