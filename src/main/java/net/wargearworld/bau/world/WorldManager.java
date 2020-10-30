@@ -5,11 +5,11 @@ import net.wargearworld.bau.hikariCP.DBConnection;
 import net.wargearworld.db.model.Plot;
 import net.wargearworld.db.model.PlotMember;
 import net.wargearworld.db.model.PlotTemplate;
-import net.wargearworld.thedependencyplugin.DependencyProvider;
 import org.bukkit.WorldType;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 
+import javax.enterprise.inject.spi.CDI;
 import javax.persistence.EntityManager;
 import java.io.File;
 import java.io.IOException;
@@ -75,7 +75,7 @@ public class WorldManager {
             } else {
                 UUID ownerUuid = UUID.fromString(owner);
                 System.out.println(worldName + " " + owner);
-                long id = DBConnection.getPlot(ownerUuid, worldName).getId();
+                long id = DBConnection.dbConnection().getPlot(ownerUuid, worldName).getId();
                 if (id == 0)
                     createWorldDir(worldName, owner, true);
 
@@ -115,7 +115,7 @@ public class WorldManager {
         neu.setWritable(true, false);
         copyFolder_raw(template.getWorldDir(), neu);
         if (!plotExists) {
-            EntityManager em = DependencyProvider.getEntityManager();
+            EntityManager em = CDI.current().select(EntityManager.class).get();
             em.getTransaction().begin();
             PlotTemplate dbTemplate = em.find(PlotTemplate.class, template.getId());
             Plot plot = new Plot();
@@ -140,7 +140,7 @@ public class WorldManager {
         if (w.getWorldFolder().exists()) {
             if (deleteDir(w.getWorldFolder())) { //TODO check if world ist instacne of PlayerWorld
                 if (world instanceof PlayerWorld) {
-                    EntityManager em = DependencyProvider.getEntityManager();
+                    EntityManager em = CDI.current().select(EntityManager.class).get();
                     Plot plot = em.find(Plot.class, world.getId());
                     for (PlotMember plotMember : plot.getMembers()) {
                         plot.removeMember(plotMember);

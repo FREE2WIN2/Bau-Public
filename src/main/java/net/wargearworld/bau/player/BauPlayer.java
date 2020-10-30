@@ -7,15 +7,12 @@ import net.minecraft.server.v1_15_R1.PlayerConnection;
 import net.wargearworld.StringGetter.Language;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
-import net.wargearworld.bau.hikariCP.DBConnection;
 import net.wargearworld.bau.tools.AutoCannonReloader;
 import net.wargearworld.bau.tools.testBlockSlave.TestBlockSlave;
 import net.wargearworld.bau.tools.testBlockSlave.testBlockEditor.TestBlockEditor;
-import net.wargearworld.bau.world.BauWorld;
 import net.wargearworld.bau.world.WorldManager;
 import net.wargearworld.bau.world.plot.Plot;
 import net.wargearworld.db.model.PlotMember;
-import net.wargearworld.thedependencyplugin.DependencyProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -24,7 +21,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
-import javax.persistence.EntityManager;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -33,6 +29,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.UUID;
 
+import static net.wargearworld.bau.hikariCP.DBConnection.dbConnection;
 public class BauPlayer {
     private static HashMap<UUID, BauPlayer> players = new HashMap<>();
 
@@ -146,7 +143,6 @@ public class BauPlayer {
         Player p = getBukkitPlayer();
         if (p == null)
             return;
-
         ArrayList<net.wargearworld.db.model.Plot> memberedPlots = new ArrayList<>();
         memberedPlots.addAll(getDbPlayer().getPlots());
         for (PlotMember member : getDbPlayer().getMemberedPlots()) {
@@ -176,7 +172,7 @@ public class BauPlayer {
     }
 
     public net.wargearworld.db.model.Player getDbPlayer() {
-        return DBConnection.getPlayer(uuid);
+        return dbConnection().getPlayer(uuid);
     }
 
     public FileConfiguration getConfig() {
@@ -192,19 +188,11 @@ public class BauPlayer {
     }
 
     public Set<net.wargearworld.db.model.Plot> getdbPlots(){
-        EntityManager em = DependencyProvider.getEntityManager();
-        net.wargearworld.db.model.Player dbPlayer = em.find(net.wargearworld.db.model.Player.class,uuid);
-        Set<net.wargearworld.db.model.Plot> plots = dbPlayer.getPlots();
-        em.close();
+        Set<net.wargearworld.db.model.Plot> plots = getDbPlayer().getPlots();
         return plots;
     }
     public boolean hasPlots(){
-        EntityManager em = DependencyProvider.getEntityManager();
-        net.wargearworld.db.model.Player dbPlayer = em.find(net.wargearworld.db.model.Player.class,uuid);
-        Set<net.wargearworld.db.model.Plot> plots = dbPlayer.getPlots();
-        boolean hasPlots = !plots.isEmpty();
-        em.close();
-        return hasPlots;
+        return !getdbPlots().isEmpty();
     }
 
     public TestBlockSlave getTestBlockSlave() {

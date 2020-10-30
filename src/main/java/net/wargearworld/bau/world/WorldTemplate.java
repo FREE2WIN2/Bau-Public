@@ -7,9 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import net.wargearworld.bau.hikariCP.DBConnection;
-import net.wargearworld.bau.world.plot.Plot;
-import net.wargearworld.db.model.PlotTemplate;
-import net.wargearworld.thedependencyplugin.DependencyProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -61,7 +58,7 @@ import javax.persistence.EntityManager;
 		} catch (IOException | InvalidConfigurationException e) {
 			e.printStackTrace();
 		}
-		this.id = DBConnection.getTemplateId(name);
+		this.id = DBConnection.dbConnection().getTemplateId(name);
 	}
 	
 	public String getName() {

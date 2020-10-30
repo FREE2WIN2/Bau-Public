@@ -8,6 +8,7 @@ import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import net.wargearworld.GUI_API.GUI_API;
 import net.wargearworld.bau.cmds.*;
 import net.wargearworld.bau.communication.DatabaseCommunication;
+import net.wargearworld.bau.hikariCP.DBConnection;
 import net.wargearworld.bau.listener.*;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.player.DefaultPlayer;
@@ -61,6 +62,7 @@ public class Main extends JavaPlugin {
         plugin = this;
         createConfigs();
 
+        new DBConnection();
         registerCommands();
         registerListener();
         WorldManager.startCheckForTempAddRemoves();

@@ -2,32 +2,45 @@ package net.wargearworld.bau.hikariCP;
 
 import java.util.*;
 
-import javax.persistence.Entity;
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.spi.CDI;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.criteria.*;
+import javax.transaction.Transactional;
 
 import net.wargearworld.StringGetter.Language;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.db.model.*;
-import net.wargearworld.thedependencyplugin.DependencyProvider;
 
+@ApplicationScoped
+@Transactional
 public class DBConnection {
+    private static DBConnection dbConnection;
+
+    public static DBConnection dbConnection() {
+        return dbConnection;
+    }
+
+    public DBConnection() {
+        dbConnection = this;
+    }
+
+    @Inject
+    private EntityManager em;
 
     /**
      * @param uuid The UUID of the Player who wants to know his plots he can join
      * @return Player
      */
 
-    public static Player getPlayer(UUID uuid) {
-        EntityManager em = DependencyProvider.getEntityManager();
+    public Player getPlayer(UUID uuid) {
         Player player = em.find(Player.class, uuid);
-        em.close();
         return player;
     }
 
-    public static Player getPlayer(String name) {
-        EntityManager em = DependencyProvider.getEntityManager();
+    public Player getPlayer(String name) {
         if (name == null)
             return null;
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
@@ -42,19 +55,15 @@ public class DBConnection {
         } catch (Exception exception) {
             exception.printStackTrace();
         }
-        em.close();
         return player;
     }
 
-    public static Plot getPlot(long id) {
-        EntityManager em = DependencyProvider.getEntityManager();
+    public Plot getPlot(long id) {
         Plot plot = em.find(Plot.class, id);
-        em.close();
         return plot;
     }
 
-    public static Plot getPlot(UUID owner, String name) {
-        EntityManager em = DependencyProvider.getEntityManager();
+    public Plot getPlot(UUID owner, String name) {
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<Plot> criteriaQuery = criteriaBuilder.createQuery(Plot.class);
         Root<Plot> root = criteriaQuery.from(Plot.class);
@@ -67,12 +76,10 @@ public class DBConnection {
         } catch (Exception exception) {
             exception.printStackTrace();
         }
-        em.close();
         return plot;
     }
 
-    public static void persist(Object obj) {
-        EntityManager em = DependencyProvider.getEntityManager();
+    public void persist(Object obj) {
         if (obj == null)
             return;
         em.getTransaction().begin();
@@ -84,7 +91,7 @@ public class DBConnection {
         em.getTransaction().commit();
     }
 
-    public static void update(Object obj, EntityManager em) {
+    public void update(Object obj, EntityManager em) {
         if (obj == null)
             return;
         em.getTransaction().begin();
@@ -92,28 +99,25 @@ public class DBConnection {
         em.getTransaction().commit();
     }
 
-    public static Language getLanguage(UUID uuid) {
+    public Language getLanguage(UUID uuid) {
         BauPlayer bauPlayer = BauPlayer.getBauPlayer(uuid);
         return bauPlayer.getLanguage();
     }
 
-    public static void remove(Object object) {
-        EntityManager em = DependencyProvider.getEntityManager();
+    public void remove(Object object) {
         if (object == null)
             return;
         em.getTransaction().begin();
         em.remove(object);
         em.getTransaction().commit();
-        em.close();
     }
 
-    public static Collection<String> getAllWorlds() {
-        EntityManager em = DependencyProvider.getEntityManager();
+    public Collection<String> getAllWorlds() {
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery criteriaQuery = criteriaBuilder.createQuery(Plot.class);
         Root root = criteriaQuery.from(Plot.class);
         Join join = root.join(Plot_.OWNER);
-        criteriaQuery.select(criteriaBuilder.construct(WorldEntry.class,join.get(Player_.UUID), root.get(Plot_.NAME)));
+        criteriaQuery.select(criteriaBuilder.construct(WorldEntry.class, join.get(Player_.UUID), root.get(Plot_.NAME)));
         Query query = em.createQuery(criteriaQuery);
 
         Set<String> out = new TreeSet<>();
@@ -126,12 +130,10 @@ public class DBConnection {
         } catch (Exception exception) {
             exception.printStackTrace();
         }
-        em.close();
         return out;
     }
 
-    public static PlotTemplate getTemplate(String name) {
-        EntityManager em = DependencyProvider.getEntityManager();
+    public PlotTemplate getTemplate(String name) {
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<PlotTemplate> criteriaQuery = criteriaBuilder.createQuery(PlotTemplate.class);
         Root<PlotTemplate> root = criteriaQuery.from(PlotTemplate.class);
@@ -144,20 +146,18 @@ public class DBConnection {
         } catch (Exception exception) {
             exception.printStackTrace();
         }
-        em.close();
         return template;
     }
 
-    public static void sendMail(String sender, Player receiver, String message) {
+    public void sendMail(String sender, Player receiver, String message) {
         Mail mail = new Mail();
         mail.setMessage(message);
         mail.setReceiver(receiver);
         mail.setSender(sender);
-        DBConnection.persist(mail);
+        persist(mail);
     }
 
-    public static Collection<String> getAllNotAddedPlayers(long plotId) {
-        EntityManager em = DependencyProvider.getEntityManager();
+    public Collection<String> getAllNotAddedPlayers(long plotId) {
         Plot plot = em.find(Plot.class, plotId);
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Player> cq = cb.createQuery(Player.class);
@@ -170,11 +170,10 @@ public class DBConnection {
 
         Collection<String> out = query.getResultList();
         out.remove(plot.getOwner().getName());
-        em.close();
         return out;
     }
 
-    public static void persist(EntityManager em, Object... objects) {
+    public void persist(EntityManager em, Object... objects) {
         for (Object obj : objects) {
             if (em.contains(obj)) {
                 em.merge(obj);
@@ -185,8 +184,8 @@ public class DBConnection {
         em.flush();
     }
 
-    public static UUID getUUID(String playerName) {
-        EntityManager em = DependencyProvider.getEntityManager();
+    public UUID getUUID(String playerName) {
+        EntityManager em = CDI.current().select(EntityManager.class).get();
         if (playerName == null)
             return null;
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
@@ -201,13 +200,11 @@ public class DBConnection {
         } catch (Exception exception) {
             exception.printStackTrace();
         }
-        em.close();
         return player.getUuid();
     }
 
 
-    public static long getTemplateId(String name) {
-        EntityManager em = DependencyProvider.getEntityManager();
+    public long getTemplateId(String name) {
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<PlotTemplate> criteriaQuery = criteriaBuilder.createQuery(PlotTemplate.class);
         Root<PlotTemplate> root = criteriaQuery.from(PlotTemplate.class);
@@ -221,7 +218,6 @@ public class DBConnection {
             exception.printStackTrace();
         }
         long id = template.getId();
-        em.close();
         return id;
     }
 }

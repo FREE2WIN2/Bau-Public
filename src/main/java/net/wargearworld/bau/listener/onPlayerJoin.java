@@ -8,7 +8,6 @@ import net.wargearworld.bau.scoreboard.ScoreBoardBau;
 import net.wargearworld.bau.utils.ItemStackCreator;
 import net.wargearworld.bau.world.BauWorld;
 import net.wargearworld.bau.world.WorldManager;
-import net.wargearworld.thedependencyplugin.DependencyProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -19,6 +18,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import javax.enterprise.inject.spi.CDI;
 import javax.persistence.EntityManager;
 import java.io.File;
 
@@ -39,7 +39,7 @@ public class onPlayerJoin implements Listener {
 		// has own gs?
 		String path = Bukkit.getWorldContainer().getAbsolutePath();
 		File gs = new File(path + "/" + p.getUniqueId() + "_" + p.getName());
-		EntityManager em = DependencyProvider.getEntityManager();
+		EntityManager em = CDI.current().select(EntityManager.class).get();
 			String uuidString = p.getUniqueId().toString();
 		if (!gs.exists()) {
 			// Bukkit.createWorld((WorldCreator) WorldCreator.name("test").createWorld());

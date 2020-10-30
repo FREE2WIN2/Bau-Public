@@ -1,19 +1,5 @@
 package net.wargearworld.bau.tools.testBlockSlave;
 
-import java.util.*;
-import java.util.Map.Entry;
-
-import net.wargearworld.bau.player.BauPlayer;
-import net.wargearworld.bau.utils.CoordGetter;
-import net.wargearworld.bau.world.plot.Plot;
-import net.wargearworld.db.model.TestBlock;
-import net.wargearworld.db.model.TestBlock_;
-import net.wargearworld.db.model.enums.schematic.SchematicDirection;
-import net.wargearworld.thedependencyplugin.DependencyProvider;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
 import com.google.common.base.CharMatcher;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -22,27 +8,33 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.session.ClipboardHolder;
-
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
-import net.wargearworld.bau.tools.testBlockSlave.testBlock.CustomTestBlock;
-import net.wargearworld.bau.tools.testBlockSlave.testBlock.EmptyTestBlock;
-import net.wargearworld.bau.tools.testBlockSlave.testBlock.Facing;
-import net.wargearworld.bau.tools.testBlockSlave.testBlock.ITestBlock;
-import net.wargearworld.bau.tools.testBlockSlave.testBlock.TestBlockType;
-import net.wargearworld.bau.tools.testBlockSlave.testBlock.Type;
-import net.wargearworld.bau.worldedit.UndoManager;
-import net.wargearworld.bau.worldedit.WorldEditHandler;
-import net.wargearworld.bau.worldedit.WorldGuardHandler;
+import net.wargearworld.bau.hikariCP.DBConnection;
+import net.wargearworld.bau.player.BauPlayer;
+import net.wargearworld.bau.tools.testBlockSlave.testBlock.*;
 import net.wargearworld.bau.utils.ClickAction;
+import net.wargearworld.bau.utils.CoordGetter;
 import net.wargearworld.bau.utils.JsonCreater;
 import net.wargearworld.bau.utils.Scheduler;
+import net.wargearworld.bau.world.plot.Plot;
+import net.wargearworld.bau.worldedit.UndoManager;
+import net.wargearworld.bau.worldedit.WorldEditHandler;
+import net.wargearworld.db.model.TestBlock;
+import net.wargearworld.db.model.TestBlock_;
+import net.wargearworld.db.model.enums.schematic.SchematicDirection;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
+import javax.enterprise.inject.spi.CDI;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class TestBlockSlave {
 
@@ -74,8 +66,8 @@ public class TestBlockSlave {
 
 	private Set<CustomTestBlock> readTestBlocks(int tier) {
 		HashSet<CustomTestBlock> outSet = new HashSet<>();
-		EntityManager em = DependencyProvider.getEntityManager();
-		net.wargearworld.db.model.Player dbPlayer = (net.wargearworld.db.model.Player) em.find(net.wargearworld.db.model.Player.class,owner);
+		EntityManager em = CDI.current().select(EntityManager.class).get();
+		net.wargearworld.db.model.Player dbPlayer = DBConnection.dbConnection().getPlayer(owner);
 
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery cq = cb.createQuery(net.wargearworld.db.model.TestBlock.class);
@@ -197,7 +189,7 @@ public class TestBlockSlave {
 	}
 
 	private void putTestBlockToDatabase(CustomTestBlock block) {
-		EntityManager em = DependencyProvider.getEntityManager();
+		EntityManager em = CDI.current().select(EntityManager.class).get();
 		em.getTransaction().begin();
 
 		net.wargearworld.db.model.TestBlock tb = new net.wargearworld.db.model.TestBlock();
@@ -209,7 +201,6 @@ public class TestBlockSlave {
 
 		em.persist(tb);
 		em.getTransaction().commit();
-		em.close();
 	}
 
 	private void saveRegionAsBlock(int tier, Facing facing, Plot plot, String name, Type type) {
@@ -283,7 +274,7 @@ public class TestBlockSlave {
 	}
 
 	private boolean deleteTestBlockFromDatabase(int tier, String name) {
-		EntityManager em = DependencyProvider.getEntityManager();
+		EntityManager em = CDI.current().select(EntityManager.class).get();
 		em.getTransaction().begin();
 		net.wargearworld.db.model.Player dbPlayer = em.find(net.wargearworld.db.model.Player.class,owner);
 		CriteriaBuilder cb = em.getCriteriaBuilder();
@@ -331,7 +322,7 @@ public class TestBlockSlave {
 	}
 
 	private boolean updateFavToDataBase(boolean fav, int tier, String name) {
-		EntityManager em = DependencyProvider.getEntityManager();
+		EntityManager em = CDI.current().select(EntityManager.class).get();
 		em.getTransaction().begin();
 		net.wargearworld.db.model.Player dbPlayer = em.find(net.wargearworld.db.model.Player.class,owner);
 		CriteriaBuilder cb = em.getCriteriaBuilder();
