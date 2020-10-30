@@ -1,7 +1,7 @@
 package net.wargearworld.bau.tools.waterremover;
 
 import com.sk89q.worldguard.protection.flags.StateFlag;
-import net.wargearworld.CommandManager.CommandHandel;
+import net.wargearworld.command_manager.CommandHandel;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.player.BauPlayer;

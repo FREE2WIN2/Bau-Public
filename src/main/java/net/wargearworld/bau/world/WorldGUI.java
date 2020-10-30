@@ -13,7 +13,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
-import net.wargearworld.CommandManager.CommandHandel;
+import net.wargearworld.command_manager.CommandHandel;
 import net.wargearworld.GUI_API.GUI.ChestGUI;
 import net.wargearworld.GUI_API.GUI.GUI;
 import net.wargearworld.GUI_API.Items.CustomHead;

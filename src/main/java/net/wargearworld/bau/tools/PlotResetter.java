@@ -1,8 +1,8 @@
 package net.wargearworld.bau.tools;
 
-import static net.wargearworld.CommandManager.Nodes.ArgumentNode.argument;
-import static net.wargearworld.CommandManager.Nodes.InvisibleNode.invisible;
-import static net.wargearworld.CommandManager.Nodes.LiteralNode.literal;
+import static net.wargearworld.command_manager.Nodes.ArgumentNode.argument;
+import static net.wargearworld.command_manager.Nodes.InvisibleNode.invisible;
+import static net.wargearworld.command_manager.Nodes.LiteralNode.literal;
 
 import java.awt.datatransfer.Clipboard;
 import java.util.*;
@@ -38,9 +38,9 @@ import net.wargearworld.bau.tools.testBlockSlave.testBlock.Facing;
 import net.wargearworld.bau.worldedit.Schematic;
 import net.wargearworld.bau.worldedit.WorldEditHandler;
 import net.wargearworld.bau.worldedit.WorldGuardHandler;
-import net.wargearworld.CommandManager.ArgumentList;
-import net.wargearworld.CommandManager.CommandHandel;
-import net.wargearworld.CommandManager.Arguments.StringArgument;
+import net.wargearworld.command_manager.ArgumentList;
+import net.wargearworld.command_manager.CommandHandel;
+import net.wargearworld.command_manager.arguments.StringArgument;
 import org.bukkit.scheduler.BukkitTask;
 
 public class PlotResetter implements TabExecutor {
@@ -48,7 +48,7 @@ public class PlotResetter implements TabExecutor {
     private CommandHandel commandHandle;
 
     public PlotResetter() {
-//		new CommandManager(MessageHandler.getInstance());
+//		new command_manager(MessageHandler.getInstance());
         commandHandle = new CommandHandel("plotreset", Main.prefix, Main.getPlugin());
         commandHandle.setCallback(s -> {
             resetRegion(s.getPlayer(), false);

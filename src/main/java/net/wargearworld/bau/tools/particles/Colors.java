@@ -1,8 +1,8 @@
 package net.wargearworld.bau.tools.particles;
 
-import net.wargearworld.CommandManager.ArgumentType;
-import net.wargearworld.CommandManager.Arguments.EnumArgument;
-import net.wargearworld.CommandManager.Arguments.EnumArgumentInterface;
+import net.wargearworld.command_manager.ArgumentType;
+import net.wargearworld.command_manager.arguments.EnumArgument;
+import net.wargearworld.command_manager.arguments.EnumArgumentInterface;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.w3c.dom.Entity;

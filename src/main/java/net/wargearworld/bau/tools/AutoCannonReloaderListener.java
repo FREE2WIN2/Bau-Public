@@ -8,8 +8,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldguard.session.Session;
-import net.wargearworld.CommandManager.ArgumentList;
-import net.wargearworld.CommandManager.CommandHandel;
+import net.wargearworld.command_manager.ArgumentList;
+import net.wargearworld.command_manager.CommandHandel;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.player.BauPlayer;
@@ -28,8 +28,8 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-import static net.wargearworld.CommandManager.Nodes.LiteralNode.literal;
-import static net.wargearworld.CommandManager.Nodes.InvisibleNode.invisible;
+import static net.wargearworld.command_manager.Nodes.LiteralNode.literal;
+import static net.wargearworld.command_manager.Nodes.InvisibleNode.invisible;
 
 import java.util.ArrayList;
 import java.util.List;

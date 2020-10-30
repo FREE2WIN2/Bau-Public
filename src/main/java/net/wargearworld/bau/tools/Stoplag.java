@@ -1,7 +1,7 @@
 package net.wargearworld.bau.tools;
 
-import static net.wargearworld.CommandManager.Nodes.ArgumentNode.argument;
-import static net.wargearworld.CommandManager.Nodes.LiteralNode.literal;
+import static net.wargearworld.command_manager.Nodes.ArgumentNode.argument;
+import static net.wargearworld.command_manager.Nodes.LiteralNode.literal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,9 +38,9 @@ import net.wargearworld.bau.world.BauWorld;
 import net.wargearworld.bau.world.WorldManager;
 import net.wargearworld.bau.world.plot.Plot;
 import net.wargearworld.bau.worldedit.WorldGuardHandler;
-import net.wargearworld.CommandManager.ArgumentList;
-import net.wargearworld.CommandManager.CommandHandel;
-import net.wargearworld.CommandManager.Arguments.IntegerArgument;
+import net.wargearworld.command_manager.ArgumentList;
+import net.wargearworld.command_manager.CommandHandel;
+import net.wargearworld.command_manager.arguments.IntegerArgument;
 
 public class Stoplag implements Listener, TabExecutor {
 	private static Stoplag instance;

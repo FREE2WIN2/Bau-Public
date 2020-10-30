@@ -1,13 +1,8 @@
 package net.wargearworld.bau.cmds;
 
-import net.wargearworld.CommandManager.ArgumentList;
-import net.wargearworld.CommandManager.Arguments.DynamicListArgument;
-import net.wargearworld.CommandManager.Arguments.DynamicListGetter;
-import net.wargearworld.CommandManager.Arguments.IntegerArgument;
-import net.wargearworld.CommandManager.Arguments.StringArgument;
-import net.wargearworld.CommandManager.CommandHandel;
-import net.wargearworld.CommandManager.CommandNode;
-import net.wargearworld.CommandManager.ParseState;
+import net.wargearworld.command_manager.ArgumentList;
+import net.wargearworld.command_manager.CommandHandel;
+import net.wargearworld.command_manager.CommandNode;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.hikariCP.DBConnection;
@@ -17,6 +12,10 @@ import net.wargearworld.bau.utils.JsonCreater;
 import net.wargearworld.bau.world.BauWorld;
 import net.wargearworld.bau.world.PlayerWorld;
 import net.wargearworld.bau.world.WorldManager;
+import net.wargearworld.command_manager.ParseState;
+import net.wargearworld.command_manager.arguments.DynamicListGetter;
+import net.wargearworld.command_manager.arguments.StringArgument;
+import net.wargearworld.commandframework.player.BukkitCommandPlayer;
 import net.wargearworld.db.model.Plot;
 import net.wargearworld.db.model.PlotMember;
 import net.wargearworld.thedependencyplugin.DependencyProvider;
@@ -31,11 +30,13 @@ import java.io.IOException;
 import java.util.*;
 import java.util.function.Predicate;
 
-import static net.wargearworld.CommandManager.Arguments.DynamicListArgument.dynamicList;
-import static net.wargearworld.CommandManager.Nodes.ArgumentNode.argument;
-import static net.wargearworld.CommandManager.Nodes.InvisibleNode.invisible;
-import static net.wargearworld.CommandManager.Nodes.LiteralNode.literal;
-import static net.wargearworld.CommandManager.Requirements.PermissionRequirement.permission;
+import static net.wargearworld.command_manager.arguments.DynamicListArgument.dynamicList;
+import static net.wargearworld.command_manager.arguments.IntegerArgument.integer;
+import static net.wargearworld.command_manager.nodes.ArgumentNode.argument;
+import static net.wargearworld.command_manager.nodes.InvisibleNode.invisible;
+import static net.wargearworld.command_manager.nodes.LiteralNode.literal;
+import static net.wargearworld.command_manager.requirements.PermissionRequirement.permission;
+import static net.wargearworld.command_manager.arguments.DynamicListArgument.dynamicList;
 
 public class gs implements TabExecutor {
 
@@ -60,24 +61,24 @@ public class gs implements TabExecutor {
                 e.printStackTrace();
             }
         }
-        CommandNode timeAdd = argument("Zeit", new IntegerArgument());
-        CommandNode playersToAdd = argument("Spieler", new DynamicListArgument("Spieler", new DynamicListGetter<String>() {
+        CommandNode timeAdd = argument("Zeit", integer());
+        CommandNode playersToAdd = argument("Spieler", dynamicList("Spieler", new DynamicListGetter<String>() {
 
             @Override
             public Collection<String> getList(ParseState state) {
-                BauWorld world = WorldManager.get(state.getPlayer().getWorld());
+                BauWorld world = WorldManager.get(getPlayer(state.getArgumentList()).getWorld());
                 if (world instanceof PlayerWorld) {
                     return DBConnection.getAllNotAddedPlayers(world.getId());
                 }
                 return new ArrayList<>();
             }
         }));
-        CommandNode members = argument("Mitglied", new DynamicListArgument("Mitglied", new DynamicListGetter<String>() {
+        CommandNode members = argument("Mitglied", dynamicList("Mitglied", new DynamicListGetter<String>() {
 
             @Override
             public Collection<String> getList(ParseState state) {
                 TreeSet<String> out = new TreeSet<>();
-                BauWorld world = WorldManager.get(state.getPlayer().getWorld());
+                BauWorld world = WorldManager.get(getPlayer(state.getArgumentList()).getWorld());
                 if (world instanceof PlayerWorld) {
                     PlayerWorld playerWorld = (PlayerWorld) world;
                     out.addAll(playerWorld.getMemberNames());
@@ -86,7 +87,7 @@ public class gs implements TabExecutor {
             }
         }));
 
-        CommandNode worlds = argument("Worlds", new DynamicListArgument("Worlds", new DynamicListGetter<String>() {
+        CommandNode worlds = argument("Worlds", dynamicList("Worlds", new DynamicListGetter<String>() {
 
             @Override
             public Collection<String> getList(ParseState state) {
@@ -96,39 +97,40 @@ public class gs implements TabExecutor {
             }
         }));
         Predicate<ArgumentList> owner = s -> {
-            return WorldManager.get(s.getPlayer().getWorld()).isOwner(s.getPlayer());
+            Player p = ((BukkitCommandPlayer)getPlayer(s)).getPlayer();
+            return WorldManager.get(p.getWorld()).isOwner(p);
         };
         Predicate<ArgumentList> authorised = s -> {
-            return getWorld(s).isAuthorized(s.getPlayer().getUniqueId()) || s.getPlayer().hasPermission("moderator");
+            return getWorld(s).isAuthorized(getPlayer(s).getUniqueId()) || getPlayer(s).hasPermission("moderator");
         };
-        commandHandle = new CommandHandel("gs", Main.prefix, Main.getPlugin());
+        commandHandle = new CommandHandel("gs", Main.prefix, MessageHandler.getInstance());
         commandHandle.setCallback(s -> {
             tp(s);
         });
 
         commandHandle.addSubNode(literal("new")
                 .setCallback(s -> {
-                    newPlot(s.getPlayer(), 1, s);
+                    newPlot(((BukkitCommandPlayer) getPlayer(s)).getPlayer(), 1, s);
                 })
                 .addSubNode(invisible(argument("UUID1", dynamicList("UUID1", s -> {
-                    return List.of(s.getPlayer().getUniqueId().toString());
+                    return List.of(getPlayer(s.getArgumentList()).getUniqueId().toString());
                 }))
                         .setCallback(s -> {
-                            newPlot(s.getPlayer(), 2, s);
+                            newPlot(getPlayer(s), 2, s);
                         })
                         .addSubNode(
                                 argument("UUID2", dynamicList("UUID2", s -> {
-                                    return List.of(s.getPlayer().getUniqueId().toString());
+                                    return List.of(getPlayer(s.getArgumentList()).getUniqueId().toString());
                                 }))
                                         .setCallback(s -> {
-                                            newPlot(s.getPlayer(), 3, s);
+                                            newPlot(getPlayer(s), 3, s);
                                         })))));
 
         commandHandle.addSubNode(literal("info").setCallback(s -> {
-            getWorld(s).showInfo(s.getPlayer());
+            getWorld(s).showInfo(getPlayer(s));
         }));
         commandHandle.addSubNode(literal("list").setCallback(s -> {
-            BauPlayer.getBauPlayer(s.getPlayer()).sendMemberedGS();
+            BauPlayer.getBauPlayer(getPlayer(s)).sendMemberedGS();
         }));
 
         commandHandle.addSubNode(literal("tp")
@@ -141,11 +143,11 @@ public class gs implements TabExecutor {
                 .setRequirement(owner)
                 .addSubNode(playersToAdd
                         .setCallback(s -> {
-                            WorldManager.get(s.getPlayer().getWorld()).add(s.getString("Spieler"), null);
+                            WorldManager.get(getPlayer(s).getWorld()).add(s.getString("Spieler"), null);
                         })
                         .addSubNode(timeAdd
                                 .setCallback(s -> {
-                                    WorldManager.get(s.getPlayer().getWorld()).addTemp(s.getString("Spieler"), s.getInt("Zeit"));
+                                    WorldManager.get(getPlayer(s).getWorld()).addTemp(s.getString("Spieler"), s.getInt("Zeit"));
                                 }))));
         /* gs addTemp <Spieler> [Zeit]*/
         commandHandle.addSubNode(literal("addtemp")
@@ -153,7 +155,7 @@ public class gs implements TabExecutor {
                 .addSubNode(playersToAdd
                         .addSubNode(timeAdd
                                 .setCallback(s -> {
-                                    WorldManager.get(s.getPlayer().getWorld()).addTemp(s.getString("Spieler"), s.getInt("Zeit"));
+                                    WorldManager.get(getPlayer(s).getWorld()).addTemp(s.getString("Spieler"), s.getInt("Zeit"));
                                 }))));
         /* gs remove <Spieler>*/
         commandHandle.addSubNode(literal("remove")
@@ -164,11 +166,11 @@ public class gs implements TabExecutor {
                         })));
         /* gs time [Zeit]*/
         commandHandle.addSubNode(literal("time")
-                .addSubNode(argument("Zeit", new IntegerArgument(1, 24000))
+                .addSubNode(argument("Zeit", integer(1, 24000))
                         .setRequirement(authorised)
                         .setCallback(s -> {
                             getWorld(s).setTime(s.getInt("Zeit"));
-                            Main.send(s.getPlayer(), "time", "" + s.getInt("Zeit"));
+                            Main.send(getPlayer(s), "time", "" + s.getInt("Zeit"));
                         })));
         /* gs delete <World>*/
         commandHandle.addSubNode(literal("delete")
@@ -179,7 +181,7 @@ public class gs implements TabExecutor {
             /* gs setrights <Spieler> */
             commandHandle.addSubNode(literal("setrights")
                     .setRequirement(s -> {
-                        return WorldManager.get(s.getPlayer().getWorld()).isOwner(s.getPlayer());
+                        return WorldManager.get(getPlayer(s).getWorld()).isOwner(getPlayer(s));
                     })
                     .addSubNode(members.clone().setCallback(s -> {
                         rights(s, true);
@@ -187,8 +189,8 @@ public class gs implements TabExecutor {
             /* gs setrights <Spieler> */
             commandHandle.addSubNode(literal("removerights")
                     .setRequirement(s -> {
-                        BauWorld bauWorld = WorldManager.get(s.getPlayer().getWorld());
-                        return bauWorld instanceof PlayerWorld && bauWorld.isOwner(s.getPlayer());
+                        BauWorld bauWorld = WorldManager.get(getPlayer(s).getWorld());
+                        return bauWorld instanceof PlayerWorld && bauWorld.isOwner(getPlayer(s));
                     })
                     .addSubNode(members.clone().setCallback(s -> {
                         rights(s, false);
@@ -198,10 +200,14 @@ public class gs implements TabExecutor {
         }
     }
 
+    private Player getPlayer(ArgumentList s){
+        return ((BukkitCommandPlayer) getPlayer(s)).getPlayer();
+    }
+    
     private void rights(ArgumentList s, boolean b) {
         String memberName = s.getString("Mitglied");
         UUID memberUUID = DBConnection.getUUID(memberName);
-        Player p = s.getPlayer();
+        Player p = getPlayer(s);
         EntityManager em = DependencyProvider.getEntityManager();
         em.getTransaction().begin();
         BauWorld bauWorld = WorldManager.get(p.getWorld());
@@ -224,11 +230,11 @@ public class gs implements TabExecutor {
     }
 
     private BauWorld getWorld(ArgumentList s) {
-        return WorldManager.get(s.getPlayer().getWorld());
+        return WorldManager.get(getPlayer(s).getWorld());
     }
 
     private void tp(ArgumentList s) {
-        Player p = s.getPlayer();
+       Player p = getPlayer(s);
         String name = s.getString("Spielername");
         if (name == null) {
             WorldManager.getWorld(p.getName(), p.getUniqueId().toString()).spawn(p);
@@ -246,14 +252,16 @@ public class gs implements TabExecutor {
                                       String arg2, String[] args) {
         Player p = (Player) sender;
         List<String> ret = new ArrayList<>();
-        commandHandle.tabComplete(p, MessageHandler.getInstance().getLanguage(p), args, ret);
+        BukkitCommandPlayer commandPlayer = new BukkitCommandPlayer(p);
+        commandHandle.tabComplete(commandPlayer, MessageHandler.getInstance().getLanguage(p), args, ret);
         return ret;
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String string, String[] args) {
         Player p = (Player) sender;
-        return commandHandle.execute(p, MessageHandler.getInstance().getLanguage(p), args);
+        BukkitCommandPlayer commandPlayer = new BukkitCommandPlayer(p);
+        return commandHandle.execute(commandPlayer, MessageHandler.getInstance().getLanguage(p), args);
     }
 
     private void newPlot(Player p, int argsLength, ArgumentList s) {
@@ -291,7 +299,7 @@ public class gs implements TabExecutor {
     public void deletePlot(ArgumentList s) {
         BauWorld world = WorldManager.getWorld(s.getString("Worlds"));
         if (world.newWorld()) {
-            Main.send(s.getPlayer(), "gsDeleted", s.getString("worlds"));
+            Main.send(getPlayer(s), "gsDeleted", s.getString("worlds"));
         }
     }
 

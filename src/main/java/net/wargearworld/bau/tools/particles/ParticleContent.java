@@ -1,6 +1,7 @@
 package net.wargearworld.bau.tools.particles;
 
-import net.wargearworld.CommandManager.Arguments.EnumArgumentInterface;
+
+import net.wargearworld.command_manager.arguments.EnumArgumentInterface;
 
 public enum ParticleContent implements EnumArgumentInterface<ParticleContent> {
     CLIPBOARD, SELECTION;

@@ -5,7 +5,7 @@ import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
-import net.wargearworld.CommandManager.CommandManager;
+import net.wargearworld.command_manager.command_manager;
 import net.wargearworld.GUI_API.GUI_API;
 import net.wargearworld.bau.cmds.*;
 import net.wargearworld.bau.communication.DatabaseCommunication;
@@ -67,7 +67,6 @@ public class Main extends JavaPlugin {
         WorldManager.startCheckForTempAddRemoves();
         WorldManager.checkForWorldsToUnload();
         new CompassBar();
-        CommandManager.registerPlugin(this, MessageHandler.getInstance());
         new GUI_API(this, MessageHandler.getInstance());
         new WorldGUI(this);
         DefaultTestBlock.generateDefaultTestBlocks();

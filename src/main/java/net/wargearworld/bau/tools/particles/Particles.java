@@ -1,12 +1,13 @@
 package net.wargearworld.bau.tools.particles;
 
-import net.wargearworld.CommandManager.ArgumentList;
-import net.wargearworld.CommandManager.Arguments.DynamicListArgument;
-import net.wargearworld.CommandManager.CommandHandel;
-import net.wargearworld.CommandManager.CommandNode;
+import net.wargearworld.command_manager.ArgumentList;
+import net.wargearworld.command_manager.arguments.DynamicListArgument;
+import net.wargearworld.command_manager.CommandHandel;
+import net.wargearworld.command_manager.CommandNode;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.player.DefaultPlayer;
+import net.wargearworld.commandframework.player.BukkitCommandPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.command.Command;
@@ -26,9 +27,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-import static net.wargearworld.CommandManager.Arguments.IntegerArgument.integer;
-import static net.wargearworld.CommandManager.Nodes.ArgumentNode.argument;
-import static net.wargearworld.CommandManager.Nodes.LiteralNode.literal;
+import static net.wargearworld.command_manager.arguments.IntegerArgument.integer;
+import static net.wargearworld.command_manager.nodes.ArgumentNode.argument;
+import static net.wargearworld.command_manager.nodes.LiteralNode.literal;
 
 public class Particles implements TabExecutor, Listener {
 	public static File particlesConfigFile;
@@ -51,15 +52,15 @@ public class Particles implements TabExecutor, Listener {
 		defaultClipboardColor = readColor(DefaultPlayer.config.getString("particles.clipboard.color"));
 		defaultSelectionColor = readColor(DefaultPlayer.config.getString("particles.selection.color"));
 
-		commandHandle = new CommandHandel("particles", Main.prefix, Main.getPlugin());
+		commandHandle = new CommandHandel("particles", Main.prefix, MessageHandler.getInstance());
 		commandHandle.addSubNode(literal("hilfe").setCallback(s -> {
-			showHelp(s.getPlayer());
+			showHelp(getPlayer(s));
 		}));
 		commandHandle.addSubNode(literal("help").setCallback(s -> {
-			showHelp(s.getPlayer());
+			showHelp(getPlayer(s));
 		}));
 		commandHandle.addSubNode(literal("gui").setCallback(s -> {
-			ParticlesGUI.open(s.getPlayer());
+			ParticlesGUI.open(getPlayer(s));
 		}));
 
 			/*
@@ -70,20 +71,20 @@ public class Particles implements TabExecutor, Listener {
 			return List.of("clip", "clipboard");
 		}));
 		clipboard.setCallback(s -> {
-			ParticlesShow particleShow = playersParticlesShow.get(s.getPlayer().getUniqueId());
-			setActive(ParticleContent.CLIPBOARD, !particleShow.isClipboardActive(), s.getPlayer());
+			ParticlesShow particleShow = playersParticlesShow.get(getPlayer(s).getUniqueId());
+			setActive(ParticleContent.CLIPBOARD, !particleShow.isClipboardActive(), getPlayer(s));
 		});
 		clipboard.addSubNode(literal("on").setCallback(s -> {
-			setActive(ParticleContent.CLIPBOARD, true, s.getPlayer());
+			setActive(ParticleContent.CLIPBOARD, true, getPlayer(s));
 		}));
 		clipboard.addSubNode(literal("an").setCallback(s -> {
-			setActive(ParticleContent.CLIPBOARD, true, s.getPlayer());
+			setActive(ParticleContent.CLIPBOARD, true, getPlayer(s));
 		}));
 		clipboard.addSubNode(literal("off").setCallback(s -> {
-			setActive(ParticleContent.CLIPBOARD, false, s.getPlayer());
+			setActive(ParticleContent.CLIPBOARD, false, getPlayer(s));
 		}));
 		clipboard.addSubNode(literal("aus").setCallback(s -> {
-			setActive(ParticleContent.CLIPBOARD, false, s.getPlayer());
+			setActive(ParticleContent.CLIPBOARD, false, getPlayer(s));
 		}));
 
 		/*
@@ -94,20 +95,20 @@ public class Particles implements TabExecutor, Listener {
 			return List.of("sel", "selection");
 		}));
 		selection.setCallback(s -> {
-			ParticlesShow particleShow = playersParticlesShow.get(s.getPlayer().getUniqueId());
-			setActive(ParticleContent.SELECTION,!particleShow.isSelectionActive(), s.getPlayer());
+			ParticlesShow particleShow = playersParticlesShow.get(getPlayer(s).getUniqueId());
+			setActive(ParticleContent.SELECTION,!particleShow.isSelectionActive(), getPlayer(s));
 		});
 		selection.addSubNode(literal("on").setCallback(s -> {
-			setActive(ParticleContent.SELECTION, true, s.getPlayer());
+			setActive(ParticleContent.SELECTION, true, getPlayer(s));
 		}));
 		selection.addSubNode(literal("an").setCallback(s -> {
-			setActive(ParticleContent.SELECTION, true, s.getPlayer());
+			setActive(ParticleContent.SELECTION, true, getPlayer(s));
 		}));
 		selection.addSubNode(literal("off").setCallback(s -> {
-			setActive(ParticleContent.SELECTION, false, s.getPlayer());
+			setActive(ParticleContent.SELECTION, false, getPlayer(s));
 		}));
 		selection.addSubNode(literal("aus").setCallback(s -> {
-			setActive(ParticleContent.SELECTION, false, s.getPlayer());
+			setActive(ParticleContent.SELECTION, false, getPlayer(s));
 		}));
 		commandHandle.addSubNode(selection);
 
@@ -140,8 +141,12 @@ public class Particles implements TabExecutor, Listener {
 		commandHandle.addSubNode(clipboard);
 	}
 
+	private Player getPlayer(ArgumentList s){
+		return ((BukkitCommandPlayer) getPlayer(s)).getPlayer();
+	}
+	
 	private void setColor(ArgumentList s) {
-		Player p = s.getPlayer();
+		Player p = getPlayer(s);
 		ParticlesShow particleShow = playersParticlesShow.get(p.getUniqueId());
 		boolean selection = s.getString("Selection") != null;
 		int r = s.getInt("R");
@@ -157,8 +162,8 @@ public class Particles implements TabExecutor, Listener {
 	}
 
 	private void setColor(ParticleContent particleContent, ArgumentList s) {
-		ParticlesShow particleShow = playersParticlesShow.get(s.getPlayer().getUniqueId());
-		Player p = s.getPlayer();
+		ParticlesShow particleShow = playersParticlesShow.get(getPlayer(s).getUniqueId());
+		Player p = getPlayer(s);
 		Colors colors = (Colors) s.getEnum("Color");
 		Color color = colors.getColor();
 		if (particleContent == ParticleContent.CLIPBOARD) {
@@ -197,7 +202,8 @@ public class Particles implements TabExecutor, Listener {
 		}
 		Player p = (Player) sender;
 		List<String> out = new ArrayList<>();
-		commandHandle.tabComplete(p, MessageHandler.getInstance().getLanguage(p), args,out);
+		BukkitCommandPlayer commandPlayer = new BukkitCommandPlayer(p);
+		commandHandle.tabComplete(commandPlayer, MessageHandler.getInstance().getLanguage(p), args,out);
 		return out;
 	}
 
@@ -211,7 +217,8 @@ public class Particles implements TabExecutor, Listener {
 			return false;
 		}
 		Player p = (Player) sender;
-		if (!commandHandle.execute(p, MessageHandler.getInstance().getLanguage(p), args)) {
+		BukkitCommandPlayer commandPlayer = new BukkitCommandPlayer(p);
+		if (!commandHandle.execute(commandPlayer, MessageHandler.getInstance().getLanguage(p), args)) {
 			Main.send(p, "particles_wrongCommand");
 		}
 		return true;

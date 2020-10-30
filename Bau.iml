@@ -81,5 +81,8 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.sk89q:commandbook:2.3" level="project" />
     <orderEntry type="library" name="Maven: com.pro-crafting.mc:WorldFuscator-Core:1.3.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.github.MilkBowl:VaultAPI:1.7" level="project" />
+    <orderEntry type="library" name="Maven: net.wargearworld:CommandFramework-Bukkit:1.2.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: net.wargearworld:StringGetter:1.1.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: net.wargearworld:TheDependencyPlugin:1.3.4-SNAPSHOT" level="project" />
   </component>
 </module>

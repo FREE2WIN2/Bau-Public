@@ -1,12 +1,14 @@
 package net.wargearworld.bau.tools.explosion_cache;
 
 import com.destroystokyo.paper.event.block.BlockDestroyEvent;
-import net.wargearworld.CommandManager.ArgumentList;
-import net.wargearworld.CommandManager.CommandHandel;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.world.BauWorld;
 import net.wargearworld.bau.world.WorldManager;
+import net.wargearworld.command_manager.ArgumentList;
+import net.wargearworld.command_manager.CommandHandel;
+import net.wargearworld.command_manager.player.CommandPlayer;
+import net.wargearworld.commandframework.player.BukkitCommandPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -23,7 +25,7 @@ import org.bukkit.event.entity.EntitySpawnEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.wargearworld.CommandManager.Nodes.LiteralNode.literal;
+import static net.wargearworld.command_manager.nodes.LiteralNode.literal;
 
 public class ExplosionCacheListener implements Listener, TabExecutor {
 
@@ -34,14 +36,14 @@ public class ExplosionCacheListener implements Listener, TabExecutor {
         Main.getPlugin().getCommand("explosion").setTabCompleter(this);
 
         Bukkit.getPluginManager().registerEvents(this, Main.getPlugin());
-        commandHandel = new CommandHandel("explosion", Main.prefix, Main.getPlugin());
+        commandHandel = new CommandHandel("explosion", Main.prefix, MessageHandler.getInstance());
         commandHandel.addSubNode(literal("redo").setCallback(s -> {
             redo(s);
         }));
     }
 
     private void redo(ArgumentList s) {
-        Player p = s.getPlayer();
+        Player p = ((BukkitCommandPlayer)s.getPlayer()).getPlayer();
         WorldManager.get(p.getWorld()).getExplosionCache().redo(p);
     }
 
@@ -51,7 +53,8 @@ public class ExplosionCacheListener implements Listener, TabExecutor {
             return false;
         }
         Player p = (Player) commandSender;
-        commandHandel.execute(p, MessageHandler.getInstance().getLanguage(p), args);
+        CommandPlayer commandPlayer = new BukkitCommandPlayer(p);
+        commandHandel.execute(commandPlayer, MessageHandler.getInstance().getLanguage(p), args);
         return true;
     }
 
@@ -62,7 +65,8 @@ public class ExplosionCacheListener implements Listener, TabExecutor {
         }
         List<String> out = new ArrayList<>();
         Player p = (Player) commandSender;
-        commandHandel.tabComplete(p, MessageHandler.getInstance().getLanguage(p), args, out);
+        CommandPlayer commandPlayer = new BukkitCommandPlayer(p);
+        commandHandel.tabComplete(commandPlayer, MessageHandler.getInstance().getLanguage(p), args, out);
         return out;
     }
 
