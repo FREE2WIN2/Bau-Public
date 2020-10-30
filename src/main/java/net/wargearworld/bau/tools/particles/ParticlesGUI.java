@@ -9,9 +9,6 @@ import net.wargearworld.GUI_API.Items.Item;
 import net.wargearworld.bau.MessageHandler;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import static net.wargearworld.GUI_API.Items.ItemBuilder.build;

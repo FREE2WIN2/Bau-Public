@@ -1,13 +1,14 @@
 package net.wargearworld.bau.tools;
 
-import static net.wargearworld.command_manager.Nodes.ArgumentNode.argument;
-import static net.wargearworld.command_manager.Nodes.LiteralNode.literal;
-
+import static net.wargearworld.command_manager.nodes.ArgumentNode.argument;
+import static net.wargearworld.command_manager.nodes.LiteralNode.literal;
+import static net.wargearworld.bau.utils.CommandUtil.getPlayer;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.protection.flags.StateFlag;
+import net.wargearworld.commandframework.player.BukkitCommandPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -55,30 +56,30 @@ public class Stoplag implements Listener, TabExecutor {
 		instance = this;
 		Bukkit.getPluginManager().registerEvents(this, Main.getPlugin());
 		Main.getPlugin().getCommand("sl").setExecutor(this);
-		commandHandle = new CommandHandel("sl", Main.prefix,Main.getPlugin());
+		commandHandle = new CommandHandel("sl", Main.prefix,MessageHandler.getInstance());
 
 		commandHandle.setCallback(s -> {
 			toggleSL(s);
 		});
 
 		commandHandle.addSubNode(literal("an").setCallback(s -> {
-			setSL(true, s.getPlayer());
+			setSL(true, getPlayer(s));
 		}));
 		commandHandle.addSubNode(literal("aus").setCallback(s -> {
-			setSL(false, s.getPlayer());
+			setSL(false, getPlayer(s));
 		}));
 
 		commandHandle.addSubNode(literal("paste").addSubNode(literal("an")).setCallback(s -> {
-			setSLPaste(true, s.getPlayer());
+			setSLPaste(true, getPlayer(s));
 		}).addSubNode(literal("aus")).setCallback(s -> {
-			setSLPaste(false, s.getPlayer());
+			setSLPaste(false, getPlayer(s));
 		}).addSubNode(argument("time", new IntegerArgument())).setCallback(s -> {
 			setSLPasteTime(s);
 		}));
 	}
 
 	public void setSLPasteTime(ArgumentList s) {
-		Player p = s.getPlayer();
+		Player p = getPlayer(s);
 		BauPlayer player = BauPlayer.getBauPlayer(p);
 		player.setSLPasteTime(s.getInt("time"));
 		Main.send(p, "stoplag_pasteTime", s.getInt("time") + "");
@@ -122,7 +123,7 @@ public class Stoplag implements Listener, TabExecutor {
 	}
 
 	private void toggleSL(ArgumentList s) {
-		Player p = s.getPlayer();
+		Player p = getPlayer(s);
 		BauWorld world = WorldManager.get(p.getWorld());
 		BlockVector3 pos = BlockVector3.at(p.getLocation().getX(), p.getLocation().getY(), p.getLocation().getZ());
 		Plot plot = world.getPlot(world.getRegionManager().getApplicableRegionsIDs(pos).get(0));
@@ -138,14 +139,16 @@ public class Stoplag implements Listener, TabExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String string, String[] args) {
 		Player p = (Player) sender;
-		return commandHandle.execute(p, MessageHandler.getInstance().getLanguage(p), args);
+		BukkitCommandPlayer commandPlayer = new BukkitCommandPlayer(p);
+		return commandHandle.execute(commandPlayer, MessageHandler.getInstance().getLanguage(p), args);
 	}
 
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
 		List<String> out = new ArrayList<>();
 		Player p = (Player) sender;
-		commandHandle.tabComplete(p, MessageHandler.getInstance().getLanguage(p), args, out);
+		BukkitCommandPlayer commandPlayer = new BukkitCommandPlayer(p);
+		commandHandle.tabComplete(commandPlayer, MessageHandler.getInstance().getLanguage(p), args, out);
 		return out;
 	}
 

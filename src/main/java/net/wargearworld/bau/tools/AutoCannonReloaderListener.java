@@ -13,6 +13,7 @@ import net.wargearworld.command_manager.CommandHandel;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.player.BauPlayer;
+import net.wargearworld.commandframework.player.BukkitCommandPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -28,9 +29,9 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-import static net.wargearworld.command_manager.Nodes.LiteralNode.literal;
-import static net.wargearworld.command_manager.Nodes.InvisibleNode.invisible;
-
+import static net.wargearworld.command_manager.nodes.LiteralNode.literal;
+import static net.wargearworld.command_manager.nodes.InvisibleNode.invisible;
+import static net.wargearworld.bau.utils.CommandUtil.getPlayer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -51,7 +52,7 @@ public class AutoCannonReloaderListener implements Listener, TabExecutor {
     private CommandHandel commandHandel;
 
     public AutoCannonReloaderListener() {
-        commandHandel = new CommandHandel("tr", Main.prefix, Main.getPlugin());
+        commandHandel = new CommandHandel("tr", Main.prefix, MessageHandler.getInstance());
         commandHandel.setCallback(s -> {
             showhelp(s);
         });
@@ -82,10 +83,10 @@ public class AutoCannonReloaderListener implements Listener, TabExecutor {
     }
 
     private void save(ArgumentList s) {
-        Player p = s.getPlayer();
+        Player p = getPlayer(s);
         LocalSession session = WorldEdit.getInstance().getSessionManager().get(BukkitAdapter.adapt(p));
-        AutoCannonReloader autoCannonReloader = BauPlayer.getBauPlayer(s.getPlayer()).getCannonReloader();
-        autoCannonReloader.deleteRecord(s.getPlayer(), true);
+        AutoCannonReloader autoCannonReloader = BauPlayer.getBauPlayer(getPlayer(s)).getCannonReloader();
+        autoCannonReloader.deleteRecord(getPlayer(s), true);
         try {
             World world = p.getWorld();
             Region rg = session.getSelection(BukkitAdapter.adapt(world));
@@ -102,29 +103,30 @@ public class AutoCannonReloaderListener implements Listener, TabExecutor {
         }
     }
 
+
     private void reset(ArgumentList s, boolean b) {
-        AutoCannonReloader autoCannonReloader = BauPlayer.getBauPlayer(s.getPlayer()).getCannonReloader();
-        autoCannonReloader.deleteRecord(s.getPlayer(), b);
+        AutoCannonReloader autoCannonReloader = BauPlayer.getBauPlayer(getPlayer(s)).getCannonReloader();
+        autoCannonReloader.deleteRecord(getPlayer(s), b);
     }
 
     private void paste(ArgumentList s) {
-        AutoCannonReloader autoCannonReloader = BauPlayer.getBauPlayer(s.getPlayer()).getCannonReloader();
-        autoCannonReloader.pasteRecord(s.getPlayer());
+        AutoCannonReloader autoCannonReloader = BauPlayer.getBauPlayer(getPlayer(s)).getCannonReloader();
+        autoCannonReloader.pasteRecord(getPlayer(s));
     }
 
     private void stop(ArgumentList s) {
-        AutoCannonReloader autoCannonReloader = BauPlayer.getBauPlayer(s.getPlayer()).getCannonReloader();
-        autoCannonReloader.endRecord(s.getPlayer());
+        AutoCannonReloader autoCannonReloader = BauPlayer.getBauPlayer(getPlayer(s)).getCannonReloader();
+        autoCannonReloader.endRecord(getPlayer(s));
     }
 
     private void start(ArgumentList s) {
-        AutoCannonReloader autoCannonReloader = BauPlayer.getBauPlayer(s.getPlayer()).getCannonReloader();
-        autoCannonReloader.startRecord(s.getPlayer());
+        AutoCannonReloader autoCannonReloader = BauPlayer.getBauPlayer(getPlayer(s)).getCannonReloader();
+        autoCannonReloader.startRecord(getPlayer(s));
     }
 
     private void showhelp(ArgumentList s) {
-        AutoCannonReloader autoCannonReloader = BauPlayer.getBauPlayer(s.getPlayer()).getCannonReloader();
-        autoCannonReloader.showHelp(s.getPlayer());
+        AutoCannonReloader autoCannonReloader = BauPlayer.getBauPlayer(getPlayer(s)).getCannonReloader();
+        autoCannonReloader.showHelp(getPlayer(s));
     }
 
     @Override
@@ -137,8 +139,8 @@ public class AutoCannonReloaderListener implements Listener, TabExecutor {
             return false;
         }
         Player p = (Player) sender;
-
-        if (!commandHandel.execute(p, MessageHandler.getInstance().getLanguage(p), args))
+        BukkitCommandPlayer commandPlayer = new BukkitCommandPlayer(p);
+        if (!commandHandel.execute(commandPlayer, MessageHandler.getInstance().getLanguage(p), args))
             Main.send(p, true, MessageHandler.getInstance().getString(p, "cannonReloader_prefix"), "cannonReloader_wrongCommand");
         return true;
     }
@@ -150,7 +152,8 @@ public class AutoCannonReloaderListener implements Listener, TabExecutor {
         }
         Player p = (Player) sender;
         List<String> ret = new ArrayList<>();
-        commandHandel.tabComplete(p, MessageHandler.getInstance().getLanguage(p), args, ret);
+        BukkitCommandPlayer commandPlayer = new BukkitCommandPlayer(p);
+        commandHandel.tabComplete(commandPlayer, MessageHandler.getInstance().getLanguage(p), args, ret);
         return ret;
     }
 

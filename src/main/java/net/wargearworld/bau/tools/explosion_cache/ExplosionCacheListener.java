@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static net.wargearworld.command_manager.nodes.LiteralNode.literal;
-
+import static net.wargearworld.bau.utils.CommandUtil.getPlayer;
 public class ExplosionCacheListener implements Listener, TabExecutor {
 
     private CommandHandel commandHandel;
@@ -43,7 +43,7 @@ public class ExplosionCacheListener implements Listener, TabExecutor {
     }
 
     private void redo(ArgumentList s) {
-        Player p = ((BukkitCommandPlayer)s.getPlayer()).getPlayer();
+        Player p = getPlayer(s);
         WorldManager.get(p.getWorld()).getExplosionCache().redo(p);
     }
 

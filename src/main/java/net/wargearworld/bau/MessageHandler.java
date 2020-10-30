@@ -65,7 +65,6 @@ public class MessageHandler implements IStringGetter {
 		return playersLanguage.get(p.getUniqueId());
 	}
 
-	@Override
 	public String getStringWithPrefix(Player p, String name, String... args) {
 		return Main.prefix + getString(p, name, args);
 	}
@@ -93,7 +92,6 @@ public class MessageHandler implements IStringGetter {
 		return getString(p.getUuid(), name, args);
 	}
 
-	@Override
 	public String getString(Player p, String name, String... args) {
 		return getString(p.getUniqueId(), name, args);
 	}

@@ -37,6 +37,7 @@ import static net.wargearworld.command_manager.nodes.InvisibleNode.invisible;
 import static net.wargearworld.command_manager.nodes.LiteralNode.literal;
 import static net.wargearworld.command_manager.requirements.PermissionRequirement.permission;
 import static net.wargearworld.command_manager.arguments.DynamicListArgument.dynamicList;
+import static net.wargearworld.bau.utils.CommandUtil.getPlayer;
 
 public class gs implements TabExecutor {
 
@@ -200,10 +201,6 @@ public class gs implements TabExecutor {
         }
     }
 
-    private Player getPlayer(ArgumentList s){
-        return ((BukkitCommandPlayer) getPlayer(s)).getPlayer();
-    }
-    
     private void rights(ArgumentList s, boolean b) {
         String memberName = s.getString("Mitglied");
         UUID memberUUID = DBConnection.getUUID(memberName);

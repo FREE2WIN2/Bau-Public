@@ -9,6 +9,7 @@ import net.wargearworld.bau.scoreboard.ScoreBoardBau;
 import net.wargearworld.bau.world.WorldManager;
 import net.wargearworld.bau.world.plot.Plot;
 
+import net.wargearworld.commandframework.player.BukkitCommandPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -24,7 +25,7 @@ import org.bukkit.event.entity.EntitySpawnEvent;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import static net.wargearworld.bau.utils.CommandUtil.getPlayer;
 public class WaterRemoverListener implements Listener, TabExecutor {
     public static StateFlag waterRemoverFlag;
 
@@ -35,17 +36,17 @@ public class WaterRemoverListener implements Listener, TabExecutor {
         Bukkit.getPluginManager().registerEvents(this,main);
         main.getCommand("waterremover").setTabCompleter(this);
         main.getCommand("waterremover").setExecutor(this);
-        commandHandel = new CommandHandel("warterremover", Main.prefix, Main.getPlugin());
+        commandHandel = new CommandHandel("warterremover", Main.prefix, MessageHandler.getInstance());
         commandHandel.setCallback(s -> {
-            BauPlayer player = BauPlayer.getBauPlayer(s.getPlayer());
+            BauPlayer player = BauPlayer.getBauPlayer(getPlayer(s));
             Plot currentPlot = player.getCurrentPlot();
             currentPlot.setWaterRemover(currentPlot.getWaterRemover()==null);
             if(currentPlot.getWaterRemover()==null){
-                MessageHandler.getInstance().send(s.getPlayer(),"waterremover_deactivated", currentPlot.getId().replace("plot",""));
+                MessageHandler.getInstance().send(getPlayer(s),"waterremover_deactivated", currentPlot.getId().replace("plot",""));
             }else{
-                MessageHandler.getInstance().send(s.getPlayer(),"waterremover_activated", currentPlot.getId().replace("plot",""));
+                MessageHandler.getInstance().send(getPlayer(s),"waterremover_activated", currentPlot.getId().replace("plot",""));
             }
-            for(Player p: s.getPlayer().getWorld().getPlayers()){
+            for(Player p: getPlayer(s).getWorld().getPlayers()){
                 ScoreBoardBau.getS(p).update();
             }
         });
@@ -58,7 +59,8 @@ public class WaterRemoverListener implements Listener, TabExecutor {
             return false;
         }
 
-        return commandHandel.execute((Player) commandSender, MessageHandler.getInstance().getLanguage(((Player) commandSender).getUniqueId()), strings);
+        BukkitCommandPlayer commandPlayer = new BukkitCommandPlayer((Player) commandSender);
+        return commandHandel.execute(commandPlayer, MessageHandler.getInstance().getLanguage(((Player) commandSender).getUniqueId()), strings);
     }
 
     @Override
@@ -67,7 +69,8 @@ public class WaterRemoverListener implements Listener, TabExecutor {
             return null;
         }
         List<String> ret = new ArrayList<>();
-        commandHandel.tabComplete((Player) commandSender, MessageHandler.getInstance().getLanguage(((Player) commandSender).getUniqueId()), strings, ret);
+        BukkitCommandPlayer commandPlayer = new BukkitCommandPlayer((Player) commandSender);
+        commandHandel.tabComplete(commandPlayer, MessageHandler.getInstance().getLanguage(((Player) commandSender).getUniqueId()), strings, ret);
         return ret;
 
     }

@@ -24,7 +24,7 @@ import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.world.WorldManager;
 import net.wargearworld.bau.worldedit.WorldGuardHandler;
-
+import static net.wargearworld.bau.utils.CommandUtil.getPlayer;
 public class GUI implements CommandExecutor, Listener {
 
     @Override

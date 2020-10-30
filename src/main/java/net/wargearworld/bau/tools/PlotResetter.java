@@ -1,23 +1,21 @@
 package net.wargearworld.bau.tools;
 
-import static net.wargearworld.command_manager.Nodes.ArgumentNode.argument;
-import static net.wargearworld.command_manager.Nodes.InvisibleNode.invisible;
-import static net.wargearworld.command_manager.Nodes.LiteralNode.literal;
-
-import java.awt.datatransfer.Clipboard;
-import java.util.*;
-
-import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
-import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
-import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.regions.Region;
-import net.wargearworld.bau.utils.*;
-import net.wargearworld.bau.world.BauWorld;
-import net.wargearworld.bau.world.WorldManager;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import net.wargearworld.bau.Main;
+import net.wargearworld.bau.MessageHandler;
+import net.wargearworld.bau.player.BauPlayer;
+import net.wargearworld.bau.utils.ClickAction;
+import net.wargearworld.bau.utils.JsonCreater;
+import net.wargearworld.bau.utils.Scheduler;
 import net.wargearworld.bau.world.plot.Plot;
+import net.wargearworld.bau.worldedit.WorldEditHandler;
+import net.wargearworld.command_manager.ArgumentList;
+import net.wargearworld.command_manager.CommandHandel;
+import net.wargearworld.command_manager.arguments.StringArgument;
+import net.wargearworld.commandframework.player.BukkitCommandPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -27,31 +25,24 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
 
-import net.wargearworld.bau.Main;
-import net.wargearworld.bau.MessageHandler;
-import net.wargearworld.bau.player.BauPlayer;
-import net.wargearworld.bau.tools.testBlockSlave.testBlock.Facing;
-import net.wargearworld.bau.worldedit.Schematic;
-import net.wargearworld.bau.worldedit.WorldEditHandler;
-import net.wargearworld.bau.worldedit.WorldGuardHandler;
-import net.wargearworld.command_manager.ArgumentList;
-import net.wargearworld.command_manager.CommandHandel;
-import net.wargearworld.command_manager.arguments.StringArgument;
-import org.bukkit.scheduler.BukkitTask;
-
+import static net.wargearworld.command_manager.nodes.ArgumentNode.argument;
+import static net.wargearworld.command_manager.nodes.InvisibleNode.invisible;
+import static net.wargearworld.command_manager.nodes.LiteralNode.literal;
+import static net.wargearworld.bau.utils.CommandUtil.getPlayer;
 public class PlotResetter implements TabExecutor {
 
     private CommandHandel commandHandle;
 
     public PlotResetter() {
 //		new command_manager(MessageHandler.getInstance());
-        commandHandle = new CommandHandel("plotreset", Main.prefix, Main.getPlugin());
+        commandHandle = new CommandHandel("plotreset", Main.prefix, MessageHandler.getInstance());
         commandHandle.setCallback(s -> {
-            resetRegion(s.getPlayer(), false);
+            resetRegion(getPlayer(s), false);
         });
         commandHandle.addSubNode(literal("undo").setCallback(s -> {
             undo(s);
@@ -64,7 +55,7 @@ public class PlotResetter implements TabExecutor {
                                     if (s.getString("UUID").equalsIgnoreCase("undo")) {
                                         undo(s);
                                     } else {
-                                        resetRegion(s.getPlayer(), true);
+                                        resetRegion(getPlayer(s), true);
                                     }
                                 })));
 
@@ -72,13 +63,13 @@ public class PlotResetter implements TabExecutor {
     }
 
     private void undo(ArgumentList s) {
-        Player p = s.getPlayer();
+        Player p = getPlayer(s);
         BauPlayer player = BauPlayer.getBauPlayer(p);
         Plot plot = player.getCurrentPlot();
         if (player.getCurrentPlot().undo(p.getWorld())) {
-            MessageHandler.getInstance().send(s.getPlayer(), "plotreset_undo", plot.getId().replace("plot", ""));
+            MessageHandler.getInstance().send(getPlayer(s), "plotreset_undo", plot.getId().replace("plot", ""));
         } else {
-            MessageHandler.getInstance().send(s.getPlayer(), "plotreset_noUndo", plot.getId().replace("plot", ""));
+            MessageHandler.getInstance().send(getPlayer(s), "plotreset_noUndo", plot.getId().replace("plot", ""));
         }
     }
 
@@ -86,7 +77,8 @@ public class PlotResetter implements TabExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String string, String[] args) {
         if (sender instanceof Player) {
             Player p = (Player) sender;
-            return commandHandle.execute(p, MessageHandler.getInstance().getLanguage(p), args);
+            BukkitCommandPlayer commandPlayer = new BukkitCommandPlayer(p);
+            return commandHandle.execute(commandPlayer, MessageHandler.getInstance().getLanguage(p), args);
         }
         return false;
     }
@@ -96,7 +88,8 @@ public class PlotResetter implements TabExecutor {
                                       String arg2, String[] args) {
         List<String> out = new ArrayList<>();
         Player p = (Player) sender;
-        commandHandle.tabComplete(p, MessageHandler.getInstance().getLanguage(p), args, out);
+        BukkitCommandPlayer commandPlayer = new BukkitCommandPlayer(p);
+        commandHandle.tabComplete(commandPlayer, MessageHandler.getInstance().getLanguage(p), args, out);
         return out;
     }
 

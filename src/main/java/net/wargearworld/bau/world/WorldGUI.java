@@ -2,6 +2,7 @@ package net.wargearworld.bau.world;
 
 import java.util.List;
 
+import net.wargearworld.commandframework.player.BukkitCommandPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -22,7 +23,7 @@ import net.wargearworld.GUI_API.Items.ItemBuilder;
 import net.wargearworld.GUI_API.Items.ItemType;
 import net.wargearworld.StringGetter.Language;
 
-
+import static net.wargearworld.bau.utils.CommandUtil.getPlayer;
 public class WorldGUI implements TabExecutor, Listener {
 
 	private CommandHandel handle;
@@ -31,10 +32,10 @@ public class WorldGUI implements TabExecutor, Listener {
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 		plugin.getCommand("worlds").setExecutor(this);
 		plugin.getCommand("worlds").setTabCompleter(this);
-		handle = new CommandHandel("worlds", Main.prefix,Main.getPlugin());
+		handle = new CommandHandel("worlds", Main.prefix,MessageHandler.getInstance());
 
 		handle.setCallback(s -> {
-			openMain(s.getPlayer());
+			openMain(getPlayer(s));
 		});
 	}
 
@@ -44,7 +45,7 @@ public class WorldGUI implements TabExecutor, Listener {
 			HeadItem item = new HeadItem("world", 1);
 		item.setExecutor(s -> {
 			s.getPlayer().sendMessage(s.getClicked().getItemMeta().getDisplayName());
-//			s.getPlayer().closeInventory();
+//			getPlayer(s).closeInventory();
 		});
 		item.setCustomSkull(CustomHead.GLOBE2);
 		item.setCancelled(false);
@@ -62,7 +63,8 @@ public class WorldGUI implements TabExecutor, Listener {
 	public boolean onCommand(CommandSender sender, Command arg1, String arg2, String[] args) {
 		if(sender instanceof Player) {
 			Player p = (Player) sender;
-			handle.execute(p, Language.DE, args);
+			BukkitCommandPlayer commandPlayer = new BukkitCommandPlayer(p);
+			handle.execute(commandPlayer, Language.DE, args);
 		}
 		return true;
 	}
