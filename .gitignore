@@ -1,3 +1,4 @@
 /target/
 /.idea/
 /Bau.iml
+/dependency-reduced-pom.xml

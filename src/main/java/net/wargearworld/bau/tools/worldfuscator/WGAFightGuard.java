@@ -12,6 +12,7 @@ import net.wargearworld.bau.world.plot.Plot;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -24,8 +25,19 @@ public class WGAFightGuard implements WorldFuscatorGuard {
         BlockVector3 min = BlockVector3.at(minX, minY, minZ);
         BlockVector3 max = BlockVector3.at(maxX, maxY, maxZ);
         RegionManager regionManager = getRegionManager(world);
-        String minRgID = regionManager.getApplicableRegionsIDs(min).get(0);
-        String maxRgID = regionManager.getApplicableRegionsIDs(max).get(0);
+
+        List<String> minRegionIds = regionManager.getApplicableRegionsIDs(min);
+        if (minRegionIds.isEmpty()) {
+            return true;
+        }
+        String minRgID = minRegionIds.get(0);
+
+        List<String> maxRegionIds = regionManager.getApplicableRegionsIDs(max);
+        if (maxRegionIds.isEmpty()) {
+            return true;
+        }
+
+        String maxRgID = maxRegionIds.get(0);
 
         BauWorld bauWorld = WorldManager.get(world);
         Plot minPlot = bauWorld.getPlot(minRgID);
