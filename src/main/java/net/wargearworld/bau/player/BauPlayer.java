@@ -7,6 +7,7 @@ import net.minecraft.server.v1_15_R1.PlayerConnection;
 import net.wargearworld.StringGetter.Language;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
+import net.wargearworld.bau.hikariCP.DBConnection;
 import net.wargearworld.bau.tools.AutoCannonReloader;
 import net.wargearworld.bau.tools.testBlockSlave.TestBlockSlave;
 import net.wargearworld.bau.tools.testBlockSlave.testBlockEditor.TestBlockEditor;
@@ -21,6 +22,10 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.spi.CDI;
+import javax.inject.Inject;
+import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -29,7 +34,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.UUID;
 
-import static net.wargearworld.bau.hikariCP.DBConnection.dbConnection;
+@Transactional
 public class BauPlayer {
     private static HashMap<UUID, BauPlayer> players = new HashMap<>();
 
@@ -56,7 +61,6 @@ public class BauPlayer {
     FileConfiguration config;
     File configFile;
     private Language language;
-
     //TODO save Tools in it
     /* Tools */
     private TestBlockSlave testBlockSlave;
@@ -172,7 +176,7 @@ public class BauPlayer {
     }
 
     public net.wargearworld.db.model.Player getDbPlayer() {
-        return dbConnection().getPlayer(uuid);
+        return CDI.current().select(DBConnection.class).get().getPlayer(uuid);
     }
 
     public FileConfiguration getConfig() {

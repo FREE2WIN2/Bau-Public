@@ -37,11 +37,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import javax.transaction.Transactional;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+@ApplicationScoped
+@Transactional
 public class Main extends JavaPlugin {
     private static Main plugin;
     public static StateFlag TntExplosion;
@@ -56,13 +61,14 @@ public class Main extends JavaPlugin {
 
     private WorldFuscatorIntegration integration;
 
+    @Inject
+    private DBConnection dbConnection;
     @Override
     public void onEnable() {
         super.onEnable();
         plugin = this;
         createConfigs();
 
-        new DBConnection();
         registerCommands();
         registerListener();
         WorldManager.startCheckForTempAddRemoves();

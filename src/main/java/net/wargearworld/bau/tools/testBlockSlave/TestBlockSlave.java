@@ -10,7 +10,6 @@ import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
-import net.wargearworld.bau.hikariCP.DBConnection;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.tools.testBlockSlave.testBlock.*;
 import net.wargearworld.bau.utils.ClickAction;
@@ -67,8 +66,7 @@ public class TestBlockSlave {
 	private Set<CustomTestBlock> readTestBlocks(int tier) {
 		HashSet<CustomTestBlock> outSet = new HashSet<>();
 		EntityManager em = CDI.current().select(EntityManager.class).get();
-		net.wargearworld.db.model.Player dbPlayer = DBConnection.dbConnection().getPlayer(owner);
-
+		net.wargearworld.db.model.Player dbPlayer = em.find(net.wargearworld.db.model.Player.class,owner);
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery cq = cb.createQuery(net.wargearworld.db.model.TestBlock.class);
 		Root root = cq.from(net.wargearworld.db.model.TestBlock.class);

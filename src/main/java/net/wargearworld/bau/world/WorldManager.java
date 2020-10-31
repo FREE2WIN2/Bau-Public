@@ -2,15 +2,21 @@ package net.wargearworld.bau.world;
 
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.hikariCP.DBConnection;
+import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.db.model.Plot;
 import net.wargearworld.db.model.PlotMember;
 import net.wargearworld.db.model.PlotTemplate;
+import net.wargearworld.db.model.Plot_;
 import org.bukkit.WorldType;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 
 import javax.enterprise.inject.spi.CDI;
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -75,7 +81,7 @@ public class WorldManager {
             } else {
                 UUID ownerUuid = UUID.fromString(owner);
                 System.out.println(worldName + " " + owner);
-                long id = DBConnection.dbConnection().getPlot(ownerUuid, worldName).getId();
+                long id = readPlot(ownerUuid, worldName).getId();
                 if (id == 0)
                     createWorldDir(worldName, owner, true);
 
@@ -239,5 +245,20 @@ public class WorldManager {
 
     }
 
+    private static Plot readPlot(UUID owner, String name) {
+        EntityManager em = CDI.current().select(EntityManager.class).get();
+        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+        CriteriaQuery<Plot> criteriaQuery = criteriaBuilder.createQuery(Plot.class);
+        Root<Plot> root = criteriaQuery.from(Plot.class);
+        criteriaQuery.where(criteriaBuilder.equal(root.get(Plot_.name), name), criteriaBuilder.equal(root.get(Plot_.owner), BauPlayer.getBauPlayer(owner).getDbPlayer()));
+        Query query = em.createQuery(criteriaQuery);
 
+        Plot plot = null;
+        try {
+            plot = (Plot) query.getSingleResult();
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+        return plot;
+    }
 }

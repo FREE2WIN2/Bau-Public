@@ -5,6 +5,7 @@ import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
+import net.wargearworld.bau.hikariCP.DBConnection;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.utils.ClickAction;
 import net.wargearworld.bau.utils.JsonCreater;
@@ -17,16 +18,18 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import javax.enterprise.inject.spi.CDI;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
-import static net.wargearworld.bau.hikariCP.DBConnection.dbConnection;
 public class PlayerWorld extends BauWorld {
 
     UUID owner;
     private long plotID;
 
+    @Inject
+    private DBConnection dbConnection;
     public PlayerWorld(long id, UUID owner, World world) {
         super(world);
         this.plotID = id;
@@ -174,7 +177,7 @@ public class PlayerWorld extends BauWorld {
     public MethodResult add(String playerName, Date to) {
 
         BauPlayer p = BauPlayer.getBauPlayer(owner);
-        UUID uuidMember = dbConnection().getUUID(playerName);
+        UUID uuidMember = dbConnection.getUUID(playerName);
         if (!isAuthorized(uuidMember)) {
             EntityManager em = CDI.current().select(EntityManager.class).get();
             Plot dbPlot = em.find(Plot.class, plotID);
@@ -256,7 +259,7 @@ public class PlayerWorld extends BauWorld {
                 memberPlayer.performCommand("gs");
             }
         } else {
-            memberName = dbConnection().getPlayer(uuid).getName();
+            memberName = dbConnection.getPlayer(uuid).getName();
         }
         if (ownerPlayer != null) {
             Main.send(ownerPlayer, "plotMemberRemoved", memberName);
@@ -265,7 +268,7 @@ public class PlayerWorld extends BauWorld {
             String message = MessageHandler.getInstance().getString(owner, "plotMemberRemoved", memberName);
             net.wargearworld.db.model.Player receiver = BauPlayer.getBauPlayer(owner).getDbPlayer();
             String sender = "plugin: BAU";
-            dbConnection().sendMail(sender, receiver, message);
+            dbConnection.sendMail(sender, receiver, message);
         }
         log(WorldAction.REMOVE, uuid.toString(), memberName);
     }

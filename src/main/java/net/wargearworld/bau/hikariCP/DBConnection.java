@@ -17,16 +17,6 @@ import net.wargearworld.db.model.*;
 @ApplicationScoped
 @Transactional
 public class DBConnection {
-    private static DBConnection dbConnection;
-
-    public static DBConnection dbConnection() {
-        return dbConnection;
-    }
-
-    public DBConnection() {
-        dbConnection = this;
-    }
-
     @Inject
     private EntityManager em;
 
@@ -63,22 +53,6 @@ public class DBConnection {
         return plot;
     }
 
-    public Plot getPlot(UUID owner, String name) {
-        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
-        CriteriaQuery<Plot> criteriaQuery = criteriaBuilder.createQuery(Plot.class);
-        Root<Plot> root = criteriaQuery.from(Plot.class);
-        criteriaQuery.where(criteriaBuilder.equal(root.get(Plot_.name), name), criteriaBuilder.equal(root.get(Plot_.owner), BauPlayer.getBauPlayer(owner).getDbPlayer()));
-        Query query = em.createQuery(criteriaQuery);
-
-        Plot plot = null;
-        try {
-            plot = (Plot) query.getSingleResult();
-        } catch (Exception exception) {
-            exception.printStackTrace();
-        }
-        return plot;
-    }
-
     public void persist(Object obj) {
         if (obj == null)
             return;
@@ -99,10 +73,7 @@ public class DBConnection {
         em.getTransaction().commit();
     }
 
-    public Language getLanguage(UUID uuid) {
-        BauPlayer bauPlayer = BauPlayer.getBauPlayer(uuid);
-        return bauPlayer.getLanguage();
-    }
+
 
     public void remove(Object object) {
         if (object == null)
@@ -203,21 +174,4 @@ public class DBConnection {
         return player.getUuid();
     }
 
-
-    public long getTemplateId(String name) {
-        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
-        CriteriaQuery<PlotTemplate> criteriaQuery = criteriaBuilder.createQuery(PlotTemplate.class);
-        Root<PlotTemplate> root = criteriaQuery.from(PlotTemplate.class);
-        criteriaQuery.where(criteriaBuilder.equal(root.get(PlotTemplate_.name), name));
-        Query query = em.createQuery(criteriaQuery);
-
-        PlotTemplate template = null;
-        try {
-            template = (PlotTemplate) query.getSingleResult();
-        } catch (Exception exception) {
-            exception.printStackTrace();
-        }
-        long id = template.getId();
-        return id;
-    }
 }

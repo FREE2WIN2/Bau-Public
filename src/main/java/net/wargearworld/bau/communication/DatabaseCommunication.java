@@ -1,9 +1,11 @@
 package net.wargearworld.bau.communication;
 
+import net.wargearworld.bau.hikariCP.DBConnection;
 import net.wargearworld.db.model.PluginCommunication;
 import net.wargearworld.db.model.PluginCommunication_;
 
 import javax.enterprise.inject.spi.CDI;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -12,7 +14,6 @@ import javax.persistence.criteria.Root;
 import java.util.List;
 import java.util.Stack;
 
-import static net.wargearworld.bau.hikariCP.DBConnection.dbConnection;
 
 
 public class DatabaseCommunication {
@@ -21,12 +22,15 @@ public class DatabaseCommunication {
     public static int repeatDelay = 5 * 20; // 5Sekunden Delay
 
     public static void sendMessage(String reciever, String subchannel, String command) {
+        EntityManager em = CDI.current().select(EntityManager.class).get();
         PluginCommunication communication = new PluginCommunication();
         communication.setCommand(command);
         communication.setReceiver(reciever);
         communication.setSubChannel(subchannel);
         communication.setSender(NAME_OF_ME);
-        dbConnection().persist(communication);
+        em.getTransaction().begin();
+        em.persist(communication);
+        em.getTransaction().commit();
     }
 
     public static Stack<PluginMessage> readMessages() {
@@ -50,8 +54,11 @@ public class DatabaseCommunication {
     }
 
     public static void deleteMessage(Long id) {
+        EntityManager em = CDI.current().select(EntityManager.class).get();
         PluginCommunication communication = CDI.current().select(EntityManager.class).get().find(PluginCommunication.class, id);
-        dbConnection().remove(communication);
+        em.getTransaction().begin();
+        em.remove(communication);
+        em.getTransaction().commit();
     }
 
     public static void startRecieve() {

@@ -51,8 +51,10 @@ public class MessageHandler implements IStringGetter {
 	@Override
 	public String getString(UUID uuid, String name, String... args) {
 		Language lang = playersLanguage.get(uuid);
-		if (lang == null)
-			lang = DBConnection.dbConnection().getLanguage(uuid);
+		if (lang == null){
+			lang = readLanguage(uuid);
+			playersLanguage.put(uuid,lang);
+		}
 		String message = props.get(lang).getProperty(name);
 		// standard
 		for (String a : args) {
@@ -113,4 +115,9 @@ public class MessageHandler implements IStringGetter {
     public void send(UUID owner, String key, String... args) {
 		send(BauPlayer.getBauPlayer(owner),key,args);
     }
+
+	public Language readLanguage(UUID uuid) {
+		BauPlayer bauPlayer = BauPlayer.getBauPlayer(uuid);
+		return bauPlayer.getLanguage();
+	}
 }
