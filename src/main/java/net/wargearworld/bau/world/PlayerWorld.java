@@ -42,7 +42,7 @@ public class PlayerWorld extends BauWorld {
             plots.put(plotPattern.getID(), plotPattern.toPlot(this));
         }
         addPlayerToAllRegions(owner);
-        em.close();
+
     }
 
     @Override
@@ -70,11 +70,11 @@ public class PlayerWorld extends BauWorld {
         Plot dbPlot = em.find(Plot.class, plotID);
         for (PlotMember member : dbPlot.getMembers()) {
             if (member.getMember().getUuid().equals(memberUUID)) {
-                em.close();
+
                 return true;
             }
         }
-        em.close();
+
         return false;
     }
 
@@ -86,7 +86,7 @@ public class PlayerWorld extends BauWorld {
         for (PlotMember plotMember : plot.getMembers()) {
             out.add(plotMember.getMember().getName());
         }
-        em.close();
+
         return out;
     }
 
@@ -108,7 +108,7 @@ public class PlayerWorld extends BauWorld {
                break;
             }
         }
-        em.close();
+
         return rights;
     }
 
@@ -151,7 +151,7 @@ public class PlayerWorld extends BauWorld {
         } catch (StorageException e) {
             e.printStackTrace();
         }
-        em.close();
+
     }
 
     @Override
@@ -170,7 +170,7 @@ public class PlayerWorld extends BauWorld {
         } catch (StorageException e) {
             e.printStackTrace();
         }
-        em.close();
+
     }
 
     @Override
@@ -219,7 +219,7 @@ public class PlayerWorld extends BauWorld {
                 uuidsToRemove.add(member.getMember().getUuid());
             }
         }
-        em.close();
+
         for(UUID uid:uuidsToRemove){
             removeMember(uid);
         }
@@ -240,7 +240,7 @@ public class PlayerWorld extends BauWorld {
             em.getTransaction().begin();
             em.merge(dbPlot);
             em.getTransaction().commit();
-            em.close();
+
 
             removeMemberFromAllRegions(plotMember.getMember().getUuid());
             memberRemoved(plotMember.getMember().getUuid());

@@ -142,7 +142,7 @@ public class Particles implements TabExecutor, Listener {
 	}
 
 	private Player getPlayer(ArgumentList s){
-		return ((BukkitCommandPlayer) getPlayer(s)).getPlayer();
+		return getPlayer(s);
 	}
 	
 	private void setColor(ArgumentList s) {

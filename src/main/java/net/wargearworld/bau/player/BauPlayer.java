@@ -22,7 +22,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.spi.CDI;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -34,7 +33,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.UUID;
 
-@Transactional
+//@Transactional
 public class BauPlayer {
     private static HashMap<UUID, BauPlayer> players = new HashMap<>();
 
@@ -61,8 +60,10 @@ public class BauPlayer {
     FileConfiguration config;
     File configFile;
     private Language language;
-    //TODO save Tools in it
     /* Tools */
+    @Inject
+    private DBConnection dbConnection;
+
     private TestBlockSlave testBlockSlave;
     private TestBlockEditor testBlockEditor;
     private AutoCannonReloader cannonReloader;

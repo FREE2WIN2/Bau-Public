@@ -100,7 +100,7 @@ public class gs implements TabExecutor {
             }
         }));
         Predicate<ArgumentList> owner = s -> {
-            Player p = ((BukkitCommandPlayer) getPlayer(s)).getPlayer();
+            Player p = getPlayer(s);
             return WorldManager.get(p.getWorld()).isOwner(p);
         };
         Predicate<ArgumentList> authorised = s -> {
@@ -113,7 +113,7 @@ public class gs implements TabExecutor {
 
         commandHandle.addSubNode(literal("new")
                 .setCallback(s -> {
-                    newPlot(((BukkitCommandPlayer) getPlayer(s)).getPlayer(), 1, s);
+                    newPlot(getPlayer(s), 1, s);
                 })
                 .addSubNode(invisible(argument("UUID1", dynamicList("UUID1", s -> {
                     return List.of(getPlayer(s.getArgumentList()).getUniqueId().toString());
@@ -216,7 +216,7 @@ public class gs implements TabExecutor {
         PlotMember plotMember = dbPlot.getMember(dbPlayer);
         plotMember.setRights(b);
         em.getTransaction().commit();
-        em.close();
+
 
 
         if (b) {

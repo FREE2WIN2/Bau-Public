@@ -131,7 +131,7 @@ public class WorldManager {
             plot.setOwner(em.find(net.wargearworld.db.model.Player.class, UUID.fromString(ownerUUID)));
             em.persist(plot);
             em.getTransaction().commit();
-            em.close();
+
         }
         // worldguard regionen
         File worldGuardWorldDir = new File(Bukkit.getWorldContainer(),
@@ -153,7 +153,7 @@ public class WorldManager {
                     }
                     plot.setTemplate(em.find(PlotTemplate.class, template.getId()));
                     em.merge(plot);
-                    em.close();
+
                 }
                 if (!w.getName().contains("test") && !w.getName().contains("world")) {
                     worlds.remove(w.getUID());

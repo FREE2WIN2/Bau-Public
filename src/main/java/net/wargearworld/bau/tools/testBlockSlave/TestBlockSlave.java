@@ -284,7 +284,7 @@ public class TestBlockSlave {
 		TestBlock tb = (TestBlock) query.getSingleResult();
 		em.remove(tb);
 		em.getTransaction().commit();
-		em.close();
+
 		return true;
 	}
 
@@ -333,7 +333,7 @@ public class TestBlockSlave {
 		tb.setFavorite(fav);
 		em.merge(tb);
 		em.getTransaction().commit();
-		em.close();
+
 		return true;
 	}
 	/* Show ManageMent Inventory */
