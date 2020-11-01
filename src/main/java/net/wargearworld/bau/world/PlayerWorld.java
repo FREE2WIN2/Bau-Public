@@ -18,7 +18,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import javax.enterprise.inject.spi.CDI;
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -28,8 +27,6 @@ public class PlayerWorld extends BauWorld {
     UUID owner;
     private long plotID;
 
-    @Inject
-    private DBConnection dbConnection;
     public PlayerWorld(long id, UUID owner, World world) {
         super(world);
         this.plotID = id;
@@ -177,7 +174,7 @@ public class PlayerWorld extends BauWorld {
     public MethodResult add(String playerName, Date to) {
 
         BauPlayer p = BauPlayer.getBauPlayer(owner);
-        UUID uuidMember = dbConnection.getUUID(playerName);
+        UUID uuidMember = CDI.current().select(DBConnection.class).get().getUUID(playerName);
         if (!isAuthorized(uuidMember)) {
             EntityManager em = CDI.current().select(EntityManager.class).get();
             Plot dbPlot = em.find(Plot.class, plotID);
@@ -191,7 +188,8 @@ public class PlayerWorld extends BauWorld {
             }
             dbPlot.addMember(plotMember);
             em.getTransaction().begin();
-            em.merge(dbPlot);
+            em.persist(plotMember);
+//            em.merge(dbPlot);
             em.getTransaction().commit();
             addPlayerToAllRegions(uuidMember);
             if (to == null) {
@@ -235,10 +233,17 @@ public class PlayerWorld extends BauWorld {
             BauPlayer memberBauPlayer = BauPlayer.getBauPlayer(member);
             EntityManager em = CDI.current().select(EntityManager.class).get();
             Plot dbPlot = em.find(Plot.class, plotID);
+            for(PlotMember plotMember: dbPlot.getMembers()){
+                System.out.println("plotMember with UUID " + plotMember.getMember().getUuid() + " searching for: " + member);
+            }
+            System.out.println(memberBauPlayer.getDbPlayer());
             PlotMember plotMember = dbPlot.getMember(memberBauPlayer.getDbPlayer());
+            System.out.println("plotMember " + plotMember);
+            System.out.println("plotMember.member " + plotMember.getMember());
+            System.out.println("plotMember.member.getMemberedPlots() " + plotMember.getMember().getMemberedPlots());
             dbPlot.removeMember(plotMember);
             em.getTransaction().begin();
-            em.merge(dbPlot);
+            em.remove(plotMember);
             em.getTransaction().commit();
 
 
@@ -259,7 +264,7 @@ public class PlayerWorld extends BauWorld {
                 memberPlayer.performCommand("gs");
             }
         } else {
-            memberName = dbConnection.getPlayer(uuid).getName();
+            memberName = CDI.current().select(DBConnection.class).get().getPlayer(uuid).getName();
         }
         if (ownerPlayer != null) {
             Main.send(ownerPlayer, "plotMemberRemoved", memberName);
@@ -268,7 +273,7 @@ public class PlayerWorld extends BauWorld {
             String message = MessageHandler.getInstance().getString(owner, "plotMemberRemoved", memberName);
             net.wargearworld.db.model.Player receiver = BauPlayer.getBauPlayer(owner).getDbPlayer();
             String sender = "plugin: BAU";
-            dbConnection.sendMail(sender, receiver, message);
+            CDI.current().select(DBConnection.class).get().sendMail(sender, receiver, message);
         }
         log(WorldAction.REMOVE, uuid.toString(), memberName);
     }

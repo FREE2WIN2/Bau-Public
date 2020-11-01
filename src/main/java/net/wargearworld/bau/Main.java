@@ -57,7 +57,7 @@ public class Main extends JavaPlugin {
     private WorldFuscatorIntegration integration;
 
 //    @Inject
-//    private DBConnection dbConnection;
+//    private DBConnection CDI.current().select(DBConnection.class).get();
     @Override
     public void onEnable() {
         super.onEnable();

@@ -47,7 +47,7 @@ public class WorldGUI implements TabExecutor, Listener {
 			s.getPlayer().sendMessage(s.getClicked().getItemMeta().getDisplayName());
 //			getPlayer(s).closeInventory();
 		});
-		item.setCustomSkull(CustomHead.GLOBE2);
+		item.setCustomSkull(new CustomHead(1234));
 		item.setCancelled(false);
 		mainGUI.setItem(1,s->{return s.hasPermission("permission");}, item);
 		mainGUI.open(p);

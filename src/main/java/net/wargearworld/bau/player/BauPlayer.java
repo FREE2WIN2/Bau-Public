@@ -24,6 +24,7 @@ import org.bukkit.entity.Player;
 
 import javax.enterprise.inject.spi.CDI;
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
@@ -61,9 +62,6 @@ public class BauPlayer {
     File configFile;
     private Language language;
     /* Tools */
-    @Inject
-    private DBConnection dbConnection;
-
     private TestBlockSlave testBlockSlave;
     private TestBlockEditor testBlockEditor;
     private AutoCannonReloader cannonReloader;
@@ -177,7 +175,7 @@ public class BauPlayer {
     }
 
     public net.wargearworld.db.model.Player getDbPlayer() {
-        return CDI.current().select(DBConnection.class).get().getPlayer(uuid);
+        return CDI.current().select(EntityManager.class).get().find(net.wargearworld.db.model.Player.class,uuid);
     }
 
     public FileConfiguration getConfig() {
