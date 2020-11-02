@@ -1,11 +1,5 @@
 package net.wargearworld.bau.tools.testBlockSlave;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.UUID;
-
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import net.wargearworld.bau.cmds.Bau;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.utils.CoordGetter;
 import net.wargearworld.bau.world.plot.Plot;

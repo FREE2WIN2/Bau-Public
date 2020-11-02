@@ -6,15 +6,15 @@ import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import net.wargearworld.GUI_API.GUI_API;
-import net.wargearworld.bau.cmds.*;
+import net.wargearworld.bau.commands.*;
 import net.wargearworld.bau.communication.DatabaseCommunication;
-import net.wargearworld.bau.hikariCP.DBConnection;
 import net.wargearworld.bau.listener.*;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.player.DefaultPlayer;
 import net.wargearworld.bau.tabCompleter.TntReloaderTC;
 import net.wargearworld.bau.tabCompleter.tbsTC;
 import net.wargearworld.bau.tools.*;
+import net.wargearworld.bau.tools.cannon_reloader.AutoCannonReloaderListener;
 import net.wargearworld.bau.tools.explosion_cache.ExplosionCacheListener;
 import net.wargearworld.bau.tools.particles.Particles;
 import net.wargearworld.bau.tools.plotrights.PlotRights;
@@ -80,25 +80,21 @@ public class Main extends JavaPlugin {
     }
 
     private void registerListener() {
-        new onPlayerJoin(this);
+        new PlayerListener(this);
         new SignListener(this);
-        new ClickListener(this);
-        new onPlayerQuit(this);
-        new onPlayerMove(this);
-        new onPlayerTeleport(this);
-        new ExplosioneventListener(this);
+        new PlayerMovement(this);
         new SpawnEvent(this);
-        new onPlayerRespawn(this);
         new WaterRemoverListener(this);
         new ExplosionCacheListener();
+        new GUI(this);
+        new TNT(this);
         PluginManager pm = Bukkit.getPluginManager();
         pm.registerEvents(TestBlockSlaveCore.getInstance(), this);
-        pm.registerEvents(new eventsToCancel(), this);
+        pm.registerEvents(new EventsToCancel(), this);
         pm.registerEvents(new Stoplag(), this);
         pm.registerEvents(new WorldEditPreCommand(), this);
         pm.registerEvents(new DesignTool(), this);
         pm.registerEvents(new TntChest(), this);
-        pm.registerEvents(new GUI(), this);
         pm.registerEvents(new TestBlockEditorCore(), this);
         pm.registerEvents(new SaWE(), this);
         pm.registerEvents(AutoCannonReloaderListener.getInstance(), this);
@@ -106,24 +102,22 @@ public class Main extends JavaPlugin {
     }
 
     private void registerCommands() {
-        new gs();
+        new GS();
         new Particles();
         new WorldFuscatorIntegration(this);
         new WorldFuscatorCommand(this);
-        getCommand("tnt").setExecutor(new tnt());
-        getCommand("gui").setExecutor(new GUI());
         getCommand("tbs").setExecutor(TestBlockSlaveCore.getInstance());
         getCommand("tbs").setTabCompleter(new tbsTC());
         getCommand("sl").setExecutor(new Stoplag());
         getCommand("dt").setExecutor(new DesignTool());
-        getCommand("ds").setExecutor(new ds());
-        getCommand("debugstick").setExecutor(new ds());
+        getCommand("ds").setExecutor(new DebugStick());
+        getCommand("debugstick").setExecutor(new DebugStick());
         getCommand("chest").setExecutor(new TntChest());
-        getCommand("stats").setExecutor(new stats());
+        getCommand("stats").setExecutor(new Stats());
         getCommand("plotreset").setExecutor(new PlotResetter());
         getCommand("baureload").setExecutor(new Bau());
         getCommand("tr").setTabCompleter(new TntReloaderTC());
-        getCommand("clear").setExecutor(new clear());
+        getCommand("clear").setExecutor(new Clear());
         getCommand("tr").setExecutor(AutoCannonReloaderListener.getInstance());
         getCommand("tr").setTabCompleter(AutoCannonReloaderListener.getInstance());
     }

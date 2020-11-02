@@ -1,11 +1,9 @@
 package net.wargearworld.bau.communication;
 
-import net.wargearworld.bau.hikariCP.DBConnection;
 import net.wargearworld.db.model.PluginCommunication;
 import net.wargearworld.db.model.PluginCommunication_;
 
 import javax.enterprise.inject.spi.CDI;
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;

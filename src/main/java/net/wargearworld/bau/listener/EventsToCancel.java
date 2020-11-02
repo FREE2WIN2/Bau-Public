@@ -16,7 +16,7 @@ import org.bukkit.event.world.PortalCreateEvent;
 
 import net.wargearworld.bau.worldedit.WorldGuardHandler;
 
-public class eventsToCancel implements Listener {
+public class EventsToCancel implements Listener {
 
 	/* permanent canceled Events */
 	

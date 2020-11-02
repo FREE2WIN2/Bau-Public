@@ -1,9 +1,18 @@
 package net.wargearworld.bau.tools;
 
+import com.sk89q.worldguard.protection.flags.StateFlag.State;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import net.wargearworld.GUI_API.Executor;
 import net.wargearworld.GUI_API.GUI.ArgumentList;
 import net.wargearworld.GUI_API.GUI.ChestGUI;
 import net.wargearworld.GUI_API.Items.*;
+import net.wargearworld.bau.Main;
+import net.wargearworld.bau.MessageHandler;
+import net.wargearworld.bau.player.BauPlayer;
+import net.wargearworld.bau.tools.cannon_reloader.AutoCannonReloader;
+import net.wargearworld.bau.world.WorldManager;
+import net.wargearworld.bau.worldedit.WorldGuardHandler;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -11,21 +20,37 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 
-import com.sk89q.worldguard.protection.flags.StateFlag.State;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-
-import net.wargearworld.bau.Main;
-import net.wargearworld.bau.MessageHandler;
-import net.wargearworld.bau.player.BauPlayer;
-import net.wargearworld.bau.world.WorldManager;
-import net.wargearworld.bau.worldedit.WorldGuardHandler;
-import static net.wargearworld.bau.utils.CommandUtil.getPlayer;
 public class GUI implements CommandExecutor, Listener {
+
+    public GUI(JavaPlugin plugin){
+        plugin.getCommand("gui").setExecutor(this);
+        Bukkit.getPluginManager().registerEvents(this,plugin);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onclick(PlayerInteractEvent e) {
+
+        Player p = (Player) e.getPlayer();
+        ItemStack is = e.getItem();
+        if (!(is == null)) {
+            if (is.getItemMeta().getDisplayName().equals("§6GUI") && (e.getAction().equals(Action.RIGHT_CLICK_AIR)
+                    || e.getAction().equals(Action.RIGHT_CLICK_BLOCK))) {
+                p.performCommand("gui");
+            } else if (is.getType().equals(Material.SPAWNER)) {
+                e.setCancelled(true);
+            }
+        }
+    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String string, String[] args) {

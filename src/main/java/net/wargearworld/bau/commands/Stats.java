@@ -1,4 +1,4 @@
-package net.wargearworld.bau.cmds;
+package net.wargearworld.bau.commands;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +22,7 @@ import com.sk89q.worldedit.regions.Region;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
 
-public class stats implements CommandExecutor {
+public class Stats implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {

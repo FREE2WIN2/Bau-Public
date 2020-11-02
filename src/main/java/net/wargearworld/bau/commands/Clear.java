@@ -1,4 +1,4 @@
-package net.wargearworld.bau.cmds;
+package net.wargearworld.bau.commands;
 
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -10,7 +10,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import net.wargearworld.bau.Main;
 
-public class clear implements CommandExecutor {
+public class Clear implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {

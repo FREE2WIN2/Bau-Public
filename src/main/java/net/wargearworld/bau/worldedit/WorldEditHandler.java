@@ -150,13 +150,13 @@ public class WorldEditHandler {
     }
 
     /**
-     * @param clipboardHolder      Clipboard to paste
-     * @param at                   paste-position
-     * @param p                    player which paste something
-     * @param ignoreAir            true if paste -a
+     * @param clipboardHolder       Clipboard to paste
+     * @param at                    paste-position
+     * @param p                     player which paste something
+     * @param ignoreAir             true if paste -a
      * @param ticksPerPasteInterval Speed of paste: min 1
-     * @param saveUndo             Save overwritten Region to undo it
-     * @param tbs                  true if paste as testblocksklave, false if it
+     * @param saveUndo              Save overwritten Region to undo it
+     * @param tbs                   true if paste as testblocksklave, false if it
      *                              used to normal worldeditOperation
      */
     public static void pasteAsync(ClipboardHolder clipboardHolder, BlockVector3 at, Player p, boolean ignoreAir,
@@ -251,10 +251,10 @@ public class WorldEditHandler {
 
     /**
      * @param clipboardHolder Clipboard to paste
-     * @param at        x-coordinate of paste-position
-     * @param w        world
-     * @param ignoreAir true if paste -a
-     *                  used to normal worldeditOperation
+     * @param at              x-coordinate of paste-position
+     * @param w               world
+     * @param ignoreAir       true if paste -a
+     *                        used to normal worldeditOperation
      */
     public static void pasteAsync(ClipboardHolder clipboardHolder, BlockVector3 at, org.bukkit.World w, boolean ignoreAir) {
 
@@ -287,58 +287,50 @@ public class WorldEditHandler {
         animation.setX(xmin);
         animation.setY(ymin);
         animation.setZ(zmin);
-        animation.setTask(Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), new Runnable() {
+        animation.setTask(Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), () -> {
 
-            @Override
-            public void run() {
-                int blockChanged = 0;
-                int xmins = animation.getX();
-                int ymins = animation.getY();
-                int zmins = animation.getZ();
-                for (int x = xmins; x <= xmax; x++) {
-                    for (int y = ymins; y <= ymax; y++) {
-                        for (int z = zmins; z <= zmax; z++) {
+            int blockChanged = 0;
+            int xmins = animation.getX();
+            int ymins = animation.getY();
+            int zmins = animation.getZ();
+            for (int x = xmins; x <= xmax; x++) {
+                for (int y = ymins; y <= ymax; y++) {
+                    for (int z = zmins; z <= zmax; z++) {
 
-                            if (blockChanged > maxBlockChangePerTick) {
-                                animation.setX(x);
-                                animation.setY(y);
-                                animation.setZ(z);
-                                return;
-                            }
-
-                            /* set block in world out of schematic */
-
-                            BlockVector3 blockLoc = BlockVector3.at(x, y, z);
-                            if (WorldGuardHandler.getPlotId(blockLoc.add(offset), world).equals(originRegion)) {
-                                if (!(clipboard.getFullBlock(blockLoc).getBlockType().getMaterial().isAir()
-                                        && ignoreAir)) {
-                                    try {
-                                        world.setBlock(blockLoc.add(offset), clipboard.getFullBlock(blockLoc));
-                                        blockChanged++;
-                                    } catch (WorldEditException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            } else {
-                                blockChanged++;
-                            }
-
+                        if (blockChanged > maxBlockChangePerTick) {
+                            animation.setX(x);
+                            animation.setY(y);
+                            animation.setZ(z);
+                            return;
                         }
-                        zmins = zmin;
-                    }
-                    ymins = ymin;
-                }
-                /* all loops are over -> pasting is done */
-                animation.cancel();
-            }
 
+                        /* set block in world out of schematic */
+
+                        BlockVector3 blockLoc = BlockVector3.at(x, y, z);
+                            if (!(clipboard.getFullBlock(blockLoc).getBlockType().getMaterial().isAir()
+                                    && ignoreAir)) {
+                                try {
+                                    world.setBlock(blockLoc.add(offset), clipboard.getFullBlock(blockLoc));
+                                    blockChanged++;
+                                } catch (WorldEditException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                    }
+                    zmins = zmin;
+                }
+                ymins = ymin;
+            }
+            /* all loops are over -> pasting is done */
+            animation.cancel();
         }, 0, 1));
     }
 
 
     public static void pasteground(Schematic schematic, Location at) {
         BlockVector3 at3 = BlockVector3.at(at.getBlockX(), at.getBlockY(), at.getBlockZ());
-        pasteAsync(new ClipboardHolder(schematic.getClip()), at3, at.getWorld(), true);
+        pasteAsync(new ClipboardHolder(schematic.getClip()), at3, at.getWorld(), false);
     }
 
     public static void pasteAsync(ClipboardHolder clipboardHolder, Location at, boolean ignoreAir) {

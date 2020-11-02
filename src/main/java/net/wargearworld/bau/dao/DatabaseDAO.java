@@ -1,6 +1,7 @@
-package net.wargearworld.bau.hikariCP;
+package net.wargearworld.bau.dao;
 
-import java.util.*;
+import net.wargearworld.bau.dao.constructors.WorldEntry;
+import net.wargearworld.db.model.*;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.spi.CDI;
@@ -9,14 +10,11 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.criteria.*;
 import javax.transaction.Transactional;
-
-import net.wargearworld.StringGetter.Language;
-import net.wargearworld.bau.player.BauPlayer;
-import net.wargearworld.db.model.*;
+import java.util.*;
 
 @ApplicationScoped
 @Transactional
-public class DBConnection {
+public class DatabaseDAO {
     @Inject
     private EntityManager em;
 
@@ -56,21 +54,17 @@ public class DBConnection {
     public void persist(Object obj) {
         if (obj == null)
             return;
-        em.getTransaction().begin();
         if (em.contains(obj)) {
             em.merge(obj);
         } else {
             em.persist(obj);
         }
-        em.getTransaction().commit();
     }
 
     public void update(Object obj, EntityManager em) {
         if (obj == null)
             return;
-        em.getTransaction().begin();
         em.merge(obj);
-        em.getTransaction().commit();
     }
 
 
@@ -78,9 +72,7 @@ public class DBConnection {
     public void remove(Object object) {
         if (object == null)
             return;
-        em.getTransaction().begin();
         em.remove(object);
-        em.getTransaction().commit();
     }
 
     public Collection<String> getAllWorlds() {
@@ -152,7 +144,6 @@ public class DBConnection {
                 em.persist(obj);
             }
         }
-        em.flush();
     }
 
     public UUID getUUID(String playerName) {

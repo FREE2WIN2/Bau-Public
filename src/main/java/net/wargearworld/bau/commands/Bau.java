@@ -1,4 +1,4 @@
-package net.wargearworld.bau.cmds;
+package net.wargearworld.bau.commands;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

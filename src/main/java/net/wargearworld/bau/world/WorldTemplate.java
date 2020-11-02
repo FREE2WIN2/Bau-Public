@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import net.wargearworld.bau.hikariCP.DBConnection;
 import net.wargearworld.db.model.PlotTemplate;
 import net.wargearworld.db.model.PlotTemplate_;
 import org.bukkit.Bukkit;

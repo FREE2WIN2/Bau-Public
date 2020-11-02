@@ -1,7 +1,6 @@
 package net.wargearworld.bau.world;
 
 import net.wargearworld.bau.Main;
-import net.wargearworld.bau.hikariCP.DBConnection;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.db.model.Plot;
 import net.wargearworld.db.model.PlotMember;

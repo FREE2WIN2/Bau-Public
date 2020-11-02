@@ -1,4 +1,4 @@
-package net.wargearworld.bau.cmds;
+package net.wargearworld.bau.commands;
 
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -7,7 +7,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class ds implements CommandExecutor {
+public class DebugStick implements CommandExecutor {
 
 	@SuppressWarnings("deprecation")
 	@Override

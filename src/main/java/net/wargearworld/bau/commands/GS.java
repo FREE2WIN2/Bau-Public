@@ -1,6 +1,6 @@
-package net.wargearworld.bau.cmds;
+package net.wargearworld.bau.commands;
 
-import net.wargearworld.bau.hikariCP.DBConnection;
+import net.wargearworld.bau.dao.DatabaseDAO;
 import net.wargearworld.command_manager.ArgumentList;
 import net.wargearworld.command_manager.CommandHandel;
 import net.wargearworld.command_manager.CommandNode;
@@ -24,7 +24,6 @@ import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
 import javax.enterprise.inject.spi.CDI;
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +38,7 @@ import static net.wargearworld.command_manager.nodes.LiteralNode.literal;
 import static net.wargearworld.command_manager.requirements.PermissionRequirement.permission;
 import static net.wargearworld.bau.utils.CommandUtil.getPlayer;
 
-public class gs implements TabExecutor {
+public class GS implements TabExecutor {
 
     public static File logFile;
     private HashSet<UUID> firstWarnNewPlot = new HashSet<>();
@@ -49,7 +48,7 @@ public class gs implements TabExecutor {
 
     private CommandHandel commandHandle;
 
-    public gs() {
+    public GS() {
         Main.getPlugin().getCommand("gs").setExecutor(this);
         Main.getPlugin().getCommand("gs").setTabCompleter(this);
 
@@ -69,7 +68,7 @@ public class gs implements TabExecutor {
             public Collection<String> getList(ParseState state) {
                 BauWorld world = WorldManager.get(getPlayer(state.getArgumentList()).getWorld());
                 if (world instanceof PlayerWorld) {
-                    return CDI.current().select(DBConnection.class).get().getAllNotAddedPlayers(world.getId());
+                    return CDI.current().select(DatabaseDAO.class).get().getAllNotAddedPlayers(world.getId());
                 }
                 return new ArrayList<>();
             }
@@ -93,7 +92,7 @@ public class gs implements TabExecutor {
             @Override
             public Collection<String> getList(ParseState state) {
 
-                return CDI.current().select(DBConnection.class).get().getAllWorlds();
+                return CDI.current().select(DatabaseDAO.class).get().getAllWorlds();
 
             }
         }));
@@ -163,7 +162,7 @@ public class gs implements TabExecutor {
                 .setRequirement(owner)
                 .addSubNode(members
                         .setCallback(s -> {
-                            getWorld(s).removeMember(CDI.current().select(DBConnection.class).get().getPlayer(s.getString("Mitglied")).getUuid());
+                            getWorld(s).removeMember(CDI.current().select(DatabaseDAO.class).get().getPlayer(s.getString("Mitglied")).getUuid());
                         })));
         /* gs time [Zeit]*/
         commandHandle.addSubNode(literal("time")
@@ -203,7 +202,7 @@ public class gs implements TabExecutor {
 
     private void rights(ArgumentList s, boolean b) {
         String memberName = s.getString("Mitglied");
-        UUID memberUUID = CDI.current().select(DBConnection.class).get().getUUID(memberName);
+        UUID memberUUID = CDI.current().select(DatabaseDAO.class).get().getUUID(memberName);
         Player p = getPlayer(s);
         EntityManager em = CDI.current().select(EntityManager.class).get();
         em.getTransaction().begin();
@@ -236,7 +235,7 @@ public class gs implements TabExecutor {
         if (name == null) {
             WorldManager.getWorld(p.getName(), p.getUniqueId().toString()).spawn(p);
         } else {
-            net.wargearworld.db.model.Player owner = CDI.current().select(DBConnection.class).get().getPlayer(name);
+            net.wargearworld.db.model.Player owner = CDI.current().select(DatabaseDAO.class).get().getPlayer(name);
             if (owner == null) {
                 return; //TODO error
             }

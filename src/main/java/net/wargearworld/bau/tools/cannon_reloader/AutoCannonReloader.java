@@ -1,4 +1,4 @@
-package net.wargearworld.bau.tools;
+package net.wargearworld.bau.tools.cannon_reloader;
 
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;

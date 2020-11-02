@@ -2,7 +2,7 @@ package net.wargearworld.bau.scoreboard;
 
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
-import net.wargearworld.bau.listener.onPlayerMove;
+import net.wargearworld.bau.listener.PlayerMovement;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.tools.Stoplag;
 import net.wargearworld.bau.utils.Scheduler;
@@ -66,7 +66,7 @@ public class ScoreBoardBau {
     }
 
     private String getSl() {
-        String rgID = onPlayerMove.playersLastPlot.get(p.getUniqueId());
+        String rgID = PlayerMovement.playersLastPlot.get(p.getUniqueId());
         if (Stoplag.getStatus(p.getWorld(), rgID)) {
             // System.out.println("sl on");
             return MessageHandler.getInstance().getString(p, "boardOn");
@@ -81,7 +81,7 @@ public class ScoreBoardBau {
         if (p == null) {
             return;
         }
-        if (onPlayerMove.playersLastPlot.containsKey(p.getUniqueId())) {
+        if (PlayerMovement.playersLastPlot.containsKey(p.getUniqueId())) {
             getS(p).update();
         }
     }

@@ -32,6 +32,7 @@ import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import javax.transaction.Transactional;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -271,9 +272,9 @@ public class TestBlockSlave {
 		return true;
 	}
 
+	@Transactional
 	private boolean deleteTestBlockFromDatabase(int tier, String name) {
 		EntityManager em = CDI.current().select(EntityManager.class).get();
-		em.getTransaction().begin();
 		net.wargearworld.db.model.Player dbPlayer = em.find(net.wargearworld.db.model.Player.class,owner);
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<TestBlock> cq = cb.createQuery(TestBlock.class);
@@ -282,9 +283,9 @@ public class TestBlockSlave {
 		cq.where(cb.equal(root.get(TestBlock_.OWNER),dbPlayer), cb.equal(root.get(TestBlock_.NAME),name), cb.equal(root.get(TestBlock_.TIER),tier));
 		Query query = em.createQuery(cq);
 		TestBlock tb = (TestBlock) query.getSingleResult();
-		em.remove(tb);
-		em.getTransaction().commit();
-
+		dbPlayer.getTestBlocks().remove(tb);
+//		em.remove(tb);
+		em.merge(dbPlayer);
 		return true;
 	}
 

@@ -8,7 +8,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import net.wargearworld.bau.Main;
-import net.wargearworld.bau.listener.onPlayerMove;
+import net.wargearworld.bau.listener.PlayerMovement;
 import net.wargearworld.bau.tools.explosion_cache.ExplosionCache;
 import net.wargearworld.bau.utils.HelperMethods;
 import net.wargearworld.bau.utils.MethodResult;
@@ -76,7 +76,7 @@ public abstract class BauWorld {
     public void spawn(Player p) {
         Plot plot = plots.get(template.getSpawnPlotID());
         p.teleport(plot.getTeleportPoint());
-        onPlayerMove.playersLastPlot.put(p.getUniqueId(), plot.getId());
+        PlayerMovement.playersLastPlot.put(p.getUniqueId(), plot.getId());
 
     }
 
@@ -159,7 +159,6 @@ public abstract class BauWorld {
     }
 
     public abstract void removeAllMembersFromRegions();
-
 
     public abstract void addAllMembersToRegions();
 

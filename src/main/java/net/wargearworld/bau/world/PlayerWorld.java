@@ -5,7 +5,7 @@ import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
-import net.wargearworld.bau.hikariCP.DBConnection;
+import net.wargearworld.bau.dao.DatabaseDAO;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.utils.ClickAction;
 import net.wargearworld.bau.utils.JsonCreater;
@@ -19,6 +19,7 @@ import org.bukkit.entity.Player;
 
 import javax.enterprise.inject.spi.CDI;
 import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -171,10 +172,11 @@ public class PlayerWorld extends BauWorld {
     }
 
     @Override
+    @Transactional
     public MethodResult add(String playerName, Date to) {
 
         BauPlayer p = BauPlayer.getBauPlayer(owner);
-        UUID uuidMember = CDI.current().select(DBConnection.class).get().getUUID(playerName);
+        UUID uuidMember = CDI.current().select(DatabaseDAO.class).get().getUUID(playerName);
         if (!isAuthorized(uuidMember)) {
             EntityManager em = CDI.current().select(EntityManager.class).get();
             Plot dbPlot = em.find(Plot.class, plotID);
@@ -187,10 +189,7 @@ public class PlayerWorld extends BauWorld {
                 plotMember.setAddedTo(new Timestamp(to.getTime()).toLocalDateTime());
             }
             dbPlot.addMember(plotMember);
-            em.getTransaction().begin();
             em.persist(plotMember);
-//            em.merge(dbPlot);
-            em.getTransaction().commit();
             addPlayerToAllRegions(uuidMember);
             if (to == null) {
                 log(WorldAction.ADD, uuidMember.toString(), playerName);
@@ -211,7 +210,10 @@ public class PlayerWorld extends BauWorld {
         LocalDateTime now = LocalDateTime.now();
         Set<UUID> uuidsToRemove = new HashSet<>();
         EntityManager em = CDI.current().select(EntityManager.class).get();
+        System.out.println(plotID);
         Plot dbPlot = em.find(Plot.class, plotID);
+        System.out.println(dbPlot);
+        System.out.println(dbPlot.getMembers());
         for (PlotMember member : dbPlot.getMembers()) {
             if (member.getAddedTo() != null && member.getAddedTo().isBefore(now)) {
                 uuidsToRemove.add(member.getMember().getUuid());
@@ -224,6 +226,7 @@ public class PlayerWorld extends BauWorld {
     }
 
     @Override
+    @Transactional
     public void removeMember(UUID member) {
         Player ownerPlayer = Bukkit.getPlayer(owner);
         if (member.toString().equals(this.owner)) {
@@ -233,18 +236,9 @@ public class PlayerWorld extends BauWorld {
             BauPlayer memberBauPlayer = BauPlayer.getBauPlayer(member);
             EntityManager em = CDI.current().select(EntityManager.class).get();
             Plot dbPlot = em.find(Plot.class, plotID);
-            for(PlotMember plotMember: dbPlot.getMembers()){
-                System.out.println("plotMember with UUID " + plotMember.getMember().getUuid() + " searching for: " + member);
-            }
-            System.out.println(memberBauPlayer.getDbPlayer());
             PlotMember plotMember = dbPlot.getMember(memberBauPlayer.getDbPlayer());
-            System.out.println("plotMember " + plotMember);
-            System.out.println("plotMember.member " + plotMember.getMember());
-            System.out.println("plotMember.member.getMemberedPlots() " + plotMember.getMember().getMemberedPlots());
             dbPlot.removeMember(plotMember);
-            em.getTransaction().begin();
             em.remove(plotMember);
-            em.getTransaction().commit();
 
 
             removeMemberFromAllRegions(plotMember.getMember().getUuid());
@@ -264,7 +258,7 @@ public class PlayerWorld extends BauWorld {
                 memberPlayer.performCommand("gs");
             }
         } else {
-            memberName = CDI.current().select(DBConnection.class).get().getPlayer(uuid).getName();
+            memberName = CDI.current().select(DatabaseDAO.class).get().getPlayer(uuid).getName();
         }
         if (ownerPlayer != null) {
             Main.send(ownerPlayer, "plotMemberRemoved", memberName);
@@ -273,7 +267,7 @@ public class PlayerWorld extends BauWorld {
             String message = MessageHandler.getInstance().getString(owner, "plotMemberRemoved", memberName);
             net.wargearworld.db.model.Player receiver = BauPlayer.getBauPlayer(owner).getDbPlayer();
             String sender = "plugin: BAU";
-            CDI.current().select(DBConnection.class).get().sendMail(sender, receiver, message);
+            CDI.current().select(DatabaseDAO.class).get().sendMail(sender, receiver, message);
         }
         log(WorldAction.REMOVE, uuid.toString(), memberName);
     }
