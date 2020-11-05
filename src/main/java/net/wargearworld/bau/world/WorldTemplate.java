@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import net.wargearworld.db.EntityManagerExecuter;
 import net.wargearworld.db.model.PlotTemplate;
 import net.wargearworld.db.model.PlotTemplate_;
 import org.bukkit.Bukkit;
@@ -118,20 +119,22 @@ public class WorldTemplate {
     }
 
     private long readTemplateId(String name) {
-        EntityManager em = CDI.current().select(EntityManager.class).get();
-        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
-        CriteriaQuery<PlotTemplate> criteriaQuery = criteriaBuilder.createQuery(PlotTemplate.class);
-        Root<PlotTemplate> root = criteriaQuery.from(PlotTemplate.class);
-        criteriaQuery.where(criteriaBuilder.equal(root.get(PlotTemplate_.name), name));
-        Query query = em.createQuery(criteriaQuery);
+        return EntityManagerExecuter.run(em -> {
 
-        PlotTemplate template = null;
-        try {
-            template = (PlotTemplate) query.getSingleResult();
-        } catch (Exception exception) {
-            exception.printStackTrace();
-        }
-        long id = template.getId();
-        return id;
+            CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+            CriteriaQuery<PlotTemplate> criteriaQuery = criteriaBuilder.createQuery(PlotTemplate.class);
+            Root<PlotTemplate> root = criteriaQuery.from(PlotTemplate.class);
+            criteriaQuery.where(criteriaBuilder.equal(root.get(PlotTemplate_.name), name));
+            Query query = em.createQuery(criteriaQuery);
+
+            PlotTemplate template = null;
+            try {
+                template = (PlotTemplate) query.getSingleResult();
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+            long id = template.getId();
+            return id;
+        });
     }
 }

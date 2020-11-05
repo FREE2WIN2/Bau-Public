@@ -16,6 +16,7 @@ import net.wargearworld.command_manager.ParseState;
 import net.wargearworld.command_manager.arguments.DynamicListGetter;
 import net.wargearworld.command_manager.arguments.StringArgument;
 import net.wargearworld.commandframework.player.BukkitCommandPlayer;
+import net.wargearworld.db.EntityManagerExecuter;
 import net.wargearworld.db.model.Plot;
 import net.wargearworld.db.model.PlotMember;
 import org.bukkit.command.Command;
@@ -68,7 +69,7 @@ public class GS implements TabExecutor {
             public Collection<String> getList(ParseState state) {
                 BauWorld world = WorldManager.get(getPlayer(state.getArgumentList()).getWorld());
                 if (world instanceof PlayerWorld) {
-                    return CDI.current().select(DatabaseDAO.class).get().getAllNotAddedPlayers(world.getId());
+                    return DatabaseDAO.getAllNotAddedPlayers(world.getId());
                 }
                 return new ArrayList<>();
             }
@@ -92,7 +93,7 @@ public class GS implements TabExecutor {
             @Override
             public Collection<String> getList(ParseState state) {
 
-                return CDI.current().select(DatabaseDAO.class).get().getAllWorlds();
+                return DatabaseDAO.getAllWorlds();
 
             }
         }));
@@ -162,7 +163,7 @@ public class GS implements TabExecutor {
                 .setRequirement(owner)
                 .addSubNode(members
                         .setCallback(s -> {
-                            getWorld(s).removeMember(CDI.current().select(DatabaseDAO.class).get().getPlayer(s.getString("Mitglied")).getUuid());
+                            getWorld(s).removeMember(DatabaseDAO.getPlayer(s.getString("Mitglied")).getUuid());
                         })));
         /* gs time [Zeit]*/
         commandHandle.addSubNode(literal("time")
@@ -202,27 +203,26 @@ public class GS implements TabExecutor {
 
     private void rights(ArgumentList s, boolean b) {
         String memberName = s.getString("Mitglied");
-        UUID memberUUID = CDI.current().select(DatabaseDAO.class).get().getUUID(memberName);
+        UUID memberUUID = DatabaseDAO.getUUID(memberName);
         Player p = getPlayer(s);
-        EntityManager em = CDI.current().select(EntityManager.class).get();
-        em.getTransaction().begin();
-        BauWorld bauWorld = WorldManager.get(p.getWorld());
-        long id = bauWorld.getId();
-        Plot dbPlot = em.find(Plot.class, id);
-        net.wargearworld.db.model.Player dbPlayer = em.find(net.wargearworld.db.model.Player.class, memberUUID);
-        PlotMember plotMember = dbPlot.getMember(dbPlayer);
-        plotMember.setRights(b);
-        em.getTransaction().commit();
+
+        EntityManagerExecuter.run(em -> {
+            BauWorld bauWorld = WorldManager.get(p.getWorld());
+            long id = bauWorld.getId();
+            Plot dbPlot = em.find(Plot.class, id);
+            net.wargearworld.db.model.Player dbPlayer = em.find(net.wargearworld.db.model.Player.class, memberUUID);
+            PlotMember plotMember = dbPlot.getMember(dbPlayer);
+            plotMember.setRights(b);
+            if (b) {
+                MessageHandler.getInstance().send(p, "plotrights_setted", memberName);
+                bauWorld.addPlayerToAllRegions(memberUUID);
+            } else {
+                MessageHandler.getInstance().send(p, "plotrights_removed", memberName);
+                bauWorld.addPlayerToAllRegions(memberUUID);
+            }
+        });
 
 
-
-        if (b) {
-            MessageHandler.getInstance().send(p, "plotrights_setted", memberName);
-            bauWorld.addPlayerToAllRegions(memberUUID);
-        } else {
-            MessageHandler.getInstance().send(p, "plotrights_removed", memberName);
-            bauWorld.addPlayerToAllRegions(memberUUID);
-        }
     }
 
     private BauWorld getWorld(ArgumentList s) {
@@ -235,7 +235,7 @@ public class GS implements TabExecutor {
         if (name == null) {
             WorldManager.getWorld(p.getName(), p.getUniqueId().toString()).spawn(p);
         } else {
-            net.wargearworld.db.model.Player owner = CDI.current().select(DatabaseDAO.class).get().getPlayer(name);
+            net.wargearworld.db.model.Player owner = DatabaseDAO.getPlayer(name);
             if (owner == null) {
                 return; //TODO error
             }

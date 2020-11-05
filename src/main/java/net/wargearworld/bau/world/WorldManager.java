@@ -2,6 +2,7 @@ package net.wargearworld.bau.world;
 
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.player.BauPlayer;
+import net.wargearworld.db.EntityManagerExecuter;
 import net.wargearworld.db.model.Plot;
 import net.wargearworld.db.model.PlotMember;
 import net.wargearworld.db.model.PlotTemplate;
@@ -120,17 +121,15 @@ public class WorldManager {
         neu.setWritable(true, false);
         copyFolder_raw(template.getWorldDir(), neu);
         if (!plotExists) {
-            EntityManager em = CDI.current().select(EntityManager.class).get();
-            em.getTransaction().begin();
-            PlotTemplate dbTemplate = em.find(PlotTemplate.class, template.getId());
-            Plot plot = new Plot();
-            plot.setDefault(false);
-            plot.setName(worldName);
-            plot.setTemplate(dbTemplate);
-            plot.setOwner(em.find(net.wargearworld.db.model.Player.class, UUID.fromString(ownerUUID)));
-            em.persist(plot);
-            em.getTransaction().commit();
-
+            EntityManagerExecuter.run(em -> {
+                PlotTemplate dbTemplate = em.find(PlotTemplate.class, template.getId());
+                Plot plot = new Plot();
+                plot.setDefault(false);
+                plot.setName(worldName);
+                plot.setTemplate(dbTemplate);
+                plot.setOwner(em.find(net.wargearworld.db.model.Player.class, UUID.fromString(ownerUUID)));
+                em.persist(plot);
+            });
         }
         // worldguard regionen
         File worldGuardWorldDir = new File(Bukkit.getWorldContainer(),
@@ -145,13 +144,14 @@ public class WorldManager {
         if (w.getWorldFolder().exists()) {
             if (deleteDir(w.getWorldFolder())) { //TODO check if world ist instacne of PlayerWorld
                 if (world instanceof PlayerWorld) {
-                    EntityManager em = CDI.current().select(EntityManager.class).get();
-                    Plot plot = em.find(Plot.class, world.getId());
-                    for (PlotMember plotMember : plot.getMembers()) {
-                        plot.removeMember(plotMember);
-                    }
-                    plot.setTemplate(em.find(PlotTemplate.class, template.getId()));
-                    em.merge(plot);
+                    EntityManagerExecuter.run(em -> {
+                        Plot plot = em.find(Plot.class, world.getId());
+                        for (PlotMember plotMember : plot.getMembers()) {
+                            plot.removeMember(plotMember);
+                        }
+                        plot.setTemplate(em.find(PlotTemplate.class, template.getId()));
+                        em.merge(plot);
+                    });
 
                 }
                 if (!w.getName().contains("test") && !w.getName().contains("world")) {
@@ -245,19 +245,20 @@ public class WorldManager {
     }
 
     private static Plot readPlot(UUID owner, String name) {
-        EntityManager em = CDI.current().select(EntityManager.class).get();
-        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
-        CriteriaQuery<Plot> criteriaQuery = criteriaBuilder.createQuery(Plot.class);
-        Root<Plot> root = criteriaQuery.from(Plot.class);
-        criteriaQuery.where(criteriaBuilder.equal(root.get(Plot_.name), name), criteriaBuilder.equal(root.get(Plot_.owner), BauPlayer.getBauPlayer(owner).getDbPlayer()));
-        Query query = em.createQuery(criteriaQuery);
+        return EntityManagerExecuter.run(em -> {
+            CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+            CriteriaQuery<Plot> criteriaQuery = criteriaBuilder.createQuery(Plot.class);
+            Root<Plot> root = criteriaQuery.from(Plot.class);
+            criteriaQuery.where(criteriaBuilder.equal(root.get(Plot_.name), name), criteriaBuilder.equal(root.get(Plot_.owner), BauPlayer.getBauPlayer(owner).getDbPlayer()));
+            Query query = em.createQuery(criteriaQuery);
 
-        Plot plot = null;
-        try {
-            plot = (Plot) query.getSingleResult();
-        } catch (Exception exception) {
-            exception.printStackTrace();
-        }
-        return plot;
+            Plot plot = null;
+            try {
+                plot = (Plot) query.getSingleResult();
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+            return plot;
+        });
     }
 }
