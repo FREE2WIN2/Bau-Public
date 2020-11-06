@@ -15,6 +15,7 @@ import net.wargearworld.bau.tabCompleter.TntReloaderTC;
 import net.wargearworld.bau.tabCompleter.tbsTC;
 import net.wargearworld.bau.tools.*;
 import net.wargearworld.bau.tools.cannon_reloader.AutoCannonReloaderListener;
+import net.wargearworld.bau.tools.cannon_timer.CannonTimerListener;
 import net.wargearworld.bau.tools.explosion_cache.ExplosionCacheListener;
 import net.wargearworld.bau.tools.particles.Particles;
 import net.wargearworld.bau.tools.plotrights.PlotRights;
@@ -88,6 +89,7 @@ public class Main extends JavaPlugin {
         new ExplosionCacheListener();
         new GUI(this);
         new TNT(this);
+        new CannonTimerListener(this);
         PluginManager pm = Bukkit.getPluginManager();
         pm.registerEvents(TestBlockSlaveCore.getInstance(), this);
         pm.registerEvents(new EventsToCancel(), this);

@@ -60,6 +60,8 @@ commands:
      aliases: [wf,blockhider,awdl]
    explosion:
      aliases: [explo,ex]
+   cannontimer:
+     aliases: [ct,kt,timer]
 
 permissions:
   bau.*:

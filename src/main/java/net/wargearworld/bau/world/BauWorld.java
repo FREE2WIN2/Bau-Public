@@ -9,6 +9,7 @@ import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.listener.PlayerMovement;
+import net.wargearworld.bau.tools.cannon_timer.CannonTimer;
 import net.wargearworld.bau.tools.explosion_cache.ExplosionCache;
 import net.wargearworld.bau.utils.HelperMethods;
 import net.wargearworld.bau.utils.MethodResult;
@@ -35,6 +36,8 @@ public abstract class BauWorld {
     private WorldTemplate template;
     private File logFile;
     private ExplosionCache explosionCache;
+
+    private CannonTimer cannonTimer;
     public BauWorld(World world) {
         this.name = world.getName().split("_", 2)[1];
         this.worldUUID = world.getUID();
@@ -50,6 +53,7 @@ public abstract class BauWorld {
             e.printStackTrace();
         }
         explosionCache = new ExplosionCache();
+        cannonTimer = new CannonTimer();
     }
 
     public String getName() {
@@ -221,4 +225,8 @@ public abstract class BauWorld {
     public abstract boolean isMember(UUID member);
 
     public abstract Set<String> getMemberNames();
+
+    public CannonTimer getCannonTimer() {
+        return cannonTimer;
+    }
 }

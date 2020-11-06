@@ -13,6 +13,13 @@ tntReload:
   materialType: TNT_MINECART
   timeout: 5                 #antispam
 fernzuender: WOODEN_HOE
+cannontimer:
+  block:
+    default: WHITE_SHULKER_BOX
+    active: LIME_SHULKER_BOX
+    inactive: RED_SHULKER_BOX
+  tool: FISHING_ROD
+  maxamount: 64
 testworlds:
   template: BauGsVorlage
 sizes:
