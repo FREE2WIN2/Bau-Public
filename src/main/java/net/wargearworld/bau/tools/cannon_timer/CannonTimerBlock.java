@@ -28,7 +28,7 @@ public class CannonTimerBlock implements Serializable{
         CannonTimerTick cannonTimerTick = ticks.get(currentTick);
         if (cannonTimerTick == null || !active)
             return;
-        cannonTimerTick.spawn(loc);
+        cannonTimerTick.spawn(loc,this);
     }
 
     public void endSpawn() {

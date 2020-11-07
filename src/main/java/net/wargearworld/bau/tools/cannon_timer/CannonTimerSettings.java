@@ -1,7 +1,11 @@
 package net.wargearworld.bau.tools.cannon_timer;
 
+import com.google.common.eventbus.DeadEvent;
+import net.wargearworld.GUI_API.Items.DefaultItem;
+import net.wargearworld.GUI_API.Items.Item;
 import net.wargearworld.bau.MessageHandler;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import java.io.Serializable;
@@ -68,4 +72,6 @@ public class CannonTimerSettings implements Serializable {
                 Double.compare(that.zOffset, zOffset) == 0 &&
                 velocity == that.velocity;
     }
+
+
 }
