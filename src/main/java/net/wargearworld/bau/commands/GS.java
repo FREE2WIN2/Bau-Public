@@ -1,17 +1,17 @@
 package net.wargearworld.bau.commands;
 
-import net.wargearworld.bau.dao.DatabaseDAO;
-import net.wargearworld.command_manager.ArgumentList;
-import net.wargearworld.command_manager.CommandHandel;
-import net.wargearworld.command_manager.CommandNode;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
+import net.wargearworld.bau.dao.DatabaseDAO;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.utils.ClickAction;
 import net.wargearworld.bau.utils.JsonCreater;
 import net.wargearworld.bau.world.BauWorld;
 import net.wargearworld.bau.world.PlayerWorld;
 import net.wargearworld.bau.world.WorldManager;
+import net.wargearworld.command_manager.ArgumentList;
+import net.wargearworld.command_manager.CommandHandel;
+import net.wargearworld.command_manager.CommandNode;
 import net.wargearworld.command_manager.ParseState;
 import net.wargearworld.command_manager.arguments.DynamicListGetter;
 import net.wargearworld.command_manager.arguments.StringArgument;
@@ -24,20 +24,18 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
-import javax.enterprise.inject.spi.CDI;
-import javax.persistence.EntityManager;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Predicate;
 
+import static net.wargearworld.bau.utils.CommandUtil.getPlayer;
 import static net.wargearworld.command_manager.arguments.DynamicListArgument.dynamicList;
 import static net.wargearworld.command_manager.arguments.IntegerArgument.integer;
 import static net.wargearworld.command_manager.nodes.ArgumentNode.argument;
 import static net.wargearworld.command_manager.nodes.InvisibleNode.invisible;
 import static net.wargearworld.command_manager.nodes.LiteralNode.literal;
 import static net.wargearworld.command_manager.requirements.PermissionRequirement.permission;
-import static net.wargearworld.bau.utils.CommandUtil.getPlayer;
 
 public class GS implements TabExecutor {
 

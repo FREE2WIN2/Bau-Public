@@ -12,6 +12,7 @@ import net.wargearworld.bau.tools.testBlockSlave.TestBlockSlave;
 import net.wargearworld.bau.tools.testBlockSlave.testBlockEditor.TestBlockEditor;
 import net.wargearworld.bau.world.WorldManager;
 import net.wargearworld.bau.world.plot.Plot;
+import net.wargearworld.db.EntityManagerExecuter;
 import net.wargearworld.db.model.PlotMember;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -172,7 +173,9 @@ public class BauPlayer {
     }
 
     public net.wargearworld.db.model.Player getDbPlayer() {
-        return CDI.current().select(EntityManager.class).get().find(net.wargearworld.db.model.Player.class,uuid);
+        return EntityManagerExecuter.run(em->{
+            return em.find(net.wargearworld.db.model.Player.class,uuid);
+        });
     }
 
     public FileConfiguration getConfig() {

@@ -13,12 +13,23 @@ import java.util.Map;
 public class CannonTimer {
 
     private Map<Location, CannonTimerBlock> blocks;
+    private boolean blocked = false;
 
     public CannonTimer() {
         blocks = new HashMap<>();
     }
 
     public void start(Player p) {
+        if (blocked) {
+            MessageHandler.getInstance().send(p, "cannonTimer_blocked");
+            return;
+        }
+        blocked = true;
+        for (CannonTimerBlock block : blocks.values()) {
+            block.startspawn();
+        }
+
+
         MessageHandler.getInstance().send(p, "cannonTimer_start");
         Scheduler scheduler = new Scheduler();
         scheduler.setX(0); // X = variable -> ticktime
@@ -29,13 +40,19 @@ public class CannonTimer {
             }
             if (currentTick == 80) {
                 scheduler.cancel();
+                Bukkit.getScheduler().runTaskLater(Main.getPlugin(), () -> {
+                    blocked = false;
+                    for (CannonTimerBlock block : blocks.values()) {
+                        block.endSpawn();
+                    }
+                }, 20 * 4);
             }
             scheduler.setX(++currentTick);
         }, 0, 1));
     }
 
     public void reset() {
-        blocks.clear();//TODO remove blocks
+        blocks.clear();
     }
 
     public void addBlock(Location loc, CannonTimerBlock cannonTimerBlock) {

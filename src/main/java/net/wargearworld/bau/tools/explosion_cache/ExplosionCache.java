@@ -7,7 +7,9 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.tools.Stoplag;
+import net.wargearworld.bau.world.BauWorld;
 import net.wargearworld.bau.world.WorldManager;
+import net.wargearworld.bau.world.plot.Plot;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -33,7 +35,13 @@ public class ExplosionCache {
 
     public void handleExplode(EntityExplodeEvent event) {
         Location loc = event.getLocation();
-        int z = WorldManager.get(loc.getWorld()).getPlot(loc).getTeleportPoint().getBlockZ();
+        BauWorld bauWorld = WorldManager.get(loc.getWorld());
+        if(bauWorld == null)
+            return;
+        Plot plot = bauWorld.getPlot(loc);
+        if(plot == null)
+            return;
+        int z = plot.getTeleportPoint().getBlockZ();
         boolean primeZSmallerThanMiddleZ = tnts.get(event.getEntity().getUniqueId());
         boolean explosionZSmallerThanMiddleZ = event.getEntity().getLocation().getBlockZ() < z;
 

@@ -42,8 +42,7 @@ public class WorldGUI implements TabExecutor, Listener {
 	public static void openMain(Player p) {
 		GUI mainGUI = new ChestGUI(27, MessageHandler.getInstance().getString(p, "worldGUI_title"));
 		ItemBuilder.build(s->{s.getPlayer().closeInventory();}, Material.WOODEN_HOE	,1, ItemType.DEFAULT, "ItemName");
-			HeadItem item = new HeadItem("world", 1);
-		item.setExecutor(s -> {
+			HeadItem item = new HeadItem(new CustomHead("world"),s->{
 			s.getPlayer().sendMessage(s.getClicked().getItemMeta().getDisplayName());
 //			getPlayer(s).closeInventory();
 		});

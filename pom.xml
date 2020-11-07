@@ -6,6 +6,7 @@
         <groupId>net.wargearworld.maven</groupId>
         <artifactId>wgw-parent</artifactId>
         <version>5</version>
+        <relativePath></relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.wargearworld</groupId>

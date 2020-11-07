@@ -79,8 +79,7 @@ public class GUI implements CommandExecutor, Listener {
 
         Item tntNotActiveItem = ItemBuilder.build(tntExecutor, Material.TNT, 1, ItemType.DEFAULT, msgHandler.getString(p, "tntDenied"));
 
-        HeadItem playerHead = new HeadItem(msgHandler.getString(p, "guiMember").replace("%r", worldname), 1);
-        playerHead.setOwner(p.getName());
+        HeadItem playerHead = new HeadItem(p.getName(),msgHandler.getString(p, "guiMember").replace("%r", worldname), 1);
         playerHead.setExecutor(s -> {
             s.getPlayer().performCommand("gs info");
             s.getPlayer().closeInventory();

@@ -2,7 +2,6 @@ package net.wargearworld.bau.tools.cannon_timer;
 
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
-import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.world.BauWorld;
 import net.wargearworld.bau.world.PlayerWorld;
 import net.wargearworld.bau.world.WorldManager;
@@ -85,16 +84,18 @@ public class CannonTimerListener implements TabExecutor, Listener {
         }
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             Material type = event.getClickedBlock().getType();
-            if ((type == activeMaterial || type == inactiveMaterial) && event.getClickedBlock() != null) {
+            if (type == blockMaterial || type == activeMaterial || type == inactiveMaterial) {
                 //openGUI
                 event.setCancelled(true);
                 Location loc = event.getClickedBlock().getLocation();
                 CannonTimerBlock cannonTimerBlock = bauWorld.getCannonTimer().getBlock(loc);
-                CannonTimerGUI.open(event.getPlayer(), cannonTimerBlock,1);
+                CannonTimerGUI.openMain(event.getPlayer(), cannonTimerBlock, 1);
             }
-        } else if (event.getAction() == Action.RIGHT_CLICK_AIR){
+        } else if (event.getAction() == Action.RIGHT_CLICK_AIR) {
             CannonTimer cannonTimer = bauWorld.getCannonTimer();
             cannonTimer.start(p);
+
+
         }
     }
 
@@ -108,13 +109,12 @@ public class CannonTimerListener implements TabExecutor, Listener {
                 return;
             }
         }
-
         if (event.getBlock().getType() == blockMaterial) {
             //openGUI
             Location loc = event.getBlockPlaced().getLocation();
             CannonTimerBlock cannonTimerBlock = new CannonTimerBlock(loc);
             bauWorld.getCannonTimer().addBlock(loc, cannonTimerBlock);
-            CannonTimerGUI.open(event.getPlayer(), cannonTimerBlock,1);
+            CannonTimerGUI.openMain(event.getPlayer(), cannonTimerBlock, 1);
         }
     }
 
@@ -132,8 +132,20 @@ public class CannonTimerListener implements TabExecutor, Listener {
         if (type == blockMaterial || type == activeMaterial || type == inactiveMaterial) {
             //openGUI
             Location loc = event.getBlock().getLocation();
-            bauWorld.getCannonTimer().removeBlock(loc);
-            MessageHandler.getInstance().send(p, "cannonTimer_removed");
+            if (event.getPlayer().getEquipment().getItemInMainHand().getType() == toolMaterial) {
+                event.setCancelled(true);
+                CannonTimerBlock cannonTimerBlock = bauWorld.getCannonTimer().getBlock(loc);
+                if (cannonTimerBlock.isActive()) {
+                cannonTimerBlock.setActive(false);
+                    MessageHandler.getInstance().send(p, "cannonTimer_deactivated");
+                } else {
+                    cannonTimerBlock.setActive(true);
+                    MessageHandler.getInstance().send(p, "cannonTimer_activated");
+                }
+            } else {
+                bauWorld.getCannonTimer().removeBlock(loc);
+                MessageHandler.getInstance().send(p, "cannonTimer_removed");
+            }
         }
     }
 }

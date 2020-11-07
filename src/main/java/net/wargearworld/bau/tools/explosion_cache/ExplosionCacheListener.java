@@ -79,7 +79,6 @@ public class ExplosionCacheListener implements Listener, TabExecutor {
         BauWorld world = WorldManager.get(loc.getWorld());
         if(world == null)
             return;
-        System.out.println("explosion");
         ExplosionCache explosionCache = world.getExplosionCache();
         explosionCache.handleExplode(event);
     }
