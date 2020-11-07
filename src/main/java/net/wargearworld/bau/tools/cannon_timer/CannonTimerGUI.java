@@ -178,8 +178,14 @@ public class CannonTimerGUI {
         return headItem;
     }
 
+    public static void openGloalSettings(Player p, CannonTimerBlock cannonTimerBlock){
 
-    public static void openTnT(Player p, CannonTimerTick cannonTimerTick){
+    }
+
+    public static void openLocalSettings(Player p, CannonTimerTick cannonTimerTick){
+        MessageHandler msgHandler = MessageHandler.getInstance();
+        ChestGUI chestGUI = new ChestGUI(9, msgHandler.getString(p, "cannonTimer_tnt_gui_title"));
+
 
     }
 }

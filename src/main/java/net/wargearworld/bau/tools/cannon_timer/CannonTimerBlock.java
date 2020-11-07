@@ -5,12 +5,14 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.ClickType;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class CannonTimerBlock {
+public class CannonTimerBlock implements Serializable{
     private Location loc;
     private boolean active = true;
     private Map<Integer, CannonTimerTick> ticks;
+    private CannonTimerSettings settings = new CannonTimerSettings();
 
     public CannonTimerBlock(Location loc) {
         ticks = new TreeMap<>();
@@ -96,5 +98,17 @@ public class CannonTimerBlock {
             }
         }
         return null;
+    }
+
+    public CannonTimerSettings getSettings() {
+        return settings;
+    }
+
+    public Location getLoc() {
+        return loc;
+    }
+
+    public void setLoc(Location loc) {
+        this.loc = loc;
     }
 }

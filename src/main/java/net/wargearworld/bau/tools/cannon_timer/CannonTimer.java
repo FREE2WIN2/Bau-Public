@@ -7,10 +7,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CannonTimer {
+public class CannonTimer implements Serializable {
 
     private Map<Location, CannonTimerBlock> blocks;
     private boolean blocked = false;
