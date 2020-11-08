@@ -37,7 +37,7 @@ public abstract class BauWorld {
     private File logFile;
     private ExplosionCache explosionCache;
 
-    private CannonTimer cannonTimer;
+
     public BauWorld(World world) {
         this.name = world.getName().split("_", 2)[1];
         this.worldUUID = world.getUID();
@@ -53,7 +53,6 @@ public abstract class BauWorld {
             e.printStackTrace();
         }
         explosionCache = new ExplosionCache();
-        cannonTimer = new CannonTimer();
     }
 
     public String getName() {
@@ -176,11 +175,11 @@ public abstract class BauWorld {
         return out;
     }
 
-    public int getAmountOfPlots(PlotType type){
+    public int getAmountOfPlots(PlotType type) {
         int out = 0;
         for (Plot plot : plots.values()) {
             if (plot.getType() == type) {
-                out ++;
+                out++;
             }
         }
         return out;
@@ -189,6 +188,12 @@ public abstract class BauWorld {
     public abstract long getId();
 
     public abstract void leave(Player p);
+
+    public void unload(){
+        for(Plot plot:plots.values()){
+            plot.unload(this);
+        }
+    }
 
     protected enum WorldAction {
         ADD, ADDTEMP, REMOVE, NEW, DELETE;
@@ -226,7 +231,7 @@ public abstract class BauWorld {
 
     public abstract Set<String> getMemberNames();
 
-    public CannonTimer getCannonTimer() {
-        return cannonTimer;
+    public CannonTimer getCannonTimer(Location loc) {
+        return getPlot(loc).getCannonTimer();
     }
 }

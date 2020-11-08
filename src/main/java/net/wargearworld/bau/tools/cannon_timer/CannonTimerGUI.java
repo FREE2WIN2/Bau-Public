@@ -26,8 +26,8 @@ import java.util.Map.Entry;
 public class CannonTimerGUI {
     private static final String ARROW_DOWN = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzI0MzE5MTFmNDE3OGI0ZDJiNDEzYWE3ZjVjNzhhZTQ0NDdmZTkyNDY5NDNjMzFkZjMxMTYzYzBlMDQzZTBkNiJ9fX0=";
     private static final String ARROW_UP = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmNjYmY5ODgzZGQzNTlmZGYyMzg1YzkwYTQ1OWQ3Mzc3NjUzODJlYzQxMTdiMDQ4OTVhYzRkYzRiNjBmYyJ9fX0=";
-    private static final String ARROW_LEFT = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzdhZWU5YTc1YmYwZGY3ODk3MTgzMDE1Y2NhMGIyYTdkNzU1YzYzMzg4ZmYwMTc1MmQ1ZjQ0MTlmYzY0NSJ9fX0=";
-    private static final String ARROW_RIGHT = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjgyYWQxYjljYjRkZDIxMjU5YzBkNzVhYTMxNWZmMzg5YzNjZWY3NTJiZTM5NDkzMzgxNjRiYWM4NGE5NmUifX19";
+    private static final String ARROW_LEFT = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2RjOWU0ZGNmYTQyMjFhMWZhZGMxYjViMmIxMWQ4YmVlYjU3ODc5YWYxYzQyMzYyMTQyYmFlMWVkZDUifX19";
+    private static final String ARROW_RIGHT = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTU2YTM2MTg0NTllNDNiMjg3YjIyYjdlMjM1ZWM2OTk1OTQ1NDZjNmZjZDZkYzg0YmZjYTRjZjMwYWI5MzExIn19fQ==";
     private static final String PLUS = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWEyZDg5MWM2YWU5ZjZiYWEwNDBkNzM2YWI4NGQ0ODM0NGJiNmI3MGQ3ZjFhMjgwZGQxMmNiYWM0ZDc3NyJ9fX0=";
     private static final String MINUS = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTM1ZTRlMjZlYWZjMTFiNTJjMTE2NjhlMWQ2NjM0ZTdkMWQwZDIxYzQxMWNiMDg1ZjkzOTQyNjhlYjRjZGZiYSJ9fX0=";
     private static final String X = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzM4YWIxNDU3NDdiNGJkMDljZTAzNTQzNTQ5NDhjZTY5ZmY2ZjQxZDllMDk4YzY4NDhiODBlMTg3ZTkxOSJ9fX0=";
@@ -100,7 +100,6 @@ public class CannonTimerGUI {
                 tnt.setExecutor(s -> {
                     openLocalSettings(p, cannonTimerTick, cannonTimerBlock, entry.getKey());
                 });
-                //TODO  open local settings
                 /* Ticks*/
 
                 Item increaseTick = getHeadItem(p, ARROW_UP, "cannonTimer_gui_increaseTick").setExecutor(s -> {
@@ -113,7 +112,11 @@ public class CannonTimerGUI {
                 });
                 increaseTick.setAmount(1);
                 Item tick = new DefaultItem(Material.PAPER, msgHandler.getString(p, "cannonTimer_gui_tick", entry.getKey() + ""), entry.getKey());
-                tick.setAmount(entry.getKey());
+                tick.setAmount(entry.getKey()).addLore(msgHandler.getString(p,"cannonTimer_gui_tick_lore"));
+                tick.setExecutor(s->{
+                   cannonTimerBlock.remove(entry.getKey());
+                   openMain(p,cannonTimerBlock,page);
+                });
                 Item decreaseTick = getHeadItem(p, ARROW_DOWN, "cannonTimer_gui_decreaseTick").setExecutor(s -> {
                     ItemStack tickIs = s.getClickedInventory().getItem(s.getClickedIndex() - 9);
                     Integer newAmount = cannonTimerBlock.decreaseTick(tickIs.getAmount(), s.getClickType());
@@ -154,7 +157,8 @@ public class CannonTimerGUI {
         Bukkit.getScheduler().runTaskLater(Main.getPlugin(), () -> {
             if (p.getOpenInventory().getTopInventory().getType() == InventoryType.CRAFTING) {
                 MessageHandler.getInstance().send(p, "cannonTimer_saved");
-                cannonTimerBlock.setActive(cannonTimerBlock.isActive());
+                cannonTimerBlock.setActive(cannonTimerBlock.isActive(),p.getWorld());
+                cannonTimerBlock.sort();
             }
         }, 1);
 
@@ -173,7 +177,7 @@ public class CannonTimerGUI {
         if (pageSize >= mapSize) {
             return map;
         }
-        Map<Integer, CannonTimerTick> out = new TreeMap<>();
+        Map<Integer, CannonTimerTick> out = new HashMap<>();
         List<Integer> list = new ArrayList<>(map.keySet());
         if (list.size() - 1 < begin) {
             return out;

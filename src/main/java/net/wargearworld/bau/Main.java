@@ -218,24 +218,10 @@ public class Main extends JavaPlugin {
                 for (Player a : w.getPlayers()) {
                     a.kickPlayer("Close");
                 }
-                unloadWorld(w.getName());
+                WorldManager.unloadWorld(w.getName());
             }
         }
         super.onDisable();
-    }
-
-    public void unloadWorld(String worldName) {
-        Bukkit.getServer().unloadWorld(worldName, true);
-        // Main main = Main.getPlugin();
-        // String path = main.getCustomConfig().getString("Config.path");
-        // File source = new File(path+"/"+worldName);
-        /*
-         * File dir = new File(path + "/Worlds/"+worldName); dir.setWritable(true,
-         * false); dir.setExecutable(true, false); dir.setReadable(true, false);
-         * onPlayerJoin.copyFolder_raw(source, dir);
-         */
-        Bukkit.getServer().getWorlds().remove(Bukkit.getServer().getWorld(worldName));
-        // deleteWorld(source);
     }
 
     public boolean deleteWorld(File path) {

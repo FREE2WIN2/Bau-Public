@@ -107,6 +107,7 @@ public class WorldManager {
             return;
         }
         if (!world.getName().contains("test") && !world.getName().contains("world")) {
+            worlds.get(world.getUID()).unload();
             worlds.remove(world.getUID());
         }
         Bukkit.unloadWorld(world, true);

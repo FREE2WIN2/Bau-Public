@@ -17,7 +17,8 @@ public class DatabaseDAO {
 
     public static Player getPlayer(UUID uuid) {
         return EntityManagerExecuter.run(em -> {
-            em.find(Player.class, uuid);
+            Player dbPlayer = em.find(Player.class, uuid);
+            Set<PlayerFriend> friends = dbPlayer.getFriends1();
         });
     }
 
@@ -25,8 +26,6 @@ public class DatabaseDAO {
         if (name == null)
             return null;
         return EntityManagerExecuter.run(em -> {
-
-
             CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
             CriteriaQuery<Player> criteriaQuery = criteriaBuilder.createQuery(Player.class);
             Root<Player> root = criteriaQuery.from(Player.class);
@@ -107,6 +106,7 @@ public class DatabaseDAO {
             CriteriaBuilder cb = em.getCriteriaBuilder();
             CriteriaQuery<Player> cq = cb.createQuery(Player.class);
             Root<Player> pr = cq.from(Player.class);
+
             Join join = pr.join(Player_.MEMBERED_PLOTS, JoinType.LEFT);
             join.on(cb.equal(join.get(PlotMember_.PLOT), plotId));
             cq.select(pr.get(Player_.NAME));

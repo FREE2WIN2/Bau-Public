@@ -28,9 +28,9 @@ public class PlotPattern {
 		Location middleNorth = this.middleNorth.toLocation(world.getWorld());// middle North
 		switch (type) {
 		case DEFAULT:
-			return new DefaultPlot(region, plotID, middleNorth, ground);
+			return new DefaultPlot(region, plotID, middleNorth, ground,world);
 		case TEST:
-			return new TestPlot(region, plotID, middleNorth, ground);
+			return new TestPlot(region, plotID, middleNorth, ground,world);
 		}
 		return null;
 

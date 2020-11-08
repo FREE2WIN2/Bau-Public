@@ -8,6 +8,7 @@ import net.wargearworld.StringGetter.Language;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.tools.cannon_reloader.AutoCannonReloader;
+import net.wargearworld.bau.tools.cannon_timer.CannonTimerBlock;
 import net.wargearworld.bau.tools.testBlockSlave.TestBlockSlave;
 import net.wargearworld.bau.tools.testBlockSlave.testBlockEditor.TestBlockEditor;
 import net.wargearworld.bau.world.WorldManager;
@@ -63,6 +64,7 @@ public class BauPlayer {
     private TestBlockSlave testBlockSlave;
     private TestBlockEditor testBlockEditor;
     private AutoCannonReloader cannonReloader;
+    private CannonTimerBlock copiedCannonTimerBlock;
     private BauPlayer(UUID uuid) {
         this.uuid = uuid;
         configFile = new File(Main.getPlugin().getDataFolder(), "users/" + uuid.toString() + "/settings.yml");
@@ -214,5 +216,13 @@ public class BauPlayer {
         if(cannonReloader == null)
             cannonReloader = new AutoCannonReloader();
         return cannonReloader;
+    }
+
+    public void setMovingCannonTimerBlock(CannonTimerBlock cannonTimerBlock) {
+        this.copiedCannonTimerBlock = cannonTimerBlock;
+    }
+
+    public CannonTimerBlock getCopiedCannonTimerBlock() {
+        return copiedCannonTimerBlock;
     }
 }

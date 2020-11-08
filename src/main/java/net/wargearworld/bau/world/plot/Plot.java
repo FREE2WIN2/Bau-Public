@@ -1,9 +1,11 @@
 package net.wargearworld.bau.world.plot;
 
 import com.sk89q.worldedit.math.BlockVector3;
+import net.wargearworld.bau.tools.cannon_timer.CannonTimer;
 import net.wargearworld.bau.tools.waterremover.WaterRemover;
 import net.wargearworld.bau.tools.waterremover.WaterRemoverListener;
 import net.wargearworld.bau.tools.worldfuscator.WorldFuscatorIntegration;
+import net.wargearworld.bau.world.BauWorld;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -24,8 +26,13 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.worldedit.Schematic;
 import net.wargearworld.bau.worldedit.WorldEditHandler;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.YamlConfiguration;
+
+import java.io.*;
 
 public abstract class Plot {
+
 
     private ProtectedRegion region;
     private String id;
@@ -34,14 +41,17 @@ public abstract class Plot {
     private Schematic ground;
     private Clipboard undo; //Undo from Reset
     private WaterRemover waterRemover;
+    private CannonTimer cannonTimer;
 
-    protected Plot(ProtectedRegion region, String id, Location middleNorth, Schematic ground) {
+    protected Plot(ProtectedRegion region, String id, Location middleNorth, Schematic ground, BauWorld bauWorld) {
         this.region = region;
         this.id = id;
         this.middleNorth = middleNorth;
         this.ground = ground;
         setWaterRemover(region.getFlag(WaterRemoverListener.waterRemoverFlag) == State.ALLOW);
+        cannonTimer = deserializeCannonTimer(bauWorld);
     }
+
 
     public ProtectedRegion getRegion() {
         return region;
@@ -202,5 +212,46 @@ public abstract class Plot {
         } else {
             region.setFlag(WorldFuscatorIntegration.worldfuscatorFlag, State.DENY);
         }
+    }
+
+    public CannonTimer getCannonTimer() {
+        return cannonTimer;
+    }
+
+    public void unload(BauWorld bauWorld) {
+        try {
+            File configFile = new File(Main.getPlugin().getDataFolder(), "worlds/" + bauWorld.getName() + "/" + getId() + "/persist.ser");
+            if (!configFile.exists()) {
+                configFile.getParentFile().mkdirs();
+            }
+            configFile.createNewFile();
+            FileOutputStream outputStream = new FileOutputStream(configFile);
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+            objectOutputStream.writeObject(cannonTimer);
+            objectOutputStream.close();
+            objectOutputStream.flush();
+            outputStream.close();
+            System.out.println("saved");
+        } catch (IOException e) {
+        }
+    }
+
+    private CannonTimer deserializeCannonTimer(BauWorld bauWorld) {
+        File configFile = new File(Main.getPlugin().getDataFolder(), "worlds/" + bauWorld.getName() + "/" + getId() + "/persist.ser");
+        if (!configFile.exists()) {
+            return new CannonTimer();
+        }
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(configFile);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            CannonTimer out = (CannonTimer) ois.readObject();
+            ois.close();
+            fis.close();
+            System.out.println("cannontimer Read");
+            return out;
+        } catch (IOException | ClassNotFoundException e) {
+        }
+        return new CannonTimer();
     }
 }

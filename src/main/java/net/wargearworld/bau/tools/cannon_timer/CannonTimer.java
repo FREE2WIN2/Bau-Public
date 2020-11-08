@@ -1,23 +1,38 @@
 package net.wargearworld.bau.tools.cannon_timer;
 
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
+import net.wargearworld.bau.utils.Loc;
 import net.wargearworld.bau.utils.Scheduler;
+import net.wargearworld.bau.world.WorldManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import java.io.IOException;
+import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 public class CannonTimer implements Serializable {
 
-    private Map<Location, CannonTimerBlock> blocks;
-    private boolean blocked = false;
+    private static final long serialVersionUID = -5360744045770382988L;
+    private Map<Loc, CannonTimerBlock> blocks;
+    private transient boolean blocked;
+    private transient Location startMove;
+    private transient Loc lastOffset;
 
     public CannonTimer() {
-        blocks = new HashMap<>();
+        blocked = false;
+        if (blocks == null)
+            blocks = new HashMap<>();
     }
 
     public void start(Player p) {
@@ -27,7 +42,7 @@ public class CannonTimer implements Serializable {
         }
         blocked = true;
         for (CannonTimerBlock block : blocks.values()) {
-            block.startspawn();
+            block.startspawn(p.getWorld());
         }
 
 
@@ -37,14 +52,14 @@ public class CannonTimer implements Serializable {
         scheduler.setTask(Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), () -> {
             int currentTick = scheduler.getX();
             for (CannonTimerBlock cannonTimerBlock : blocks.values()) {
-                cannonTimerBlock.spawnTnTs(currentTick);
+                cannonTimerBlock.spawnTnTs(currentTick, p.getWorld());
             }
             if (currentTick == 80) {
                 scheduler.cancel();
                 Bukkit.getScheduler().runTaskLater(Main.getPlugin(), () -> {
                     blocked = false;
                     for (CannonTimerBlock block : blocks.values()) {
-                        block.endSpawn();
+                        block.endSpawn(p.getWorld());
                     }
                 }, 20 * 4);
             }
@@ -57,14 +72,93 @@ public class CannonTimer implements Serializable {
     }
 
     public void addBlock(Location loc, CannonTimerBlock cannonTimerBlock) {
+        blocks.put(Loc.getByLocation(loc), cannonTimerBlock);
+    }
+
+    public void setBlock(Location loc, CannonTimerBlock cannonTimerBlock) {
+        blocks.put(Loc.getByLocation(loc), cannonTimerBlock);
+    }
+
+    public void addBlock(Loc loc, CannonTimerBlock cannonTimerBlock) {
         blocks.put(loc, cannonTimerBlock);
     }
 
     public void removeBlock(Location loc) {
-        blocks.remove(loc);
+        blocks.remove(Loc.getByLocation(loc));
     }
 
     public CannonTimerBlock getBlock(Location loc) {
+        return blocks.get(Loc.getByLocation(loc));
+    }
+
+    public CannonTimerBlock getBlock(Loc loc) {
         return blocks.get(loc);
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out)
+            throws IOException {
+        System.out.println(blocks.size());
+        out.writeObject(blocks);
+    }
+
+    private void readObject(java.io.ObjectInputStream in)
+            throws IOException, ClassNotFoundException {
+        blocks = (Map<Loc, CannonTimerBlock>) in.readObject();
+        System.out.println(blocks.size());
+    }
+
+    private void readObjectNoData()
+            throws ObjectStreamException {
+        System.out.println("noDatat");
+        blocks = new HashMap<>();
+    }
+
+    public void startMove(Player p) {
+        if (startMove != null) {
+            MessageHandler.getInstance().send(p, "cannonTimer_already_moving", WorldManager.get(p.getWorld()).getPlot(p.getLocation()).getId().replace("plot", ""));
+            return;
+        }
+        startMove = p.getLocation().getBlock().getLocation();
+        MessageHandler msghandler = MessageHandler.getInstance();
+        TextComponent tc1 = new TextComponent(Main.prefix + msghandler.getString(p, "cannonTimer_start_moving"));
+        tc1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/cr move stop"));
+        tc1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(msghandler.getString(p, "cannonTimer_start_moving_hover")).create()));
+        TextComponent tc2 = new TextComponent(msghandler.getString(p,"cannonTimer_start_moving_2"));
+        p.spigot().sendMessage(tc1,tc2);
+    }
+
+    public void place(Player p) {
+        if (startMove == null) {
+            MessageHandler.getInstance().send(p, "cannonTimer_not_moving", WorldManager.get(p.getWorld()).getPlot(p.getLocation()).getId().replace("plot", ""));
+            return;
+        }
+        Loc offset = Loc.getByLocation(p.getLocation().getBlock().getLocation().subtract(startMove));
+        move(p.getWorld(), offset);
+        startMove = null;
+        lastOffset = offset;
+        MessageHandler.getInstance().send(p, "cannonTimer_moved");
+    }
+
+    private void move(World world, Loc offset) {
+        HashMap<Loc,CannonTimerBlock> map = new HashMap(blocks);
+        blocks.clear();
+        for (Map.Entry<Loc, CannonTimerBlock> entry : map.entrySet()) {
+            Loc loc = entry.getKey();
+            CannonTimerBlock cannonTimerBlock = entry.getValue();
+            loc.getBlock(world).setType(Material.AIR);
+            loc = loc.move(offset);
+            cannonTimerBlock.setLoc(loc);
+            cannonTimerBlock.setActive(cannonTimerBlock.isActive(), world);
+            blocks.put(loc,cannonTimerBlock);
+        }
+    }
+
+    public void undoMoving(Player p) {
+        if (lastOffset == null) {
+            MessageHandler.getInstance().send(p, "cannonTimer_move_noUndo");
+            return;
+        }
+        move(p.getWorld(), new Loc(lastOffset.getX(), lastOffset.getY(), lastOffset.getZ()));
+        MessageHandler.getInstance().send(p, "cannonTimer_move_undo");
     }
 }

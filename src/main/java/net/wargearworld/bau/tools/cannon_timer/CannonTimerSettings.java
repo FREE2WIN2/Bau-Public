@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CannonTimerSettings implements Serializable {
+    private static final long serialVersionUID = -4625095191290257419L;
     private double xOffset = 0;
     private double zOffset = 0;
     private boolean velocity = false;
@@ -40,10 +41,14 @@ public class CannonTimerSettings implements Serializable {
     }
 
     public double getxOffset() {
+
+
         return xOffset;
     }
 
     public void setxOffset(double xOffset) {
+        if(xOffset>5)
+            xOffset = 5;
         this.xOffset = xOffset;
     }
 
@@ -52,6 +57,8 @@ public class CannonTimerSettings implements Serializable {
     }
 
     public void setzOffset(double zOffset) {
+        if(zOffset>5)
+            zOffset = 5;
         this.zOffset = zOffset;
     }
 
@@ -73,5 +80,12 @@ public class CannonTimerSettings implements Serializable {
                 velocity == that.velocity;
     }
 
-
+    @Override
+    public String toString() {
+        return "CannonTimerSettings{" +
+                "xOffset=" + xOffset +
+                ", zOffset=" + zOffset +
+                ", velocity=" + velocity +
+                '}';
+    }
 }
