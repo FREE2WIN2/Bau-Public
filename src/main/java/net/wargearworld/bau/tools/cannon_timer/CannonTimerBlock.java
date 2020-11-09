@@ -1,6 +1,8 @@
 package net.wargearworld.bau.tools.cannon_timer;
 
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import net.wargearworld.bau.utils.Loc;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -25,7 +27,7 @@ public class CannonTimerBlock implements Serializable, Cloneable {
     }
 
     public CannonTimerBlock(Loc loc) {
-        ticks = new TreeMap<>();
+        ticks = new HashMap<>();
         this.loc = loc;
         this.settings = new CannonTimerSettings();
         this.active = true;
@@ -35,12 +37,12 @@ public class CannonTimerBlock implements Serializable, Cloneable {
         loc.getBlock(world).setType(Material.AIR);
     }
 
-    public void spawnTnTs(int currentTick,World world) {
+    public void spawnTnTs(int currentTick, World world) {
 
         CannonTimerTick cannonTimerTick = ticks.get(currentTick);
         if (cannonTimerTick == null || !active)
             return;
-        cannonTimerTick.spawn(loc,world, this);
+        cannonTimerTick.spawn(loc, world, this);
     }
 
     public void endSpawn(World world) {
@@ -56,7 +58,7 @@ public class CannonTimerBlock implements Serializable, Cloneable {
     }
 
     public void addTick() {
-        for (int i = 1; i <=CannonTimerListener.MAX_TICKS; i++) {
+        for (int i = 1; i <= CannonTimerListener.MAX_TICKS; i++) {
             if (ticks.get(i) == null) {
                 ticks.put(i, new CannonTimerTick());
                 return;
@@ -72,7 +74,7 @@ public class CannonTimerBlock implements Serializable, Cloneable {
         return ticks;
     }
 
-    public void setActive(boolean active,World world) {
+    public void setActive(boolean active, World world) {
         this.active = active;
         if (this.active) {
             loc.getBlock(world).setType(CannonTimerListener.activeMaterial);
@@ -90,7 +92,6 @@ public class CannonTimerBlock implements Serializable, Cloneable {
             if (!ticks.containsKey(i)) {
                 ticks.remove(tick);
                 ticks.put(i, cannonTimerTick);
-
                 return i;
             }
         }
@@ -129,6 +130,7 @@ public class CannonTimerBlock implements Serializable, Cloneable {
     }
 
     public void sort() {
+        System.out.println("sort");
         TreeMap<Integer, CannonTimerTick> newTicks = new TreeMap<>(ticks);
         this.ticks = newTicks;
     }

@@ -35,6 +35,7 @@ public abstract class BauWorld {
     protected RegionManager regionManager;
     private WorldTemplate template;
     private File logFile;
+    private File worldSettingsDir;
     private ExplosionCache explosionCache;
 
 
@@ -42,7 +43,10 @@ public abstract class BauWorld {
         this.name = world.getName().split("_", 2)[1];
         this.worldUUID = world.getUID();
         regionManager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(world));
-        logFile = new File(Main.getPlugin().getDataFolder(), "worlds/" + world.getName() + "/logs.txt");
+        worldSettingsDir = new File(Main.getPlugin().getDataFolder(), "worlds/" + world.getName());
+        if(!worldSettingsDir.exists())
+            worldSettingsDir.mkdirs();
+        logFile = new File(worldSettingsDir, "logs.txt");
         try {
             if (!logFile.exists())
                 if (!logFile.getParentFile().exists())
@@ -233,5 +237,9 @@ public abstract class BauWorld {
 
     public CannonTimer getCannonTimer(Location loc) {
         return getPlot(loc).getCannonTimer();
+    }
+
+    public File getWorldSettingsDir() {
+        return worldSettingsDir;
     }
 }

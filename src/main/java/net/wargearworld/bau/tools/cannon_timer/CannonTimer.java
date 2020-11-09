@@ -121,7 +121,7 @@ public class CannonTimer implements Serializable {
         startMove = p.getLocation().getBlock().getLocation();
         MessageHandler msghandler = MessageHandler.getInstance();
         TextComponent tc1 = new TextComponent(Main.prefix + msghandler.getString(p, "cannonTimer_start_moving"));
-        tc1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/cr move stop"));
+        tc1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/ct move end"));
         tc1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(msghandler.getString(p, "cannonTimer_start_moving_hover")).create()));
         TextComponent tc2 = new TextComponent(msghandler.getString(p,"cannonTimer_start_moving_2"));
         p.spigot().sendMessage(tc1,tc2);

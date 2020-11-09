@@ -16,6 +16,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -64,7 +65,7 @@ public class CannonTimerGUI {
             openMain(p, cannonTimerBlock, page);
         });
         for (int i = currentRow; i < 9; i++) {
-            if (i == 8) {
+            if (i == 8 && ((page == 1 && content.size() == 8) || (page > 1 && content.size() == 7)) && page != 10) {
                 /* Set NEXT item */
                 Item next = getHeadItem(p, ARROW_RIGHT, "cannonTimer_gui_nextPage");
                 next.setExecutor(s -> {
@@ -81,14 +82,10 @@ public class CannonTimerGUI {
 
                 Item increaseTNT = getHeadItem(p, ARROW_UP, "cannonTimer_gui_increaseAmount").setExecutor(s -> {
                     cannonTimerTick.add(s.getClickType());
-                    ItemStack tnt = s.getClickedInventory().getItem(s.getClickedIndex() + 9);
-                    tnt.setAmount(cannonTimerTick.getAmount());
                     openMain(p, cannonTimerBlock, page);
                 });
                 Item decreaseTNT = getHeadItem(p, ARROW_DOWN, "cannonTimer_gui_decreaseAmount").setExecutor(s -> {
                     cannonTimerTick.remove(s.getClickType());
-                    ItemStack tnt = s.getClickedInventory().getItem(s.getClickedIndex() - 9);
-                    tnt.setAmount(cannonTimerTick.getAmount());
                     openMain(p, cannonTimerBlock, page);
                 });
                 Item tnt = new DefaultItem(Material.TNT, msgHandler.getString(p, "cannonTimer_gui_tnt", cannonTimerTick.getAmount() + ""));
@@ -107,22 +104,21 @@ public class CannonTimerGUI {
                     Integer newAmount = cannonTimerBlock.increaseTick(tickIs.getAmount(), s.getClickType());
                     if (newAmount == null)
                         return;
-                    tickIs.setAmount(newAmount);
                     openMain(p, cannonTimerBlock, page);
+//                    openMain(p, cannonTimerBlock, page);
                 });
                 increaseTick.setAmount(1);
                 Item tick = new DefaultItem(Material.PAPER, msgHandler.getString(p, "cannonTimer_gui_tick", entry.getKey() + ""), entry.getKey());
-                tick.setAmount(entry.getKey()).addLore(msgHandler.getString(p,"cannonTimer_gui_tick_lore"));
-                tick.setExecutor(s->{
-                   cannonTimerBlock.remove(entry.getKey());
-                   openMain(p,cannonTimerBlock,page);
+                tick.setAmount(entry.getKey()).addLore(msgHandler.getString(p, "cannonTimer_gui_tick_lore"));
+                tick.setExecutor(s -> {
+                    cannonTimerBlock.remove(entry.getKey());
+                    openMain(p, cannonTimerBlock, page);
                 });
                 Item decreaseTick = getHeadItem(p, ARROW_DOWN, "cannonTimer_gui_decreaseTick").setExecutor(s -> {
                     ItemStack tickIs = s.getClickedInventory().getItem(s.getClickedIndex() - 9);
                     Integer newAmount = cannonTimerBlock.decreaseTick(tickIs.getAmount(), s.getClickType());
                     if (newAmount == null)
                         return;
-                    tickIs.setAmount(newAmount);
                     openMain(p, cannonTimerBlock, page);
                 });
                 decreaseTick.setAmount(1);
@@ -138,15 +134,17 @@ public class CannonTimerGUI {
                     chestGUI.setItem(i + 45, decreaseTick);
                 }
                 continue;
-            } else {
+            } else{
+                if(i == 8)
+                    continue;
                 chestGUI.setItem(i + 27, plus);
                 continue;
             }
         }
         Item settings = getHeadItem(p, SETTINGS, "cannonTimer_gui_settings_item");
         settings.addLore(cannonTimerBlock.getSettings().generateLore(p));
-        settings.setExecutor(s->{
-           openGloalSettings(p,cannonTimerBlock);
+        settings.setExecutor(s -> {
+            openGloalSettings(p, cannonTimerBlock);
         });
         chestGUI.setItem(8, settings);
 
@@ -157,7 +155,7 @@ public class CannonTimerGUI {
         Bukkit.getScheduler().runTaskLater(Main.getPlugin(), () -> {
             if (p.getOpenInventory().getTopInventory().getType() == InventoryType.CRAFTING) {
                 MessageHandler.getInstance().send(p, "cannonTimer_saved");
-                cannonTimerBlock.setActive(cannonTimerBlock.isActive(),p.getWorld());
+                cannonTimerBlock.setActive(cannonTimerBlock.isActive(), p.getWorld());
                 cannonTimerBlock.sort();
             }
         }, 1);
@@ -170,7 +168,9 @@ public class CannonTimerGUI {
         int pageSize = 7;
         if (page == 1) {
             pageSize++;
-        } else {
+        } else{
+            if(page == 10)
+                pageSize++;
             begin += 8;
             begin += (page - 2) * 7;
         }
@@ -179,6 +179,7 @@ public class CannonTimerGUI {
         }
         Map<Integer, CannonTimerTick> out = new HashMap<>();
         List<Integer> list = new ArrayList<>(map.keySet());
+
         if (list.size() - 1 < begin) {
             return out;
         }
@@ -255,12 +256,14 @@ public class CannonTimerGUI {
             openOffset(p, finalSettings, "X", list -> {
                 openLocalSettings(p, cannonTimerTick, cannonTimerBlock, tick);
             });
-        }).addLore(List.of(msgHandler.getString(p, "cannonTimer_gui_settings_lore_xOffset", settings.getxOffset() + "")));;
+        }).addLore(List.of(msgHandler.getString(p, "cannonTimer_gui_settings_lore_xOffset", settings.getxOffset() + "")));
+        ;
         Item setZOffset = getHeadItem(p, Z, "cannonTimer_settings_zOffset").setExecutor(s -> {
             openOffset(p, finalSettings, "Z", list -> {
                 openLocalSettings(p, cannonTimerTick, cannonTimerBlock, tick);
             });
-        }).addLore(List.of(msgHandler.getString(p, "cannonTimer_gui_settings_lore_zOffset", settings.getzOffset() + "")));;
+        }).addLore(List.of(msgHandler.getString(p, "cannonTimer_gui_settings_lore_zOffset", settings.getzOffset() + "")));
+        ;
         Item setRandom = getRandomItem(p, finalSettings).setExecutor(s -> {
             finalSettings.setVelocity(!finalSettings.isVelocity());
             openLocalSettings(p, cannonTimerTick, cannonTimerBlock, tick);

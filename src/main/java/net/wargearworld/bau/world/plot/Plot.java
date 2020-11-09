@@ -220,35 +220,33 @@ public abstract class Plot {
 
     public void unload(BauWorld bauWorld) {
         try {
-            File configFile = new File(Main.getPlugin().getDataFolder(), "worlds/" + bauWorld.getName() + "/" + getId() + "/persist.ser");
-            if (!configFile.exists()) {
-                configFile.getParentFile().mkdirs();
+            File serializationFile = new File(bauWorld.getWorldSettingsDir(), getId() + ".ser");
+            if (!serializationFile.exists()) {
+                serializationFile.getParentFile().mkdirs();
             }
-            configFile.createNewFile();
-            FileOutputStream outputStream = new FileOutputStream(configFile);
+            serializationFile.createNewFile();
+            FileOutputStream outputStream = new FileOutputStream(serializationFile);
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
             objectOutputStream.writeObject(cannonTimer);
             objectOutputStream.close();
             objectOutputStream.flush();
             outputStream.close();
-            System.out.println("saved");
         } catch (IOException e) {
         }
     }
 
     private CannonTimer deserializeCannonTimer(BauWorld bauWorld) {
-        File configFile = new File(Main.getPlugin().getDataFolder(), "worlds/" + bauWorld.getName() + "/" + getId() + "/persist.ser");
-        if (!configFile.exists()) {
+        File serializationFile = new File(bauWorld.getWorldSettingsDir(), getId() + ".ser");
+        if (!serializationFile.exists()) {
             return new CannonTimer();
         }
         FileInputStream fis = null;
         try {
-            fis = new FileInputStream(configFile);
+            fis = new FileInputStream(serializationFile);
             ObjectInputStream ois = new ObjectInputStream(fis);
             CannonTimer out = (CannonTimer) ois.readObject();
             ois.close();
             fis.close();
-            System.out.println("cannontimer Read");
             return out;
         } catch (IOException | ClassNotFoundException e) {
         }
