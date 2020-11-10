@@ -1,5 +1,6 @@
 package net.wargearworld.bau.world;
 
+import net.wargearworld.bau.team.Team;
 import net.wargearworld.bau.utils.MethodResult;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -18,7 +19,12 @@ public class TeamWorld extends BauWorld{
 		this.teamID = teamID;
 	}
 
-	@Override
+    public TeamWorld(Team team, World w) {
+        super(w);
+
+    }
+
+    @Override
 	public boolean isAuthorized(UUID uuid) {
 		return leaders.contains(uuid) || members.contains(uuid);
 	}

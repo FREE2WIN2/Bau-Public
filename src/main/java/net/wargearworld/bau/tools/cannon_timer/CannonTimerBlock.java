@@ -27,7 +27,7 @@ public class CannonTimerBlock implements Serializable, Cloneable {
     }
 
     public CannonTimerBlock(Loc loc) {
-        ticks = new LinkedHashMap<>();
+        ticks = new HashMap<>();
         this.loc = loc;
         this.settings = new CannonTimerSettings();
         this.active = true;
@@ -88,7 +88,7 @@ public class CannonTimerBlock implements Serializable, Cloneable {
         Integer newTick = getNewTick(tick, clickType);
         if (newTick == null)
             return null;
-        LinkedHashMap<Integer, CannonTimerTick> copy = new LinkedHashMap<>(ticks);
+        HashMap<Integer, CannonTimerTick> copy = new HashMap<>(ticks);
         ticks.clear();
         for (Map.Entry<Integer, CannonTimerTick> entry : copy.entrySet()) {
             if (entry.getKey() == tick) {

@@ -2,6 +2,7 @@ package net.wargearworld.bau.world;
 
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.player.BauPlayer;
+import net.wargearworld.bau.team.Team;
 import net.wargearworld.db.EntityManagerExecuter;
 import net.wargearworld.db.model.Plot;
 import net.wargearworld.db.model.PlotMember;
@@ -11,8 +12,6 @@ import org.bukkit.WorldType;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 
-import javax.enterprise.inject.spi.CDI;
-import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -34,14 +33,16 @@ public class WorldManager {
         return worlds.get(world.getUID());
     }
 
-    public static BauWorld getWorld(String name, String owner) { // name is unique!
+    public static BauWorld getPlayerWorld(String name, String owner) { // name is unique!
         return get(loadWorld(name, owner));
     }
 
-	/*public static BauWorld getWorld(String name) { // name is unique!
-		String uuid = DBConnection.getUUID(name);
-		return get(loadWorld(name, uuid));
-	}*/
+//    public static BauWorld getTeamWorld(Team team) { // name is unique!
+//        return get(loadWorld(team));
+//    }
+
+    //    public static TeamWorld getTeamWorld(UUID uniqueId) {
+//    }
 
     public static BauWorld getWorld(UUID worldUUID) {
         return worlds.get(worldUUID);
@@ -51,52 +52,56 @@ public class WorldManager {
      * @param worldName name which has the File(owner_name)
      * @return BauWorld
      */
-    public static BauWorld getWorld(String worldName) {
+    public static BauWorld getPlayerWorld(String worldName) {//UUID_Spielername
         String[] split = worldName.split("_");
-        return getWorld(split[1], split[0]);
+        return getPlayerWorld(split[1], split[0]);
     }
-
-	/*public static List<TeamWorld> getTeamWorlds(int teamID) {
-		//owner = teamID
-		//name?
-		List<TeamWorld> out= new ArrayList<>();
-		for(String worldName : DBConnection.getWorldName(teamID)) {
-			BauWorld world = getWorld(worldName, teamID + "");
-			if(world instanceof TeamWorld) {
-				out.add((TeamWorld)world);
-			}
-		}
-		return out;
-	}*/
 
     public final static WorldTemplate template = WorldTemplate
             .getTemplate(Main.getPlugin().getCustomConfig().getString("plottemplate"));
 
+
     public static World loadWorld(String worldName, String owner) {
         World w = Bukkit.getWorld(owner + "_" + worldName);
         if (w == null) {
-            if (isInt(owner)) {
-                //TeamPlot
-//				worlds.put(w.getUID(), new TeamWorld(DBConnection.getID(worldName, owner), w, Integer.getInteger(owner)));
-            } else {
-                UUID ownerUuid = UUID.fromString(owner);
-                System.out.println(worldName + " " + owner);
-                long id = readPlot(ownerUuid, worldName).getId();
-                if (id == 0)
-                    createWorldDir(worldName, owner, true);
+            UUID ownerUuid = UUID.fromString(owner);
+            System.out.println(worldName + " " + owner);
+            long id = readPlot(ownerUuid, worldName).getId();
+            if (id == 0)
+                createWorldDir(worldName, owner, true);
 
-                WorldCreator wc = new WorldCreator(owner + "_" + worldName);
-                wc.type(WorldType.NORMAL);
-                w = Bukkit.getServer().createWorld(wc);
-                w.setStorm(false);
-                w.setThundering(false);
-                w.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
-                w.setGameRule(GameRule.DO_MOB_SPAWNING, false);
-                worlds.put(w.getUID(), new PlayerWorld(id, UUID.fromString(owner), w));
-            }
+            WorldCreator wc = new WorldCreator(owner + "_" + worldName);
+            wc.type(WorldType.NORMAL);
+            w = Bukkit.getServer().createWorld(wc);
+            w.setStorm(false);
+            w.setThundering(false);
+            w.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
+            w.setGameRule(GameRule.DO_MOB_SPAWNING, false);
+            worlds.put(w.getUID(), new PlayerWorld(id, UUID.fromString(owner), w));
         }
         return w;
     }
+
+//    private static World loadWorld(Team team) {
+//        World w = Bukkit.getWorld(owner + "_" + worldName);
+//        if (w == null) {
+//            UUID ownerUuid = UUID.fromString(owner);
+//            System.out.println(worldName + " " + owner);
+//            long id = readPlot(ownerUuid, worldName).getId();
+//            if (id == 0)
+//                createWorldDir(worldName, owner, true);
+//
+//            WorldCreator wc = new WorldCreator("team_" + team.getId());
+//            wc.type(WorldType.NORMAL);
+//            w = Bukkit.getServer().createWorld(wc);
+//            w.setStorm(false);
+//            w.setThundering(false);
+//            w.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
+//            w.setGameRule(GameRule.DO_MOB_SPAWNING, false);
+//            worlds.put(w.getUID(), new TeamWorld(team, w));
+//        }
+//        return w;
+//    }
 
     public static void unloadWorld(String worldName) {
         undloadWorld(Bukkit.getWorld(worldName));
@@ -262,4 +267,6 @@ public class WorldManager {
             return plot;
         });
     }
+
+
 }

@@ -30,6 +30,7 @@ import java.util.UUID;
 import static net.wargearworld.command_manager.arguments.IntegerArgument.integer;
 import static net.wargearworld.command_manager.nodes.ArgumentNode.argument;
 import static net.wargearworld.command_manager.nodes.LiteralNode.literal;
+import static net.wargearworld.bau.utils.CommandUtil.getPlayer;
 
 public class Particles implements TabExecutor, Listener {
 	public static File particlesConfigFile;
@@ -141,10 +142,7 @@ public class Particles implements TabExecutor, Listener {
 		commandHandle.addSubNode(clipboard);
 	}
 
-	private Player getPlayer(ArgumentList s){
-		return getPlayer(s);
-	}
-	
+
 	private void setColor(ArgumentList s) {
 		Player p = getPlayer(s);
 		ParticlesShow particleShow = playersParticlesShow.get(p.getUniqueId());

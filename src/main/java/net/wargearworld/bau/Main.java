@@ -25,6 +25,7 @@ import net.wargearworld.bau.tools.testBlockSlave.testBlockEditor.TestBlockEditor
 import net.wargearworld.bau.tools.waterremover.WaterRemoverListener;
 import net.wargearworld.bau.tools.worldfuscator.WorldFuscatorCommand;
 import net.wargearworld.bau.tools.worldfuscator.WorldFuscatorIntegration;
+import net.wargearworld.bau.world.WorldCommand;
 import net.wargearworld.bau.world.WorldGUI;
 import net.wargearworld.bau.world.WorldManager;
 import net.wargearworld.bau.worldedit.SaWE;
@@ -108,6 +109,7 @@ public class Main extends JavaPlugin {
         new Particles();
         new WorldFuscatorIntegration(this);
         new WorldFuscatorCommand(this);
+        new WorldCommand(this);
         getCommand("tbs").setExecutor(TestBlockSlaveCore.getInstance());
         getCommand("tbs").setTabCompleter(new tbsTC());
         getCommand("sl").setExecutor(new Stoplag());

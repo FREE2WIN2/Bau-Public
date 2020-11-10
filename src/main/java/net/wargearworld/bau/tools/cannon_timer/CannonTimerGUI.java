@@ -43,7 +43,7 @@ public class CannonTimerGUI {
         });
 
 
-        chestGUI.setMaxStackSize(80);
+        chestGUI.setMaxStackSize(CannonTimerListener.MAX_TICKS);
         int currentRow = 0; // starts with 0
         Map<Integer, CannonTimerTick> content = readContent(cannonTimerBlock.getTicks(), page);
 
@@ -117,6 +117,9 @@ public class CannonTimerGUI {
                     cannonTimerBlock.remove(entry.getKey());
                     openMain(p, cannonTimerBlock, page);
                 });
+                tick.setMaxStackSize(CannonTimerListener.MAX_TICKS);
+
+
                 Item decreaseTick = getHeadItem(p, ARROW_DOWN, "cannonTimer_gui_decreaseTick").setExecutor(s -> {
                     ItemStack tickIs = s.getClickedInventory().getItem(s.getClickedIndex() - 9);
                     Integer newAmount = cannonTimerBlock.decreaseTick(tickIs.getAmount(), s.getClickType());
@@ -129,7 +132,7 @@ public class CannonTimerGUI {
                 if (cannonTimerTick.getAmount() < 64) chestGUI.setItem(i, increaseTNT);
                 chestGUI.setItem(i + 9, tnt);
                 if (cannonTimerTick.getAmount() > 1) chestGUI.setItem(i + 18, decreaseTNT);
-                if (entry.getKey() < 81) {
+                if (entry.getKey() < CannonTimerListener.MAX_TICKS) {
                     chestGUI.setItem(i + 27, increaseTick);
                 }
                 chestGUI.setItem(i + 36, tick);

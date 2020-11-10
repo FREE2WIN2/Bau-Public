@@ -3,11 +3,14 @@ package net.wargearworld.bau.commands;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.dao.DatabaseDAO;
+import net.wargearworld.bau.dao.WorldDAO;
 import net.wargearworld.bau.player.BauPlayer;
+import net.wargearworld.bau.team.Team;
 import net.wargearworld.bau.utils.ClickAction;
 import net.wargearworld.bau.utils.JsonCreater;
 import net.wargearworld.bau.world.BauWorld;
 import net.wargearworld.bau.world.PlayerWorld;
+import net.wargearworld.bau.world.TeamWorld;
 import net.wargearworld.bau.world.WorldManager;
 import net.wargearworld.command_manager.ArgumentList;
 import net.wargearworld.command_manager.CommandHandel;
@@ -19,6 +22,7 @@ import net.wargearworld.commandframework.player.BukkitCommandPlayer;
 import net.wargearworld.db.EntityManagerExecuter;
 import net.wargearworld.db.model.Plot;
 import net.wargearworld.db.model.PlotMember;
+import net.wargearworld.db.model.WargearTeam;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -67,7 +71,7 @@ public class GS implements TabExecutor {
             public Collection<String> getList(ParseState state) {
                 BauWorld world = WorldManager.get(getPlayer(state.getArgumentList()).getWorld());
                 if (world instanceof PlayerWorld) {
-                    return DatabaseDAO.getAllNotAddedPlayers(world.getId());
+                    return WorldDAO.getAllNotAddedPlayers(world.getId());
                 }
                 return new ArrayList<>();
             }
@@ -91,7 +95,7 @@ public class GS implements TabExecutor {
             @Override
             public Collection<String> getList(ParseState state) {
 
-                return DatabaseDAO.getAllWorlds();
+                return WorldDAO.getAllWorlds();
 
             }
         }));
@@ -133,6 +137,9 @@ public class GS implements TabExecutor {
         }));
 
         commandHandle.addSubNode(literal("tp")
+                .addSubNode(literal("team")).setCallback(s->{
+                    tpTeam(s);
+                })
                 .addSubNode(argument("Spielername", new StringArgument())
                         .setCallback(s -> {
                             tp(s);
@@ -176,6 +183,11 @@ public class GS implements TabExecutor {
                 .setRequirement(permission("bau.delete.bypass")).addSubNode(worlds.setCallback(s -> {
                     deletePlot(s);
                 })));
+        /* gs tp team */
+        commandHandle.addSubNode(literal("delete")
+                .setRequirement(permission("bau.delete.bypass")).addSubNode(worlds.setCallback(s -> {
+                    deletePlot(s);
+                })));
         try {
             /* gs setrights <Spieler> */
             commandHandle.addSubNode(literal("setrights")
@@ -197,6 +209,28 @@ public class GS implements TabExecutor {
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();
         }
+    }
+
+    private void tpTeam(ArgumentList s) {
+        Player p = getPlayer(s);
+        BauPlayer bauPlayer = BauPlayer.getBauPlayer(p);
+        Team team = Team.of(bauPlayer);
+        if(team == null){
+
+        }else{
+
+        }
+        TeamWorld teamWorld = WorldManager.getTeamWorld(p.getUniqueId());
+       WargearTeam wargearTeam = EntityManagerExecuter.run(em->{});
+//        if (name == null) {
+//            WorldManager.getPlayerWorld(p.getName(), p.getUniqueId().toString()).spawn(p);
+//        } else {
+//            net.wargearworld.db.model.Player owner = DatabaseDAO.getPlayer(name);
+//            if (owner == null) {
+//                return; //TODO error
+//            }
+//            WorldManager.getPlayerWorld(name, owner.getUuid().toString()).spawn(p);
+//        }
     }
 
     private void rights(ArgumentList s, boolean b) {
@@ -231,13 +265,13 @@ public class GS implements TabExecutor {
         Player p = getPlayer(s);
         String name = s.getString("Spielername");
         if (name == null) {
-            WorldManager.getWorld(p.getName(), p.getUniqueId().toString()).spawn(p);
+            WorldManager.getPlayerWorld(p.getName(), p.getUniqueId().toString()).spawn(p);
         } else {
             net.wargearworld.db.model.Player owner = DatabaseDAO.getPlayer(name);
             if (owner == null) {
                 return; //TODO error
             }
-            WorldManager.getWorld(name, owner.getUuid().toString()).spawn(p);
+            WorldManager.getPlayerWorld(name, owner.getUuid().toString()).spawn(p);
         }
     }
 
@@ -291,7 +325,7 @@ public class GS implements TabExecutor {
     }
 
     public void deletePlot(ArgumentList s) {
-        BauWorld world = WorldManager.getWorld(s.getString("Worlds"));
+        BauWorld world = WorldManager.getPlayerWorld(s.getString("Worlds"));
         if (world.newWorld()) {
             Main.send(getPlayer(s), "gsDeleted", s.getString("worlds"));
         }
