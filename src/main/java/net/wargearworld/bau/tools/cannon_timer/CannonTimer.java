@@ -97,19 +97,16 @@ public class CannonTimer implements Serializable {
 
     private void writeObject(java.io.ObjectOutputStream out)
             throws IOException {
-        System.out.println(blocks.size());
         out.writeObject(blocks);
     }
 
     private void readObject(java.io.ObjectInputStream in)
             throws IOException, ClassNotFoundException {
         blocks = (Map<Loc, CannonTimerBlock>) in.readObject();
-        System.out.println(blocks.size());
     }
 
     private void readObjectNoData()
             throws ObjectStreamException {
-        System.out.println("noDatat");
         blocks = new HashMap<>();
     }
 

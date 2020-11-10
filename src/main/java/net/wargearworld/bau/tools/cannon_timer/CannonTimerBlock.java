@@ -27,7 +27,7 @@ public class CannonTimerBlock implements Serializable, Cloneable {
     }
 
     public CannonTimerBlock(Loc loc) {
-        ticks = new HashMap<>();
+        ticks = new LinkedHashMap<>();
         this.loc = loc;
         this.settings = new CannonTimerSettings();
         this.active = true;
@@ -85,13 +85,27 @@ public class CannonTimerBlock implements Serializable, Cloneable {
 
     public Integer increaseTick(int tick, ClickType clickType) {
         CannonTimerTick cannonTimerTick = ticks.get(tick);
+        Integer newTick = getNewTick(tick, clickType);
+        if (newTick == null)
+            return null;
+        LinkedHashMap<Integer, CannonTimerTick> copy = new LinkedHashMap<>(ticks);
+        ticks.clear();
+        for (Map.Entry<Integer, CannonTimerTick> entry : copy.entrySet()) {
+            if (entry.getKey() == tick) {
+                ticks.put(newTick, entry.getValue());
+            } else {
+                ticks.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return newTick;
+    }
+
+    private Integer getNewTick(int tick, ClickType clickType) {
         int jumps = 1;
         if (clickType == ClickType.RIGHT)
             jumps = 5;
         for (int i = tick + jumps; i <= CannonTimerListener.MAX_TICKS; i++) {
             if (!ticks.containsKey(i)) {
-                ticks.remove(tick);
-                ticks.put(i, cannonTimerTick);
                 return i;
             }
         }
@@ -99,14 +113,27 @@ public class CannonTimerBlock implements Serializable, Cloneable {
     }
 
     public Integer decreaseTick(int tick, ClickType clickType) {
-        CannonTimerTick cannonTimerTick = ticks.get(tick);
+        Integer newTick = getLowerTick(tick, clickType);
+        if (newTick == null)
+            return null;
+        Map<Integer, CannonTimerTick> copy = new HashMap<>(ticks);
+        ticks.clear();
+        for (Map.Entry<Integer, CannonTimerTick> entry : copy.entrySet()) {
+            if (entry.getKey() == tick) {
+                ticks.put(newTick, entry.getValue());
+            } else {
+                ticks.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return newTick;
+    }
+
+    private Integer getLowerTick(int tick, ClickType clickType) {
         int jumps = 1;
         if (clickType == ClickType.RIGHT && tick > 5)
             jumps = 5;
         for (int i = tick - jumps; i >= 1; i--) {
             if (!ticks.containsKey(i)) {
-                ticks.remove(tick);
-                ticks.put(i, cannonTimerTick);
                 return i;
             }
         }
@@ -142,7 +169,6 @@ public class CannonTimerBlock implements Serializable, Cloneable {
         out.writeBoolean(active);
         out.writeObject(settings);
         out.writeObject(ticks);
-        System.out.println(ticks.size());
     }
 
     private void readObject(java.io.ObjectInputStream in)
@@ -151,8 +177,6 @@ public class CannonTimerBlock implements Serializable, Cloneable {
         active = in.readBoolean();
         settings = (CannonTimerSettings) in.readObject();
         ticks = (Map<Integer, CannonTimerTick>) in.readObject();
-
-        System.out.println(toString());
     }
 
     private void readObjectNoData()

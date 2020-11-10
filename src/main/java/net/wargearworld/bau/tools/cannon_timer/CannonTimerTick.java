@@ -96,7 +96,6 @@ public class CannonTimerTick implements Serializable {
         if (obj != null)
             settings = (CannonTimerSettings) obj;
         amount = in.readInt();
-        System.out.println(toString());
     }
 
     private void readObjectNoData()

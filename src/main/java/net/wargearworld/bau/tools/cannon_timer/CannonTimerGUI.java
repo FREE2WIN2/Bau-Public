@@ -98,6 +98,7 @@ public class CannonTimerGUI {
                     openLocalSettings(p, cannonTimerTick, cannonTimerBlock, entry.getKey());
                 });
                 /* Ticks*/
+                String tickString =msgHandler.getString(p, "cannonTimer_gui_tick", entry.getKey() + "");
 
                 Item increaseTick = getHeadItem(p, ARROW_UP, "cannonTimer_gui_increaseTick").setExecutor(s -> {
                     ItemStack tickIs = s.getClickedInventory().getItem(s.getClickedIndex() + 9);
@@ -108,7 +109,9 @@ public class CannonTimerGUI {
 //                    openMain(p, cannonTimerBlock, page);
                 });
                 increaseTick.setAmount(1);
-                Item tick = new DefaultItem(Material.PAPER, msgHandler.getString(p, "cannonTimer_gui_tick", entry.getKey() + ""), entry.getKey());
+                increaseTick.addLore(tickString);
+
+                Item tick = new DefaultItem(Material.PAPER, tickString, entry.getKey());
                 tick.setAmount(entry.getKey()).addLore(msgHandler.getString(p, "cannonTimer_gui_tick_lore"));
                 tick.setExecutor(s -> {
                     cannonTimerBlock.remove(entry.getKey());
@@ -122,7 +125,7 @@ public class CannonTimerGUI {
                     openMain(p, cannonTimerBlock, page);
                 });
                 decreaseTick.setAmount(1);
-
+                decreaseTick.addLore(tickString);
                 if (cannonTimerTick.getAmount() < 64) chestGUI.setItem(i, increaseTNT);
                 chestGUI.setItem(i + 9, tnt);
                 if (cannonTimerTick.getAmount() > 1) chestGUI.setItem(i + 18, decreaseTNT);
