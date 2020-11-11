@@ -7,8 +7,11 @@ import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.scoreboard.ScoreBoardBau;
 import net.wargearworld.bau.tools.testBlockSlave.testBlockEditor.TestBlockEditorCore;
 import net.wargearworld.bau.utils.ItemStackCreator;
-import net.wargearworld.bau.world.BauWorld;
+import net.wargearworld.bau.world.bauworld.BauWorld;
 import net.wargearworld.bau.world.WorldManager;
+import net.wargearworld.db.EntityManagerExecuter;
+import net.wargearworld.db.model.Plot;
+import net.wargearworld.db.model.PlotTemplate;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -45,7 +48,16 @@ public class PlayerListener implements Listener {
         if (!gs.exists()) {
             // Bukkit.createWorld((WorldCreator) WorldCreator.name("test").createWorld());
             // wenn nicht-> erstellen und hinteleportieren
-            WorldManager.createWorldDir(p.getName(), uuidString, player.hasPlots());
+            WorldManager.createWorldDir(uuidString + "_" + p.getName(), WorldManager.template);
+            EntityManagerExecuter.run(em -> {
+                PlotTemplate dbTemplate = em.find(PlotTemplate.class, WorldManager.template.getId());
+                Plot plot = new Plot();
+                plot.setDefault(false);
+                plot.setName(p.getName());
+                plot.setTemplate(dbTemplate);
+                plot.setOwner(em.find(net.wargearworld.db.model.Player.class, p.getUniqueId()));
+                em.persist(plot);
+            });
             p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "plotGenerating"));
         }
         World world = WorldManager.loadWorld(p.getName(), uuidString);

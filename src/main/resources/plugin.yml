@@ -70,6 +70,7 @@ permissions:
       bau.move.bypass: true
       bau.delete.bypass: true
       bau.build.bypass: true
+      bau.rights.bypass: true
   bau.move.bypass:
     default: op
   bau.delete.bypass:

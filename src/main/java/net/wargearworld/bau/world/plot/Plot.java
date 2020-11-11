@@ -5,7 +5,7 @@ import net.wargearworld.bau.tools.cannon_timer.CannonTimer;
 import net.wargearworld.bau.tools.waterremover.WaterRemover;
 import net.wargearworld.bau.tools.waterremover.WaterRemoverListener;
 import net.wargearworld.bau.tools.worldfuscator.WorldFuscatorIntegration;
-import net.wargearworld.bau.world.BauWorld;
+import net.wargearworld.bau.world.bauworld.BauWorld;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -26,8 +26,6 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.worldedit.Schematic;
 import net.wargearworld.bau.worldedit.WorldEditHandler;
-import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.*;
 
@@ -48,7 +46,8 @@ public abstract class Plot {
         this.id = id;
         this.middleNorth = middleNorth;
         this.ground = ground;
-        setWaterRemover(region.getFlag(WaterRemoverListener.waterRemoverFlag) == State.ALLOW);
+
+        setWaterRemover(region.getFlag(WaterRemoverListener.waterRemoverFlag) == State.DENY);
         cannonTimer = deserializeCannonTimer(bauWorld);
     }
 

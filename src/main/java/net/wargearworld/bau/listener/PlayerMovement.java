@@ -3,7 +3,7 @@ package net.wargearworld.bau.listener;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.scoreboard.ScoreBoardBau;
-import net.wargearworld.bau.world.BauWorld;
+import net.wargearworld.bau.world.bauworld.BauWorld;
 import net.wargearworld.bau.world.WorldManager;
 import net.wargearworld.bau.worldedit.WorldGuardHandler;
 import org.bukkit.Bukkit;

@@ -1,9 +1,8 @@
 package net.wargearworld.bau.tools.explosion_cache;
 
-import com.destroystokyo.paper.event.block.BlockDestroyEvent;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
-import net.wargearworld.bau.world.BauWorld;
+import net.wargearworld.bau.world.bauworld.BauWorld;
 import net.wargearworld.bau.world.WorldManager;
 import net.wargearworld.command_manager.ArgumentList;
 import net.wargearworld.command_manager.CommandHandel;

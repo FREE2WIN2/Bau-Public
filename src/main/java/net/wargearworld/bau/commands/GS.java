@@ -6,12 +6,13 @@ import net.wargearworld.bau.dao.DatabaseDAO;
 import net.wargearworld.bau.dao.WorldDAO;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.team.Team;
+import net.wargearworld.bau.team.TeamManager;
 import net.wargearworld.bau.utils.ClickAction;
 import net.wargearworld.bau.utils.JsonCreater;
-import net.wargearworld.bau.world.BauWorld;
-import net.wargearworld.bau.world.PlayerWorld;
-import net.wargearworld.bau.world.TeamWorld;
+import net.wargearworld.bau.world.bauworld.BauWorld;
+import net.wargearworld.bau.world.bauworld.PlayerWorld;
 import net.wargearworld.bau.world.WorldManager;
+import net.wargearworld.bau.world.bauworld.TeamWorld;
 import net.wargearworld.command_manager.ArgumentList;
 import net.wargearworld.command_manager.CommandHandel;
 import net.wargearworld.command_manager.CommandNode;
@@ -214,23 +215,13 @@ public class GS implements TabExecutor {
     private void tpTeam(ArgumentList s) {
         Player p = getPlayer(s);
         BauPlayer bauPlayer = BauPlayer.getBauPlayer(p);
-        Team team = Team.of(bauPlayer);
+        Team team = TeamManager.getTeam(bauPlayer.getUuid());
         if(team == null){
-
+            MessageHandler.getInstance().send(p,"no_team");
         }else{
-
+            BauWorld teamWorld = WorldManager.getTeamWorld(team);
+            teamWorld.spawn(p);
         }
-        TeamWorld teamWorld = WorldManager.getTeamWorld(p.getUniqueId());
-       WargearTeam wargearTeam = EntityManagerExecuter.run(em->{});
-//        if (name == null) {
-//            WorldManager.getPlayerWorld(p.getName(), p.getUniqueId().toString()).spawn(p);
-//        } else {
-//            net.wargearworld.db.model.Player owner = DatabaseDAO.getPlayer(name);
-//            if (owner == null) {
-//                return; //TODO error
-//            }
-//            WorldManager.getPlayerWorld(name, owner.getUuid().toString()).spawn(p);
-//        }
     }
 
     private void rights(ArgumentList s, boolean b) {
@@ -262,8 +253,12 @@ public class GS implements TabExecutor {
     }
 
     private void tp(ArgumentList s) {
-        Player p = getPlayer(s);
         String name = s.getString("Spielername");
+        if(name.equalsIgnoreCase("team")){
+            tpTeam(s);
+            return;
+        }
+        Player p = getPlayer(s);
         if (name == null) {
             WorldManager.getPlayerWorld(p.getName(), p.getUniqueId().toString()).spawn(p);
         } else {

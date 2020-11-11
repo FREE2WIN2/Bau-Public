@@ -1,4 +1,4 @@
-package net.wargearworld.bau.world;
+package net.wargearworld.bau.world.bauworld;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -13,6 +13,8 @@ import net.wargearworld.bau.tools.cannon_timer.CannonTimer;
 import net.wargearworld.bau.tools.explosion_cache.ExplosionCache;
 import net.wargearworld.bau.utils.HelperMethods;
 import net.wargearworld.bau.utils.MethodResult;
+import net.wargearworld.bau.world.WorldManager;
+import net.wargearworld.bau.world.WorldTemplate;
 import net.wargearworld.bau.world.plot.Plot;
 import net.wargearworld.bau.world.plot.PlotType;
 
@@ -36,15 +38,16 @@ public abstract class BauWorld {
     private WorldTemplate template;
     private File logFile;
     private File worldSettingsDir;
-    private ExplosionCache explosionCache;
-
+    ExplosionCache explosionCache;
+    String worldName;
 
     public BauWorld(World world) {
         this.name = world.getName().split("_", 2)[1];
         this.worldUUID = world.getUID();
+        this.worldName = world.getName();
         regionManager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(world));
         worldSettingsDir = new File(Main.getPlugin().getDataFolder(), "worlds/" + world.getName());
-        if(!worldSettingsDir.exists())
+        if (!worldSettingsDir.exists())
             worldSettingsDir.mkdirs();
         logFile = new File(worldSettingsDir, "logs.txt");
         try {
@@ -155,7 +158,10 @@ public abstract class BauWorld {
         return true;
     }
 
-    public abstract void setTemplate(String templateName);
+    public void setTemplate(String templateName) {
+        WorldTemplate template = WorldTemplate.getTemplate(templateName);
+        setTemplate(template);
+    }
 
     public WorldTemplate getTemplate() {
         return template;
@@ -193,10 +199,16 @@ public abstract class BauWorld {
 
     public abstract void leave(Player p);
 
-    public void unload(){
-        for(Plot plot:plots.values()){
+    public void unload() {
+        for (Plot plot : plots.values()) {
             plot.unload(this);
         }
+    }
+
+    public abstract String rename(String newName);
+
+    protected void setWorldName(String newName) {
+        this.worldName = newName;
     }
 
     protected enum WorldAction {
@@ -229,11 +241,11 @@ public abstract class BauWorld {
         return explosionCache;
     }
 
-    protected abstract String getOwner();
+    public abstract String getOwner();
 
     public abstract boolean isMember(UUID member);
 
-    public abstract Set<String> getMemberNames();
+    public abstract Collection<String> getMemberNames();
 
     public CannonTimer getCannonTimer(Location loc) {
         return getPlot(loc).getCannonTimer();
@@ -241,5 +253,9 @@ public abstract class BauWorld {
 
     public File getWorldSettingsDir() {
         return worldSettingsDir;
+    }
+
+    public String getWorldName() {
+        return worldName;
     }
 }

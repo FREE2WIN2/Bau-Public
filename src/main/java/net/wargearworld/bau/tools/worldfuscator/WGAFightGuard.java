@@ -5,7 +5,7 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
-import net.wargearworld.bau.world.BauWorld;
+import net.wargearworld.bau.world.bauworld.BauWorld;
 import net.wargearworld.bau.world.WorldManager;
 import net.wargearworld.bau.world.plot.Plot;
 

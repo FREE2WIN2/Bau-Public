@@ -3,6 +3,9 @@ package net.wargearworld.bau.world;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.team.Team;
+import net.wargearworld.bau.world.bauworld.BauWorld;
+import net.wargearworld.bau.world.bauworld.PlayerWorld;
+import net.wargearworld.bau.world.bauworld.TeamWorld;
 import net.wargearworld.db.EntityManagerExecuter;
 import net.wargearworld.db.model.Plot;
 import net.wargearworld.db.model.PlotMember;
@@ -23,8 +26,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.UUID;
 
-import static net.wargearworld.bau.utils.HelperMethods.isInt;
-
 public class WorldManager {
 
     private static HashMap<UUID, BauWorld> worlds = new HashMap<>();
@@ -37,12 +38,9 @@ public class WorldManager {
         return get(loadWorld(name, owner));
     }
 
-//    public static BauWorld getTeamWorld(Team team) { // name is unique!
-//        return get(loadWorld(team));
-//    }
-
-    //    public static TeamWorld getTeamWorld(UUID uniqueId) {
-//    }
+    public static BauWorld getTeamWorld(Team team) { // name is unique!
+        return get(loadWorld(team));
+    }
 
     public static BauWorld getWorld(UUID worldUUID) {
         return worlds.get(worldUUID);
@@ -68,7 +66,7 @@ public class WorldManager {
             System.out.println(worldName + " " + owner);
             long id = readPlot(ownerUuid, worldName).getId();
             if (id == 0)
-                createWorldDir(worldName, owner, true);
+                createWorldDir(owner + "_" + worldName, template);
 
             WorldCreator wc = new WorldCreator(owner + "_" + worldName);
             wc.type(WorldType.NORMAL);
@@ -82,26 +80,23 @@ public class WorldManager {
         return w;
     }
 
-//    private static World loadWorld(Team team) {
-//        World w = Bukkit.getWorld(owner + "_" + worldName);
-//        if (w == null) {
-//            UUID ownerUuid = UUID.fromString(owner);
-//            System.out.println(worldName + " " + owner);
-//            long id = readPlot(ownerUuid, worldName).getId();
-//            if (id == 0)
-//                createWorldDir(worldName, owner, true);
-//
-//            WorldCreator wc = new WorldCreator("team_" + team.getId());
-//            wc.type(WorldType.NORMAL);
-//            w = Bukkit.getServer().createWorld(wc);
-//            w.setStorm(false);
-//            w.setThundering(false);
-//            w.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
-//            w.setGameRule(GameRule.DO_MOB_SPAWNING, false);
-//            worlds.put(w.getUID(), new TeamWorld(team, w));
-//        }
-//        return w;
-//    }
+    private static World loadWorld(Team team) {
+        World w = Bukkit.getWorld("team_" + team.getId());
+        if (w == null) {
+            if (!new File(Bukkit.getWorldContainer(), "team_" + team.getId()).exists()) {
+                createWorldDir("team_" + team.getId(), team.getTemplate());
+            }
+            WorldCreator wc = new WorldCreator("team_" + team.getId());
+            wc.type(WorldType.NORMAL);
+            w = Bukkit.getServer().createWorld(wc);
+            w.setStorm(false);
+            w.setThundering(false);
+            w.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
+            w.setGameRule(GameRule.DO_MOB_SPAWNING, false);
+            worlds.put(w.getUID(), new TeamWorld(team, w));
+        }
+        return w;
+    }
 
     public static void unloadWorld(String worldName) {
         undloadWorld(Bukkit.getWorld(worldName));
@@ -118,29 +113,18 @@ public class WorldManager {
         Bukkit.unloadWorld(world, true);
     }
 
-    public static void createWorldDir(String worldName, String ownerUUID, boolean plotExists) {
+    public static void createWorldDir(String worldName, WorldTemplate worldTemplate) {
         // File neu = new File(path + "/Worlds/" + uuid);
-        File neu = new File(Bukkit.getWorldContainer(), ownerUUID + "_" + worldName);
+        File neu = new File(Bukkit.getWorldContainer(), worldName);
         neu.mkdirs();
         neu.setExecutable(true, false);
         neu.setReadable(true, false);
         neu.setWritable(true, false);
-        copyFolder_raw(template.getWorldDir(), neu);
-        if (!plotExists) {
-            EntityManagerExecuter.run(em -> {
-                PlotTemplate dbTemplate = em.find(PlotTemplate.class, template.getId());
-                Plot plot = new Plot();
-                plot.setDefault(false);
-                plot.setName(worldName);
-                plot.setTemplate(dbTemplate);
-                plot.setOwner(em.find(net.wargearworld.db.model.Player.class, UUID.fromString(ownerUUID)));
-                em.persist(plot);
-            });
-        }
+        copyFolder_raw(worldTemplate.getWorldDir(), neu);
         // worldguard regionen
         File worldGuardWorldDir = new File(Bukkit.getWorldContainer(),
-                "plugins/WorldGuard/worlds/" + ownerUUID + "_" + worldName);
-        copyFolder_raw(template.getWorldguardDir(), worldGuardWorldDir);
+                "plugins/WorldGuard/worlds/" + worldName);
+        copyFolder_raw(worldTemplate.getWorldguardDir(), worldGuardWorldDir);
     }
 
     public static boolean deleteWorld(World w) {
@@ -232,9 +216,32 @@ public class WorldManager {
             p.kickPlayer("GS DELETE");
         }
         deleteWorld(oldWorld);
-        createWorldDir(name, world.getOwner(), true);
+        createWorldDir(world.getWorldName(), world.getTemplate());
         return loadWorld(name, world.getOwner());
 
+    }
+
+    public static World renameWorld(BauWorld world, String newName) {
+        world.setTemplate(template.getName());
+        World oldWorld = loadWorld(world);
+        worlds.remove(oldWorld.getUID());
+        for (Player p : oldWorld.getPlayers()) {
+            p.kickPlayer("GS Rename!");
+        }
+        world.rename(newName);
+        deleteWorld(oldWorld);
+        copyFolder_raw(new File(Bukkit.getWorldContainer(), world.getWorldName()), new File(Bukkit.getWorldContainer(), world.rename(newName)));
+        String newWorldName = world.getWorldName();
+        // worldguard regionen
+        File worldGuardWorldDir = new File(Bukkit.getWorldContainer(),
+                "plugins/WorldGuard/worlds/" + newWorldName);
+        copyFolder_raw(world.getTemplate().getWorldguardDir(), worldGuardWorldDir);
+        return loadWorld(newWorldName, world.getOwner());
+
+    }
+
+    private static World loadWorld(BauWorld world) {
+        return Bukkit.getWorld(world.getWorldUUID());
     }
 
     public static void startCheckForTempAddRemoves() {

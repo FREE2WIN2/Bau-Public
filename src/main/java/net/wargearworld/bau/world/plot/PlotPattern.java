@@ -4,7 +4,7 @@ import org.bukkit.Location;
 
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
-import net.wargearworld.bau.world.BauWorld;
+import net.wargearworld.bau.world.bauworld.BauWorld;
 import net.wargearworld.bau.worldedit.Schematic;
 import net.wargearworld.bau.utils.Loc;
 

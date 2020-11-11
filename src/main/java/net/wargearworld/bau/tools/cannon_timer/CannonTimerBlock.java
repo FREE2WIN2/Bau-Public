@@ -27,7 +27,7 @@ public class CannonTimerBlock implements Serializable, Cloneable {
     }
 
     public CannonTimerBlock(Loc loc) {
-        ticks = new HashMap<>();
+        ticks = new LinkedHashMap<>();
         this.loc = loc;
         this.settings = new CannonTimerSettings();
         this.active = true;
@@ -88,7 +88,7 @@ public class CannonTimerBlock implements Serializable, Cloneable {
         Integer newTick = getNewTick(tick, clickType);
         if (newTick == null)
             return null;
-        HashMap<Integer, CannonTimerTick> copy = new HashMap<>(ticks);
+        HashMap<Integer, CannonTimerTick> copy = new LinkedHashMap<>(ticks);
         ticks.clear();
         for (Map.Entry<Integer, CannonTimerTick> entry : copy.entrySet()) {
             if (entry.getKey() == tick) {
@@ -116,7 +116,7 @@ public class CannonTimerBlock implements Serializable, Cloneable {
         Integer newTick = getLowerTick(tick, clickType);
         if (newTick == null)
             return null;
-        Map<Integer, CannonTimerTick> copy = new HashMap<>(ticks);
+        Map<Integer, CannonTimerTick> copy = new LinkedHashMap<>(ticks);
         ticks.clear();
         for (Map.Entry<Integer, CannonTimerTick> entry : copy.entrySet()) {
             if (entry.getKey() == tick) {
@@ -159,7 +159,7 @@ public class CannonTimerBlock implements Serializable, Cloneable {
     public void sort() {
         System.out.println("sort");
         TreeMap<Integer, CannonTimerTick> newTicks = new TreeMap<>(ticks);
-        this.ticks = newTicks;
+        this.ticks.putAll(newTicks);
     }
 
     /* Serialization */

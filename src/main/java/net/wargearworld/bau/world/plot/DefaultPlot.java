@@ -1,6 +1,6 @@
 package net.wargearworld.bau.world.plot;
 
-import net.wargearworld.bau.world.BauWorld;
+import net.wargearworld.bau.world.bauworld.BauWorld;
 import org.bukkit.Location;
 
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;

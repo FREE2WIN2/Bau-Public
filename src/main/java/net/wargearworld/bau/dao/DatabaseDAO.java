@@ -7,8 +7,7 @@ import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class DatabaseDAO {
 
@@ -19,8 +18,7 @@ public class DatabaseDAO {
 
     public static Player getPlayer(UUID uuid) {
         return EntityManagerExecuter.run(em -> {
-            Player dbPlayer = em.find(Player.class, uuid);
-            Set<PlayerFriend> friends = dbPlayer.getFriends1();
+            return em.find(Player.class, uuid);
         });
     }
 
@@ -51,7 +49,6 @@ public class DatabaseDAO {
     }
 
 
-
     public static void sendMail(String sender, Player receiver, String message) {
         EntityManagerExecuter.run(em -> {
             Mail mail = new Mail();
@@ -61,7 +58,6 @@ public class DatabaseDAO {
             em.persist(mail);
         });
     }
-
 
 
     public static UUID getUUID(String playerName) {
@@ -85,4 +81,13 @@ public class DatabaseDAO {
 
     }
 
+    public static Collection<? extends String> getNames(Set<UUID> uuids) {
+        List<String> out = new ArrayList();
+        EntityManagerExecuter.run(em -> {
+            for (UUID uuid : uuids) {
+                out.add(em.find(Player.class, uuid).getName());
+            }
+        });
+        return out;
+    }
 }

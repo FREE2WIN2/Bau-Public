@@ -3,7 +3,7 @@ package net.wargearworld.bau.tools;
 import net.wargearworld.GUI_API.GUI.ChestGUI;
 import net.wargearworld.GUI_API.GUI.GUI;
 import net.wargearworld.GUI_API.Items.DefaultItem;
-import net.wargearworld.bau.world.BauWorld;
+import net.wargearworld.bau.world.bauworld.BauWorld;
 import net.wargearworld.bau.world.WorldManager;
 import net.wargearworld.bau.world.plot.Plot;
 import net.wargearworld.bau.world.plot.PlotType;

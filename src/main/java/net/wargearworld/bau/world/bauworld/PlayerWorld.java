@@ -1,4 +1,4 @@
-package net.wargearworld.bau.world;
+package net.wargearworld.bau.world.bauworld;
 
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
@@ -10,6 +10,7 @@ import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.utils.ClickAction;
 import net.wargearworld.bau.utils.JsonCreater;
 import net.wargearworld.bau.utils.MethodResult;
+import net.wargearworld.bau.world.WorldManager;
 import net.wargearworld.bau.world.plot.PlotPattern;
 import net.wargearworld.db.EntityManagerExecuter;
 import net.wargearworld.db.model.Plot;
@@ -18,9 +19,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-import javax.enterprise.inject.spi.CDI;
-import javax.persistence.EntityManager;
-import javax.transaction.Transactional;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -79,7 +77,7 @@ public class PlayerWorld extends BauWorld {
     }
 
     @Override
-    public Set<String> getMemberNames() {
+    public Collection<String> getMemberNames() {
         return EntityManagerExecuter.run(em -> {
             Set<String> out = new HashSet<>();
             Plot plot = em.find(Plot.class, plotID);
@@ -117,6 +115,29 @@ public class PlayerWorld extends BauWorld {
         return owner.equals(player.getUniqueId());
     }
 
+
+    @Override
+    public void removeAllMembersFromRegions() {
+        EntityManagerExecuter.run(em -> {
+            Plot dbPlot = em.find(Plot.class, plotID);
+            for (PlotMember member : dbPlot.getMembers()) {
+                super.removeMemberFromAllRegions(member.getMember().getUuid());
+            }
+        });
+
+    }
+
+    @Override
+    public void addAllMembersToRegions() {
+        EntityManagerExecuter.run(em -> {
+            Plot dbPlot = em.find(Plot.class, plotID);
+            for (PlotMember member : dbPlot.getMembers()) {
+                super.addPlayerToAllRegions(member.getMember().getUuid());
+            }
+        });
+    }
+
+
     @Override
     public void addTemp(String playerName, int time) {
         BauPlayer p = BauPlayer.getBauPlayer(owner);
@@ -130,53 +151,6 @@ public class PlayerWorld extends BauWorld {
     }
 
     @Override
-    public void setTemplate(String templateName) {
-        WorldTemplate template = WorldTemplate.getTemplate(templateName);
-        super.setTemplate(template);
-    }
-
-    @Override
-    public void removeAllMembersFromRegions() {
-        EntityManagerExecuter.run(em -> {
-            Plot dbPlot = em.find(Plot.class, plotID);
-            for (PlotMember member : dbPlot.getMembers()) {
-                for (ProtectedRegion region : super.regionManager.getRegions().values()) {
-                    DefaultDomain members = region.getMembers();
-                    members.removePlayer(member.getMember().getUuid());
-                    region.setMembers(members);
-                }
-            }
-            try {
-                regionManager.saveChanges();
-            } catch (StorageException e) {
-                e.printStackTrace();
-            }
-        });
-
-    }
-
-    @Override
-    public void addAllMembersToRegions() {
-        EntityManagerExecuter.run(em -> {
-            Plot dbPlot = em.find(Plot.class, plotID);
-            for (PlotMember member : dbPlot.getMembers()) {
-                for (ProtectedRegion region : regionManager.getRegions().values()) {
-                    DefaultDomain members = region.getMembers();
-                    members.addPlayer(member.getMember().getUuid());
-                    region.setMembers(members);
-                }
-            }
-            try {
-                regionManager.saveChanges();
-            } catch (StorageException e) {
-                e.printStackTrace();
-            }
-        });
-
-    }
-
-    @Override
-    @Transactional
     public MethodResult add(String playerName, Date to) {
 
         BauPlayer p = BauPlayer.getBauPlayer(owner);
@@ -230,7 +204,6 @@ public class PlayerWorld extends BauWorld {
     }
 
     @Override
-    @Transactional
     public void removeMember(UUID member) {
         Player ownerPlayer = Bukkit.getPlayer(owner);
         if (member.toString().equals(this.owner)) {
@@ -280,7 +253,7 @@ public class PlayerWorld extends BauWorld {
     }
 
     @Override
-    protected String getOwner() {
+    public String getOwner() {
         return owner.toString();
     }
 
@@ -296,6 +269,13 @@ public class PlayerWorld extends BauWorld {
         if (ownerPlayer == null || ownerPlayer == p)
             return;
         MessageHandler.getInstance().send(ownerPlayer, "plot_leaved", p.getName());
+    }
+
+    @Override
+    public String rename(String newName) {
+        super.setWorldName(newName);
+        super.worldName = owner + "_" + newName;
+        return getOwner() + "_" + newName;
     }
 
     @Override

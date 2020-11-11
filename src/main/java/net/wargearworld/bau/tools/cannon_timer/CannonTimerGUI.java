@@ -16,7 +16,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -117,7 +116,7 @@ public class CannonTimerGUI {
                     cannonTimerBlock.remove(entry.getKey());
                     openMain(p, cannonTimerBlock, page);
                 });
-                tick.setMaxStackSize(CannonTimerListener.MAX_TICKS);
+//                tick.setMaxStackSize(CannonTimerListener.MAX_TICKS);
 
 
                 Item decreaseTick = getHeadItem(p, ARROW_DOWN, "cannonTimer_gui_decreaseTick").setExecutor(s -> {
@@ -183,7 +182,7 @@ public class CannonTimerGUI {
         if (pageSize >= mapSize) {
             return map;
         }
-        Map<Integer, CannonTimerTick> out = new HashMap<>();
+        Map<Integer, CannonTimerTick> out = new LinkedHashMap<>();
         List<Integer> list = new ArrayList<>(map.keySet());
 
         if (list.size() - 1 < begin) {
