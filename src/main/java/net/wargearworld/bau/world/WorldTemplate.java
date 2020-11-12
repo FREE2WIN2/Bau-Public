@@ -2,14 +2,18 @@ package net.wargearworld.bau.world;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
+import net.wargearworld.GUI_API.Items.CustomHead;
+import net.wargearworld.GUI_API.Items.DefaultItem;
+import net.wargearworld.GUI_API.Items.HeadItem;
+import net.wargearworld.GUI_API.Items.Item;
+import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.db.EntityManagerExecuter;
 import net.wargearworld.db.model.PlotTemplate;
 import net.wargearworld.db.model.PlotTemplate_;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -28,7 +32,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-public class WorldTemplate {
+public class WorldTemplate implements Comparable {
     private static HashMap<String, WorldTemplate> templates;
 
     public static void load() {
@@ -55,6 +59,7 @@ public class WorldTemplate {
     private long id;
     private List<PlotPattern> plots;
     private String spawnPlotID;
+    private Double price;
 
     private WorldTemplate(File configFile) {
         name = configFile.getName().split("\\.")[0];
@@ -134,7 +139,44 @@ public class WorldTemplate {
                 exception.printStackTrace();
             }
             long id = template.getId();
+            this.price = template.getCosts();
             return id;
         });
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public Item getItem(UUID playerUUID) {
+        return EntityManagerExecuter.run(em -> {
+            PlotTemplate plotTemplate = em.find(PlotTemplate.class, id);
+            Item item;
+            if (plotTemplate.getIcon().getValue() != null) {
+                item = new HeadItem(new CustomHead(plotTemplate.getIcon().getValue()), s -> {
+                });
+            } else {
+                Material mat = Material.valueOf(plotTemplate.getIcon().getMaterial().toUpperCase());
+                item = new DefaultItem(mat,"");
+            }
+            return item;
+        });
+    }
+
+
+    @Override
+    public int compareTo(Object o) {
+        if (o instanceof WorldTemplate) {
+            return name.compareTo(((WorldTemplate) o).getName());
+        }
+        return 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        WorldTemplate that = (WorldTemplate) o;
+        return id == that.id;
     }
 }

@@ -159,6 +159,7 @@ public class CannonTimerBlock implements Serializable, Cloneable {
     public void sort() {
         System.out.println("sort");
         TreeMap<Integer, CannonTimerTick> newTicks = new TreeMap<>(ticks);
+        ticks.clear();
         this.ticks.putAll(newTicks);
     }
 

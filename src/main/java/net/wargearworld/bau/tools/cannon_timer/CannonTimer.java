@@ -6,6 +6,7 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
+import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.utils.Loc;
 import net.wargearworld.bau.utils.Scheduler;
 import net.wargearworld.bau.world.WorldManager;
@@ -28,7 +29,6 @@ public class CannonTimer implements Serializable {
     private transient boolean blocked;
     private transient Location startMove;
     private transient Loc lastOffset;
-
     public CannonTimer() {
         blocked = false;
         if (blocks == null)
@@ -41,6 +41,9 @@ public class CannonTimer implements Serializable {
             return;
         }
         blocked = true;
+        if(BauPlayer.getBauPlayer(p).getActivateTrailOnCannonTimer()){
+            p.performCommand("trail new");
+        }
         for (CannonTimerBlock block : blocks.values()) {
             block.startspawn(p.getWorld());
         }
@@ -77,6 +80,10 @@ public class CannonTimer implements Serializable {
 
     public void setBlock(Location loc, CannonTimerBlock cannonTimerBlock) {
         blocks.put(Loc.getByLocation(loc), cannonTimerBlock);
+    }
+
+    public void setBlock(Loc loc, CannonTimerBlock cannonTimerBlock) {
+        blocks.put(loc, cannonTimerBlock);
     }
 
     public void addBlock(Loc loc, CannonTimerBlock cannonTimerBlock) {

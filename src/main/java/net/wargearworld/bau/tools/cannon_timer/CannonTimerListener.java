@@ -3,6 +3,7 @@ package net.wargearworld.bau.tools.cannon_timer;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.player.BauPlayer;
+import net.wargearworld.bau.utils.Loc;
 import net.wargearworld.bau.world.bauworld.BauWorld;
 import net.wargearworld.bau.world.bauworld.PlayerWorld;
 import net.wargearworld.bau.world.WorldManager;
@@ -74,6 +75,12 @@ public class CannonTimerListener implements TabExecutor, Listener {
                             cannonTimer.undoMoving(p);
                         })));
 
+        commandHandel.addSubNode(literal("toggleAutoActivateTrail").setCallback(s->{
+            BauPlayer bauPlayer = BauPlayer.getBauPlayer(s.getPlayer().getUUID());
+            bauPlayer.setActivateTrailOnCannonTimer(!bauPlayer.getActivateTrailOnCannonTimer());
+            MessageHandler.getInstance().send(bauPlayer,"cannonTimer_settings_autoTrail_"+bauPlayer.getActivateTrailOnCannonTimer());
+        }));
+
         updatePaperNMS();
 
     }
@@ -144,13 +151,16 @@ public class CannonTimerListener implements TabExecutor, Listener {
         }
         CannonTimer cannonTimer = bauWorld.getCannonTimer(p.getLocation());
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-        Location blockLocation = event.getClickedBlock().getLocation();
+            Location blockLocation = event.getClickedBlock().getLocation();
             Material type = event.getClickedBlock().getType();
             if (type == blockMaterial || type == activeMaterial || type == inactiveMaterial) {
                 //openGUI
-                event.setCancelled(true);
                 CannonTimerBlock cannonTimerBlock = cannonTimer.getBlock(blockLocation);
-                if (p.isSneaking() && event.getItem().getType() == toolMaterial) {
+                if(cannonTimerBlock == null){
+                    return;
+                }
+                if (p.isSneaking() && event.getItem() != null && event.getItem().getType() == toolMaterial) {
+                    event.setCancelled(true);
                     BauPlayer bauPlayer = BauPlayer.getBauPlayer(p);
                     try {
                         bauPlayer.setMovingCannonTimerBlock(cannonTimerBlock.clone());
@@ -159,8 +169,10 @@ public class CannonTimerListener implements TabExecutor, Listener {
                     MessageHandler.getInstance().send(p, "cannonTimer_copied");
                     return;
                 }
-                if (cannonTimerBlock != null)
+                if (!p.isSneaking()) {
+                    event.setCancelled(true);
                     CannonTimerGUI.openMain(event.getPlayer(), cannonTimerBlock, 1);
+                }
             } else {
                 if (event.getItem().getType() == toolMaterial) {
                     cannonTimer.start(p);
@@ -168,7 +180,7 @@ public class CannonTimerListener implements TabExecutor, Listener {
                     return;
                 }
             }
-        } else if (event.getAction() == Action.LEFT_CLICK_BLOCK && event.getItem() !=null &&event.getItem().getType() == toolMaterial && p.isSneaking()) {
+        } else if (event.getAction() == Action.LEFT_CLICK_BLOCK && event.getItem() != null && event.getItem().getType() == toolMaterial && p.isSneaking()) {
             event.setCancelled(true);
             BauPlayer bauPlayer = BauPlayer.getBauPlayer(p);
             CannonTimerBlock cannonTimerBlock = bauPlayer.getCopiedCannonTimerBlock();
@@ -176,7 +188,9 @@ public class CannonTimerListener implements TabExecutor, Listener {
                 MessageHandler.getInstance().send(p, "cannonTimer_no_copy");
                 return;
             }
-            cannonTimer.setBlock(event.getClickedBlock().getLocation(), cannonTimerBlock);
+            Loc loc = Loc.getByLocation(event.getClickedBlock().getLocation());
+            cannonTimer.setBlock(loc, cannonTimerBlock);
+            cannonTimerBlock.setLoc(loc);
             MessageHandler.getInstance().send(p, "cannonTimer_pasted");
             return;
         } else if (event.getAction() == Action.RIGHT_CLICK_AIR && event.getItem().getType() == toolMaterial) {
@@ -195,7 +209,7 @@ public class CannonTimerListener implements TabExecutor, Listener {
                 return;
             }
         }
-        if (event.getBlock().getType().name().contains("SHULKER_BOX")) {
+        if (event.getBlockPlaced().getType().name().contains("SHULKER_BOX")) {
             //openGUI
             Location loc = event.getBlockPlaced().getLocation();
             CannonTimerBlock cannonTimerBlock = new CannonTimerBlock(loc);

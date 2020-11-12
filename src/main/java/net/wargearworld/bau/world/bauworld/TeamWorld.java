@@ -33,19 +33,11 @@ public class TeamWorld extends BauWorld {
 
     @Override
     public void showInfo(Player p) {
-        boolean isOwner = isOwner(p);
-        Main.send(p, "memberListHeader", getName());
+        Main.send(p, "memberListHeader", team.getName());
         for (String memberName : getMemberNames()) {
             String hover = MessageHandler.getInstance().getString(p, "memberHoverRemove").replace("%r", memberName);
             JsonCreater remove = new JsonCreater("§7[§6" + memberName + "§7]");
-            if (isOwner) {
-                remove.addClickEvent("/gs remove " + memberName, ClickAction.SUGGEST_COMMAND).addHoverEvent(hover);
-            }
             remove.send(p);
-        }
-        if (isOwner) {
-            new JsonCreater("§a[+]§r  ").addClickEvent("/gs add ", ClickAction.SUGGEST_COMMAND)
-                    .addHoverEvent(MessageHandler.getInstance().getString(p, "addMemberHover")).send(p);
         }
         Main.send(p, "timeShow", p.getWorld().getTime() + "");
     }

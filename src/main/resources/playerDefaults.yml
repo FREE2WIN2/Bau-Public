@@ -11,3 +11,5 @@ particles:
   selection:
     active: true
     color: 85 255 85 #rgb
+
+activateTrailOnCannonTimer: true

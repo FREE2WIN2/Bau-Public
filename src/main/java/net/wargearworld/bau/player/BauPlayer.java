@@ -23,8 +23,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
-import javax.enterprise.inject.spi.CDI;
-import javax.persistence.EntityManager;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -140,6 +138,15 @@ public class BauPlayer {
 
     public boolean getDT() {
         return config.getBoolean("dt");
+    }
+
+    public void setActivateTrailOnCannonTimer(boolean on){
+        config.set("activateTrailOnCannonTimer", on);
+        saveConfig();
+    }
+
+    public boolean getActivateTrailOnCannonTimer(){
+        return config.getBoolean("activateTrailOnCannonTimer");
     }
 
     public void sendMemberedGS() {

@@ -254,7 +254,7 @@ public class GS implements TabExecutor {
 
     private void tp(ArgumentList s) {
         String name = s.getString("Spielername");
-        if(name.equalsIgnoreCase("team")){
+        if(name != null && name.equalsIgnoreCase("team")){
             tpTeam(s);
             return;
         }
