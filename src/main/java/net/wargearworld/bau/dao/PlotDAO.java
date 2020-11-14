@@ -46,7 +46,6 @@ public class PlotDAO {
 
             PlotTemplate plotTemplate = em.find(PlotTemplate.class,teamWorld.getTemplate().getId());
             plotTemplate.getWargearTeams().add(wargearTeam);
-            System.out.println("plotTemlateID "  + plotTemplate.getId());
             wargearTeam.setTemplate(plotTemplate);
             em.merge(wargearTeam);
         });

@@ -111,6 +111,7 @@ public class Main extends JavaPlugin {
         new WorldFuscatorCommand(this);
         new WorldCommand(this);
         new PlotCommand(this);
+        new Buy(this);
         getCommand("tbs").setExecutor(TestBlockSlaveCore.getInstance());
         getCommand("tbs").setTabCompleter(new tbsTC());
         getCommand("sl").setExecutor(new Stoplag());

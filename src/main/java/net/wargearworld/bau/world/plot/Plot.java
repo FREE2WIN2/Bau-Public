@@ -46,8 +46,8 @@ public abstract class Plot {
         this.id = id;
         this.middleNorth = middleNorth;
         this.ground = ground;
-
-        setWaterRemover(region.getFlag(WaterRemoverListener.waterRemoverFlag) == State.DENY);
+        if (region != null)
+            setWaterRemover(region.getFlag(WaterRemoverListener.waterRemoverFlag) == State.DENY);
         cannonTimer = deserializeCannonTimer(bauWorld);
     }
 

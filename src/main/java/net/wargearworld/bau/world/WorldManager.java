@@ -61,7 +61,6 @@ public class WorldManager {
         World w = Bukkit.getWorld(owner + "_" + worldName);
         if (w == null) {
             UUID ownerUuid = UUID.fromString(owner);
-            System.out.println(worldName + " " + owner);
             long id = readPlot(ownerUuid, worldName).getId();
             if (id == 0)
                 createWorldDir(owner + "_" + worldName, template);
@@ -112,13 +111,14 @@ public class WorldManager {
     }
 
     public static void createWorldDir(String worldName, WorldTemplate worldTemplate) {
+        System.out.println("createWorldDIr: worldname: " + worldName + " Template: " + worldTemplate.getName());
         // File neu = new File(path + "/Worlds/" + uuid);
-        System.out.println(worldTemplate.getId() + " create");
         File neu = new File(Bukkit.getWorldContainer(), worldName);
         neu.mkdirs();
         neu.setExecutable(true, false);
         neu.setReadable(true, false);
         neu.setWritable(true, false);
+        System.out.println(worldTemplate.getWorldDir());
         copyFolder_raw(worldTemplate.getWorldDir(), neu);
         // worldguard regionen
         File worldGuardWorldDir = new File(Bukkit.getWorldContainer(),
@@ -213,25 +213,16 @@ public class WorldManager {
         }, 20 * 60, 20 * 60);
     }
 
-    public static World createNewWorld(BauWorld world) {
-        world.setTemplate(template.getName());
-        String name = world.getName();
+    public static void createNewWorld(BauWorld world) {
         World oldWorld = world.getWorld();
         for (Player p : oldWorld.getPlayers()) {
             p.kickPlayer("GS DELETE");
         }
         deleteWorld(oldWorld);
 //        createWorldDir(world.getWorldName(), world.getTemplate());
-//        if (world instanceof TeamWorld) {
-//            return loadWorld(((TeamWorld) world).getTeam());
-//        } else {
-//            return loadWorld(name, world.getOwner());
-//        }
-        return null;
     }
 
     public static World renameWorld(BauWorld world, String newName) {
-        world.setTemplate(template.getName());
         World oldWorld = loadWorld(world);
         worlds.remove(oldWorld.getUID());
         for (Player p : oldWorld.getPlayers()) {
@@ -266,7 +257,7 @@ public class WorldManager {
 
     }
 
-    private static Plot readPlot(UUID owner, String name) {
+    public static Plot readPlot(UUID owner, String name) {
         return EntityManagerExecuter.run(em -> {
             CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
             CriteriaQuery<Plot> criteriaQuery = criteriaBuilder.createQuery(Plot.class);

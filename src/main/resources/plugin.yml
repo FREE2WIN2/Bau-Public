@@ -65,6 +65,8 @@ commands:
      aliases: [ct,kt,timer]
    plot:
      aliases: [p,tpplot,plottp]
+   buy:
+     description: Buy stuff like WWorlds and Templates
 permissions:
   bau.*:
     default: op

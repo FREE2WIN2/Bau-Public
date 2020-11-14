@@ -220,16 +220,13 @@ public class GS implements TabExecutor {
                 .setRequirement(owner)
                 .addSubNode(argument("template", dynamicList("template", s -> {
                     Set<String> out = new TreeSet<>();
-                    PlayerDAO.getPlayersTeamplates(s.getPlayer().getUUID()).entrySet().forEach(entry ->
-                    {
+                    PlayerDAO.getPlayersTeamplates(s.getPlayer().getUUID()).entrySet().forEach(entry ->{
                         if (entry.getValue()) {
                             out.add(entry.getKey().getName());
-                        }
-                    });
-                    return out;
-                })).setCallback(s -> {
-                    setPlotTemplate(s, 1);
-                })
+                        }});return out;}))
+                        .setCallback(s -> {
+                            setPlotTemplate(s, 1);
+                        })
                         .addSubNode(invisible(argument("UUID1", dynamicList("UUID1", s -> {
                             return List.of(getPlayer(s.getArgumentList()).getUniqueId().toString());
                         }))
@@ -254,15 +251,15 @@ public class GS implements TabExecutor {
             bauWorld.newWorld();
             bauWorld.setTemplate(s.getString("template"));
         } else if (argsLength == 2 && p.getUniqueId().toString().equals(s.getString("UUID1"))) {
-            JsonCreater jsonMsg = new JsonCreater(Main.prefix + MessageHandler.getInstance().getString(p, "gs_newTemplate_secondWarn,templatename"));
-            JsonCreater jsonMsgClick = new JsonCreater(MessageHandler.getInstance().getString(p, "gs_newTemplate_secondWarn_click"));
-            jsonMsgClick.addHoverEvent(MessageHandler.getInstance().getString(p, "gs_newTemplate_secondWarn_clickHover", templateName));
+            JsonCreater jsonMsg = new JsonCreater(Main.prefix + MessageHandler.getInstance().getString(p, "gs_newPlotTemplate_secondWarn",templateName));
+            JsonCreater jsonMsgClick = new JsonCreater(MessageHandler.getInstance().getString(p, "gs_newPlotTemplate_secondWarn_click"));
+            jsonMsgClick.addHoverEvent(MessageHandler.getInstance().getString(p, "gs_newPlotTemplate_secondWarn_clickHover", templateName));
             jsonMsg.addJson(jsonMsgClick.addClickEvent("/gs setTemplate " + templateName + " " + uuid.toString() + " " + uuid.toString(),
                     ClickAction.RUN_COMMAND)).send(p);
         } else if (argsLength == 1) {
-            JsonCreater jsonMsg = new JsonCreater(Main.prefix + MessageHandler.getInstance().getString(p, "gs_newTemplate_firstWarn", templateName));
-            JsonCreater jsonMsgClick = new JsonCreater(MessageHandler.getInstance().getString(p, "gs_newTemplate_firstWarn_click"));
-            jsonMsgClick.addHoverEvent(MessageHandler.getInstance().getString(p, "gs_newTemplate_firstWarn_clickHover", templateName));
+            JsonCreater jsonMsg = new JsonCreater(Main.prefix + MessageHandler.getInstance().getString(p, "gs_newPlotTemplate_firstWarn", templateName));
+            JsonCreater jsonMsgClick = new JsonCreater(MessageHandler.getInstance().getString(p, "gs_newPlotTemplate_firstWarn_click"));
+            jsonMsgClick.addHoverEvent(MessageHandler.getInstance().getString(p, "gs_newPlotTemplate_firstWarn_clickHover", templateName));
             jsonMsg.addJson(jsonMsgClick.addClickEvent("/gs setTemplate " + templateName + " " + uuid.toString(), ClickAction.RUN_COMMAND)).send(p);
         }
     }

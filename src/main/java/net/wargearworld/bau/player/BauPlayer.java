@@ -1,5 +1,11 @@
 package net.wargearworld.bau.player;
 
+import com.sk89q.worldedit.EmptyClipboardException;
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.session.ClipboardHolder;
 import net.minecraft.server.v1_15_R1.IChatBaseComponent;
 import net.minecraft.server.v1_15_R1.IChatBaseComponent.ChatSerializer;
 import net.minecraft.server.v1_15_R1.PacketPlayOutChat;
@@ -13,6 +19,7 @@ import net.wargearworld.bau.tools.testBlockSlave.TestBlockSlave;
 import net.wargearworld.bau.tools.testBlockSlave.testBlockEditor.TestBlockEditor;
 import net.wargearworld.bau.world.WorldManager;
 import net.wargearworld.bau.world.plot.Plot;
+import net.wargearworld.bau.worldedit.WorldEditHandler;
 import net.wargearworld.db.EntityManagerExecuter;
 import net.wargearworld.db.model.PlotMember;
 import org.bukkit.Bukkit;
@@ -63,6 +70,7 @@ public class BauPlayer {
     private TestBlockEditor testBlockEditor;
     private AutoCannonReloader cannonReloader;
     private CannonTimerBlock copiedCannonTimerBlock;
+    private File clipboardFile;
     private BauPlayer(UUID uuid) {
         this.uuid = uuid;
         configFile = new File(Main.getPlugin().getDataFolder(), "users/" + uuid.toString() + "/settings.yml");
@@ -121,7 +129,11 @@ public class BauPlayer {
     }
 
     public Plot getCurrentPlot() {
-        Location loc = getBukkitPlayer().getLocation();
+        Player p = getBukkitPlayer();
+        if(p == null)
+            return null;
+
+        Location loc = p.getLocation();
         return WorldManager.get(loc.getWorld()).getPlot(loc);
     }
 
@@ -200,11 +212,15 @@ public class BauPlayer {
     }
 
     public Set<net.wargearworld.db.model.Plot> getdbPlots(){
-        Set<net.wargearworld.db.model.Plot> plots = getDbPlayer().getPlots();
-        return plots;
+        return EntityManagerExecuter.run(em->{
+            return em.find(net.wargearworld.db.model.Player.class,uuid).getPlots();
+        });
     }
     public boolean hasPlots(){
-        return !getdbPlots().isEmpty();
+        return EntityManagerExecuter.run(em->{
+            Set<net.wargearworld.db.model.Plot> plots = em.find(net.wargearworld.db.model.Player.class,uuid).getPlots();
+            return plots !=null && !plots.isEmpty();
+        });
     }
 
     public TestBlockSlave getTestBlockSlave() {
@@ -231,5 +247,30 @@ public class BauPlayer {
 
     public CannonTimerBlock getCopiedCannonTimerBlock() {
         return copiedCannonTimerBlock;
+    }
+
+    public void loadClipboard() {
+        Player p = getBukkitPlayer();
+        if(p == null)
+            return;
+        LocalSession localSession = WorldEdit.getInstance().getSessionManager().get(BukkitAdapter.adapt(p));
+        clipboardFile = new File(Main.getPlugin().getDataFolder(), "users/" + uuid.toString() + "/clipboard.schem");
+        if(!clipboardFile.exists())
+            return;
+        Clipboard clipboard = WorldEditHandler.createClipboard(clipboardFile);
+        localSession.setClipboard(new ClipboardHolder(clipboard));
+        MessageHandler.getInstance().send(p,"clipboard_restored");
+    }
+
+    public void saveClipboard() {
+        Player p = getBukkitPlayer();
+        if(p == null)
+            return;
+        LocalSession localSession = WorldEdit.getInstance().getSessionManager().get(BukkitAdapter.adapt(p));
+        try {
+        WorldEditHandler.saveClipboardAsSchematic(Main.getPlugin().getDataFolder() + "users/" + uuid.toString(), "clipboard.schem",localSession.getClipboard().getClipboard());
+        MessageHandler.getInstance().send(p,"clipboard_saved");
+        } catch (EmptyClipboardException e) {}
+
     }
 }

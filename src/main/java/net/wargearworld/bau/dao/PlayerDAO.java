@@ -1,9 +1,11 @@
 package net.wargearworld.bau.dao;
 
+import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.world.WorldTemplate;
 import net.wargearworld.db.EntityManagerExecuter;
 import net.wargearworld.db.model.Player;
 import net.wargearworld.db.model.PlayerPlotTemplate;
+import net.wargearworld.db.model.Plot;
 import net.wargearworld.db.model.PlotTemplate;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -49,6 +51,18 @@ public class PlayerDAO {
             plotTemplate.addPlayerPlotTemplate(playerPlotTemplate);
 
             em.persist(playerPlotTemplate);
+        });
+    }
+
+    public static PlotTemplate getDefaultPlotTemplate(UUID uuid) {
+        return EntityManagerExecuter.run(em->{
+            Player dbPlayer = em.find(Player.class,uuid);
+            for(Plot plot:dbPlayer.getPlots()){
+                if(plot.getDefault()){
+                    return plot.getTemplate();
+                }
+            }
+            return null;
         });
     }
 }

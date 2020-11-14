@@ -55,7 +55,6 @@ public abstract class BauWorld {
                 if (!logFile.getParentFile().exists())
                     logFile.getParentFile().mkdirs();
             logFile.createNewFile();
-//			config.load(configFile);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -72,7 +71,11 @@ public abstract class BauWorld {
 
     public Plot getPlot(Location loc) {
         BlockVector3 pos = BlockVector3.at(loc.getX(), loc.getY(), loc.getZ());
-        return getPlot(regionManager.getApplicableRegionsIDs(pos).get(0));
+        List<String> regionsIDs = regionManager.getApplicableRegionsIDs(pos);
+        if(regionsIDs.size() < 1){
+            return null;
+        }
+        return getPlot(regionsIDs.get(0));
     }
 
     public World getWorld() {
@@ -149,12 +152,7 @@ public abstract class BauWorld {
 
     public boolean newWorld() {
         removeAllMembersFromRegions();
-        regionManager = null;
-        World world = WorldManager.createNewWorld(this);
-//        this.worldUUID = world.getUID();
-//        this.name = world.getName();
-//
-//        regionManager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(world));
+        WorldManager.createNewWorld(this);
         return true;
     }
 
@@ -246,7 +244,10 @@ public abstract class BauWorld {
     public abstract Collection<String> getMemberNames();
 
     public CannonTimer getCannonTimer(Location loc) {
-        return getPlot(loc).getCannonTimer();
+        Plot plot = getPlot(loc);
+        if(plot == null)
+            return null;
+        return plot.getCannonTimer();
     }
 
     public File getWorldSettingsDir() {

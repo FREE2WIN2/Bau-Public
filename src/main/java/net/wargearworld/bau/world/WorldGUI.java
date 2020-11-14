@@ -7,6 +7,11 @@ import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.dao.PlayerDAO;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.world.bauworld.BauWorld;
+import net.wargearworld.db.model.enums.TransactionType;
+import net.wargearworld.economy.core.account.Account;
+import net.wargearworld.economy.core.account.Transaction;
+import net.wargearworld.economy.core.exception.NegativeAmountException;
+import net.wargearworld.economy.core.exception.NotEnoughMoneyException;
 import net.wargearworld.economy.core.utils.EconomyFormatter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -16,6 +21,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.List;
 import java.util.Map;
 
 public class WorldGUI implements Listener {
@@ -64,14 +70,11 @@ public class WorldGUI implements Listener {
                 worldTemplateItem.addLore(msgHandler.getString(p, "worldTemplateGUI_template_not_available_lore"));
                 worldTemplateItem.addLore(msgHandler.getString(p, "worldTemplateGUI_template_price_lore", economyFormatter.format(worldTemplate.getPrice())));
                 worldTemplateItem.setExecutor(s -> {
-                    //TODO Kaufen
-
-
+                    p.performCommand("buy template " + worldTemplate.getName());
+                    p.getOpenInventory().close();
                 });
             }
             if (bauWorld.getTemplate().equals(entry.getKey())) {
-//                worldTemplateItem.addEnchantment(Enchantment.VANISHING_CURSE, 1);
-//                worldTemplateItem.addItemFLags(ItemFlag.HIDE_ENCHANTS);
                 worldTemplateItem.addLore(msgHandler.getString(p, "worldTemplateGUI_template_active_lore"));
                 worldTemplateItem.setExecutor(s -> {
                     if (bauWorld.isOwner(s.getPlayer())) {
