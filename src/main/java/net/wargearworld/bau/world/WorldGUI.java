@@ -7,6 +7,7 @@ import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.dao.PlayerDAO;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.world.bauworld.BauWorld;
+import net.wargearworld.economy.core.utils.EconomyFormatter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -33,26 +34,55 @@ public class WorldGUI implements Listener {
     }
 
     public static void openTemplates(Player p) {
+        MessageHandler msgHandler = MessageHandler.getInstance();
         BauPlayer bauPlayer = BauPlayer.getBauPlayer(p);
         BauWorld bauWorld = WorldManager.get(p.getWorld());
         Map<WorldTemplate, Boolean> playersTemplates = PlayerDAO.getPlayersTeamplates(bauPlayer.getUuid());
         int invSize = (playersTemplates.size() + 8) / 9;
         GUI gui = new ChestGUI(invSize * 9, MessageHandler.getInstance().getString(p, "worldTemplateGUI_title"));
+        EconomyFormatter economyFormatter = EconomyFormatter.getInstance();
         for (Map.Entry<WorldTemplate, Boolean> entry : playersTemplates.entrySet()) {
+            WorldTemplate worldTemplate = entry.getKey();
             Item worldTemplateItem = entry.getKey().getItem(bauPlayer.getUuid());
             String prefix = "§c";
-            if (entry.getValue()) {
+
+            worldTemplateItem.addLore("§8§m                    ");
+            worldTemplateItem.addLore(" ");
+            if (entry.getValue() || worldTemplate.getPrice() == 0) {
+                if (!entry.getValue()) {
+                    PlayerDAO.addPlotTemplate(worldTemplate, p.getUniqueId());
+                }
                 prefix = "§3";
+                worldTemplateItem.addLore(msgHandler.getString(p, "worldTemplateGUI_template_available_lore"));
+                worldTemplateItem.setExecutor(s -> {
+                    if (bauWorld.isOwner(s.getPlayer())) {
+                        s.getPlayer().closeInventory();
+                        s.getPlayer().performCommand("gs setTemplate " + worldTemplate.getName());
+                    }
+                });
+            } else {
+                worldTemplateItem.addLore(msgHandler.getString(p, "worldTemplateGUI_template_not_available_lore"));
+                worldTemplateItem.addLore(msgHandler.getString(p, "worldTemplateGUI_template_price_lore", economyFormatter.format(worldTemplate.getPrice())));
+                worldTemplateItem.setExecutor(s -> {
+                    //TODO Kaufen
+
+
+                });
             }
-            if (bauWorld.getTemplate().equals(entry.getKey())) { //Doenst work!
-                worldTemplateItem.addEnchantment(Enchantment.VANISHING_CURSE, 1);
-                worldTemplateItem.addItemFLags(ItemFlag.HIDE_ENCHANTS);
+            if (bauWorld.getTemplate().equals(entry.getKey())) {
+//                worldTemplateItem.addEnchantment(Enchantment.VANISHING_CURSE, 1);
+//                worldTemplateItem.addItemFLags(ItemFlag.HIDE_ENCHANTS);
+                worldTemplateItem.addLore(msgHandler.getString(p, "worldTemplateGUI_template_active_lore"));
+                worldTemplateItem.setExecutor(s -> {
+                    if (bauWorld.isOwner(s.getPlayer())) {
+                        s.getPlayer().performCommand("gs new");
+                        s.getPlayer().closeInventory();
+                    }
+                });
             }
             //ODO addLore
             worldTemplateItem.setName(prefix + entry.getKey().getName());
-            worldTemplateItem.setExecutor(s -> {
-                //TODO
-            });
+
 
             gui.addItem(worldTemplateItem);
         }

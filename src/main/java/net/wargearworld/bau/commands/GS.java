@@ -3,6 +3,7 @@ package net.wargearworld.bau.commands;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.dao.DatabaseDAO;
+import net.wargearworld.bau.dao.PlayerDAO;
 import net.wargearworld.bau.dao.WorldDAO;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.team.Team;
@@ -47,6 +48,7 @@ public class GS implements TabExecutor {
     public static File logFile;
     private HashSet<UUID> firstWarnNewPlot = new HashSet<>();
     private HashSet<UUID> secondWarnNewPlot = new HashSet<>();
+
     private HashSet<UUID> blocked = new HashSet<>();
 
 
@@ -137,8 +139,11 @@ public class GS implements TabExecutor {
             BauPlayer.getBauPlayer(getPlayer(s)).sendMemberedGS();
         }));
 
+        commandHandle.addSubNode(literal("team")).setCallback(s -> {
+            tpTeam(s);
+        });
         commandHandle.addSubNode(literal("tp")
-                .addSubNode(literal("team")).setCallback(s->{
+                .addSubNode(literal("team")).setCallback(s -> {
                     tpTeam(s);
                 })
                 .addSubNode(argument("Spielername", new StringArgument())
@@ -210,15 +215,65 @@ public class GS implements TabExecutor {
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();
         }
+        /* gs setTemplate <Template> */
+        commandHandle.addSubNode(literal("setTemplate")
+                .setRequirement(owner)
+                .addSubNode(argument("template", dynamicList("template", s -> {
+                    Set<String> out = new TreeSet<>();
+                    PlayerDAO.getPlayersTeamplates(s.getPlayer().getUUID()).entrySet().forEach(entry ->
+                    {
+                        if (entry.getValue()) {
+                            out.add(entry.getKey().getName());
+                        }
+                    });
+                    return out;
+                })).setCallback(s -> {
+                    setPlotTemplate(s, 1);
+                })
+                        .addSubNode(invisible(argument("UUID1", dynamicList("UUID1", s -> {
+                            return List.of(getPlayer(s.getArgumentList()).getUniqueId().toString());
+                        }))
+                                .setCallback(s -> {
+                                    setPlotTemplate(s, 2);
+                                })
+                                .addSubNode(
+                                        argument("UUID2", dynamicList("UUID2", s -> {
+                                            return List.of(getPlayer(s.getArgumentList()).getUniqueId().toString());
+                                        })).setCallback(s -> {
+                                            setPlotTemplate(s, 3);
+                                        }))))));
+    }
+
+    private void setPlotTemplate(ArgumentList s, int argsLength) {
+        Player p = getPlayer(s);
+        UUID uuid = p.getUniqueId();
+        String templateName = s.getString("template");
+        if (argsLength == 3 && p.getUniqueId().toString().equals(s.getString("UUID2"))) {
+            Main.send(p, "gs_newTemplateGenerating", templateName);
+            BauWorld bauWorld = WorldManager.get(p.getWorld());
+            bauWorld.newWorld();
+            bauWorld.setTemplate(s.getString("template"));
+        } else if (argsLength == 2 && p.getUniqueId().toString().equals(s.getString("UUID1"))) {
+            JsonCreater jsonMsg = new JsonCreater(Main.prefix + MessageHandler.getInstance().getString(p, "gs_newTemplate_secondWarn,templatename"));
+            JsonCreater jsonMsgClick = new JsonCreater(MessageHandler.getInstance().getString(p, "gs_newTemplate_secondWarn_click"));
+            jsonMsgClick.addHoverEvent(MessageHandler.getInstance().getString(p, "gs_newTemplate_secondWarn_clickHover", templateName));
+            jsonMsg.addJson(jsonMsgClick.addClickEvent("/gs setTemplate " + templateName + " " + uuid.toString() + " " + uuid.toString(),
+                    ClickAction.RUN_COMMAND)).send(p);
+        } else if (argsLength == 1) {
+            JsonCreater jsonMsg = new JsonCreater(Main.prefix + MessageHandler.getInstance().getString(p, "gs_newTemplate_firstWarn", templateName));
+            JsonCreater jsonMsgClick = new JsonCreater(MessageHandler.getInstance().getString(p, "gs_newTemplate_firstWarn_click"));
+            jsonMsgClick.addHoverEvent(MessageHandler.getInstance().getString(p, "gs_newTemplate_firstWarn_clickHover", templateName));
+            jsonMsg.addJson(jsonMsgClick.addClickEvent("/gs setTemplate " + templateName + " " + uuid.toString(), ClickAction.RUN_COMMAND)).send(p);
+        }
     }
 
     private void tpTeam(ArgumentList s) {
         Player p = getPlayer(s);
         BauPlayer bauPlayer = BauPlayer.getBauPlayer(p);
         Team team = TeamManager.getTeam(bauPlayer.getUuid());
-        if(team == null){
-            MessageHandler.getInstance().send(p,"no_team");
-        }else{
+        if (team == null) {
+            MessageHandler.getInstance().send(p, "no_team");
+        } else {
             BauWorld teamWorld = WorldManager.getTeamWorld(team);
             teamWorld.spawn(p);
         }
@@ -254,7 +309,7 @@ public class GS implements TabExecutor {
 
     private void tp(ArgumentList s) {
         String name = s.getString("Spielername");
-        if(name != null && name.equalsIgnoreCase("team")){
+        if (name != null && name.equalsIgnoreCase("team")) {
             tpTeam(s);
             return;
         }

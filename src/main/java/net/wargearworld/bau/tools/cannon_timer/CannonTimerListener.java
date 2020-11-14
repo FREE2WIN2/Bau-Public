@@ -81,6 +81,11 @@ public class CannonTimerListener implements TabExecutor, Listener {
             MessageHandler.getInstance().send(bauPlayer,"cannonTimer_settings_autoTrail_"+bauPlayer.getActivateTrailOnCannonTimer());
         }));
 
+        commandHandel.addSubNode(literal("start").setCallback(s->{
+            Player p  = getPlayer(s);
+            WorldManager.get(p.getWorld()).getCannonTimer(p.getLocation()).start(p);
+        }));
+
         updatePaperNMS();
 
     }
@@ -143,12 +148,16 @@ public class CannonTimerListener implements TabExecutor, Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player p = event.getPlayer();
         BauWorld bauWorld = WorldManager.get(p.getWorld());
+        if(bauWorld == null){
+            return;
+        }
         if (bauWorld instanceof PlayerWorld) {
             if (!((PlayerWorld) bauWorld).hasRights(p.getUniqueId())) {
                 event.setCancelled(true);
                 return;
             }
         }
+
         CannonTimer cannonTimer = bauWorld.getCannonTimer(p.getLocation());
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             Location blockLocation = event.getClickedBlock().getLocation();
@@ -174,7 +183,7 @@ public class CannonTimerListener implements TabExecutor, Listener {
                     CannonTimerGUI.openMain(event.getPlayer(), cannonTimerBlock, 1);
                 }
             } else {
-                if (event.getItem().getType() == toolMaterial) {
+                if (event.getItem() != null && event.getItem().getType() == toolMaterial) {
                     cannonTimer.start(p);
                     event.setCancelled(true);
                     return;

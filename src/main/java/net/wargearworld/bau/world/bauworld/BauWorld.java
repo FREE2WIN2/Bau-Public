@@ -35,7 +35,7 @@ public abstract class BauWorld {
     private String name;
     HashMap<String, Plot> plots;
     protected RegionManager regionManager;
-    private WorldTemplate template;
+    WorldTemplate template;
     private File logFile;
     private File worldSettingsDir;
     ExplosionCache explosionCache;
@@ -151,10 +151,10 @@ public abstract class BauWorld {
         removeAllMembersFromRegions();
         regionManager = null;
         World world = WorldManager.createNewWorld(this);
-        this.worldUUID = world.getUID();
-        this.name = world.getName();
-
-        regionManager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(world));
+//        this.worldUUID = world.getUID();
+//        this.name = world.getName();
+//
+//        regionManager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(world));
         return true;
     }
 
@@ -167,9 +167,7 @@ public abstract class BauWorld {
         return template;
     }
 
-    protected void setTemplate(WorldTemplate template) {
-        this.template = template;
-    }
+    public abstract void setTemplate(WorldTemplate template);
 
     public abstract void removeAllMembersFromRegions();
 

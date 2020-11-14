@@ -8,8 +8,6 @@ import net.wargearworld.bau.world.bauworld.PlayerWorld;
 import net.wargearworld.bau.world.bauworld.TeamWorld;
 import net.wargearworld.db.EntityManagerExecuter;
 import net.wargearworld.db.model.Plot;
-import net.wargearworld.db.model.PlotMember;
-import net.wargearworld.db.model.PlotTemplate;
 import net.wargearworld.db.model.Plot_;
 import org.bukkit.WorldType;
 import org.bukkit.*;
@@ -106,7 +104,7 @@ public class WorldManager {
         if (world == null) {
             return;
         }
-        if (!world.getName().contains("test") && !world.getName().contains("world")) {
+        if (!world.getName().contains("test") && !world.getName().contains("world") && world.getName().length() != 5) {
             worlds.get(world.getUID()).unload();
             worlds.remove(world.getUID());
         }
@@ -115,6 +113,7 @@ public class WorldManager {
 
     public static void createWorldDir(String worldName, WorldTemplate worldTemplate) {
         // File neu = new File(path + "/Worlds/" + uuid);
+        System.out.println(worldTemplate.getId() + " create");
         File neu = new File(Bukkit.getWorldContainer(), worldName);
         neu.mkdirs();
         neu.setExecutable(true, false);
@@ -128,28 +127,20 @@ public class WorldManager {
     }
 
     public static boolean deleteWorld(World w) {
-        Bukkit.getServer().unloadWorld(w, true);
         BauWorld world = worlds.get(w);
+        Bukkit.getServer().unloadWorld(w, false);
 
         if (w.getWorldFolder().exists()) {
             if (deleteDir(w.getWorldFolder())) { //TODO check if world ist instacne of PlayerWorld
-                if (world instanceof PlayerWorld) {
-                    EntityManagerExecuter.run(em -> {
-                        Plot plot = em.find(Plot.class, world.getId());
-                        for (PlotMember plotMember : plot.getMembers()) {
-                            plot.removeMember(plotMember);
-                        }
-                        plot.setTemplate(em.find(PlotTemplate.class, template.getId()));
-                        em.merge(plot);
-                    });
-
-                }
-                if (!w.getName().contains("test") && !w.getName().contains("world")) {
+                if (world != null) {
                     worlds.remove(w.getUID());
                 }
 
                 File file = new File(Bukkit.getWorldContainer(), "plugins/WorldGuard/worlds/" + w.getName());
-                file.delete();
+                deleteDir(file);
+
+                File persistDir = new File(Main.getPlugin().getDataFolder(), "worlds/" + w.getName());
+                deleteDir(persistDir, "ser");
                 return true;
             }
         }
@@ -184,18 +175,32 @@ public class WorldManager {
 
     }
 
-    public static boolean deleteDir(File path) {
+    public static boolean deleteDir(File path, String... strings) {
         if (path.exists()) {
             File files[] = path.listFiles();
             for (int i = 0; i < files.length; i++) {
                 if (files[i].isDirectory()) {
-                    deleteDir(files[i]);
+                    deleteDir(files[i], strings);
                 } else {
-                    files[i].delete();
+                    boolean deleted = false;
+                    for (String end : strings) {
+                        if (files[i].getName().endsWith(end)) {
+                            files[i].delete();
+                            deleted = true;
+                            break;
+                        }
+                    }
+                    if (!deleted && strings.length == 0) {
+                        files[i].delete();
+                    }
                 }
             }
         }
-        return (path.delete());
+        if (path.listFiles().length == 0) {
+            return (path.delete());
+        } else {
+            return true;
+        }
     }
 
     public static void checkForWorldsToUnload() {
@@ -211,14 +216,18 @@ public class WorldManager {
     public static World createNewWorld(BauWorld world) {
         world.setTemplate(template.getName());
         String name = world.getName();
-        World oldWorld = loadWorld(name, world.getOwner());
+        World oldWorld = world.getWorld();
         for (Player p : oldWorld.getPlayers()) {
             p.kickPlayer("GS DELETE");
         }
         deleteWorld(oldWorld);
-        createWorldDir(world.getWorldName(), world.getTemplate());
-        return loadWorld(name, world.getOwner());
-
+//        createWorldDir(world.getWorldName(), world.getTemplate());
+//        if (world instanceof TeamWorld) {
+//            return loadWorld(((TeamWorld) world).getTeam());
+//        } else {
+//            return loadWorld(name, world.getOwner());
+//        }
+        return null;
     }
 
     public static World renameWorld(BauWorld world, String newName) {

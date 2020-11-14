@@ -1,16 +1,15 @@
 package net.wargearworld.bau.world.bauworld;
 
-import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.managers.storage.StorageException;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.dao.DatabaseDAO;
+import net.wargearworld.bau.dao.PlotDAO;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.utils.ClickAction;
 import net.wargearworld.bau.utils.JsonCreater;
 import net.wargearworld.bau.utils.MethodResult;
 import net.wargearworld.bau.world.WorldManager;
+import net.wargearworld.bau.world.WorldTemplate;
 import net.wargearworld.bau.world.plot.PlotPattern;
 import net.wargearworld.db.EntityManagerExecuter;
 import net.wargearworld.db.model.Plot;
@@ -224,6 +223,12 @@ public class PlayerWorld extends BauWorld {
 
 
         }
+    }
+
+    @Override
+    public void setTemplate(WorldTemplate template) {
+        super.template = template;
+        PlotDAO.update(this);
     }
 
     private void memberRemoved(UUID uuid) {

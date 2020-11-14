@@ -114,6 +114,8 @@ public class WaterRemover {
 
     public void handleExplode(EntityExplodeEvent event){
         event.setYield(0);
+        if(tnts == null || event.getEntity() == null || tnts.get(event.getEntity().getUniqueId()) == null)
+            return;
         boolean primeZSmallerThanMiddleZ = tnts.get(event.getEntity().getUniqueId());
         boolean explosionZSmallerThanMiddleZ = event.getEntity().getLocation().getBlockZ() < z;
 

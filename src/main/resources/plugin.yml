@@ -10,6 +10,7 @@ commands:
       description: aab
    gs:
      usage: /<command> [list, info , tp, add, addtemp, remove] [PlayerName] [TempTime]
+     aliases: [world]
    tnt:
      usage: /<command>
      description: Enable/Disable Tnt
@@ -42,7 +43,7 @@ commands:
       description: handling
    particles:
       description: toggle Particles
-      aliases: [partikel,p]
+      aliases: [partikel]
       usage: /<command> [on|off]
    tr:
      description: tntReload command
@@ -62,7 +63,8 @@ commands:
      aliases: [explo,ex]
    cannontimer:
      aliases: [ct,kt,timer]
-
+   plot:
+     aliases: [p,tpplot,plottp]
 permissions:
   bau.*:
     default: op

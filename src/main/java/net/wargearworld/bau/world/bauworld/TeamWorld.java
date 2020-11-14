@@ -2,10 +2,11 @@ package net.wargearworld.bau.world.bauworld;
 
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
+import net.wargearworld.bau.dao.PlotDAO;
 import net.wargearworld.bau.team.Team;
-import net.wargearworld.bau.utils.ClickAction;
 import net.wargearworld.bau.utils.JsonCreater;
 import net.wargearworld.bau.utils.MethodResult;
+import net.wargearworld.bau.world.WorldTemplate;
 import net.wargearworld.bau.world.plot.PlotPattern;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -68,6 +69,12 @@ public class TeamWorld extends BauWorld {
     }
 
     @Override
+    public void setTemplate(WorldTemplate template) {
+        super.template = template;
+        PlotDAO.update(this);
+    }
+
+    @Override
     public void removeAllMembersFromRegions() {
         for (UUID uuid : team.getLeaders()) {
             removeMemberFromAllRegions(uuid);
@@ -123,4 +130,7 @@ public class TeamWorld extends BauWorld {
         return team.getMemberNames();
     }
 
+    public Team getTeam() {
+       return team;
+    }
 }

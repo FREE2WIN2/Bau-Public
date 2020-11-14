@@ -69,7 +69,7 @@ public class ExplosionCacheListener implements Listener, TabExecutor {
         return out;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void entityExplodeHandler(EntityExplodeEvent event) {
         if (event.getEntityType() != EntityType.PRIMED_TNT) {
             return;

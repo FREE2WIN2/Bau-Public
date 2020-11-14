@@ -39,4 +39,16 @@ public class PlayerDAO {
             return out;
         });
     }
+
+    public static void addPlotTemplate(WorldTemplate worldTemplate, UUID playerUUID) {
+        EntityManagerExecuter.run(em->{
+            Player dbPlayer = em.find(Player.class,playerUUID);
+            PlotTemplate plotTemplate = em.find(PlotTemplate.class,worldTemplate.getId());
+            PlayerPlotTemplate playerPlotTemplate = new PlayerPlotTemplate();
+            dbPlayer.addPlayerPlotTemplate(playerPlotTemplate);
+            plotTemplate.addPlayerPlotTemplate(playerPlotTemplate);
+
+            em.persist(playerPlotTemplate);
+        });
+    }
 }

@@ -89,4 +89,27 @@ public class Team {
             return WorldTemplate.getTemplate(wargearTeam.getTemplate().getName());
         });
     }
+
+    public void setName(String name) {
+        this.name = name;
+        EntityManagerExecuter.run(em->{
+            WargearTeam wargearTeam = em.find(WargearTeam.class, this.id);
+            wargearTeam.setName(name);
+            em.merge(wargearTeam);
+        });
+    }
+
+    public void setAbbreviation(String abbreviation) {
+        this.abbreviation = abbreviation;
+        EntityManagerExecuter.run(em->{
+            WargearTeam wargearTeam = em.find(WargearTeam.class, this.id);
+            wargearTeam.setAbbreviation(abbreviation);
+            em.merge(wargearTeam);
+        });
+    }
+
+    public void setNewcomers(Set<UUID> newcomers) {
+        this.newcomers = newcomers;
+    }
+
 }

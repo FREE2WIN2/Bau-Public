@@ -40,10 +40,15 @@ public class CannonTimer implements Serializable {
             MessageHandler.getInstance().send(p, "cannonTimer_blocked");
             return;
         }
+        if(blocks.isEmpty()){
+            MessageHandler.getInstance().send(p, "cannonTimer_empty");
+            return;
+        }
         blocked = true;
         if(BauPlayer.getBauPlayer(p).getActivateTrailOnCannonTimer()){
             p.performCommand("trail new");
         }
+
         for (CannonTimerBlock block : blocks.values()) {
             block.startspawn(p.getWorld());
         }
