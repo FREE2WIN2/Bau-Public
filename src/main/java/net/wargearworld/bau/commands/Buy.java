@@ -7,6 +7,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.dao.PlayerDAO;
+import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.world.WorldTemplate;
 import net.wargearworld.command_manager.ArgumentList;
 import net.wargearworld.command_manager.CommandHandel;
@@ -22,15 +23,14 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.w3c.dom.Text;
 
 import static net.wargearworld.command_manager.nodes.LiteralNode.literal;
 import static net.wargearworld.command_manager.nodes.ArgumentNode.argument;
 import static net.wargearworld.command_manager.arguments.DynamicListArgument.dynamicList;
 import static net.wargearworld.command_manager.nodes.InvisibleNode.invisible;
+import static net.wargearworld.command_manager.arguments.StringArgument.string;
 import static net.wargearworld.bau.utils.CommandUtil.getPlayer;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -60,14 +60,49 @@ public class Buy implements TabExecutor {
                                 .addSubNode(invisible(literal("confirm").setCallback(s -> {
                                     buyTemplate(s, true);
                                 })))));
+
+        commandHandel.addSubNode(literal("world")
+                .addSubNode(argument("WorldName", string())
+                        .setCallback(s -> {buyWorld(s, false);})
+                        .addSubNode(invisible(literal("confirm")
+                                .setCallback(s -> { buyWorld(s, true);})))));
     }
 
-    private void buyTemplate(ArgumentList s, boolean b) {
+    private void buyWorld(ArgumentList s, boolean confirmed) {
+        Player p = getPlayer(s);
+        int amountOfWorlds = BauPlayer.getBauPlayer(p).getdbPlots().size();
+        MessageHandler msgHandler = MessageHandler.getInstance();
+        String worldName = s.getString("WorldName");
+        Double price = amountOfWorlds * Main.getPlugin().getCustomConfig().getDouble("worldprice");
+        EconomyFormatter economyFormatter = EconomyFormatter.getInstance();
+        if (confirmed) {
+            Account senderAccount = Account.getByUUID(p.getUniqueId());
+            Transaction transaction = new Transaction(senderAccount, null, price, TransactionType.PAY);
+            transaction.setSenderMessageKey("MONEY.BUY.TEMPLATE");
+            transaction.setSenderMessageArguments(List.of(worldName, price + ""));
+            try {
+                transaction.execute();
+                PlayerDAO.addNewWorld(worldName,p.getUniqueId());
+                msgHandler.send(p, "worldtemplate_bought", worldName, economyFormatter.format(price), worldName);
+            } catch (NotEnoughMoneyException e) {
+                msgHandler.send(p, "not_enough_money_template", (price - senderAccount.getBalance()) + economyFormatter.getCurrencySymbol(), worldName);
+            } catch (NegativeAmountException e) {
+            }
+        } else {
+            TextComponent tc = new TextComponent(Main.prefix + msgHandler.getString(p, "worldtemplate_buy_confirm", worldName, economyFormatter.format(price)));
+            TextComponent click = new TextComponent(msgHandler.getString(p, "worldtemplate_buy_confirm_button"));
+            click.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(msgHandler.getString(p, "worldtemplate_buy_confirm_button_hover", worldName)).create()));
+            click.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/buy template " + worldName + " confirm"));
+            p.spigot().sendMessage(tc, click);
+        }
+    }
+
+    private void buyTemplate(ArgumentList s, boolean confirmed) {
         Player p = getPlayer(s);
         MessageHandler msgHandler = MessageHandler.getInstance();
-            WorldTemplate worldTemplate = WorldTemplate.getTemplate(s.getString("TemplateName"));
-            EconomyFormatter economyFormatter = EconomyFormatter.getInstance();
-        if (b) {
+        WorldTemplate worldTemplate = WorldTemplate.getTemplate(s.getString("TemplateName"));
+        EconomyFormatter economyFormatter = EconomyFormatter.getInstance();
+        if (confirmed) {
             Account senderAccount = Account.getByUUID(p.getUniqueId());
             Transaction transaction = new Transaction(senderAccount, null, worldTemplate.getPrice(), TransactionType.PAY);
             transaction.setSenderMessageKey("MONEY.BUY.TEMPLATE");
@@ -81,11 +116,11 @@ public class Buy implements TabExecutor {
             } catch (NegativeAmountException e) {
             }
         } else {
-            TextComponent tc = new TextComponent(Main.prefix + msgHandler.getString(p, "worldtemplate_buy_confirm",worldTemplate.getName(), economyFormatter.format(worldTemplate.getPrice())));
-            TextComponent click = new TextComponent(msgHandler.getString(p,"worldtemplate_buy_confirm_button"));
-            click.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(msgHandler.getString(p,"worldtemplate_buy_confirm_button_hover",worldTemplate.getName())).create()));
-            click.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/buy template " + worldTemplate.getName() + " confirm"));
-            p.spigot().sendMessage(tc,click);
+            TextComponent tc = new TextComponent(Main.prefix + msgHandler.getString(p, "worldtemplate_buy_confirm", worldTemplate.getName(), economyFormatter.format(worldTemplate.getPrice())));
+            TextComponent click = new TextComponent(msgHandler.getString(p, "worldtemplate_buy_confirm_button"));
+            click.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(msgHandler.getString(p, "worldtemplate_buy_confirm_button_hover", worldTemplate.getName())).create()));
+            click.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/buy template " + worldTemplate.getName() + " confirm"));
+            p.spigot().sendMessage(tc, click);
         }
     }
 

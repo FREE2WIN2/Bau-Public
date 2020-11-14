@@ -1,9 +1,3 @@
-MySQL:
-  database:
-  host:
-  user:
-  password:
-
 worldEdit:
   maxBlockPerSecond: 5000
 plottemplate: BauGsVorlage #If you want to update this, change the worldname! Else User cannot get a new plot
@@ -18,10 +12,13 @@ cannontimer:
     default: WHITE_SHULKER_BOX
     active: LIME_SHULKER_BOX
     inactive: RED_SHULKER_BOX
-  tool: FISHING_ROD
+  tool: CLOCK
   maxamount: 64
+
 testworlds:
   template: BauGsVorlage
+worldprice: 25000
+maxworlds: 3
 sizes:
   1:
     x: 23

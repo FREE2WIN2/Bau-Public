@@ -65,4 +65,8 @@ public class PlayerDAO {
             return null;
         });
     }
+
+    public static void addNewWorld(String worldName, UUID uniqueId) {
+
+    }
 }
