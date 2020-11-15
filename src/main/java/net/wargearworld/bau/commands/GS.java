@@ -13,18 +13,15 @@ import net.wargearworld.bau.utils.JsonCreater;
 import net.wargearworld.bau.world.bauworld.BauWorld;
 import net.wargearworld.bau.world.bauworld.PlayerWorld;
 import net.wargearworld.bau.world.WorldManager;
-import net.wargearworld.bau.world.bauworld.TeamWorld;
 import net.wargearworld.command_manager.ArgumentList;
 import net.wargearworld.command_manager.CommandHandel;
 import net.wargearworld.command_manager.CommandNode;
 import net.wargearworld.command_manager.ParseState;
 import net.wargearworld.command_manager.arguments.DynamicListGetter;
-import net.wargearworld.command_manager.arguments.StringArgument;
 import net.wargearworld.commandframework.player.BukkitCommandPlayer;
 import net.wargearworld.db.EntityManagerExecuter;
 import net.wargearworld.db.model.Plot;
 import net.wargearworld.db.model.PlotMember;
-import net.wargearworld.db.model.WargearTeam;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -79,18 +76,14 @@ public class GS implements TabExecutor {
                 return new ArrayList<>();
             }
         }));
-        CommandNode members = argument("Mitglied", dynamicList("Mitglied", new DynamicListGetter<String>() {
-
-            @Override
-            public Collection<String> getList(ParseState state) {
-                TreeSet<String> out = new TreeSet<>();
-                BauWorld world = WorldManager.get(getPlayer(state.getArgumentList()).getWorld());
-                if (world instanceof PlayerWorld) {
-                    PlayerWorld playerWorld = (PlayerWorld) world;
-                    out.addAll(playerWorld.getMemberNames());
-                }
-                return out;
+        CommandNode members = argument("Mitglied", dynamicList("Mitglied", state -> {
+            TreeSet<String> out = new TreeSet<>();
+            BauWorld world = WorldManager.get(getPlayer(state.getArgumentList()).getWorld());
+            if (world instanceof PlayerWorld) {
+                PlayerWorld playerWorld = (PlayerWorld) world;
+                out.addAll(playerWorld.getMemberNames());
             }
+            return out;
         }));
 
         CommandNode worlds = argument("Worlds", dynamicList("Worlds", new DynamicListGetter<String>() {
@@ -111,7 +104,7 @@ public class GS implements TabExecutor {
         };
         commandHandle = new CommandHandel("gs", Main.prefix, MessageHandler.getInstance());
         commandHandle.setCallback(s -> {
-            tp(s);
+            tp(s, true);
         });
 
         commandHandle.addSubNode(literal("new")
@@ -125,8 +118,8 @@ public class GS implements TabExecutor {
                             newPlot(getPlayer(s), 2, s);
                         })
                         .addSubNode(
-                                argument("UUID2", dynamicList("UUID2", s -> {
-                                    return List.of(getPlayer(s.getArgumentList()).getUniqueId().toString());
+                                argument("UUID2", dynamicList("UUID2", state -> {
+                                    return List.of(getPlayer(state.getArgumentList()).getUniqueId().toString());
                                 }))
                                         .setCallback(s -> {
                                             newPlot(getPlayer(s), 3, s);
@@ -143,13 +136,29 @@ public class GS implements TabExecutor {
             tpTeam(s);
         });
         commandHandle.addSubNode(literal("tp")
-                .addSubNode(literal("team")).setCallback(s -> {
+                .addSubNode(literal("team").setCallback(s -> {
                     tpTeam(s);
-                })
-                .addSubNode(argument("Spielername", new StringArgument())
+                }))
+                .addSubNode(argument("Worldname", dynamicList("Worldname", state -> {
+                    return PlayerDAO.getPlayersPlotNames(getPlayer(state.getArgumentList()).getName());
+                }))
                         .setCallback(s -> {
-                            tp(s);
-                        })));
+                            tp(s, false);
+                        }))
+                .addSubNode(argument("Spielername", dynamicList("Spielername", state -> {
+                    if (getPlayer(state.getArgumentList()).hasPermission("bau.move.bypass"))
+                        return PlayerDAO.getAllPlayersWithPlot();
+                    return PlayerDAO.getPlayersAddedPlotsPlayerNames(state.getPlayer().getUUID());
+                }))
+                        .setCallback(s -> {
+                            tp(s, true);
+                        })
+                        .addSubNode(argument("Worldname", dynamicList("Worldname", state -> {
+                            return PlayerDAO.getPlayersPlotNames(state.getArgumentList().getString("Spielername"));
+                        }))
+                                .setCallback(s -> {
+                                    tp(s, false);
+                                }))));
         /* gs add <Spieler> [Zeit]*/
         commandHandle.addSubNode(literal("add")
                 .setRequirement(owner)
@@ -220,10 +229,13 @@ public class GS implements TabExecutor {
                 .setRequirement(owner)
                 .addSubNode(argument("template", dynamicList("template", s -> {
                     Set<String> out = new TreeSet<>();
-                    PlayerDAO.getPlayersTeamplates(s.getPlayer().getUUID()).entrySet().forEach(entry ->{
+                    PlayerDAO.getPlayersTeamplates(s.getPlayer().getUUID()).entrySet().forEach(entry -> {
                         if (entry.getValue()) {
                             out.add(entry.getKey().getName());
-                        }});return out;}))
+                        }
+                    });
+                    return out;
+                }))
                         .setCallback(s -> {
                             setPlotTemplate(s, 1);
                         })
@@ -251,7 +263,7 @@ public class GS implements TabExecutor {
             bauWorld.newWorld();
             bauWorld.setTemplate(s.getString("template"));
         } else if (argsLength == 2 && p.getUniqueId().toString().equals(s.getString("UUID1"))) {
-            JsonCreater jsonMsg = new JsonCreater(Main.prefix + MessageHandler.getInstance().getString(p, "gs_newPlotTemplate_secondWarn",templateName));
+            JsonCreater jsonMsg = new JsonCreater(Main.prefix + MessageHandler.getInstance().getString(p, "gs_newPlotTemplate_secondWarn", templateName));
             JsonCreater jsonMsgClick = new JsonCreater(MessageHandler.getInstance().getString(p, "gs_newPlotTemplate_secondWarn_click"));
             jsonMsgClick.addHoverEvent(MessageHandler.getInstance().getString(p, "gs_newPlotTemplate_secondWarn_clickHover", templateName));
             jsonMsg.addJson(jsonMsgClick.addClickEvent("/gs setTemplate " + templateName + " " + uuid.toString() + " " + uuid.toString(),
@@ -304,22 +316,34 @@ public class GS implements TabExecutor {
         return WorldManager.get(getPlayer(s).getWorld());
     }
 
-    private void tp(ArgumentList s) {
+    private void tp(ArgumentList s, boolean defaultWorld) {
+        // /gs tp <WorldName>
+        // /gs tp <SpielerName> <WorldName>
+        // /gs tp team
+        // /gs
         String name = s.getString("Spielername");
+        String worldName = s.getString("Worldname");
+        System.out.println("Spielername: " + name + " worldName: " + worldName);
         if (name != null && name.equalsIgnoreCase("team")) {
             tpTeam(s);
             return;
         }
         Player p = getPlayer(s);
-        if (name == null) {
-            WorldManager.getPlayerWorld(p.getName(), p.getUniqueId().toString()).spawn(p);
+        UUID ownerUUID = null;
+        if (name == null) { // /gs
+            ownerUUID = p.getUniqueId();
         } else {
-            net.wargearworld.db.model.Player owner = DatabaseDAO.getPlayer(name);
-            if (owner == null) {
+            ownerUUID = DatabaseDAO.getUUID(name);
+            if (ownerUUID == null) {
                 return; //TODO error
             }
-            WorldManager.getPlayerWorld(name, owner.getUuid().toString()).spawn(p);
+
         }
+        if (defaultWorld || worldName == null) {
+            worldName = PlayerDAO.getDefaultWorldName(ownerUUID);
+        }
+        System.out.println(worldName + " " + ownerUUID.toString());
+        WorldManager.getPlayerWorld(worldName, ownerUUID).spawn(p);
     }
 
     @Override

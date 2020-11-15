@@ -50,7 +50,7 @@ public class BauConfig {
     }
 
     private void loadContent() {
-        this.weMaxBlocksPerTick = configuration.getInt("worldedit.maxBlockPerSecond");
+        this.weMaxBlocksPerTick = configuration.getInt("worldEdit.maxBlockPerSecond");
         this.defaultTemplate = WorldTemplate.getTemplate(configuration.getString("plottemplate"));
         this.schemPath = configuration.getString("schempath");
         this.tntReloadMaxTnT = configuration.getInt("tntReload.maxTnt");

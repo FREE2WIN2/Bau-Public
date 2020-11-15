@@ -6,6 +6,10 @@ import net.wargearworld.bau.listener.PlayerMovement;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.tools.Stoplag;
 import net.wargearworld.bau.utils.Scheduler;
+import net.wargearworld.bau.world.WorldManager;
+import net.wargearworld.bau.world.bauworld.BauWorld;
+import net.wargearworld.bau.world.bauworld.PlayerWorld;
+import net.wargearworld.bau.world.bauworld.TeamWorld;
 import net.wargearworld.bau.world.plot.Plot;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -97,9 +101,16 @@ public class ScoreBoardBau {
         Plot currentPlot = player.getCurrentPlot();
         if (currentPlot == null)
             return;
+        BauWorld bauWorld = WorldManager.get(p.getWorld());
         obj = board.registerNewObjective(p.getName(), p.getName() + "bbbb", p.getName() + "cccc");
         obj.setDisplayName("§6Time: §c" + getTime());
         obj.setDisplaySlot(DisplaySlot.SIDEBAR);
+        if (bauWorld instanceof PlayerWorld) {
+            obj.getScore(MessageHandler.getInstance().getString(p, "scoreboard_world", bauWorld.getName())).setScore(12);
+        } else {
+            obj.getScore(MessageHandler.getInstance().getString(p, "scoreboard_teamworld", ((TeamWorld) bauWorld).getTeam().getAbbreviation())).setScore(12);
+        }
+        obj.getScore("§a§8§l§m               §r").setScore(11);
         obj.getScore("§6Plot: §c" + currentPlot.getId().replace("plot", "")).setScore(10);
         obj.getScore("§1§8§l§m               §r").setScore(9);
         obj.getScore("§6TNT: " + getTNT(currentPlot)).setScore(8);

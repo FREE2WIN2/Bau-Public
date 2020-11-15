@@ -273,7 +273,7 @@ public class PlayerWorld extends BauWorld {
         Player ownerPlayer = Bukkit.getPlayer(owner);
         if (ownerPlayer == null || ownerPlayer == p)
             return;
-        MessageHandler.getInstance().send(ownerPlayer, "plot_leaved", p.getName());
+        MessageHandler.getInstance().send(ownerPlayer, "plot_leaved", p.getName(), getName());
     }
 
     @Override
@@ -289,7 +289,7 @@ public class PlayerWorld extends BauWorld {
         Player ownerPlayer = Bukkit.getPlayer(owner);
         if (ownerPlayer == null || ownerPlayer == p)
             return;
-        MessageHandler.getInstance().send(ownerPlayer, "plot_entered", p.getName());
+        MessageHandler.getInstance().send(ownerPlayer, "plot_entered", p.getName(), getName());
     }
 
 }

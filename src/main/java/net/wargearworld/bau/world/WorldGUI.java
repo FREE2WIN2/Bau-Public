@@ -2,40 +2,40 @@ package net.wargearworld.bau.world;
 
 import net.wargearworld.GUI_API.GUI.ChestGUI;
 import net.wargearworld.GUI_API.GUI.GUI;
-import net.wargearworld.GUI_API.Items.*;
+import net.wargearworld.GUI_API.Items.CustomHead;
+import net.wargearworld.GUI_API.Items.HeadItem;
+import net.wargearworld.GUI_API.Items.Item;
 import net.wargearworld.bau.MessageHandler;
+import net.wargearworld.bau.config.BauConfig;
 import net.wargearworld.bau.dao.PlayerDAO;
 import net.wargearworld.bau.player.BauPlayer;
+import net.wargearworld.bau.utils.HelperMethods;
 import net.wargearworld.bau.world.bauworld.BauWorld;
-import net.wargearworld.db.model.enums.TransactionType;
-import net.wargearworld.economy.core.account.Account;
-import net.wargearworld.economy.core.account.Transaction;
-import net.wargearworld.economy.core.exception.NegativeAmountException;
-import net.wargearworld.economy.core.exception.NotEnoughMoneyException;
 import net.wargearworld.economy.core.utils.EconomyFormatter;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 public class WorldGUI implements Listener {
+
+    private static final String TEMPLATE = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWMxMWQ2Yzc5YjhhMWYxODkwMmQ3ODNjZGRhNGJkZmI5ZDQ3MzM3YjczNzkxMDI4YTEyNmE2ZTZjZjEwMWRlZiJ9fX0=";
 
     public WorldGUI(JavaPlugin plugin) {
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
     public static void openMain(Player p) {
-        GUI mainGUI = new ChestGUI(27, MessageHandler.getInstance().getString(p, "worldGUI_title"));
-        HeadItem item = new HeadItem(new CustomHead("world"), s -> {
+        GUI mainGUI = new ChestGUI(36, MessageHandler.getInstance().getString(p, "worldGUI_title"));
+        Iterator iterator = HelperMethods.getMiddlePositions(BauConfig.getInstance().getMaxworlds() + 1).iterator();
+        Item item = new HeadItem(new CustomHead(TEMPLATE), s -> {
             openTemplates(s.getPlayer());
         });
-        mainGUI.addItem(item);
+        mainGUI.setItem(2, item);
         mainGUI.open(p);
     }
 
@@ -92,4 +92,7 @@ public class WorldGUI implements Listener {
         gui.open(p);
     }
 
+    public static void openWorlds(Player p) {
+
+    }
 }

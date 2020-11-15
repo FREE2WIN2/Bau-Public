@@ -5,6 +5,7 @@ import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.config.BauConfig;
 import net.wargearworld.bau.dao.PlayerDAO;
+import net.wargearworld.bau.dao.PlotDAO;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.scoreboard.ScoreBoardBau;
 import net.wargearworld.bau.tools.testBlockSlave.testBlockEditor.TestBlockEditorCore;
@@ -50,35 +51,23 @@ public class PlayerListener implements Listener {
         File gs = new File(path + "/" + p.getUniqueId() + "_" + p.getName());
         String uuidString = p.getUniqueId().toString();
         if (!player.hasPlots()) {
-            EntityManagerExecuter.run(em -> {
-                PlotTemplate dbTemplate = em.find(PlotTemplate.class, BauConfig.getInstance().getDefaultTemplate().getId());
-                Plot plot = new Plot();
-                plot.setName(p.getName());
-                plot.setTemplate(dbTemplate);
-                plot.setOwner(em.find(net.wargearworld.db.model.Player.class, p.getUniqueId()));
-                plot.setDefault(true);
-                em.persist(plot);
-            });
+            PlayerDAO.addNewWorld(p.getName(),p.getUniqueId(),true);
         }
-        WorldTemplate worldTemplate = EntityManagerExecuter.run(em -> {
-            PlotTemplate plotTemplate = PlayerDAO.getDefaultPlotTemplate(p.getUniqueId());
-            if (plotTemplate == null) {
-                return BauConfig.getInstance().getDefaultTemplate();
-            } else {
-                return WorldTemplate.getTemplate(plotTemplate.getName());
-            }
-        });
-
-
         if (!gs.exists()) {
+            WorldTemplate worldTemplate = EntityManagerExecuter.run(em -> {
+                PlotTemplate plotTemplate = PlayerDAO.getDefaultPlotTemplate(p.getUniqueId());
+                if (plotTemplate == null) {
+                    return BauConfig.getInstance().getDefaultTemplate();
+                } else {
+                    return WorldTemplate.getTemplate(plotTemplate.getName());
+                }
+            });
             // Bukkit.createWorld((WorldCreator) WorldCreator.name("test").createWorld());
             // wenn nicht-> erstellen und hinteleportieren
             WorldManager.createWorldDir(uuidString + "_" + p.getName(), worldTemplate);
             p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "plotGenerating"));
         }
-
-
-        World world = WorldManager.loadWorld(p.getName(), uuidString);
+        World world = WorldManager.loadDefaultWorld(p.getUniqueId());
         BauWorld bauWorld = WorldManager.get(world);
         bauWorld.spawn(p);
         // wenn ja-> teleportieren

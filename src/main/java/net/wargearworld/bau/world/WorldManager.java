@@ -1,8 +1,7 @@
 package net.wargearworld.bau.world;
 
 import net.wargearworld.bau.Main;
-import net.wargearworld.bau.config.BauConfig;
-import net.wargearworld.bau.player.BauPlayer;
+import net.wargearworld.bau.dao.PlayerDAO;
 import net.wargearworld.bau.team.Team;
 import net.wargearworld.bau.world.bauworld.BauWorld;
 import net.wargearworld.bau.world.bauworld.PlayerWorld;
@@ -23,6 +22,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.UUID;
 
 public class WorldManager {
@@ -30,10 +30,12 @@ public class WorldManager {
     private static HashMap<UUID, BauWorld> worlds = new HashMap<>();
 
     public static BauWorld get(World world) {
+        if (world == null)
+            return null;
         return worlds.get(world.getUID());
     }
 
-    public static BauWorld getPlayerWorld(String name, String owner) { // name is unique!
+    public static BauWorld getPlayerWorld(String name, UUID owner) { // name is unique!
         return get(loadWorld(name, owner));
     }
 
@@ -51,25 +53,31 @@ public class WorldManager {
      */
     public static BauWorld getPlayerWorld(String worldName) {//UUID_Spielername
         String[] split = worldName.split("_");
-        return getPlayerWorld(split[1], split[0]);
+        return getPlayerWorld(split[1], UUID.fromString(split[0]));
     }
 
-    public static World loadWorld(String worldName, String owner) {
-        World w = Bukkit.getWorld(owner + "_" + worldName);
+    public static World loadWorld(String worldName, UUID owner) {
+        String bukkitWorldName = owner + "_" + worldName;
+        World w = Bukkit.getWorld(bukkitWorldName);
         if (w == null) {
-            UUID ownerUuid = UUID.fromString(owner);
-            long id = readPlot(ownerUuid, worldName).getId();
-            if (id == 0)
-                createWorldDir(owner + "_" + worldName, BauConfig.getInstance().getDefaultTemplate());
+            Plot plot = readPlot(owner,worldName);
+            if (plot == null)
+                return null;
+            long id = readPlot(owner, worldName).getId();
+            if(id == 0)
+                return null;
+            if (!new File(Bukkit.getWorldContainer(), bukkitWorldName).exists()) {
+                EntityManagerExecuter.run(em->{createWorldDir(bukkitWorldName,WorldTemplate.getTemplate(em.find(Plot.class,id).getTemplate().getName()));});
+            }
 
-            WorldCreator wc = new WorldCreator(owner + "_" + worldName);
+            WorldCreator wc = new WorldCreator(bukkitWorldName);
             wc.type(WorldType.NORMAL);
             w = Bukkit.getServer().createWorld(wc);
             w.setStorm(false);
             w.setThundering(false);
             w.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
             w.setGameRule(GameRule.DO_MOB_SPAWNING, false);
-            worlds.put(w.getUID(), new PlayerWorld(id, UUID.fromString(owner), w));
+            worlds.put(w.getUID(), new PlayerWorld(id, owner, w));
         }
         return w;
     }
@@ -216,7 +224,6 @@ public class WorldManager {
             p.kickPlayer("GS DELETE");
         }
         deleteWorld(oldWorld);
-//        createWorldDir(world.getWorldName(), world.getTemplate());
     }
 
     public static World renameWorld(BauWorld world, String newName) {
@@ -233,7 +240,7 @@ public class WorldManager {
         File worldGuardWorldDir = new File(Bukkit.getWorldContainer(),
                 "plugins/WorldGuard/worlds/" + newWorldName);
         copyFolder_raw(world.getTemplate().getWorldguardDir(), worldGuardWorldDir);
-        return loadWorld(newWorldName, world.getOwner());
+        return loadWorld(newWorldName, UUID.fromString(world.getOwner()));
 
     }
 
@@ -259,17 +266,23 @@ public class WorldManager {
             CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
             CriteriaQuery<Plot> criteriaQuery = criteriaBuilder.createQuery(Plot.class);
             Root<Plot> root = criteriaQuery.from(Plot.class);
-            criteriaQuery.where(criteriaBuilder.equal(root.get(Plot_.name), name), criteriaBuilder.equal(root.get(Plot_.owner), BauPlayer.getBauPlayer(owner).getDbPlayer()));
+            criteriaQuery.where(criteriaBuilder.equal(root.get(Plot_.name), name), criteriaBuilder.equal(root.get(Plot_.owner), em.find(net.wargearworld.db.model.Player.class,owner)));
             Query query = em.createQuery(criteriaQuery);
-
             Plot plot = null;
             try {
                 plot = (Plot) query.getSingleResult();
             } catch (Exception exception) {
-                exception.printStackTrace();
             }
             return plot;
         });
+    }
+
+
+    public static World loadDefaultWorld(UUID uuid) {
+        String worldName = PlayerDAO.getDefaultWorldName(uuid);
+        if (worldName == null)
+            return null;
+        return loadWorld(worldName, uuid);
     }
 
 

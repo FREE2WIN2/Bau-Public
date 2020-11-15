@@ -71,6 +71,7 @@ public class BauPlayer {
     private AutoCannonReloader cannonReloader;
     private CannonTimerBlock copiedCannonTimerBlock;
     private File clipboardFile;
+
     private BauPlayer(UUID uuid) {
         this.uuid = uuid;
         configFile = new File(Main.getPlugin().getDataFolder(), "users/" + uuid.toString() + "/settings.yml");
@@ -130,7 +131,7 @@ public class BauPlayer {
 
     public Plot getCurrentPlot() {
         Player p = getBukkitPlayer();
-        if(p == null)
+        if (p == null)
             return null;
 
         Location loc = p.getLocation();
@@ -152,12 +153,12 @@ public class BauPlayer {
         return config.getBoolean("dt");
     }
 
-    public void setActivateTrailOnCannonTimer(boolean on){
+    public void setActivateTrailOnCannonTimer(boolean on) {
         config.set("activateTrailOnCannonTimer", on);
         saveConfig();
     }
 
-    public boolean getActivateTrailOnCannonTimer(){
+    public boolean getActivateTrailOnCannonTimer() {
         return config.getBoolean("activateTrailOnCannonTimer");
     }
 
@@ -166,24 +167,26 @@ public class BauPlayer {
         if (p == null)
             return;
         ArrayList<net.wargearworld.db.model.Plot> memberedPlots = new ArrayList<>();
-        memberedPlots.addAll(getDbPlayer().getPlots());
-        for (PlotMember member : getDbPlayer().getMemberedPlots()) {
-            memberedPlots.add(member.getPlot());
-        }
-        PlayerConnection pConn = ((CraftPlayer) p).getHandle().playerConnection;
-        p.sendMessage(MessageHandler.getInstance().getString(p, "listGsHeading"));
-        for (net.wargearworld.db.model.Plot plot : memberedPlots) {
-            /* s == PlayerName */
-            String name = plot.getName();
-            String hover = MessageHandler.getInstance().getString(p, "listGsHover").replace("%r", name);
-            String txt = "{\"text\":\"§7[§6" + name
-                    + "§7]\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/gs tp " + name
-                    + "\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"" + hover + "\"}}}";
-            IChatBaseComponent txtc = ChatSerializer.a(txt);
-            PacketPlayOutChat txtp = new PacketPlayOutChat(txtc);
-            pConn.sendPacket(txtp);
-        }
-        p.sendMessage("§7----------------------------");
+        EntityManagerExecuter.run(em -> {
+            memberedPlots.addAll(getDbPlayer().getPlots());
+            for (PlotMember member : getDbPlayer().getMemberedPlots()) {
+                memberedPlots.add(member.getPlot());
+            }
+            PlayerConnection pConn = ((CraftPlayer) p).getHandle().playerConnection;
+            p.sendMessage(MessageHandler.getInstance().getString(p, "listGsHeading"));
+            for (net.wargearworld.db.model.Plot plot : memberedPlots) {
+                /* s == PlayerName */
+                String name = plot.getName();
+                String hover = MessageHandler.getInstance().getString(p, "listGsHover").replace("%r", name);
+                String txt = "{\"text\":\"§7[§6" + name
+                        + "§7]\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/gs tp " + name
+                        + "\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"" + hover + "\"}}}";
+                IChatBaseComponent txtc = ChatSerializer.a(txt);
+                PacketPlayOutChat txtp = new PacketPlayOutChat(txtc);
+                pConn.sendPacket(txtp);
+            }
+            p.sendMessage("§7----------------------------");
+        });
     }
 
     public void sendMessage(String message) {
@@ -194,8 +197,8 @@ public class BauPlayer {
     }
 
     public net.wargearworld.db.model.Player getDbPlayer() {
-        return EntityManagerExecuter.run(em->{
-            return em.find(net.wargearworld.db.model.Player.class,uuid);
+        return EntityManagerExecuter.run(em -> {
+            return em.find(net.wargearworld.db.model.Player.class, uuid);
         });
     }
 
@@ -211,15 +214,16 @@ public class BauPlayer {
         return language;
     }
 
-    public Set<net.wargearworld.db.model.Plot> getdbPlots(){
-        return EntityManagerExecuter.run(em->{
-            return em.find(net.wargearworld.db.model.Player.class,uuid).getPlots();
+    public Set<net.wargearworld.db.model.Plot> getdbPlots() {
+        return EntityManagerExecuter.run(em -> {
+            return em.find(net.wargearworld.db.model.Player.class, uuid).getPlots();
         });
     }
-    public boolean hasPlots(){
-        return EntityManagerExecuter.run(em->{
-            Set<net.wargearworld.db.model.Plot> plots = em.find(net.wargearworld.db.model.Player.class,uuid).getPlots();
-            return plots !=null && !plots.isEmpty();
+
+    public boolean hasPlots() {
+        return EntityManagerExecuter.run(em -> {
+            Set<net.wargearworld.db.model.Plot> plots = em.find(net.wargearworld.db.model.Player.class, uuid).getPlots();
+            return plots != null && !plots.isEmpty();
         });
     }
 
@@ -236,7 +240,7 @@ public class BauPlayer {
     }
 
     public AutoCannonReloader getCannonReloader() {
-        if(cannonReloader == null)
+        if (cannonReloader == null)
             cannonReloader = new AutoCannonReloader();
         return cannonReloader;
     }
@@ -251,28 +255,28 @@ public class BauPlayer {
 
     public void loadClipboard() {
         Player p = getBukkitPlayer();
-        if(p == null)
+        if (p == null)
             return;
         LocalSession localSession = WorldEdit.getInstance().getSessionManager().get(BukkitAdapter.adapt(p));
         clipboardFile = new File(Main.getPlugin().getDataFolder(), "users/" + uuid.toString() + "/clipboard.schem");
-        if(!clipboardFile.exists())
+        if (!clipboardFile.exists())
             return;
         Clipboard clipboard = WorldEditHandler.createClipboard(clipboardFile);
         localSession.setClipboard(new ClipboardHolder(clipboard));
-        MessageHandler.getInstance().send(p,"clipboard_restored");
+        MessageHandler.getInstance().send(p, "clipboard_restored");
     }
 
     public void saveClipboard() {
         Player p = getBukkitPlayer();
-        if(p == null){
+        if (p == null) {
             System.out.println("p == null");
             return;
         }
         System.out.println("save");
         LocalSession localSession = WorldEdit.getInstance().getSessionManager().get(BukkitAdapter.adapt(p));
         try {
-        WorldEditHandler.saveClipboardAsSchematic(Main.getPlugin().getDataFolder() + "/users/" + uuid.toString(), "clipboard.schem",localSession.getClipboard().getClipboard());
-        MessageHandler.getInstance().send(p,"clipboard_saved");
+            WorldEditHandler.saveClipboardAsSchematic(Main.getPlugin().getDataFolder() + "/users/" + uuid.toString(), "clipboard.schem", localSession.getClipboard().getClipboard());
+            MessageHandler.getInstance().send(p, "clipboard_saved");
         } catch (EmptyClipboardException e) {
             System.out.println("NoCLip");
         }

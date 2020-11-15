@@ -9,6 +9,7 @@ import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.listener.PlayerMovement;
+import net.wargearworld.bau.scoreboard.ScoreBoardBau;
 import net.wargearworld.bau.tools.cannon_timer.CannonTimer;
 import net.wargearworld.bau.tools.explosion_cache.ExplosionCache;
 import net.wargearworld.bau.utils.HelperMethods;
@@ -90,7 +91,7 @@ public abstract class BauWorld {
         Plot plot = plots.get(template.getSpawnPlotID());
         p.teleport(plot.getTeleportPoint());
         PlayerMovement.playersLastPlot.put(p.getUniqueId(), plot.getId());
-
+        ScoreBoardBau.cmdUpdate(p);
     }
 
     public abstract boolean isAuthorized(UUID uuid);
