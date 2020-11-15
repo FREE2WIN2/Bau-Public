@@ -10,6 +10,7 @@ import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
+import net.wargearworld.bau.config.BauConfig;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.tools.testBlockSlave.testBlock.*;
 import net.wargearworld.bau.utils.ClickAction;
@@ -218,7 +219,7 @@ public class TestBlockSlave {
         Clipboard board = WorldEditHandler.createClipboardOutOfRegion(rg,
                 CoordGetter.getTBSPastePosition(plot, facing), BukkitAdapter.adapt(ownerPlayer.getWorld()));
         WorldEditHandler.saveClipboardAsSchematic(
-                Main.schempath + "/" + owner.toString() + "/TestBlockSklave", name + ".schem", board);
+                BauConfig.getInstance().getSchemPath() + "/" + owner.toString() + "/TestBlockSklave", name + ".schem", board);
 
     }
 

@@ -2,6 +2,7 @@ package net.wargearworld.bau.tools.plotrights;
 
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
+import net.wargearworld.bau.config.BauConfig;
 import net.wargearworld.bau.world.bauworld.BauWorld;
 import net.wargearworld.bau.world.bauworld.PlayerWorld;
 import net.wargearworld.bau.world.WorldManager;
@@ -14,10 +15,8 @@ import java.util.List;
 
 
 public class PlotRights implements Listener {
-    private final List<String> disallowedCommands;
 
     public PlotRights() {
-        disallowedCommands = Main.getPlugin().getCustomConfig().getStringList("disallowedcommands");
     }
 
     @EventHandler
@@ -28,6 +27,7 @@ public class PlotRights implements Listener {
         }
         String message = event.getMessage();
         BauWorld world = WorldManager.get(player.getWorld());
+        List<String> disallowedCommands = BauConfig.getInstance().getDisallowedCommands();
         if (world instanceof PlayerWorld) {
             PlayerWorld playerWorld = (PlayerWorld) world;
             if (!playerWorld.hasRights(player.getUniqueId())) {

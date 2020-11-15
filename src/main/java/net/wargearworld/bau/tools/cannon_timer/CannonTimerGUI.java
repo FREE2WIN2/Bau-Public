@@ -11,6 +11,7 @@ import net.wargearworld.GUI_API.Items.HeadItem;
 import net.wargearworld.GUI_API.Items.Item;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
+import net.wargearworld.bau.config.BauConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -42,7 +43,8 @@ public class CannonTimerGUI {
         });
 
 
-        chestGUI.setMaxStackSize(CannonTimerListener.MAX_TICKS);
+        int maxTicks = BauConfig.getInstance().getCannonTimerMaxTicks();
+        chestGUI.setMaxStackSize(maxTicks);
         int currentRow = 0; // starts with 0
         Map<Integer, CannonTimerTick> content = readContent(cannonTimerBlock.getTicks(), page);
 
@@ -131,7 +133,7 @@ public class CannonTimerGUI {
                 if (cannonTimerTick.getAmount() < 64) chestGUI.setItem(i, increaseTNT);
                 chestGUI.setItem(i + 9, tnt);
                 if (cannonTimerTick.getAmount() > 1) chestGUI.setItem(i + 18, decreaseTNT);
-                if (entry.getKey() < CannonTimerListener.MAX_TICKS) {
+                if (entry.getKey() < maxTicks) {
                     chestGUI.setItem(i + 27, increaseTick);
                 }
                 chestGUI.setItem(i + 36, tick);

@@ -1,6 +1,8 @@
 package net.wargearworld.bau.utils;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 
+import net.wargearworld.bau.config.BauConfig;
+import net.wargearworld.bau.config.Sizes;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
@@ -31,12 +33,10 @@ public class CoordGetter {
     }
 
     public static BlockVector3 getMaxSizeOfBlock(int tier) {
-        ConfigurationSection section = Main.getPlugin().getConfig()
-                .getConfigurationSection("sizes." + tier);
-        int x = section.getInt("x");
-        int y = section.getInt("y");
-        int z = section.getInt("z");
-        return BlockVector3.at(x, y, z);
+        Sizes sizes = BauConfig.getInstance().getSize(tier);
+        if(sizes == null)
+            return null;
+        return sizes.toBlockVector();
     }
 
     public static BlockVector3 locToVec(Location loc) {

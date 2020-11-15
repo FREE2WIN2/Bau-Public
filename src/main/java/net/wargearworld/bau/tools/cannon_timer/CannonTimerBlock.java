@@ -1,16 +1,21 @@
 package net.wargearworld.bau.tools.cannon_timer;
 
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
+import net.wargearworld.bau.config.BauConfig;
 import net.wargearworld.bau.utils.Loc;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.event.inventory.ClickType;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.InvalidObjectException;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class CannonTimerBlock implements Serializable, Cloneable {
     private static final long serialVersionUID = -4112709504886629938L;
@@ -46,10 +51,11 @@ public class CannonTimerBlock implements Serializable, Cloneable {
     }
 
     public void endSpawn(World world) {
+        BauConfig bauConfig = BauConfig.getInstance();
         if (active) {
-            loc.getBlock(world).setType(CannonTimerListener.activeMaterial);
+            loc.getBlock(world).setType(bauConfig.getCannonTimerActiveBlock());
         } else {
-            loc.getBlock(world).setType(CannonTimerListener.inactiveMaterial);
+            loc.getBlock(world).setType(bauConfig.getCannonTimerInactiveBlock());
         }
     }
 
@@ -58,7 +64,8 @@ public class CannonTimerBlock implements Serializable, Cloneable {
     }
 
     public void addTick() {
-        for (int i = 1; i <= CannonTimerListener.MAX_TICKS; i++) {
+        BauConfig bauConfig = BauConfig.getInstance();
+        for (int i = 1; i <= bauConfig.getCannonTimerMaxTicks(); i++) {
             if (ticks.get(i) == null) {
                 ticks.put(i, new CannonTimerTick());
                 return;
@@ -76,11 +83,7 @@ public class CannonTimerBlock implements Serializable, Cloneable {
 
     public void setActive(boolean active, World world) {
         this.active = active;
-        if (this.active) {
-            loc.getBlock(world).setType(CannonTimerListener.activeMaterial);
-        } else {
-            loc.getBlock(world).setType(CannonTimerListener.inactiveMaterial);
-        }
+        endSpawn(world);
     }
 
     public Integer increaseTick(int tick, ClickType clickType) {
@@ -101,10 +104,11 @@ public class CannonTimerBlock implements Serializable, Cloneable {
     }
 
     private Integer getNewTick(int tick, ClickType clickType) {
+        BauConfig bauConfig = BauConfig.getInstance();
         int jumps = 1;
         if (clickType == ClickType.RIGHT)
             jumps = 5;
-        for (int i = tick + jumps; i <= CannonTimerListener.MAX_TICKS; i++) {
+        for (int i = tick + jumps; i <= bauConfig.getCannonTimerMaxTicks(); i++) {
             if (!ticks.containsKey(i)) {
                 return i;
             }

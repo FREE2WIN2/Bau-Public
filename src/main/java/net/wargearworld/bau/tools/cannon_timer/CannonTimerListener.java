@@ -2,6 +2,7 @@ package net.wargearworld.bau.tools.cannon_timer;
 
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
+import net.wargearworld.bau.config.BauConfig;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.utils.Loc;
 import net.wargearworld.bau.world.bauworld.BauWorld;
@@ -32,19 +33,9 @@ import static net.wargearworld.command_manager.nodes.LiteralNode.literal;
 import static net.wargearworld.bau.utils.CommandUtil.getPlayer;
 
 public class CannonTimerListener implements TabExecutor, Listener {
-    public static Material toolMaterial;
-    public static Material blockMaterial;
-    public static Material activeMaterial;
-    public static Material inactiveMaterial;
-    public static final int MAX_TNT_PER_BLOCK = Main.getPlugin().getCustomConfig().getInt("cannontimer.maxamount");
-    public static final int MAX_TICKS = 100;
     private CommandHandel commandHandel;
 
     public CannonTimerListener(Main main) {
-        toolMaterial = Material.valueOf(main.getCustomConfig().getString("cannontimer.tool"));
-        blockMaterial = Material.valueOf(main.getCustomConfig().getString("cannontimer.block.default"));
-        activeMaterial = Material.valueOf(main.getCustomConfig().getString("cannontimer.block.active"));
-        inactiveMaterial = Material.valueOf(main.getCustomConfig().getString("cannontimer.block.inactive"));
         main.getCommand("cannontimer").setExecutor(this);
         main.getCommand("cannontimer").setTabCompleter(this);
         Bukkit.getPluginManager().registerEvents(this, main);
@@ -75,45 +66,17 @@ public class CannonTimerListener implements TabExecutor, Listener {
                             cannonTimer.undoMoving(p);
                         })));
 
-        commandHandel.addSubNode(literal("toggleAutoActivateTrail").setCallback(s->{
+        commandHandel.addSubNode(literal("toggleAutoActivateTrail").setCallback(s -> {
             BauPlayer bauPlayer = BauPlayer.getBauPlayer(s.getPlayer().getUUID());
             bauPlayer.setActivateTrailOnCannonTimer(!bauPlayer.getActivateTrailOnCannonTimer());
-            MessageHandler.getInstance().send(bauPlayer,"cannonTimer_settings_autoTrail_"+bauPlayer.getActivateTrailOnCannonTimer());
+            MessageHandler.getInstance().send(bauPlayer, "cannonTimer_settings_autoTrail_" + bauPlayer.getActivateTrailOnCannonTimer());
         }));
 
-        commandHandel.addSubNode(literal("start").setCallback(s->{
-            Player p  = getPlayer(s);
+        commandHandel.addSubNode(literal("start").setCallback(s -> {
+            Player p = getPlayer(s);
             WorldManager.get(p.getWorld()).getCannonTimer(p.getLocation()).start(p);
         }));
 
-        updatePaperNMS();
-
-    }
-
-    /**
-     * @author tormbav
-     */
-    private void updatePaperNMS() {
-        try {
-            // Get the server package version.
-            // In 1.14, the package that the server class CraftServer is in, is called "org.bukkit.craftbukkit.v1_14_R1".
-            String packageVersion = Main.getPlugin().getServer().getClass().getPackage().getName().split("\\.")[3];
-            // Convert a Material into its corresponding Item by using the getItem method on the Material.
-            Class<?> magicClass = Class.forName("org.bukkit.craftbukkit." + packageVersion + ".util.CraftMagicNumbers");
-            Method method = magicClass.getDeclaredMethod("getItem", Material.class);
-            Object item = method.invoke(null, Material.PAPER);
-            // Get the maxItemStack field in Item and change it.
-            Class<?> itemClass = Class.forName("net.minecraft.server." + packageVersion + ".Item");
-            Field field = itemClass.getDeclaredField("maxStackSize");
-            field.setAccessible(true);
-            field.setInt(item, MAX_TICKS);
-            // Change the maxStack field in the Material.
-            Field mf = Material.class.getDeclaredField("maxStack");
-            mf.setAccessible(true);
-            mf.setInt(Material.PAPER, MAX_TICKS);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
     }
 
     private CannonTimer getCannonTimer(Player p) {
@@ -148,7 +111,7 @@ public class CannonTimerListener implements TabExecutor, Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player p = event.getPlayer();
         BauWorld bauWorld = WorldManager.get(p.getWorld());
-        if(bauWorld == null){
+        if (bauWorld == null) {
             return;
         }
         if (bauWorld instanceof PlayerWorld) {
@@ -159,13 +122,15 @@ public class CannonTimerListener implements TabExecutor, Listener {
         }
 
         CannonTimer cannonTimer = bauWorld.getCannonTimer(p.getLocation());
+            BauConfig bauConfig = BauConfig.getInstance();
+            Material toolMaterial = bauConfig.getCannonTimerTool();
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             Location blockLocation = event.getClickedBlock().getLocation();
             Material type = event.getClickedBlock().getType();
-            if (type == blockMaterial || type == activeMaterial || type == inactiveMaterial) {
+            if (type.name().contains(bauConfig.getCannonTimerDefaultBlock()) || type == bauConfig.getCannonTimerActiveBlock() || type == bauConfig.getCannonTimerInactiveBlock()) {
                 //openGUI
                 CannonTimerBlock cannonTimerBlock = cannonTimer.getBlock(blockLocation);
-                if(cannonTimerBlock == null){
+                if (cannonTimerBlock == null) {
                     return;
                 }
                 if (p.isSneaking() && event.getItem() != null && event.getItem().getType() == toolMaterial) {
@@ -237,8 +202,10 @@ public class CannonTimerListener implements TabExecutor, Listener {
                 return;
             }
         }
-        Material type = event.getBlock().getType();
-        if (type == blockMaterial || type == activeMaterial || type == inactiveMaterial) {
+        Material type = event.getBlock().getType();BauConfig bauConfig = BauConfig.getInstance();
+        Material toolMaterial = bauConfig.getCannonTimerTool();
+
+        if (type.name().contains(bauConfig.getCannonTimerDefaultBlock()) || type == bauConfig.getCannonTimerActiveBlock() || type == bauConfig.getCannonTimerInactiveBlock()) {
             //openGUI
             Location loc = event.getBlock().getLocation();
             if (event.getPlayer().getEquipment().getItemInMainHand().getType() == toolMaterial) {

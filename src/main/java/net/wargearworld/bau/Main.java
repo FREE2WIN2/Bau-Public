@@ -8,6 +8,7 @@ import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import net.wargearworld.GUI_API.GUI_API;
 import net.wargearworld.bau.commands.*;
 import net.wargearworld.bau.communication.DatabaseCommunication;
+import net.wargearworld.bau.config.BauConfig;
 import net.wargearworld.bau.listener.*;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.player.DefaultPlayer;
@@ -48,18 +49,13 @@ public class Main extends JavaPlugin {
     private static Main plugin;
     public static StateFlag TntExplosion;
     public static StateFlag stoplag;
-    public static String schempath;
 
-    private static File customConfigFile;
-    private static YamlConfiguration customConfig;
     public static String prefix = "§8[§6Bau§8] §r";
     public static File tempAddConfigFile;
     public static YamlConfiguration tempAddConfig;
 
     private WorldFuscatorIntegration integration;
 
-//    @Inject
-//    private DBConnection CDI.current().select(DBConnection.class).get();
     @Override
     public void onEnable() {
         super.onEnable();
@@ -75,10 +71,8 @@ public class Main extends JavaPlugin {
         new WorldGUI(this);
         DefaultTestBlock.generateDefaultTestBlocks();
         DatabaseCommunication.startRecieve();
-        schempath = customConfig.getString("schempath");
         integration =  new WorldFuscatorIntegration(this);
         integration.start();
-//		doTests();
     }
 
     private void registerListener() {
@@ -130,8 +124,9 @@ public class Main extends JavaPlugin {
 
     public void createConfigs() {
 
-        customConfigFile = createConfigFile("config.yml");
-        customConfig = createConfig(customConfigFile);
+        File customConfigFile = createConfigFile("config.yml");
+        FileConfiguration customConfig = createConfig(customConfigFile);
+            new BauConfig(customConfig,customConfigFile);
 
         tempAddConfigFile = createConfigFile("tempAddConfig.yml");
         tempAddConfig = createConfig(tempAddConfigFile);
@@ -207,13 +202,6 @@ public class Main extends JavaPlugin {
         super.onLoad();
     }
 
-    public FileConfiguration getCustomConfig() {
-        return customConfig;
-    }
-
-    public File getCustomConfigFile() {
-        return customConfigFile;
-    }
 
     @Override
     public void onDisable() {

@@ -1,6 +1,7 @@
 package net.wargearworld.bau.world;
 
 import net.wargearworld.bau.Main;
+import net.wargearworld.bau.config.BauConfig;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.team.Team;
 import net.wargearworld.bau.world.bauworld.BauWorld;
@@ -53,17 +54,13 @@ public class WorldManager {
         return getPlayerWorld(split[1], split[0]);
     }
 
-    public final static WorldTemplate template = WorldTemplate
-            .getTemplate(Main.getPlugin().getCustomConfig().getString("plottemplate"));
-
-
     public static World loadWorld(String worldName, String owner) {
         World w = Bukkit.getWorld(owner + "_" + worldName);
         if (w == null) {
             UUID ownerUuid = UUID.fromString(owner);
             long id = readPlot(ownerUuid, worldName).getId();
             if (id == 0)
-                createWorldDir(owner + "_" + worldName, template);
+                createWorldDir(owner + "_" + worldName, BauConfig.getInstance().getDefaultTemplate());
 
             WorldCreator wc = new WorldCreator(owner + "_" + worldName);
             wc.type(WorldType.NORMAL);

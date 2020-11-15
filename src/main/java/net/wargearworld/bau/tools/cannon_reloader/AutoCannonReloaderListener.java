@@ -6,6 +6,7 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
+import net.wargearworld.bau.config.BauConfig;
 import net.wargearworld.command_manager.ArgumentList;
 import net.wargearworld.command_manager.CommandHandel;
 import net.wargearworld.bau.Main;
@@ -35,9 +36,6 @@ import java.util.List;
 import java.util.UUID;
 
 public class AutoCannonReloaderListener implements Listener, TabExecutor {
-    public static final Material toolMaterial = Material
-            .valueOf(Main.getPlugin().getCustomConfig().getString("tntReload.materialType"));
-
     private static AutoCannonReloaderListener instance;
 
     public static AutoCannonReloaderListener getInstance() {
@@ -159,7 +157,7 @@ public class AutoCannonReloaderListener implements Listener, TabExecutor {
     public void clickListener(PlayerInteractEvent event) {
         Action a = event.getAction();
         Player p = event.getPlayer();
-        if (!event.getMaterial().equals(toolMaterial)) {
+        if (!event.getMaterial().equals(BauConfig.getInstance().getTntReloadItem())) {
             return;
         }
         AutoCannonReloader autoCannonReloader = BauPlayer.getBauPlayer(p).getCannonReloader();

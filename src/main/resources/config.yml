@@ -9,11 +9,11 @@ tntReload:
 fernzuender: WOODEN_HOE
 cannontimer:
   block:
-    default: WHITE_SHULKER_BOX
+    default: SHULKER_BOX
     active: LIME_SHULKER_BOX
     inactive: RED_SHULKER_BOX
   tool: CLOCK
-  maxamount: 64
+  maxticks: 100
 
 testworlds:
   template: BauGsVorlage

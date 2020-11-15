@@ -6,6 +6,7 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
+import net.wargearworld.bau.config.BauConfig;
 import net.wargearworld.bau.utils.Loc;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -17,11 +18,6 @@ import java.util.HashSet;
 import java.util.UUID;
 
 public class AutoCannonReloader {
-    private static final int TIMEOUT = 20 * Main.getPlugin().getCustomConfig().getInt("tntReload.timeout");
-    private static final int MAX_TNT = Main.getPlugin().getCustomConfig().getInt("tntReload.maxTnt");
-    public static final Material toolMaterial = Material
-            .valueOf(Main.getPlugin().getCustomConfig().getString("tntReload.materialType"));
-
     public static HashSet<Loc> tntLocations;
     private boolean recording;
     private boolean antiSpam;
@@ -64,7 +60,7 @@ public class AutoCannonReloader {
         UUID uuid = p.getUniqueId();
         if (antiSpam) {
             Main.send(p, true, MessageHandler.getInstance().getString(p, "cannonReloader_prefix"), "cannonReloader_antispam",
-                    String.valueOf(TIMEOUT / 20));
+                    String.valueOf(BauConfig.getInstance().getTntReloadMaxTnT() / 20));
             return;
         }
         World world = p.getWorld();
@@ -86,7 +82,7 @@ public class AutoCannonReloader {
             public void run() {
                 antiSpam = false;
             }
-        }, TIMEOUT);
+        }, BauConfig.getInstance().getTntReloadTimeout());
     }
 
     protected void showHelp(Player p) {
@@ -110,16 +106,17 @@ public class AutoCannonReloader {
     }
 
     public void save(Location location, Player p) {
-        if (tntLocations.size() >= MAX_TNT) {
+        int maxTnT = BauConfig.getInstance().getTntReloadMaxTnT();
+        if (tntLocations.size() >= maxTnT) {
             Main.send(p, true, MessageHandler.getInstance().getString(p, "cannonReloader_prefix"), "cannonReloader_maxTntOverload",
-                    String.valueOf(MAX_TNT));
+                    String.valueOf(maxTnT));
             return;
         }
 
         tntLocations.add(new Loc(location));
-        if (tntLocations.size() == MAX_TNT) {
+        if (tntLocations.size() == maxTnT) {
             Main.send(p, true, MessageHandler.getInstance().getString(p, "cannonReloader_prefix"), "cannonReloader_maxTnt",
-                    String.valueOf(MAX_TNT));
+                    String.valueOf(maxTnT));
         }
     }
 

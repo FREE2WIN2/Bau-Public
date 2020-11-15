@@ -6,6 +6,7 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
+import net.wargearworld.bau.config.BauConfig;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.utils.ClickAction;
 import net.wargearworld.bau.utils.JsonCreater;
@@ -125,7 +126,7 @@ public class PlotResetter implements TabExecutor {
         boolean sl = current.getSL();
         Bukkit.getScheduler().runTaskAsynchronously(Main.getPlugin(), () -> {
         List<Block> list = new LinkedList<>();
-        int maxBlockChangePerTick = WorldEditHandler.maxBlockChangePerTick;
+        int maxBlockChangePerTick = BauConfig.getInstance().getWeMaxBlocksPerTick();
         int blockCount = 0;
             for (int x = minimumPoint.getBlockX(); x <= maximumPoint.getBlockX(); x++) {
                 for (int y = minimumPoint.getBlockY(); y <= maximumPoint.getBlockY(); y++) {

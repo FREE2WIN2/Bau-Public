@@ -2,6 +2,7 @@ package net.wargearworld.bau.worldedit;
 
 import java.io.File;
 
+import net.wargearworld.bau.config.BauConfig;
 import org.bukkit.Location;
 
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -26,10 +27,11 @@ public class Schematic {
 	
 	
 	public Schematic(String dir, String name) {
- 		if(dir == null) {
-			file = new File(Main.getPlugin().getCustomConfig().getString("schempath") + "/" + name);
+ 		String schemPath = BauConfig.getInstance().getSchemPath();
+		if(dir == null) {
+			file = new File(schemPath + "/" + name);
 		}else {
-			file = new File(Main.getPlugin().getCustomConfig().getString("schempath") + "/" + dir + "/" + name);
+			file = new File(schemPath + "/" + dir + "/" + name);
 		}
 		if(!file.exists()) {
 			System.err.println("Schematic not fount: " + file.getAbsolutePath());

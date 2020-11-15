@@ -6,6 +6,7 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
+import net.wargearworld.bau.config.BauConfig;
 import net.wargearworld.bau.dao.PlayerDAO;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.world.WorldTemplate;
@@ -73,7 +74,7 @@ public class Buy implements TabExecutor {
         int amountOfWorlds = BauPlayer.getBauPlayer(p).getdbPlots().size();
         MessageHandler msgHandler = MessageHandler.getInstance();
         String worldName = s.getString("WorldName");
-        Double price = amountOfWorlds * Main.getPlugin().getCustomConfig().getDouble("worldprice");
+        Double price = amountOfWorlds * BauConfig.getInstance().getWorldprice();
         EconomyFormatter economyFormatter = EconomyFormatter.getInstance();
         if (confirmed) {
             Account senderAccount = Account.getByUUID(p.getUniqueId());

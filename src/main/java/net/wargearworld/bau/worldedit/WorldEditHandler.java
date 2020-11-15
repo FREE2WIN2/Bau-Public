@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import net.wargearworld.bau.config.BauConfig;
 import net.wargearworld.bau.utils.CoordGetter;
 import net.wargearworld.bau.world.plot.Plot;
 import org.bukkit.Bukkit;
@@ -37,15 +38,10 @@ import com.sk89q.worldedit.world.World;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.tools.Stoplag;
-import net.wargearworld.bau.tools.testBlockSlave.TestBlockSlaveCore;
 import net.wargearworld.bau.tools.testBlockSlave.testBlock.Facing;
 import net.wargearworld.bau.utils.Scheduler;
 
 public class WorldEditHandler {
-
-    public final static int maxBlockChangePerTick = Main.getPlugin().getCustomConfig()
-            .getInt("worldEdit.maxBlockPerSecond");
-
     /* all Clipboard creator */
 
     public static Clipboard createClipboard(File file) {
@@ -201,6 +197,7 @@ public class WorldEditHandler {
         if (tbs && !saveUndo && !ignoreAir & Stoplag.getStatus(p.getLocation())) {
             Stoplag.getInstance().setStatusTemp(p.getLocation(), true, BauPlayer.getBauPlayer(p).getPasteTime());
         }
+        int maxBlockChangePerTick = BauConfig.getInstance().getWeMaxBlocksPerTick();
         animation.setTask(Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), new Runnable() {
 
             @Override
@@ -287,6 +284,7 @@ public class WorldEditHandler {
         animation.setX(xmin);
         animation.setY(ymin);
         animation.setZ(zmin);
+        int maxBlockChangePerTick = BauConfig.getInstance().getWeMaxBlocksPerTick();
         animation.setTask(Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), () -> {
 
             int blockChanged = 0;

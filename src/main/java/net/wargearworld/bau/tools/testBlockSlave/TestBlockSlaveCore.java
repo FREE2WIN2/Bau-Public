@@ -1,5 +1,7 @@
 package net.wargearworld.bau.tools.testBlockSlave;
 
+import net.wargearworld.bau.config.BauConfig;
+import net.wargearworld.bau.config.Sizes;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.utils.CoordGetter;
 import net.wargearworld.bau.world.plot.Plot;
@@ -391,8 +393,9 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 	}
 
 	public static int getMaxShieldSizeOfTier(int tier) {
-		ConfigurationSection section = Main.getPlugin().getConfig()
-				.getConfigurationSection("sizes." + tier);
-		return section.getInt("shields");
+		Sizes sizes = BauConfig.getInstance().getSize(tier);
+		if(sizes == null)
+			return 0;
+		return sizes.getShields();
 	}
 }

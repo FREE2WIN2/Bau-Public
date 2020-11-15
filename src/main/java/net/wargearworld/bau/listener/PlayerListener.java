@@ -3,6 +3,7 @@ package net.wargearworld.bau.listener;
 import net.wargearworld.StringGetter.Language;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
+import net.wargearworld.bau.config.BauConfig;
 import net.wargearworld.bau.dao.PlayerDAO;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.scoreboard.ScoreBoardBau;
@@ -50,7 +51,7 @@ public class PlayerListener implements Listener {
         String uuidString = p.getUniqueId().toString();
         if (!player.hasPlots()) {
             EntityManagerExecuter.run(em -> {
-                PlotTemplate dbTemplate = em.find(PlotTemplate.class, WorldManager.template.getId());
+                PlotTemplate dbTemplate = em.find(PlotTemplate.class, BauConfig.getInstance().getDefaultTemplate().getId());
                 Plot plot = new Plot();
                 plot.setName(p.getName());
                 plot.setTemplate(dbTemplate);
@@ -62,7 +63,7 @@ public class PlayerListener implements Listener {
         WorldTemplate worldTemplate = EntityManagerExecuter.run(em -> {
             PlotTemplate plotTemplate = PlayerDAO.getDefaultPlotTemplate(p.getUniqueId());
             if (plotTemplate == null) {
-                return WorldManager.template;
+                return BauConfig.getInstance().getDefaultTemplate();
             } else {
                 return WorldTemplate.getTemplate(plotTemplate.getName());
             }

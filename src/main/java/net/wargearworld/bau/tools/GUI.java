@@ -8,6 +8,7 @@ import net.wargearworld.GUI_API.GUI.ChestGUI;
 import net.wargearworld.GUI_API.Items.*;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
+import net.wargearworld.bau.config.BauConfig;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.tools.cannon_reloader.AutoCannonReloader;
 import net.wargearworld.bau.world.WorldManager;
@@ -110,11 +111,11 @@ public class GUI implements CommandExecutor, Listener {
 
         Item testBlockSlave = new DefaultItem(Material.WHITE_WOOL,msgHandler.getString(p,"testBlockSklaveGui"),1).setExecutor(s->{s.getPlayer().performCommand("tbs");});
 
-        Material ferzuenerMaterial =  Material.valueOf(Main.getPlugin().getCustomConfig().getString("fernzuender"));
+        Material ferzuenerMaterial = BauConfig.getInstance().getRemoteDetonatorTool();
         Item fernzuenderItem = new DefaultItem(ferzuenerMaterial,msgHandler.getString(p,"fernzuender"),1);
         fernzuenderItem.setCancelled(false);
 
-        Item cannonReloaderItem = new DefaultItem(AutoCannonReloader.toolMaterial,msgHandler.getString(p,"cannonReloader_guiName"),1);
+        Item cannonReloaderItem = new DefaultItem(BauConfig.getInstance().getTntReloadItem(),msgHandler.getString(p,"cannonReloader_guiName"),1);
         cannonReloaderItem.setCancelled(false);
 
         Item designToolOn = new DefaultItem(Material.WOODEN_SHOVEL,msgHandler.getString(p, "dtItemOn"),1).setExecutor(s->{s.getPlayer().performCommand("dt");s.getPlayer().closeInventory();});
