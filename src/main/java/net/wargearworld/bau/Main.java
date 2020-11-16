@@ -27,7 +27,7 @@ import net.wargearworld.bau.tools.waterremover.WaterRemoverListener;
 import net.wargearworld.bau.tools.worldfuscator.WorldFuscatorCommand;
 import net.wargearworld.bau.tools.worldfuscator.WorldFuscatorIntegration;
 import net.wargearworld.bau.world.WorldCommand;
-import net.wargearworld.bau.world.WorldGUI;
+import net.wargearworld.bau.world.gui.WorldGUI;
 import net.wargearworld.bau.world.WorldManager;
 import net.wargearworld.bau.worldedit.SaWE;
 import net.wargearworld.bau.worldedit.WorldEditPreCommand;

@@ -1,7 +1,6 @@
 package net.wargearworld.bau.team;
 
 import net.wargearworld.bau.dao.DatabaseDAO;
-import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.world.WorldTemplate;
 import net.wargearworld.db.EntityManagerExecuter;
 import net.wargearworld.db.model.WargearTeam;
@@ -18,7 +17,6 @@ public class Team {
     private Set<UUID> newcomers;
 
     public Team(Long id) {
-
         this.id = Objects.requireNonNull(id);
         System.out.println(this.id);
         leaders = new HashSet<>();

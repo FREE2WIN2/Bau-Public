@@ -44,6 +44,14 @@ public class TeamWorld extends BauWorld {
     }
 
     @Override
+    public Collection<UUID> getMembers() {
+        Collection<UUID> members = new ArrayList<>(team.getLeaders());
+        members.addAll(team.getMembers());
+        members.addAll(team.getNewcomers());
+        return members;
+    }
+
+    @Override
     public boolean isOwner(Player player) {
         return team.getLeaders().contains(player.getUniqueId());
     }

@@ -3,6 +3,7 @@ package net.wargearworld.bau.world;
 import net.wargearworld.StringGetter.Language;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
+import net.wargearworld.bau.world.gui.WorldGUI;
 import net.wargearworld.command_manager.CommandHandel;
 import net.wargearworld.commandframework.player.BukkitCommandPlayer;
 import org.bukkit.command.Command;
@@ -24,7 +25,7 @@ public class WorldCommand implements TabExecutor {
         handle = new CommandHandel("worlds", Main.prefix, MessageHandler.getInstance());
 
         handle.setCallback(s -> {
-            WorldGUI.openMain(getPlayer(s));
+            WorldGUI.openMain(getPlayer(s),1);
         });
 
     }

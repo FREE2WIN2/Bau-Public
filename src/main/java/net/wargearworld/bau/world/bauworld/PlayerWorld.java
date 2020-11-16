@@ -63,16 +63,20 @@ public class PlayerWorld extends BauWorld {
     }
 
     @Override
-    public boolean isMember(UUID memberUUID) {
+    public Collection<UUID> getMembers() {
         return EntityManagerExecuter.run(em -> {
+            List<UUID> members = new ArrayList<>();
             Plot dbPlot = em.find(Plot.class, plotID);
             for (PlotMember member : dbPlot.getMembers()) {
-                if (member.getMember().getUuid().equals(memberUUID)) {
-                    return true;
-                }
+                members.add(member.getMember().getUuid());
             }
-            return false;
+            return members;
         });
+    }
+
+    @Override
+    public boolean isMember(UUID memberUUID) {
+        return getMembers().contains(memberUUID);
     }
 
     @Override

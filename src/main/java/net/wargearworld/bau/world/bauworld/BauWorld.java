@@ -16,6 +16,7 @@ import net.wargearworld.bau.utils.HelperMethods;
 import net.wargearworld.bau.utils.MethodResult;
 import net.wargearworld.bau.world.WorldManager;
 import net.wargearworld.bau.world.WorldTemplate;
+import net.wargearworld.bau.world.gui.WorldGUI;
 import net.wargearworld.bau.world.plot.Plot;
 import net.wargearworld.bau.world.plot.PlotType;
 
@@ -96,7 +97,11 @@ public abstract class BauWorld {
 
     public abstract boolean isAuthorized(UUID uuid);
 
-    public abstract void showInfo(Player p);
+    public void showInfo(Player p){
+        WorldGUI.openWorldInfo(p,this);
+    }
+
+    public abstract Collection<UUID> getMembers();
 
     public abstract boolean isOwner(Player player);
 
