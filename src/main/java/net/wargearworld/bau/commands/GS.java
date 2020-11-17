@@ -13,6 +13,7 @@ import net.wargearworld.bau.utils.JsonCreater;
 import net.wargearworld.bau.world.bauworld.BauWorld;
 import net.wargearworld.bau.world.bauworld.PlayerWorld;
 import net.wargearworld.bau.world.WorldManager;
+import net.wargearworld.bau.world.gui.WorldGUI;
 import net.wargearworld.command_manager.ArgumentList;
 import net.wargearworld.command_manager.CommandHandel;
 import net.wargearworld.command_manager.CommandNode;
@@ -132,9 +133,9 @@ public class GS implements TabExecutor {
             BauPlayer.getBauPlayer(getPlayer(s)).sendMemberedGS();
         }));
 
-        commandHandle.addSubNode(literal("team")).setCallback(s -> {
+        commandHandle.addSubNode(literal("team").setCallback(s -> {
             tpTeam(s);
-        });
+        }));
         commandHandle.addSubNode(literal("tp")
                 .addSubNode(literal("team").setCallback(s -> {
                     tpTeam(s);

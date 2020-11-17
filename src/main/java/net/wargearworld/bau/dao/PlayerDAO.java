@@ -66,6 +66,8 @@ public class PlayerDAO {
             Player dbPlayer = em.find(Player.class, uuid);
             PlotTemplate plotTemplate = em.find(PlotTemplate.class,BauConfig.getInstance().getDefaultTemplate().getId());
             Plot plot = new Plot(worldName,dbPlayer, plotTemplate,isDefault);
+            Icon icon = em.find(Icon.class,2l);
+            plot.setIcon(icon);
             em.persist(plot);
         });
     }
@@ -116,6 +118,13 @@ public class PlayerDAO {
                 out.add(player.getName());
             });
             return out;
+        });
+    }
+
+    public static Collection<PlotMember> getMemberedPlots(UUID uuid){
+        return EntityManagerExecuter.run(em->{
+            Player dbPlayer = em.find(Player.class,uuid);
+            return dbPlayer.getMemberedPlots();
         });
     }
 }

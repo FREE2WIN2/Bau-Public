@@ -4,8 +4,11 @@ import net.wargearworld.GUI_API.Items.DefaultItem;
 import net.wargearworld.GUI_API.Items.HeadItem;
 import net.wargearworld.GUI_API.Items.Item;
 import net.wargearworld.bau.MessageHandler;
+import net.wargearworld.bau.dao.PlotDAO;
 import net.wargearworld.bau.world.WorldManager;
+import net.wargearworld.bau.world.WorldTemplate;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -25,15 +28,14 @@ public class GUIPlayerWorld implements IGUIWorld {
 
     public Item getIconItem(Player p) {
         if (owner != p.getUniqueId()) {
-            return new DefaultItem(Material.AIR);
+            return null;
         }
-        return new DefaultItem(Material.NAME_TAG, MessageHandler.getInstance().getString(p, "world_gui_icon_rename", name), s -> {
+        return worldIcon.toItem().setName(MessageHandler.getInstance().getString(p, "world_gui_icon_change", name)).setExecutor(s -> {
             WorldGUI.openIcon(p, owner, name);
-        }).addLore(MessageHandler.getInstance().getString(p, "world_gui_world_icon_lore", name));
+        }).addLore(MessageHandler.getInstance().getString(p, "world_gui_icon_change_lore", name));
     }
 
     public Item getWorldItem(Player p) {
-        //TODO if no Icon -> TemplateIcon
         return worldIcon.toItem().setName(MessageHandler.getInstance().getString(p, "world_gui_world_info", name)).setExecutor(s -> {
             WorldGUI.openPlayerWorldInfo(p, owner, name);
         }).addLore(MessageHandler.getInstance().getString(p, "world_gui_world_info_lore", name));
@@ -41,14 +43,15 @@ public class GUIPlayerWorld implements IGUIWorld {
 
     public Item getTeleportItem(Player p) {
         return new DefaultItem(Material.ENDER_PEARL, MessageHandler.getInstance().getString(p, "world_gui_world_teleport", name), s -> {
-            p.performCommand("/gs tp " + ownerName + " " + name);
+            WorldManager.getPlayerWorld(name, owner).spawn(p);
+
             p.closeInventory();
         }).addLore(MessageHandler.getInstance().getString(p, "world_gui_world_teleport_lore", name));
     }
 
     public Item getRenameItem(Player p) {
         if (owner != p.getUniqueId()) {
-            return new DefaultItem(Material.AIR);
+            return null;
         }
         return new DefaultItem(Material.NAME_TAG, MessageHandler.getInstance().getString(p, "world_gui_world_rename", name), s -> {
             WorldGUI.openRename(p, WorldManager.getPlayerWorld(name, owner));
@@ -56,6 +59,34 @@ public class GUIPlayerWorld implements IGUIWorld {
     }
 
     public Item getOwnerItem(Player p) {
-        return new HeadItem(ownerName,MessageHandler.getInstance().getString(p, "world_gui_item_owner", ownerName),1).setExecutor(s->{});
+        return new HeadItem(ownerName, MessageHandler.getInstance().getString(p, "world_gui_item_owner", ownerName), 1).setExecutor(s -> {
+        });
+    }
+
+    @Override
+    public Item getTimeIcon(Player p, World w) {
+        Item timeItem = new DefaultItem(Material.CLOCK, MessageHandler.getInstance().getString(p, "world_gui_item_time", w.getTime() + ""));
+        if (owner.equals(p.getUniqueId())) {
+            timeItem.addLore(MessageHandler.getInstance().getString(p, "world_gui_item_time_lore", w.getTime() + ""));
+            timeItem.setExecutor(s -> {
+                WorldGUI.openTimeChange(p, w);
+            });
+        }
+        return timeItem;
+    }
+
+    @Override
+    public Item getTemplateIcon(Player p) {
+        WorldTemplate worldTemplate = PlotDAO.getTemplate(owner,name);
+        if(worldTemplate == null)
+            return null;
+        Item item = worldTemplate.getItem(p.getUniqueId()).setName(MessageHandler.getInstance().getString(p, "world_gui_world_template", worldTemplate.getName()));
+        if (p.getUniqueId().equals(owner)) {
+            item.setExecutor(s -> {
+                WorldGUI.openTemplates(p, WorldManager.getPlayerWorld(name, owner));
+            });
+            item.addLore(MessageHandler.getInstance().getString(p, "world_gui_world_template_lore"));
+        }
+        return item;
     }
 }

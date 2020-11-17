@@ -10,6 +10,9 @@ import net.wargearworld.bau.utils.JsonCreater;
 import net.wargearworld.bau.utils.MethodResult;
 import net.wargearworld.bau.world.WorldManager;
 import net.wargearworld.bau.world.WorldTemplate;
+import net.wargearworld.bau.world.gui.GUIPlayerWorld;
+import net.wargearworld.bau.world.gui.IGUIWorld;
+import net.wargearworld.bau.world.gui.WorldGUI;
 import net.wargearworld.bau.world.plot.PlotPattern;
 import net.wargearworld.db.EntityManagerExecuter;
 import net.wargearworld.db.model.Plot;
@@ -26,6 +29,8 @@ public class PlayerWorld extends BauWorld {
 
     UUID owner;
     private long plotID;
+    private IGUIWorld iguiWorld;
+    private Collection<WorldMember> worldMembers;
 
     public PlayerWorld(long id, UUID owner, World world) {
         super(world);
@@ -45,41 +50,32 @@ public class PlayerWorld extends BauWorld {
 
     @Override
     public void showInfo(Player p) {
-        boolean isOwner = isOwner(p);
-        Main.send(p, "memberListHeader", getName());
-        for (String memberName : getMemberNames()) {
-            String hover = MessageHandler.getInstance().getString(p, "memberHoverRemove").replace("%r", memberName);
-            JsonCreater remove = new JsonCreater("§7[§6" + memberName + "§7]");
-            if (isOwner) {
-                remove.addClickEvent("/gs remove " + memberName, ClickAction.SUGGEST_COMMAND).addHoverEvent(hover);
-            }
-            remove.send(p);
-        }
-        if (isOwner) {
-            new JsonCreater("§a[+]§r  ").addClickEvent("/gs add ", ClickAction.SUGGEST_COMMAND)
-                    .addHoverEvent(MessageHandler.getInstance().getString(p, "addMemberHover")).send(p);
-        }
-        Main.send(p, "timeShow", p.getWorld().getTime() + "");
+        WorldGUI.openWorldInfo(p, this);
     }
 
     @Override
-    public Collection<UUID> getMembers() {
-        return EntityManagerExecuter.run(em -> {
-            List<UUID> members = new ArrayList<>();
-            Plot dbPlot = em.find(Plot.class, plotID);
-            for (PlotMember member : dbPlot.getMembers()) {
-                members.add(member.getMember().getUuid());
-            }
-            return members;
-        });
+    public Collection<WorldMember> getMembers() {
+        if (worldMembers == null) {
+            EntityManagerExecuter.run(em -> {
+                worldMembers = new ArrayList<>();
+                Plot dbPlot = em.find(Plot.class, plotID);
+                for (PlotMember member : dbPlot.getMembers()) {
+                    worldMembers.add(new WorldMember(member.getMember().getName(), member.getMember().getUuid()));
+                }
+            });
+        }
+        return worldMembers;
     }
 
     @Override
     public boolean isMember(UUID memberUUID) {
-        return getMembers().contains(memberUUID);
+        for(WorldMember worldMember:getMembers()){
+            if(worldMember.getUuid().equals(memberUUID))
+                return true;
+        }
+        return false;
     }
 
-    @Override
     public Collection<String> getMemberNames() {
         return EntityManagerExecuter.run(em -> {
             Set<String> out = new HashSet<>();
@@ -288,12 +284,20 @@ public class PlayerWorld extends BauWorld {
     }
 
     @Override
+    public IGUIWorld getGUIWorld() {
+        if (iguiWorld == null)
+            iguiWorld = new GUIPlayerWorld(getName(), owner, DatabaseDAO.getPlayer(owner).getName(), PlotDAO.getWorldIcon(plotID));
+        return iguiWorld;
+    }
+
+    @Override
     public void spawn(Player p) {
         super.spawn(p);
         Player ownerPlayer = Bukkit.getPlayer(owner);
         if (ownerPlayer == null || ownerPlayer == p)
             return;
         MessageHandler.getInstance().send(ownerPlayer, "plot_entered", p.getName(), getName());
+        MessageHandler.getInstance().send(p, "world_tp", getName(), getOwner());
     }
 
 }

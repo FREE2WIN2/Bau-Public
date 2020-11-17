@@ -19,6 +19,8 @@ public class WorldIcon {
     }
 
     public WorldIcon(Icon icon) {
+        if(icon == null)
+            return;
         this.value = icon.getValue();
         this.materialName = icon.getMaterial();
     }

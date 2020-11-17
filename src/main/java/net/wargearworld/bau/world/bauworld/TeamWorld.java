@@ -7,6 +7,9 @@ import net.wargearworld.bau.team.Team;
 import net.wargearworld.bau.utils.JsonCreater;
 import net.wargearworld.bau.utils.MethodResult;
 import net.wargearworld.bau.world.WorldTemplate;
+import net.wargearworld.bau.world.gui.GUITeamWorld;
+import net.wargearworld.bau.world.gui.IGUIWorld;
+import net.wargearworld.bau.world.gui.WorldGUI;
 import net.wargearworld.bau.world.plot.PlotPattern;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -16,7 +19,8 @@ import java.util.*;
 public class TeamWorld extends BauWorld {
 
     private Team team;
-
+    private IGUIWorld iGuiWorld;
+    private Collection<WorldMember> worldMembers;
     public TeamWorld(Team team, World w) {
         super(w);
         this.team = team;
@@ -34,21 +38,15 @@ public class TeamWorld extends BauWorld {
 
     @Override
     public void showInfo(Player p) {
-        Main.send(p, "memberListHeader", team.getName());
-        for (String memberName : getMemberNames()) {
-            String hover = MessageHandler.getInstance().getString(p, "memberHoverRemove").replace("%r", memberName);
-            JsonCreater remove = new JsonCreater("§7[§6" + memberName + "§7]");
-            remove.send(p);
-        }
-        Main.send(p, "timeShow", p.getWorld().getTime() + "");
+        WorldGUI.openWorldInfo(p,this);
     }
 
     @Override
-    public Collection<UUID> getMembers() {
-        Collection<UUID> members = new ArrayList<>(team.getLeaders());
-        members.addAll(team.getMembers());
-        members.addAll(team.getNewcomers());
-        return members;
+    public Collection<WorldMember> getMembers() {
+        if(worldMembers == null){
+            worldMembers = team.getWorldMembers();
+        }
+        return worldMembers;
     }
 
     @Override
@@ -84,27 +82,27 @@ public class TeamWorld extends BauWorld {
 
     @Override
     public void removeAllMembersFromRegions() {
-        for (UUID uuid : team.getLeaders()) {
-            removeMemberFromAllRegions(uuid);
+        for (WorldMember worldMember : team.getLeaders()) {
+            removeMemberFromAllRegions(worldMember.getUuid());
         }
-        for (UUID uuid : team.getMembers()) {
-            removeMemberFromAllRegions(uuid);
+        for (WorldMember worldMember : team.getMembers()) {
+            removeMemberFromAllRegions(worldMember.getUuid());
         }
-        for (UUID uuid : team.getNewcomers()) {
-            removeMemberFromAllRegions(uuid);
+        for (WorldMember worldMember : team.getNewcomers()) {
+            removeMemberFromAllRegions(worldMember.getUuid());
         }
     }
 
     @Override
     public void addAllMembersToRegions() {
-        for (UUID uuid : team.getLeaders()) {
-            addPlayerToAllRegions(uuid);
+        for (WorldMember worldMember : team.getLeaders()) {
+            addPlayerToAllRegions(worldMember.getUuid());
         }
-        for (UUID uuid : team.getMembers()) {
-            addPlayerToAllRegions(uuid);
+        for (WorldMember worldMember : team.getMembers()) {
+            addPlayerToAllRegions(worldMember.getUuid());
         }
-        for (UUID uuid : team.getNewcomers()) {
-            addPlayerToAllRegions(uuid);
+        for (WorldMember worldMember : team.getNewcomers()) {
+            addPlayerToAllRegions(worldMember.getUuid());
         }
     }
 
@@ -124,6 +122,13 @@ public class TeamWorld extends BauWorld {
     }
 
     @Override
+    public IGUIWorld getGUIWorld() {
+        if(iGuiWorld == null)
+            iGuiWorld = new GUITeamWorld(team);
+        return null;
+    }
+
+    @Override
     public String getOwner() {
         return team.getName();
     }
@@ -133,12 +138,13 @@ public class TeamWorld extends BauWorld {
         return team.isMember(member);
     }
 
-    @Override
-    public Collection<String> getMemberNames() {
-        return team.getMemberNames();
-    }
-
     public Team getTeam() {
        return team;
+    }
+
+    @Override
+    public void spawn(Player p){
+        super.spawn(p);
+        MessageHandler.getInstance().send(p, "world_tp", getName(), "Team: " + getOwner());
     }
 }

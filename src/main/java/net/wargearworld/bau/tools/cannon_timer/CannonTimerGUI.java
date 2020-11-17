@@ -191,7 +191,7 @@ public class CannonTimerGUI {
             return out;
         }
         if (list.size() - 1 < begin + pageSize) {
-            list = list.subList(begin, list.size() - 1);
+            list = list.subList(begin, list.size());
         } else {
             list = list.subList(begin, begin + pageSize);
         }

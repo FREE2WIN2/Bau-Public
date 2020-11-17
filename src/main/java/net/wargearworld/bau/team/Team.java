@@ -1,10 +1,13 @@
 package net.wargearworld.bau.team;
 
 import net.wargearworld.bau.dao.DatabaseDAO;
+import net.wargearworld.bau.world.WorldManager;
 import net.wargearworld.bau.world.WorldTemplate;
+import net.wargearworld.bau.world.bauworld.WorldMember;
 import net.wargearworld.db.EntityManagerExecuter;
 import net.wargearworld.db.model.WargearTeam;
 import net.wargearworld.db.model.WargearTeamMember;
+import org.bukkit.World;
 
 import java.util.*;
 
@@ -12,13 +15,12 @@ public class Team {
     private Long id;
     private String name;
     private String abbreviation;
-    private Set<UUID> leaders;
-    private Set<UUID> members;
-    private Set<UUID> newcomers;
+    private Set<WorldMember> leaders;
+    private Set<WorldMember> members;
+    private Set<WorldMember> newcomers;
 
     public Team(Long id) {
         this.id = Objects.requireNonNull(id);
-        System.out.println(this.id);
         leaders = new HashSet<>();
         members = new HashSet<>();
         newcomers = new HashSet<>();
@@ -28,25 +30,33 @@ public class Team {
             this.name = wargearTeam.getName();
             for (WargearTeamMember wargearTeamMember : wargearTeam.getMembers()) {
                 UUID uuid = wargearTeamMember.getMember().getUuid();
+                String name = wargearTeamMember.getMember().getName();
+                WorldMember worldMember = new WorldMember(name, uuid);
                 if (wargearTeamMember.isLeader()) {
-                    leaders.add(uuid);
+                    leaders.add(worldMember);
                 } else if (wargearTeamMember.isNewcomer()) {
-                    newcomers.add(uuid);
+                    newcomers.add(worldMember);
                 } else {
-                    members.add(uuid);
+                    members.add(worldMember);
                 }
             }
         });
     }
 
     public boolean isMember(UUID playerUUID) {
-        if (leaders.contains(playerUUID) || members.contains(playerUUID))
-            return true;
-        return false;
+        return isAuthorized(playerUUID);
     }
 
     public boolean isAuthorized(UUID uuid) {
-        return leaders.contains(uuid) || members.contains(uuid);
+        for (WorldMember worldMember : leaders) {
+            if (worldMember.getUuid().equals(uuid))
+                return true;
+        }
+        for (WorldMember worldMember : members) {
+            if (worldMember.getUuid().equals(uuid))
+                return true;
+        }
+        return false;
     }
 
     public Long getId() {
@@ -61,28 +71,34 @@ public class Team {
         return abbreviation;
     }
 
-    public Set<UUID> getLeaders() {
+    public Set<WorldMember> getLeaders() {
         return leaders;
     }
 
-    public Set<UUID> getMembers() {
+    public Set<WorldMember> getMembers() {
         return members;
     }
 
-    public Set<UUID> getNewcomers() {
+    public Set<WorldMember> getNewcomers() {
         return newcomers;
     }
 
     public Collection<String> getMemberNames() {
         List<String> out = new ArrayList<>();
-        out.addAll(DatabaseDAO.getNames(leaders));
-        out.addAll(DatabaseDAO.getNames(members));
-        out.addAll(DatabaseDAO.getNames(newcomers));
+        getNameOfMembers(leaders, out);
+        getNameOfMembers(members, out);
+        getNameOfMembers(newcomers, out);
         return out;
     }
 
+    private void getNameOfMembers(Collection<WorldMember> membersList, Collection<String> outList) {
+        for (WorldMember worldMember : membersList) {
+            outList.add(worldMember.getName());
+        }
+    }
+
     public WorldTemplate getTemplate() {
-        return  EntityManagerExecuter.run(em -> {
+        return EntityManagerExecuter.run(em -> {
             WargearTeam wargearTeam = em.find(WargearTeam.class, this.id);
             return WorldTemplate.getTemplate(wargearTeam.getTemplate().getName());
         });
@@ -90,7 +106,7 @@ public class Team {
 
     public void setName(String name) {
         this.name = name;
-        EntityManagerExecuter.run(em->{
+        EntityManagerExecuter.run(em -> {
             WargearTeam wargearTeam = em.find(WargearTeam.class, this.id);
             wargearTeam.setName(name);
             em.merge(wargearTeam);
@@ -99,15 +115,30 @@ public class Team {
 
     public void setAbbreviation(String abbreviation) {
         this.abbreviation = abbreviation;
-        EntityManagerExecuter.run(em->{
+        EntityManagerExecuter.run(em -> {
             WargearTeam wargearTeam = em.find(WargearTeam.class, this.id);
             wargearTeam.setAbbreviation(abbreviation);
             em.merge(wargearTeam);
         });
     }
 
-    public void setNewcomers(Set<UUID> newcomers) {
+    public void setNewcomers(Set<WorldMember> newcomers) {
         this.newcomers = newcomers;
     }
 
+    public Collection<WorldMember> getWorldMembers() {
+        List<WorldMember> out = new ArrayList<>(leaders);
+        out.addAll(members);
+        out.addAll(newcomers);
+        return out;
+    }
+
+    public boolean isLeader(UUID uniqueId) {
+        for (WorldMember worldMember : leaders) {
+            if (worldMember.getUuid().equals(uniqueId)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

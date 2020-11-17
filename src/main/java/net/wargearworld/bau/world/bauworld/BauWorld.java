@@ -8,6 +8,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import net.wargearworld.bau.Main;
+import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.listener.PlayerMovement;
 import net.wargearworld.bau.scoreboard.ScoreBoardBau;
 import net.wargearworld.bau.tools.cannon_timer.CannonTimer;
@@ -16,6 +17,7 @@ import net.wargearworld.bau.utils.HelperMethods;
 import net.wargearworld.bau.utils.MethodResult;
 import net.wargearworld.bau.world.WorldManager;
 import net.wargearworld.bau.world.WorldTemplate;
+import net.wargearworld.bau.world.gui.IGUIWorld;
 import net.wargearworld.bau.world.gui.WorldGUI;
 import net.wargearworld.bau.world.plot.Plot;
 import net.wargearworld.bau.world.plot.PlotType;
@@ -74,7 +76,7 @@ public abstract class BauWorld {
     public Plot getPlot(Location loc) {
         BlockVector3 pos = BlockVector3.at(loc.getX(), loc.getY(), loc.getZ());
         List<String> regionsIDs = regionManager.getApplicableRegionsIDs(pos);
-        if(regionsIDs.size() < 1){
+        if (regionsIDs.size() < 1) {
             return null;
         }
         return getPlot(regionsIDs.get(0));
@@ -97,11 +99,11 @@ public abstract class BauWorld {
 
     public abstract boolean isAuthorized(UUID uuid);
 
-    public void showInfo(Player p){
-        WorldGUI.openWorldInfo(p,this);
+    public void showInfo(Player p) {
+        WorldGUI.openWorldInfo(p, this);
     }
 
-    public abstract Collection<UUID> getMembers();
+    public abstract Collection<WorldMember> getMembers();
 
     public abstract boolean isOwner(Player player);
 
@@ -213,6 +215,8 @@ public abstract class BauWorld {
         this.worldName = newName;
     }
 
+    public abstract IGUIWorld getGUIWorld();
+
     protected enum WorldAction {
         ADD, ADDTEMP, REMOVE, NEW, DELETE;
 
@@ -247,11 +251,9 @@ public abstract class BauWorld {
 
     public abstract boolean isMember(UUID member);
 
-    public abstract Collection<String> getMemberNames();
-
     public CannonTimer getCannonTimer(Location loc) {
         Plot plot = getPlot(loc);
-        if(plot == null)
+        if (plot == null)
             return null;
         return plot.getCannonTimer();
     }
