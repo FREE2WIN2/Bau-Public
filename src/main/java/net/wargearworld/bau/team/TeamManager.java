@@ -5,6 +5,8 @@ import net.wargearworld.db.model.Player;
 import net.wargearworld.db.model.WargearTeamMember;
 import net.wargearworld.db.model.WargearTeamMember_;
 
+import javax.persistence.NoResultException;
+import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -34,7 +36,13 @@ public class TeamManager {
             Root<WargearTeamMember> root = criteriaQuery.from(WargearTeamMember.class);
 
             criteriaQuery.where(cb.equal(root.get(WargearTeamMember_.member), em.find(Player.class, playerUUID)));
-            WargearTeamMember wargearTeamMember = em.createQuery(criteriaQuery).getSingleResult();
+            Query query = em.createQuery(criteriaQuery);
+            WargearTeamMember wargearTeamMember = null;
+            try{
+                wargearTeamMember = (WargearTeamMember) query.getSingleResult();
+            }catch(NoResultException ex){
+                return null;
+            }
             return wargearTeamMember.getTeam().getId();
         });
         return getTeam(teamID);

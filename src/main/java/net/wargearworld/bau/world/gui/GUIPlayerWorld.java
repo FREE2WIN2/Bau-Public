@@ -4,6 +4,7 @@ import net.wargearworld.GUI_API.Items.DefaultItem;
 import net.wargearworld.GUI_API.Items.HeadItem;
 import net.wargearworld.GUI_API.Items.Item;
 import net.wargearworld.bau.MessageHandler;
+import net.wargearworld.bau.dao.PlayerDAO;
 import net.wargearworld.bau.dao.PlotDAO;
 import net.wargearworld.bau.world.WorldManager;
 import net.wargearworld.bau.world.WorldTemplate;
@@ -31,7 +32,7 @@ public class GUIPlayerWorld implements IGUIWorld {
             return null;
         }
         return worldIcon.toItem().setName(MessageHandler.getInstance().getString(p, "world_gui_icon_change", name)).setExecutor(s -> {
-            WorldGUI.openIcon(p, owner, name);
+            WorldGUI.openIcon(p, owner, name,IconType.WORLD);
         }).addLore(MessageHandler.getInstance().getString(p, "world_gui_icon_change_lore", name));
     }
 
@@ -86,6 +87,23 @@ public class GUIPlayerWorld implements IGUIWorld {
                 WorldGUI.openTemplates(p, WorldManager.getPlayerWorld(name, owner));
             });
             item.addLore(MessageHandler.getInstance().getString(p, "world_gui_world_template_lore"));
+        }
+        return item;
+    }
+
+    @Override
+    public Item getDefaultItem(Player p,int page) {
+        boolean isOwner = p.getUniqueId().equals(owner);
+        boolean isDefault = PlayerDAO.getDefaultWorldName(owner).equalsIgnoreCase(name);
+        Item item = null;
+        if(isDefault){
+        item = new DefaultItem(Material.NETHER_STAR,MessageHandler.getInstance().getString(p,"world_gui_item_default"),s->{
+        });
+        }else if(isOwner) {
+            item = new DefaultItem(Material.FIREWORK_STAR,MessageHandler.getInstance().getString(p,"world_gui_item_default_change"),s->{
+                PlotDAO.changeToDefault(owner,name);
+                WorldGUI.openMain(p,page);
+            }).addLore(MessageHandler.getInstance().getString(p,"world_gui_item_default_change_lore",name));
         }
         return item;
     }

@@ -32,7 +32,9 @@ import net.wargearworld.bau.world.WorldManager;
 import net.wargearworld.bau.worldedit.SaWE;
 import net.wargearworld.bau.worldedit.WorldEditPreCommand;
 import org.bukkit.Bukkit;
+import org.bukkit.DyeColor;
 import org.bukkit.World;
+import org.bukkit.block.banner.PatternType;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -173,7 +175,7 @@ public class Main extends JavaPlugin {
             // create a flag with the name "my-custom-flag", defaulting to true
             StateFlag flag = new StateFlag("TntExplosion", true);
             StateFlag stoplag = new StateFlag("stoplag", true);
-            StateFlag waterRemoverFlag = new StateFlag("waterremover", true);
+            StateFlag waterRemoverFlag = new StateFlag("waterremover", false);
             StateFlag worldfuscatorFlag = new StateFlag("worldfuscator", true);
             registry.register(flag);
             registry.register(stoplag);

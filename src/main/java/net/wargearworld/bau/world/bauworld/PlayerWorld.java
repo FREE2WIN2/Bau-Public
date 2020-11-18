@@ -221,6 +221,13 @@ public class PlayerWorld extends BauWorld {
                 em.remove(plotMember);
             });
 
+            for(WorldMember worldMember:worldMembers){
+                if(worldMember.getUuid().equals(member)){
+                    worldMembers.remove(worldMember);
+                    break;
+                }
+            }
+
 
         }
     }

@@ -12,6 +12,7 @@ import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.utils.HelperMethods;
 import net.wargearworld.bau.world.WorldManager;
 import net.wargearworld.bau.world.WorldTemplate;
+import net.wargearworld.bau.world.gui.WorldGUI;
 import net.wargearworld.command_manager.ArgumentList;
 import net.wargearworld.command_manager.CommandHandel;
 import net.wargearworld.commandframework.player.BukkitCommandPlayer;
@@ -66,6 +67,7 @@ public class Buy implements TabExecutor {
                                 })))));
 
         commandHandel.addSubNode(literal("world")
+                .setCallback(s->{buyWorld(s,false);})
                 .addSubNode(argument("WorldName", string())
                         .setCallback(s -> {buyWorld(s, false);})
                         .addSubNode(invisible(literal("confirm")
@@ -81,11 +83,19 @@ public class Buy implements TabExecutor {
             return;
         }
         String worldName = s.getString("WorldName");
+        EconomyFormatter economyFormatter = EconomyFormatter.getInstance();
+        Double price = amountOfWorlds * BauConfig.getInstance().getWorldprice();
+            Account senderAccount = Account.getByUUID(p.getUniqueId());
+        if(worldName == null){
+            if(senderAccount.has(price)){
+                WorldGUI.openBuyWorldName(p);
+            }else{
+                msgHandler.send(p, "not_enough_money_world", (price - senderAccount.getBalance()) + economyFormatter.getCurrencySymbol(), "");
+            }
+        }
         if(!HelperMethods.isAscii(worldName) || worldName.contains("/")){
             msgHandler.send(p,"world_name_notAllowedChars",worldName);
             return;        }
-        Double price = amountOfWorlds * BauConfig.getInstance().getWorldprice();
-        EconomyFormatter economyFormatter = EconomyFormatter.getInstance();
         if(WorldManager.getPlayerWorld(worldName,p.getUniqueId()) != null){
             msgHandler.send(p,"world_name_exists",worldName);
             return;
@@ -93,7 +103,6 @@ public class Buy implements TabExecutor {
 
 
         if (confirmed) {
-            Account senderAccount = Account.getByUUID(p.getUniqueId());
             Transaction transaction = new Transaction(senderAccount, null, price, TransactionType.PAY);
             transaction.setSenderMessageKey("MONEY.BUY.WORLD");
             transaction.setSenderMessageArguments(List.of(price + ""));

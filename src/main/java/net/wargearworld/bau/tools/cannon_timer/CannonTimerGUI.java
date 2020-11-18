@@ -12,6 +12,8 @@ import net.wargearworld.GUI_API.Items.Item;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.config.BauConfig;
+import net.wargearworld.bau.utils.CustomHeadValues;
+import net.wargearworld.bau.utils.HelperMethods;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -25,15 +27,6 @@ import java.util.Map.Entry;
  * Gives static access to methods to open the Block GUIs in the CannonTimer
  */
 public class CannonTimerGUI {
-    private static final String ARROW_DOWN = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzI0MzE5MTFmNDE3OGI0ZDJiNDEzYWE3ZjVjNzhhZTQ0NDdmZTkyNDY5NDNjMzFkZjMxMTYzYzBlMDQzZTBkNiJ9fX0=";
-    private static final String ARROW_UP = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmNjYmY5ODgzZGQzNTlmZGYyMzg1YzkwYTQ1OWQ3Mzc3NjUzODJlYzQxMTdiMDQ4OTVhYzRkYzRiNjBmYyJ9fX0=";
-    private static final String ARROW_LEFT = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2RjOWU0ZGNmYTQyMjFhMWZhZGMxYjViMmIxMWQ4YmVlYjU3ODc5YWYxYzQyMzYyMTQyYmFlMWVkZDUifX19";
-    private static final String ARROW_RIGHT = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTU2YTM2MTg0NTllNDNiMjg3YjIyYjdlMjM1ZWM2OTk1OTQ1NDZjNmZjZDZkYzg0YmZjYTRjZjMwYWI5MzExIn19fQ==";
-    private static final String PLUS = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWEyZDg5MWM2YWU5ZjZiYWEwNDBkNzM2YWI4NGQ0ODM0NGJiNmI3MGQ3ZjFhMjgwZGQxMmNiYWM0ZDc3NyJ9fX0=";
-    private static final String MINUS = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTM1ZTRlMjZlYWZjMTFiNTJjMTE2NjhlMWQ2NjM0ZTdkMWQwZDIxYzQxMWNiMDg1ZjkzOTQyNjhlYjRjZGZiYSJ9fX0=";
-    private static final String X = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzM4YWIxNDU3NDdiNGJkMDljZTAzNTQzNTQ5NDhjZTY5ZmY2ZjQxZDllMDk4YzY4NDhiODBlMTg3ZTkxOSJ9fX0=";
-    private static final String Z = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzk5MmM3NTNiZjljNjI1ODUzY2UyYTBiN2IxNzRiODlhNmVjMjZiYjVjM2NjYjQ3M2I2YTIwMTI0OTYzMTIifX19";
-    private static final String SETTINGS = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTRkNDliYWU5NWM3OTBjM2IxZmY1YjJmMDEwNTJhNzE0ZDYxODU0ODFkNWIxYzg1OTMwYjNmOTlkMjMyMTY3NCJ9fX0=";
 
     public static void openMain(Player p, CannonTimerBlock cannonTimerBlock, int page) {
         MessageHandler msgHandler = MessageHandler.getInstance();
@@ -50,7 +43,7 @@ public class CannonTimerGUI {
 
         if (page > 1) {
             /* Set PREVIOUS Item */
-            Item back = getHeadItem(p, ARROW_LEFT, "cannonTimer_gui_previousPage");
+            Item back = getHeadItem(p, CustomHeadValues.ARROW_LEFT.getValue(), "cannonTimer_gui_previousPage");
             back.setExecutor(s -> {
                 int newpage = page - 1;
                 openMain(p, cannonTimerBlock, newpage);
@@ -61,14 +54,14 @@ public class CannonTimerGUI {
         }
 
         Iterator<Entry<Integer, CannonTimerTick>> iterator = content.entrySet().iterator();
-        Item plus = getHeadItem(p, PLUS, "cannonTimer_gui_plus").setExecutor(s -> {
+        Item plus = getHeadItem(p, CustomHeadValues.PLUS.getValue(), "cannonTimer_gui_plus").setExecutor(s -> {
             cannonTimerBlock.addTick();
             openMain(p, cannonTimerBlock, page);
         });
         for (int i = currentRow; i < 9; i++) {
             if (i == 8 && ((page == 1 && content.size() == 8) || (page > 1 && content.size() == 7)) && page != 10) {
                 /* Set NEXT item */
-                Item next = getHeadItem(p, ARROW_RIGHT, "cannonTimer_gui_nextPage");
+                Item next = getHeadItem(p, CustomHeadValues.ARROW_RIGHT.getValue(), "cannonTimer_gui_nextPage");
                 next.setExecutor(s -> {
                     int newpage = page + 1;
                     openMain(p, cannonTimerBlock, newpage);
@@ -81,11 +74,11 @@ public class CannonTimerGUI {
 
                 /* TNT */
 
-                Item increaseTNT = getHeadItem(p, ARROW_UP, "cannonTimer_gui_increaseAmount").setExecutor(s -> {
+                Item increaseTNT = getHeadItem(p, CustomHeadValues.ARROW_UP.getValue(), "cannonTimer_gui_increaseAmount").setExecutor(s -> {
                     cannonTimerTick.add(s.getClickType());
                     openMain(p, cannonTimerBlock, page);
                 });
-                Item decreaseTNT = getHeadItem(p, ARROW_DOWN, "cannonTimer_gui_decreaseAmount").setExecutor(s -> {
+                Item decreaseTNT = getHeadItem(p, CustomHeadValues.ARROW_DOWN.getValue(), "cannonTimer_gui_decreaseAmount").setExecutor(s -> {
                     cannonTimerTick.remove(s.getClickType());
                     openMain(p, cannonTimerBlock, page);
                 });
@@ -101,7 +94,7 @@ public class CannonTimerGUI {
                 /* Ticks*/
                 String tickString = msgHandler.getString(p, "cannonTimer_gui_tick", entry.getKey() + "");
 
-                Item increaseTick = getHeadItem(p, ARROW_UP, "cannonTimer_gui_increaseTick").setExecutor(s -> {
+                Item increaseTick = getHeadItem(p, CustomHeadValues.ARROW_UP.getValue(), "cannonTimer_gui_increaseTick").setExecutor(s -> {
                     ItemStack tickIs = s.getClickedInventory().getItem(s.getClickedIndex() + 9);
                     Integer newAmount = cannonTimerBlock.increaseTick(tickIs.getAmount(), s.getClickType());
                     if (newAmount == null)
@@ -120,7 +113,7 @@ public class CannonTimerGUI {
                 tick.addLore(msgHandler.getString(p, "cannonTimer_gui_tick_hint_lore"));
 
 
-                Item decreaseTick = getHeadItem(p, ARROW_DOWN, "cannonTimer_gui_decreaseTick").setExecutor(s -> {
+                Item decreaseTick = getHeadItem(p, CustomHeadValues.ARROW_DOWN.getValue(), "cannonTimer_gui_decreaseTick").setExecutor(s -> {
                     ItemStack tickIs = s.getClickedInventory().getItem(s.getClickedIndex() - 9);
                     Integer newAmount = cannonTimerBlock.decreaseTick(tickIs.getAmount(), s.getClickType());
                     if (newAmount == null)
@@ -148,7 +141,7 @@ public class CannonTimerGUI {
                 continue;
             }
         }
-        Item settings = getHeadItem(p, SETTINGS, "cannonTimer_gui_settings_item");
+        Item settings = getHeadItem(p, CustomHeadValues.SETTINGS.getValue(), "cannonTimer_gui_settings_item");
         settings.addLore(cannonTimerBlock.getSettings().generateLore(p));
         settings.setExecutor(s -> {
             openGloalSettings(p, cannonTimerBlock);
@@ -170,32 +163,10 @@ public class CannonTimerGUI {
     }
 
     private static Map<Integer, CannonTimerTick> readContent(Map<Integer, CannonTimerTick> map, int page) {
-        int mapSize = map.size();
-        int begin = 0;
-        int pageSize = 7;
-        if (page == 1) {
-            pageSize++;
-        } else {
-            if (page == 10)
-                pageSize++;
-            begin += 8;
-            begin += (page - 2) * 7;
-        }
-        if (pageSize >= mapSize) {
-            return map;
-        }
         Map<Integer, CannonTimerTick> out = new LinkedHashMap<>();
         List<Integer> list = new ArrayList<>(map.keySet());
-
-        if (list.size() - 1 < begin) {
-            return out;
-        }
-        if (list.size() - 1 < begin + pageSize) {
-            list = list.subList(begin, list.size());
-        } else {
-            list = list.subList(begin, begin + pageSize);
-        }
-        for (int i : list) {
+        Collection<Integer> outList = HelperMethods.getPage(list,page);
+        for (int i : outList) {
             out.put(i, map.get(i));
         }
         return out;
@@ -221,12 +192,12 @@ public class CannonTimerGUI {
                     openMain(p, cannonTimerBlock, 1);
             }, 1);
         });
-        Item setXOffset = getHeadItem(p, X, "cannonTimer_settings_xOffset").setExecutor(s -> {
+        Item setXOffset = getHeadItem(p, CustomHeadValues.X.getValue(), "cannonTimer_settings_xOffset").setExecutor(s -> {
             openOffset(p, settings, "X", list -> {
                 openGloalSettings(p, cannonTimerBlock);
             });
         }).addLore(List.of(msgHandler.getString(p, "cannonTimer_gui_settings_lore_xOffset", settings.getxOffset() + "")));
-        Item setZOffset = getHeadItem(p, Z, "cannonTimer_settings_zOffset").setExecutor(s -> {
+        Item setZOffset = getHeadItem(p, CustomHeadValues.Z.getValue(), "cannonTimer_settings_zOffset").setExecutor(s -> {
             openOffset(p, settings, "Z", list -> {
                 openGloalSettings(p, cannonTimerBlock);
             });
@@ -259,13 +230,13 @@ public class CannonTimerGUI {
                     openMain(p, cannonTimerBlock, 1);
             }, 1);
         });
-        Item setXOffset = getHeadItem(p, X, "cannonTimer_settings_xOffset").setExecutor(s -> {
+        Item setXOffset = getHeadItem(p, CustomHeadValues.X.getValue(), "cannonTimer_settings_xOffset").setExecutor(s -> {
             openOffset(p, finalSettings, "X", list -> {
                 openLocalSettings(p, cannonTimerTick, cannonTimerBlock, tick);
             });
         }).addLore(List.of(msgHandler.getString(p, "cannonTimer_gui_settings_lore_xOffset", settings.getxOffset() + "")));
         ;
-        Item setZOffset = getHeadItem(p, Z, "cannonTimer_settings_zOffset").setExecutor(s -> {
+        Item setZOffset = getHeadItem(p, CustomHeadValues.Z.getValue(), "cannonTimer_settings_zOffset").setExecutor(s -> {
             openOffset(p, finalSettings, "Z", list -> {
                 openLocalSettings(p, cannonTimerTick, cannonTimerBlock, tick);
             });

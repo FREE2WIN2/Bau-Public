@@ -1,5 +1,6 @@
 package net.wargearworld.bau.world.gui;
 
+import net.wargearworld.GUI_API.GUI.AnvilGUI;
 import net.wargearworld.GUI_API.GUI.ChestGUI;
 import net.wargearworld.GUI_API.GUI.GUI;
 import net.wargearworld.GUI_API.Items.CustomHead;
@@ -7,6 +8,7 @@ import net.wargearworld.GUI_API.Items.HeadItem;
 import net.wargearworld.GUI_API.Items.Item;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
+import net.wargearworld.bau.config.BauConfig;
 import net.wargearworld.bau.dao.DatabaseDAO;
 import net.wargearworld.bau.dao.PlayerDAO;
 import net.wargearworld.bau.dao.PlotDAO;
@@ -14,6 +16,7 @@ import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.team.Team;
 import net.wargearworld.bau.team.TeamManager;
 import net.wargearworld.bau.tools.cannon_timer.CannonTimerTick;
+import net.wargearworld.bau.utils.CustomHeadValues;
 import net.wargearworld.bau.utils.HelperMethods;
 import net.wargearworld.bau.world.WorldManager;
 import net.wargearworld.bau.world.WorldTemplate;
@@ -36,51 +39,60 @@ import java.util.*;
 
 public class WorldGUI implements Listener {
 
-    private static final String TEMPLATE = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWMxMWQ2Yzc5YjhhMWYxODkwMmQ3ODNjZGRhNGJkZmI5ZDQ3MzM3YjczNzkxMDI4YTEyNmE2ZTZjZjEwMWRlZiJ9fX0=";
-    private static final String GREEN_PLUS = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWZmMzE0MzFkNjQ1ODdmZjZlZjk4YzA2NzU4MTA2ODFmOGMxM2JmOTZmNTFkOWNiMDdlZDc4NTJiMmZmZDEifX19";
-    private static final String ARROW_RIGHT = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTU2YTM2MTg0NTllNDNiMjg3YjIyYjdlMjM1ZWM2OTk1OTQ1NDZjNmZjZDZkYzg0YmZjYTRjZjMwYWI5MzExIn19fQ==";
-    private static final String ARROW_LEFT = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2RjOWU0ZGNmYTQyMjFhMWZhZGMxYjViMmIxMWQ4YmVlYjU3ODc5YWYxYzQyMzYyMTQyYmFlMWVkZDUifX19";
-
     public WorldGUI(JavaPlugin plugin) {
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
     public static void openMain(Player p, int page) {
-        GUI mainGUI = new ChestGUI(45, MessageHandler.getInstance().getString(p, "worldGUI_title"));
+        GUI mainGUI = new ChestGUI(54, MessageHandler.getInstance().getString(p, "worldGUI_title"));
         List<IGUIWorld> allWorlds = getAllWorlds(p);
         int maxPages = calcMaxPages(allWorlds);
-        Collection<IGUIWorld> worlds = getWorlds(allWorlds, page);
+        Collection<IGUIWorld> worlds = HelperMethods.getPage(allWorlds, page);
         if (worlds.size() == 0)
             openMain(p, --page);
         int currentColumn = 0;
         final int prevpage = page - 1;
-        if(page > 1){
+        if (page > 1) {
             currentColumn++;
-            Item prevpageItem = new HeadItem(new CustomHead(ARROW_LEFT), s -> {
+            Item prevpageItem = new HeadItem(new CustomHead(CustomHeadValues.ARROW_LEFT.getValue()), s -> {
                 openMain(p, prevpage);
             }).setName(MessageHandler.getInstance().getString(p, "world_gui_previous_page", prevpage + ""));
             mainGUI.setItem(18, prevpageItem);
+            mainGUI.setItem(35, prevpageItem);
         }
         for (IGUIWorld iguiWorld : worlds) {
+            Item defaultItem = iguiWorld.getDefaultItem(p, page);
+            if (defaultItem != null)
+                mainGUI.setItem(currentColumn, defaultItem);
+
             Item ownerItem = iguiWorld.getOwnerItem(p);
             if (ownerItem != null)
-                mainGUI.setItem(currentColumn, ownerItem);
+                mainGUI.setItem(currentColumn + 9, ownerItem);
 
-            mainGUI.setItem(currentColumn + 9, iguiWorld.getWorldItem(p));
-            mainGUI.setItem(currentColumn + 18, iguiWorld.getTemplateIcon(p));
-            mainGUI.setItem(currentColumn + 27, iguiWorld.getTeleportItem(p));
+            Item worldItem = iguiWorld.getWorldItem(p);
+            if (worldItem != null)
+                mainGUI.setItem(currentColumn + 18, worldItem);
+
+            Item templateIcon = iguiWorld.getTemplateIcon(p);
+            if (templateIcon != null)
+                mainGUI.setItem(currentColumn + 27, templateIcon);
+
+            Item teleportItem = iguiWorld.getTeleportItem(p);
+            if (teleportItem != null)
+                mainGUI.setItem(currentColumn + 36, teleportItem);
 
             Item renameItem = iguiWorld.getRenameItem(p);
             if (renameItem != null)
-                mainGUI.setItem(currentColumn + 36, iguiWorld.getRenameItem(p));
+                mainGUI.setItem(currentColumn + 45, iguiWorld.getRenameItem(p));
             currentColumn++;
         }
         final int nextpage = page + 1;
         if (page < maxPages) {
-            Item nextPage = new HeadItem(new CustomHead(ARROW_RIGHT), s -> {
+            Item nextPage = new HeadItem(new CustomHead(CustomHeadValues.ARROW_RIGHT.getValue()), s -> {
                 openMain(p, nextpage);
             }).setName(MessageHandler.getInstance().getString(p, "world_gui_next_page", nextpage + ""));
             mainGUI.setItem(26, nextPage);
+            mainGUI.setItem(35, nextPage);
         }
 
 
@@ -89,37 +101,9 @@ public class WorldGUI implements Listener {
 
     private static int calcMaxPages(List<IGUIWorld> allWorlds) {
         int size = allWorlds.size();
-        if (size <= 9)
+        if (size <= 8)
             return 1;
-        return (size + 7) / 8;
-    }
-
-    private static Collection<IGUIWorld> getWorlds(List<IGUIWorld> worldsOrigin, int page) {
-        List<IGUIWorld> worlds = new ArrayList<>(worldsOrigin);
-        int size = worlds.size();
-        int begin = 0;
-        int pageSize = 8;
-        if (page == 1) {
-            if (worlds.size() <= 9) {
-                return worlds;
-            }
-        } else {
-            begin += 8;
-            begin += (page - 2) * 7;
-            pageSize = 7;
-        }
-        if (pageSize >= size) {
-            return worlds;
-        }
-        if (size - 1 < begin) {
-            return worlds;
-        }
-        if (size - 1 < begin + pageSize) {
-            worlds = worlds.subList(begin, size);
-        } else {
-            worlds = worlds.subList(begin, begin + pageSize);
-        }
-        return worlds;
+        return (size + 6) / 7;
     }
 
     private static List<IGUIWorld> getAllWorlds(Player p) {
@@ -130,10 +114,14 @@ public class WorldGUI implements Listener {
             for (Plot plot : bauPlayer.getdbPlots()) {
                 worlds.add(new GUIPlayerWorld(plot.getName(), plot.getOwner().getUuid(), plot.getOwner().getName(), new WorldIcon(plot.getIcon())));
             }
-            //then team
+            for (int i = worlds.size(); i < BauConfig.getInstance().getMaxworlds(); i++) {
+                worlds.add(new GUIMissingPlayerWorld());
+            }
             Team team = TeamManager.getTeam(p.getUniqueId());
             if (team != null) {
                 worlds.add(new GUITeamWorld(team));
+            } else {
+                worlds.add(new GUIMissingTeamWorld());
             }
             //Then membered
             for (PlotMember plotMember : PlayerDAO.getMemberedPlots(p.getUniqueId())) {
@@ -258,12 +246,36 @@ public class WorldGUI implements Listener {
         });
     }
 
-    public static void openIcon(Player p, UUID owner, String worldName) {
+    public static void openIcon(Player p, UUID owner, String worldName, IconType iconType) {
+        List<WorldIcon> icons = iconType.getIconList();
+        int size = ((icons.size() + 8) / 9) * 9 + 9;
+        if (size > 54) {
+            icons = icons.subList(0, 45);
+            size = 54;
+        }
+        GUI gui = new ChestGUI(size, MessageHandler.getInstance().getString(p, "world_choose_icon_gui",worldName));
+        for (WorldIcon worldIcon : icons) {
+            gui.addItem(worldIcon.toItem().setExecutor(s -> {
+                PlotDAO.setIcon(owner, worldName, worldIcon.getId());
+                openMain(p, 1);
+            }));
+        }
+        gui.setItem(size - 6, IconType.WORLD.getItem(s -> {
+            openIcon(p, owner, worldName, IconType.WORLD);
+        }, MessageHandler.getInstance().getString(p, "world_choose_icon_world"), new ArrayList<>()));
+        gui.setItem(size - 4, IconType.MATERIAL.getItem(s -> {
+            openIcon(p, owner, worldName, IconType.MATERIAL);
+        }, MessageHandler.getInstance().getString(p, "world_choose_icon_material"), new ArrayList<>()));
+        gui.open(p);
     }
 
     public static void openRename(Player p, BauWorld bauWorld) {
     }
 
     public static void openTimeChange(Player p, World w) {
+    }
+
+    public static void openBuyWorldName(Player p) {
+//        AnvilGUI gui = new AnvilGUI()
     }
 }
