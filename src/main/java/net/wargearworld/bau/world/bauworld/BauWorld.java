@@ -265,4 +265,8 @@ public abstract class BauWorld {
     public String getWorldName() {
         return worldName;
     }
+
+    protected void setName(String name) {
+        this.name = name;
+    }
 }

@@ -85,13 +85,14 @@ public class Buy implements TabExecutor {
         String worldName = s.getString("WorldName");
         EconomyFormatter economyFormatter = EconomyFormatter.getInstance();
         Double price = amountOfWorlds * BauConfig.getInstance().getWorldprice();
-            Account senderAccount = Account.getByUUID(p.getUniqueId());
-        if(worldName == null){
+        Account senderAccount = Account.getByUUID(p.getUniqueId());
+        if(worldName == null || worldName.equals("")){
             if(senderAccount.has(price)){
                 WorldGUI.openBuyWorldName(p);
             }else{
                 msgHandler.send(p, "not_enough_money_world", (price - senderAccount.getBalance()) + economyFormatter.getCurrencySymbol(), "");
             }
+            return;
         }
         if(!HelperMethods.isAscii(worldName) || worldName.contains("/")){
             msgHandler.send(p,"world_name_notAllowedChars",worldName);

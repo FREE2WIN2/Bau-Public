@@ -60,14 +60,16 @@ public class WorldManager {
         String bukkitWorldName = owner + "_" + worldName;
         World w = Bukkit.getWorld(bukkitWorldName);
         if (w == null) {
-            Plot plot = readPlot(owner,worldName);
+            Plot plot = readPlot(owner, worldName);
             if (plot == null)
                 return null;
             long id = readPlot(owner, worldName).getId();
-            if(id == 0)
+            if (id == 0)
                 return null;
             if (!new File(Bukkit.getWorldContainer(), bukkitWorldName).exists()) {
-                EntityManagerExecuter.run(em->{createWorldDir(bukkitWorldName,WorldTemplate.getTemplate(em.find(Plot.class,id).getTemplate().getName()));});
+                EntityManagerExecuter.run(em -> {
+                    createWorldDir(bukkitWorldName, WorldTemplate.getTemplate(em.find(Plot.class, id).getTemplate().getName()));
+                });
             }
 
             WorldCreator wc = new WorldCreator(bukkitWorldName);
@@ -226,22 +228,23 @@ public class WorldManager {
         deleteWorld(oldWorld);
     }
 
-    public static World renameWorld(BauWorld world, String newName) {
-        World oldWorld = loadWorld(world);
+    public static void renameWorld(BauWorld world, String newName) {
+        World oldWorld = world.getWorld();
+        Bukkit.unloadWorld(oldWorld, true);
         worlds.remove(oldWorld.getUID());
         for (Player p : oldWorld.getPlayers()) {
             p.kickPlayer("GS Rename!");
         }
-        world.rename(newName);
-        deleteWorld(oldWorld);
-        copyFolder_raw(new File(Bukkit.getWorldContainer(), world.getWorldName()), new File(Bukkit.getWorldContainer(), world.rename(newName)));
-        String newWorldName = world.getWorldName();
-        // worldguard regionen
-        File worldGuardWorldDir = new File(Bukkit.getWorldContainer(),
-                "plugins/WorldGuard/worlds/" + newWorldName);
-        copyFolder_raw(world.getTemplate().getWorldguardDir(), worldGuardWorldDir);
-        return loadWorld(newWorldName, UUID.fromString(world.getOwner()));
+        String newWorldName = world.rename(newName);
+        oldWorld.getWorldFolder().renameTo(new File(Bukkit.getWorldContainer(), newWorldName));
+        new File(Main.getPlugin().getDataFolder(), "worlds/" + oldWorld.getName()).renameTo(new File(Main.getPlugin().getDataFolder(), "worlds/" + newWorldName));
+        //delete
 
+        File worldGuardDir = new File(Bukkit.getWorldContainer(), "plugins/WorldGuard/worlds/" + oldWorld.getName());
+                worldGuardDir.renameTo(new File(Bukkit.getWorldContainer(),
+                        "plugins/WorldGuard/worlds/" + newWorldName));
+        File persistDir = new File(Main.getPlugin().getDataFolder(), "worlds/" + oldWorld.getName());
+        persistDir.renameTo(new File(Main.getPlugin().getDataFolder(), "worlds/" + newWorldName));
     }
 
     private static World loadWorld(BauWorld world) {
@@ -266,7 +269,7 @@ public class WorldManager {
             CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
             CriteriaQuery<Plot> criteriaQuery = criteriaBuilder.createQuery(Plot.class);
             Root<Plot> root = criteriaQuery.from(Plot.class);
-            criteriaQuery.where(criteriaBuilder.equal(root.get(Plot_.name), name), criteriaBuilder.equal(root.get(Plot_.owner), em.find(net.wargearworld.db.model.Player.class,owner)));
+            criteriaQuery.where(criteriaBuilder.equal(root.get(Plot_.name), name), criteriaBuilder.equal(root.get(Plot_.owner), em.find(net.wargearworld.db.model.Player.class, owner)));
             Query query = em.createQuery(criteriaQuery);
             Plot plot = null;
             try {

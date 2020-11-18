@@ -3,6 +3,7 @@ package net.wargearworld.bau.world.gui;
 import net.wargearworld.GUI_API.GUI.AnvilGUI;
 import net.wargearworld.GUI_API.GUI.ChestGUI;
 import net.wargearworld.GUI_API.GUI.GUI;
+import net.wargearworld.GUI_API.GUI.Slot;
 import net.wargearworld.GUI_API.Items.CustomHead;
 import net.wargearworld.GUI_API.Items.HeadItem;
 import net.wargearworld.GUI_API.Items.Item;
@@ -22,6 +23,7 @@ import net.wargearworld.bau.world.WorldManager;
 import net.wargearworld.bau.world.WorldTemplate;
 import net.wargearworld.bau.world.bauworld.BauWorld;
 import net.wargearworld.bau.world.bauworld.PlayerWorld;
+import net.wargearworld.bau.world.bauworld.TeamWorld;
 import net.wargearworld.bau.world.bauworld.WorldMember;
 import net.wargearworld.db.EntityManagerExecuter;
 import net.wargearworld.db.model.Plot;
@@ -35,6 +37,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.awt.image.ShortLookupTable;
 import java.util.*;
 
 public class WorldGUI implements Listener {
@@ -227,7 +230,7 @@ public class WorldGUI implements Listener {
             items.add(guiWorld.getRenameItem(p));
             items.add(guiWorld.getTeleportItem(p));
             items.add(guiWorld.getIconItem(p));//Icon
-            items.add(guiWorld.getTimeIcon(p, bauWorld.getWorld()));
+            items.add(guiWorld.getTimeIcon(p, bauWorld.getWorld(), bauWorld.getName()));
             items.remove(null);
             Iterator<Integer> iterator = HelperMethods.getMiddlePositions(items.size()).iterator();
             Iterator<Item> itemIterator = items.iterator();
@@ -253,7 +256,7 @@ public class WorldGUI implements Listener {
             icons = icons.subList(0, 45);
             size = 54;
         }
-        GUI gui = new ChestGUI(size, MessageHandler.getInstance().getString(p, "world_choose_icon_gui",worldName));
+        GUI gui = new ChestGUI(size, MessageHandler.getInstance().getString(p, "world_choose_icon_gui", worldName));
         for (WorldIcon worldIcon : icons) {
             gui.addItem(worldIcon.toItem().setExecutor(s -> {
                 PlotDAO.setIcon(owner, worldName, worldIcon.getId());
@@ -270,12 +273,55 @@ public class WorldGUI implements Listener {
     }
 
     public static void openRename(Player p, BauWorld bauWorld) {
+        if(bauWorld instanceof TeamWorld)
+            return;
+
+        String oldName = bauWorld.getName();
+        AnvilGUI anvilGUI = new AnvilGUI(MessageHandler.getInstance().getString(p, "world_rename_world_gui", oldName), oldName, s -> {
+            ItemStack is = s.getClicked();
+            if(is == null || !is.hasItemMeta())
+                return;
+            String newName = s.getClicked().getItemMeta().getDisplayName();
+            MessageHandler.getInstance().send(p, "world_renamed", oldName, newName);
+            p.closeInventory();
+            WorldManager.renameWorld(bauWorld,newName);
+        });
+        anvilGUI.setItem(Slot.INPUT_LEFT, bauWorld.getGUIWorld().getIconItem(p).setExecutor(s -> {
+        }).setLore(new ArrayList<>()).setName(oldName));
+        anvilGUI.open(p);
     }
 
-    public static void openTimeChange(Player p, World w) {
+    public static void openTimeChange(Player p, World w, String worldName) {
+        AnvilGUI gui = new AnvilGUI(MessageHandler.getInstance().getString(p, "world_world_change_time_gui",worldName),w.getTime() + "" , s->{
+            ItemStack is = s.getClicked();
+            if(is == null || !is.hasItemMeta())
+                return;
+            String value = s.getClicked().getItemMeta().getDisplayName();
+            if(value.startsWith(" "))
+                value = value.replaceFirst(" ", "");
+
+            if(!HelperMethods.isInt(value)){
+                MessageHandler.getInstance().send(p,"no_integer",value);
+            }else{
+                w.setTime(Integer.parseInt(value));
+                MessageHandler.getInstance().send(p,"world_time_setted", worldName);
+            }
+           p.closeInventory();
+        });
+        gui.open(p);
     }
 
     public static void openBuyWorldName(Player p) {
-//        AnvilGUI gui = new AnvilGUI()
+        AnvilGUI gui = new AnvilGUI(MessageHandler.getInstance().getString(p, "world_buy_world_name_gui")," " , s->{
+            ItemStack is = s.getClicked();
+            if(is == null || !is.hasItemMeta())
+                return;
+            String worldName = s.getClicked().getItemMeta().getDisplayName();
+            if(worldName.startsWith(" "))
+                worldName = worldName.replaceFirst(" ", "");
+            s.getPlayer().performCommand("buy world " + worldName);
+            s.getPlayer().closeInventory();
+        });
+        gui.open(p);
     }
 }

@@ -44,7 +44,7 @@ public class GUIMissingPlayerWorld implements IGUIWorld{
     }
 
     @Override
-    public Item getTimeIcon(Player p, World w) {
+    public Item getTimeIcon(Player p, World w, String worldName) {
         return null;
     }
 

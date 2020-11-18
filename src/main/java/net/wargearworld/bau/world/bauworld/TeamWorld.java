@@ -118,7 +118,7 @@ public class TeamWorld extends BauWorld {
 
     @Override
     public String rename(String newName) {
-        return null;
+        return super.worldName;
     }
 
     @Override

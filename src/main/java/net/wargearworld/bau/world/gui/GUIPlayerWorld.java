@@ -65,12 +65,12 @@ public class GUIPlayerWorld implements IGUIWorld {
     }
 
     @Override
-    public Item getTimeIcon(Player p, World w) {
+    public Item getTimeIcon(Player p, World w, String worldName) {
         Item timeItem = new DefaultItem(Material.CLOCK, MessageHandler.getInstance().getString(p, "world_gui_item_time", w.getTime() + ""));
         if (owner.equals(p.getUniqueId())) {
             timeItem.addLore(MessageHandler.getInstance().getString(p, "world_gui_item_time_lore", w.getTime() + ""));
             timeItem.setExecutor(s -> {
-                WorldGUI.openTimeChange(p, w);
+                WorldGUI.openTimeChange(p, w,worldName);
             });
         }
         return timeItem;

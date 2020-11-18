@@ -70,8 +70,15 @@ public class GUITeamWorld implements IGUIWorld{
     }
 
     @Override
-    public Item getTimeIcon(Player p, World w) {
-        return null;
+    public Item getTimeIcon(Player p, World w, String worldName) {
+        Item timeItem = new DefaultItem(Material.CLOCK, MessageHandler.getInstance().getString(p, "world_gui_item_time", w.getTime() + ""));
+        if (team.isLeader(p.getUniqueId())) {
+            timeItem.addLore(MessageHandler.getInstance().getString(p, "world_gui_item_time_lore", w.getTime() + ""));
+            timeItem.setExecutor(s -> {
+                WorldGUI.openTimeChange(p, w,worldName);
+            });
+        }
+        return timeItem;
     }
 
     @Override

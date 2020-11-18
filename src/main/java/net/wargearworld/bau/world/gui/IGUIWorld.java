@@ -10,7 +10,7 @@ public interface IGUIWorld {
     public Item getTeleportItem(Player p);
     public Item getRenameItem(Player p);
     public Item getOwnerItem(Player p);
-    public Item getTimeIcon(Player p, World w);
+    public Item getTimeIcon(Player p, World w, String worldName);
     public Item getTemplateIcon(Player p);
     public Item getDefaultItem(Player p,int page);
 }

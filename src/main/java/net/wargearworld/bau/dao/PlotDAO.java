@@ -19,6 +19,7 @@ public class PlotDAO {
         EntityManagerExecuter.run(em -> {
             Plot plot = em.find(Plot.class, playerWorld.getId());
             plot.setTemplate(em.find(PlotTemplate.class, playerWorld.getTemplate().getId()));
+            plot.setName(playerWorld.getName());
             em.merge(plot);
         });
     }

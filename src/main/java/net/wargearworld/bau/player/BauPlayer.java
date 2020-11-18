@@ -18,6 +18,7 @@ import net.wargearworld.bau.tools.cannon_timer.CannonTimerBlock;
 import net.wargearworld.bau.tools.testBlockSlave.TestBlockSlave;
 import net.wargearworld.bau.tools.testBlockSlave.testBlockEditor.TestBlockEditor;
 import net.wargearworld.bau.world.WorldManager;
+import net.wargearworld.bau.world.gui.WorldGUI;
 import net.wargearworld.bau.world.plot.Plot;
 import net.wargearworld.bau.worldedit.WorldEditHandler;
 import net.wargearworld.db.EntityManagerExecuter;
@@ -166,27 +167,7 @@ public class BauPlayer {
         Player p = getBukkitPlayer();
         if (p == null)
             return;
-        ArrayList<net.wargearworld.db.model.Plot> memberedPlots = new ArrayList<>();
-        EntityManagerExecuter.run(em -> {
-            memberedPlots.addAll(getDbPlayer().getPlots());
-            for (PlotMember member : getDbPlayer().getMemberedPlots()) {
-                memberedPlots.add(member.getPlot());
-            }
-            PlayerConnection pConn = ((CraftPlayer) p).getHandle().playerConnection;
-            p.sendMessage(MessageHandler.getInstance().getString(p, "listGsHeading"));
-            for (net.wargearworld.db.model.Plot plot : memberedPlots) {
-                /* s == PlayerName */
-                String name = plot.getName();
-                String hover = MessageHandler.getInstance().getString(p, "listGsHover").replace("%r", name);
-                String txt = "{\"text\":\"§7[§6" + name
-                        + "§7]\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/gs tp " + name
-                        + "\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"" + hover + "\"}}}";
-                IChatBaseComponent txtc = ChatSerializer.a(txt);
-                PacketPlayOutChat txtp = new PacketPlayOutChat(txtc);
-                pConn.sendPacket(txtp);
-            }
-            p.sendMessage("§7----------------------------");
-        });
+        WorldGUI.openMain(p,1);
     }
 
     public void sendMessage(String message) {

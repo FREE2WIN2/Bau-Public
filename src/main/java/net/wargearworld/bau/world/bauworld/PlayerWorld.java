@@ -286,7 +286,9 @@ public class PlayerWorld extends BauWorld {
     @Override
     public String rename(String newName) {
         super.setWorldName(newName);
+        super.setName(newName);
         super.worldName = owner + "_" + newName;
+        PlotDAO.update(this);
         return getOwner() + "_" + newName;
     }
 
