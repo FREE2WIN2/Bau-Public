@@ -42,6 +42,7 @@ public abstract class Plot {
 
     private Clipboard undo; //Undo from Reset
     private CannonTimer undoCannonTimer;
+
     protected Plot(ProtectedRegion region, String id, Location middleNorth, Schematic ground, BauWorld bauWorld) {
         this.region = region;
         this.id = id;
@@ -50,7 +51,7 @@ public abstract class Plot {
         if (region != null)
             setWaterRemover(region.getFlag(WaterRemoverListener.waterRemoverFlag) == State.DENY);
         cannonTimer = deserializeCannonTimer(bauWorld);
-        if(cannonTimer == null)
+        if (cannonTimer == null)
             cannonTimer = new CannonTimer();
     }
 
@@ -130,7 +131,8 @@ public abstract class Plot {
 
         WorldEditHandler.pasteground(ground, middleNorth);
         undoCannonTimer = cannonTimer.clone();
-        cannonTimer.clear();
+        cannonTimer = null;
+        System.out.println(undoCannonTimer);
         return true;
 
     }
@@ -138,17 +140,21 @@ public abstract class Plot {
     private void delundo() {
         Bukkit.getScheduler().runTaskLater(Main.getPlugin(), () -> {
             undo = null;
+            undoCannonTimer = null;
         }, 20 * 60 * 1);
     }
 
     public boolean undo(World world) {
         /* save Undo */
-        if (undo == null)
-            return false;
-        WorldEditHandler.pasteAsync(new ClipboardHolder(undo), undo.getOrigin(), world, true);
-        undo = null;
-        cannonTimer.setBlocks(undoCannonTimer.getBlocks());
-        undoCannonTimer = null;
+        if (undo != null) {
+            WorldEditHandler.pasteAsync(new ClipboardHolder(undo), undo.getOrigin(), world, true);
+            undo = null;
+        }
+        if (undoCannonTimer != null) {
+            System.out.println(undoCannonTimer);
+            cannonTimer = undoCannonTimer.clone();
+            undoCannonTimer = null;
+        }
         return true;
 
     }

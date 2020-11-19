@@ -7,6 +7,7 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import net.wargearworld.bau.config.BauConfig;
+import net.wargearworld.bau.event.WorldEditMoveEvent;
 import net.wargearworld.command_manager.ArgumentList;
 import net.wargearworld.command_manager.CommandHandel;
 import net.wargearworld.bau.Main;
@@ -212,6 +213,14 @@ public class AutoCannonReloaderListener implements Listener, TabExecutor {
             return;
         }
         autoCannonReloader.remove(event.getBlock().getLocation(), p);
+
+    }
+
+    @EventHandler
+    public void unregister(WorldEditMoveEvent event) {
+        Player p = event.getPlayer();
+        AutoCannonReloader autoCannonReloader = BauPlayer.getBauPlayer(p.getUniqueId()).getCannonReloader();
+        autoCannonReloader.move(event.getRegion(), event.getOffset());
 
     }
 

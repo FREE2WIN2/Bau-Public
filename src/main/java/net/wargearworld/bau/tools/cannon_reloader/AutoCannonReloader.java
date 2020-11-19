@@ -1,5 +1,7 @@
 package net.wargearworld.bau.tools.cannon_reloader;
 
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.Region;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -126,5 +128,17 @@ public class AutoCannonReloader {
 
     public int getSize() {
         return tntLocations.size();
+    }
+
+    public void move(Region region, BlockVector3 offset) {
+        Bukkit.getScheduler().runTaskAsynchronously(Main.getPlugin(), () -> {
+            for (BlockVector3 blockVector3 : region) {
+                Loc loc = Loc.getByBlockVector(blockVector3);
+                if(tntLocations.contains(loc)){
+                    tntLocations.remove(loc);
+                    tntLocations.add(loc.move(Loc.getByBlockVector(offset)));
+                }
+            }
+        });
     }
 }
