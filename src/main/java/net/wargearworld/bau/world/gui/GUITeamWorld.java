@@ -85,7 +85,7 @@ public class GUITeamWorld implements IGUIWorld{
     public Item getTemplateIcon(Player p) {
         WorldTemplate worldTemplate = team.getTemplate();
         Item item = worldTemplate.getItem(p.getUniqueId()).setName(MessageHandler.getInstance().getString(p, "world_gui_world_template", worldTemplate.getName()));
-        if (team.isLeader(p.getUniqueId())) {
+        if (team.isLeader(p.getUniqueId())&& p.getWorld().getName().equals("team_" + team.getId())) {
             item.setExecutor(s -> {
                 WorldGUI.openTemplates(p, WorldManager.getTeamWorld(team));
             });

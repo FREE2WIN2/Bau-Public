@@ -100,7 +100,7 @@ public abstract class BauWorld {
     public abstract boolean isAuthorized(UUID uuid);
 
     public void showInfo(Player p) {
-        WorldGUI.openWorldInfo(p, this);
+        WorldGUI.openWorldInfo(p, this,false);
     }
 
     public abstract Collection<WorldMember> getMembers();

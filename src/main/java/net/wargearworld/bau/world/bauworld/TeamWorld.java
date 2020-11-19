@@ -38,7 +38,7 @@ public class TeamWorld extends BauWorld {
 
     @Override
     public void showInfo(Player p) {
-        WorldGUI.openWorldInfo(p,this);
+        WorldGUI.openWorldInfo(p,this,false);
     }
 
     @Override

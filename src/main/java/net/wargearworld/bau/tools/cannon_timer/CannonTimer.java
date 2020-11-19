@@ -22,13 +22,14 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CannonTimer implements Serializable {
+public class CannonTimer implements Serializable, Cloneable {
 
     private static final long serialVersionUID = -5360744045770382988L;
     private Map<Loc, CannonTimerBlock> blocks;
     private transient boolean blocked;
     private transient Location startMove;
     private transient Loc lastOffset;
+
     public CannonTimer() {
         blocked = false;
         if (blocks == null)
@@ -40,12 +41,12 @@ public class CannonTimer implements Serializable {
             MessageHandler.getInstance().send(p, "cannonTimer_blocked");
             return;
         }
-        if(blocks.isEmpty()){
+        if (blocks.isEmpty()) {
             MessageHandler.getInstance().send(p, "cannonTimer_empty");
             return;
         }
         blocked = true;
-        if(BauPlayer.getBauPlayer(p).getActivateTrailOnCannonTimer()){
+        if (BauPlayer.getBauPlayer(p).getActivateTrailOnCannonTimer()) {
             p.performCommand("trail new");
         }
 
@@ -132,8 +133,8 @@ public class CannonTimer implements Serializable {
         TextComponent tc1 = new TextComponent(Main.prefix + msghandler.getString(p, "cannonTimer_start_moving"));
         tc1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/ct move end"));
         tc1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(msghandler.getString(p, "cannonTimer_start_moving_hover")).create()));
-        TextComponent tc2 = new TextComponent(msghandler.getString(p,"cannonTimer_start_moving_2"));
-        p.spigot().sendMessage(tc1,tc2);
+        TextComponent tc2 = new TextComponent(msghandler.getString(p, "cannonTimer_start_moving_2"));
+        p.spigot().sendMessage(tc1, tc2);
     }
 
     public void place(Player p) {
@@ -149,7 +150,7 @@ public class CannonTimer implements Serializable {
     }
 
     private void move(World world, Loc offset) {
-        HashMap<Loc,CannonTimerBlock> map = new HashMap(blocks);
+        HashMap<Loc, CannonTimerBlock> map = new HashMap(blocks);
         blocks.clear();
         for (Map.Entry<Loc, CannonTimerBlock> entry : map.entrySet()) {
             Loc loc = entry.getKey();
@@ -158,7 +159,7 @@ public class CannonTimer implements Serializable {
             loc = loc.move(offset);
             cannonTimerBlock.setLoc(loc);
             cannonTimerBlock.setActive(cannonTimerBlock.isActive(), world);
-            blocks.put(loc,cannonTimerBlock);
+            blocks.put(loc, cannonTimerBlock);
         }
     }
 
@@ -169,5 +170,34 @@ public class CannonTimer implements Serializable {
         }
         move(p.getWorld(), new Loc(lastOffset.getX(), lastOffset.getY(), lastOffset.getZ()));
         MessageHandler.getInstance().send(p, "cannonTimer_move_undo");
+    }
+
+    public void moveBlock(CannonTimerBlock cannonTimerBlock, Loc offset) {
+        Loc loc = cannonTimerBlock.getLoc();
+        blocks.remove(loc);
+        Loc newLoc = loc.move(offset);
+        blocks.put(newLoc, cannonTimerBlock);
+        cannonTimerBlock.setLoc(newLoc);
+    }
+
+    public void clear() {
+        blocks.clear();
+    }
+
+    public Map<Loc, CannonTimerBlock> getBlocks() {
+        return blocks;
+    }
+
+    public void setBlocks(Map<Loc, CannonTimerBlock> blocks) {
+        this.blocks = blocks;
+    }
+
+    @Override
+    public CannonTimer clone() {
+        try {
+            return (CannonTimer) super.clone();
+        } catch (CloneNotSupportedException ex) {
+            return null;
+        }
     }
 }

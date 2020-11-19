@@ -1,8 +1,11 @@
 package net.wargearworld.bau.tools.cannon_timer;
 
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.Region;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.config.BauConfig;
+import net.wargearworld.bau.event.WorldEditMoveEvent;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.utils.Loc;
 import net.wargearworld.bau.world.bauworld.BauWorld;
@@ -24,8 +27,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -122,8 +123,8 @@ public class CannonTimerListener implements TabExecutor, Listener {
         }
 
         CannonTimer cannonTimer = bauWorld.getCannonTimer(p.getLocation());
-            BauConfig bauConfig = BauConfig.getInstance();
-            Material toolMaterial = bauConfig.getCannonTimerTool();
+        BauConfig bauConfig = BauConfig.getInstance();
+        Material toolMaterial = bauConfig.getCannonTimerTool();
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             Location blockLocation = event.getClickedBlock().getLocation();
             Material type = event.getClickedBlock().getType();
@@ -202,7 +203,8 @@ public class CannonTimerListener implements TabExecutor, Listener {
                 return;
             }
         }
-        Material type = event.getBlock().getType();BauConfig bauConfig = BauConfig.getInstance();
+        Material type = event.getBlock().getType();
+        BauConfig bauConfig = BauConfig.getInstance();
         Material toolMaterial = bauConfig.getCannonTimerTool();
 
         if (type.name().contains(bauConfig.getCannonTimerDefaultBlock()) || type == bauConfig.getCannonTimerActiveBlock() || type == bauConfig.getCannonTimerInactiveBlock()) {
@@ -229,5 +231,32 @@ public class CannonTimerListener implements TabExecutor, Listener {
                 }
             }
         }
+    }
+
+    @EventHandler
+    public void onWorldeditMove(WorldEditMoveEvent event) {
+
+            Player p = event.getPlayer();
+            BauWorld bauWorld = WorldManager.get(p.getWorld());
+            if (bauWorld instanceof PlayerWorld) {
+                if (!((PlayerWorld) bauWorld).hasRights(p.getUniqueId())) {
+                    return;
+                }
+            }
+
+            BlockVector3 offset = event.getOffset();
+            Region origin = event.getRegion();
+            Location location = p.getLocation();
+            CannonTimer cannonTimer = bauWorld.getCannonTimer(location);
+            if (cannonTimer == null)
+                return;
+
+            for (BlockVector3 block : origin) {
+                Loc loc = Loc.getByBlockVector(block);
+                CannonTimerBlock cannonTimerBlock = cannonTimer.getBlock(loc);
+                if (cannonTimerBlock != null) {
+                    cannonTimer.moveBlock(cannonTimerBlock, Loc.getByBlockVector(offset));
+                }
+            }
     }
 }

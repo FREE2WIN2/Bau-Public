@@ -137,6 +137,7 @@ public class WorldGUI implements Listener {
     }
 
     public static void openTemplates(Player p, BauWorld bauWorld) {
+        //TODO only open if you are on this world! -> Set Executor null?
         MessageHandler msgHandler = MessageHandler.getInstance();
         BauPlayer bauPlayer = BauPlayer.getBauPlayer(p);
         Map<WorldTemplate, Boolean> playersTemplates = PlayerDAO.getPlayersTeamplates(bauPlayer.getUuid());
@@ -159,8 +160,13 @@ public class WorldGUI implements Listener {
                 worldTemplateItem.setExecutor(s -> {
                     if (bauWorld.isOwner(s.getPlayer())) {
                         s.getPlayer().closeInventory();
-                        bauWorld.setTemplate(worldTemplate);
-                        MessageHandler.getInstance().send(p, "world_template_setted", bauWorld.getName(), worldTemplate.getName());
+                        if (!p.getWorld().equals(bauWorld.getWorld())) {
+                            MessageHandler.getInstance().send(p, "world_template_not_on_world", bauWorld.getName(), worldTemplate.getName());
+                        } else {
+                            p.performCommand("gs setTemplate " + worldTemplate.getName());
+//                            bauWorld.setTemplate(worldTemplate);
+//                            MessageHandler.getInstance().send(p, "world_template_setted", bauWorld.getName(), worldTemplate.getName());
+                        }
                     }
                 });
             } else {
@@ -190,63 +196,69 @@ public class WorldGUI implements Listener {
     }
 
     public static void openPlayerWorldInfo(Player p, UUID owner, String worldName) {
-        openWorldInfo(p, WorldManager.getPlayerWorld(worldName, owner));
+        openWorldInfo(p, WorldManager.getPlayerWorld(worldName, owner), true);
     }
 
     public static void openTeamWorldInfo(Player p, Team team) {
         if (team != null)
-            openWorldInfo(p, WorldManager.getTeamWorld(team));
+            openWorldInfo(p, WorldManager.getTeamWorld(team), true);
     }
 
-    public static void openWorldInfo(Player p, BauWorld bauWorld) {
-        Bukkit.getScheduler().runTaskAsynchronously(Main.getPlugin(), () -> {
-            MessageHandler msgHandler = MessageHandler.getInstance();
-            if (bauWorld == null) {
-                //TODO Message
-                return;
-            }
-            Collection<WorldMember> members = bauWorld.getMembers();
-            int size = ((members.size() + 8) / 9) * 9 + 18;
-            if (size > 54) size = 54;
-            GUI gui;
-            if (bauWorld instanceof PlayerWorld) {
-                gui = new ChestGUI(size, msgHandler.getString(p, "world_gui_title_player", bauWorld.getName()));
-            } else {
-                gui = new ChestGUI(size, msgHandler.getString(p, "world_gui_title_team", bauWorld.getName()));
-            }
-            for (WorldMember member : members) {
-                HeadItem memberHead = new HeadItem(member.getUuid(), "§3" + member.getName(), 1);
+    public static void openWorldInfo(Player p, BauWorld bauWorld, boolean openMainIfClosed) {
+        MessageHandler msgHandler = MessageHandler.getInstance();
+        if (bauWorld == null) {
+            //TODO Message
+            return;
+        }
+        Collection<WorldMember> members = bauWorld.getMembers();
+        int size = ((members.size() + 8) / 9) * 9 + 18;
+        if (size > 54) size = 54;
+        GUI gui;
+        if (bauWorld instanceof PlayerWorld) {
+            gui = new ChestGUI(size, msgHandler.getString(p, "world_gui_title_player", bauWorld.getName()));
+        } else {
+            gui = new ChestGUI(size, msgHandler.getString(p, "world_gui_title_team", bauWorld.getName()));
+        }
+        for (WorldMember member : members) {
+            HeadItem memberHead = new HeadItem(member.getUuid(), "§3" + member.getName(), 1);
+            memberHead.setExecutor(s->{}).setCancelled(true);
+            if (bauWorld.isOwner(p)) {
                 memberHead.setExecutor(s -> {
                     bauWorld.removeMember(member.getUuid());
                     p.getOpenInventory().getTopInventory().setItem(s.getClickedIndex(), new ItemStack(Material.AIR));
                     p.updateInventory();
                 }).addLore(msgHandler.getString(p, "world_gui_member_lore", member.getName()));
-                gui.addItem(memberHead);
             }
+            gui.addItem(memberHead);
+        }
 
-            IGUIWorld guiWorld = bauWorld.getGUIWorld();
-            List<Item> items = new ArrayList<>();
-            items.add(guiWorld.getOwnerItem(p));
-            items.add(guiWorld.getRenameItem(p));
-            items.add(guiWorld.getTeleportItem(p));
-            items.add(guiWorld.getIconItem(p));//Icon
-            items.add(guiWorld.getTimeIcon(p, bauWorld.getWorld(), bauWorld.getName()));
-            items.remove(null);
-            Iterator<Integer> iterator = HelperMethods.getMiddlePositions(items.size()).iterator();
-            Iterator<Item> itemIterator = items.iterator();
-            while (iterator.hasNext() && itemIterator.hasNext()) {
-                Item item = itemIterator.next();
-                if (item == null) {
-                    iterator.next();
-                    continue;
-                }
-                gui.setItem(size - (9 - iterator.next()), item);
-                item.build();
+        IGUIWorld guiWorld = bauWorld.getGUIWorld();
+        List<Item> items = new ArrayList<>();
+        items.add(guiWorld.getOwnerItem(p));
+        items.add(guiWorld.getRenameItem(p));
+        items.add(guiWorld.getTeleportItem(p));
+        items.add(guiWorld.getIconItem(p));//Icon
+        items.add(guiWorld.getTimeIcon(p, bauWorld.getWorld(), bauWorld.getName()));
+        items.remove(null);
+        Iterator<Integer> iterator = HelperMethods.getMiddlePositions(items.size()).iterator();
+        Iterator<Item> itemIterator = items.iterator();
+        while (iterator.hasNext() && itemIterator.hasNext()) {
+            Item item = itemIterator.next();
+            if (item == null) {
+                iterator.next();
+                continue;
             }
-            Bukkit.getScheduler().runTask(Main.getPlugin(), () -> {
-                gui.open(p);
+            gui.setItem(size - (9 - iterator.next()), item);
+            item.build();
+        }
+        if (openMainIfClosed)
+            gui.onClose(s -> {
+                Bukkit.getScheduler().runTaskLater(Main.getPlugin(), () -> {
+
+                    openMain(p, 1);
+                }, 1);
             });
-        });
+        gui.open(p);
     }
 
     public static void openIcon(Player p, UUID owner, String worldName, IconType iconType) {
@@ -273,18 +285,18 @@ public class WorldGUI implements Listener {
     }
 
     public static void openRename(Player p, BauWorld bauWorld) {
-        if(bauWorld instanceof TeamWorld)
+        if (bauWorld instanceof TeamWorld)
             return;
 
         String oldName = bauWorld.getName();
         AnvilGUI anvilGUI = new AnvilGUI(MessageHandler.getInstance().getString(p, "world_rename_world_gui", oldName), oldName, s -> {
             ItemStack is = s.getClicked();
-            if(is == null || !is.hasItemMeta())
+            if (is == null || !is.hasItemMeta())
                 return;
             String newName = s.getClicked().getItemMeta().getDisplayName();
             MessageHandler.getInstance().send(p, "world_renamed", oldName, newName);
             p.closeInventory();
-            WorldManager.renameWorld(bauWorld,newName);
+            WorldManager.renameWorld(bauWorld, newName);
         });
         anvilGUI.setItem(Slot.INPUT_LEFT, bauWorld.getGUIWorld().getIconItem(p).setExecutor(s -> {
         }).setLore(new ArrayList<>()).setName(oldName));
@@ -292,32 +304,31 @@ public class WorldGUI implements Listener {
     }
 
     public static void openTimeChange(Player p, World w, String worldName) {
-        AnvilGUI gui = new AnvilGUI(MessageHandler.getInstance().getString(p, "world_world_change_time_gui",worldName),w.getTime() + "" , s->{
+        AnvilGUI gui = new AnvilGUI(MessageHandler.getInstance().getString(p, "world_world_change_time_gui", worldName), w.getTime() + "", s -> {
             ItemStack is = s.getClicked();
-            if(is == null || !is.hasItemMeta())
+            if (is == null || !is.hasItemMeta())
                 return;
             String value = s.getClicked().getItemMeta().getDisplayName();
-            if(value.startsWith(" "))
-                value = value.replaceFirst(" ", "");
+            value = value.replace(" ", "");
 
-            if(!HelperMethods.isInt(value)){
-                MessageHandler.getInstance().send(p,"no_integer",value);
-            }else{
+            if (!HelperMethods.isInt(value)) {
+                MessageHandler.getInstance().send(p, "no_integer", value);
+            } else {
                 w.setTime(Integer.parseInt(value));
-                MessageHandler.getInstance().send(p,"world_time_setted", worldName);
+                MessageHandler.getInstance().send(p, "world_time_setted", worldName);
             }
-           p.closeInventory();
+            p.closeInventory();
         });
         gui.open(p);
     }
 
     public static void openBuyWorldName(Player p) {
-        AnvilGUI gui = new AnvilGUI(MessageHandler.getInstance().getString(p, "world_buy_world_name_gui")," " , s->{
+        AnvilGUI gui = new AnvilGUI(MessageHandler.getInstance().getString(p, "world_buy_world_name_gui"), " ", s -> {
             ItemStack is = s.getClicked();
-            if(is == null || !is.hasItemMeta())
+            if (is == null || !is.hasItemMeta())
                 return;
             String worldName = s.getClicked().getItemMeta().getDisplayName();
-            if(worldName.startsWith(" "))
+            if (worldName.startsWith(" "))
                 worldName = worldName.replaceFirst(" ", "");
             s.getPlayer().performCommand("buy world " + worldName);
             s.getPlayer().closeInventory();

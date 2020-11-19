@@ -37,10 +37,11 @@ public abstract class Plot {
 
     private Location middleNorth;
     private Schematic ground;
-    private Clipboard undo; //Undo from Reset
     private WaterRemover waterRemover;
     private CannonTimer cannonTimer;
 
+    private Clipboard undo; //Undo from Reset
+    private CannonTimer undoCannonTimer;
     protected Plot(ProtectedRegion region, String id, Location middleNorth, Schematic ground, BauWorld bauWorld) {
         this.region = region;
         this.id = id;
@@ -49,6 +50,8 @@ public abstract class Plot {
         if (region != null)
             setWaterRemover(region.getFlag(WaterRemoverListener.waterRemoverFlag) == State.DENY);
         cannonTimer = deserializeCannonTimer(bauWorld);
+        if(cannonTimer == null)
+            cannonTimer = new CannonTimer();
     }
 
 
@@ -126,6 +129,8 @@ public abstract class Plot {
         delundo();
 
         WorldEditHandler.pasteground(ground, middleNorth);
+        undoCannonTimer = cannonTimer.clone();
+        cannonTimer.clear();
         return true;
 
     }
@@ -142,6 +147,8 @@ public abstract class Plot {
             return false;
         WorldEditHandler.pasteAsync(new ClipboardHolder(undo), undo.getOrigin(), world, true);
         undo = null;
+        cannonTimer.setBlocks(undoCannonTimer.getBlocks());
+        undoCannonTimer = null;
         return true;
 
     }
@@ -251,4 +258,6 @@ public abstract class Plot {
         }
         return new CannonTimer();
     }
+
+
 }

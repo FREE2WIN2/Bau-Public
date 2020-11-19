@@ -50,7 +50,7 @@ public class PlayerWorld extends BauWorld {
 
     @Override
     public void showInfo(Player p) {
-        WorldGUI.openWorldInfo(p, this);
+        WorldGUI.openWorldInfo(p, this,false);
     }
 
     @Override
@@ -96,6 +96,8 @@ public class PlayerWorld extends BauWorld {
         if (owner.equals(uuid)) {
             return true;
         }
+        Player p = Bukkit.getPlayer(uuid);
+        if(p != null && p.hasPermission("bau.rights.bypass")) return true;
         return EntityManagerExecuter.run(em -> {
             net.wargearworld.db.model.Player dbPlayer = em.find(net.wargearworld.db.model.Player.class, uuid);
             for (PlotMember plotMember : dbPlayer.getMemberedPlots()) {

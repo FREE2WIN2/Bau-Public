@@ -1,5 +1,6 @@
 package net.wargearworld.bau.utils;
 
+import com.sk89q.worldedit.math.BlockVector3;
 import net.wargearworld.bau.tools.testBlockSlave.ChooseTestBlock;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -37,6 +38,11 @@ public class Loc implements Serializable {
     public static Loc getByLocation(Location loc) {
         return new Loc(loc.getX(), loc.getY(), loc.getZ());
     }
+
+    public static Loc getByBlockVector(BlockVector3 blockVector3) {
+        return new Loc(blockVector3.getX(), blockVector3.getY(), blockVector3.getZ());
+    }
+
 
     public Location toLocation(World world) {
         return new Location(world, x, y, z);

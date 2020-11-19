@@ -82,7 +82,7 @@ public class GUIPlayerWorld implements IGUIWorld {
         if(worldTemplate == null)
             return null;
         Item item = worldTemplate.getItem(p.getUniqueId()).setName(MessageHandler.getInstance().getString(p, "world_gui_world_template", worldTemplate.getName()));
-        if (p.getUniqueId().equals(owner)) {
+        if (p.getUniqueId().equals(owner) && p.getWorld().getName().equals(owner + "_" + name)) {
             item.setExecutor(s -> {
                 WorldGUI.openTemplates(p, WorldManager.getPlayerWorld(name, owner));
             });
