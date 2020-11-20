@@ -266,4 +266,7 @@ public abstract class Plot {
     }
 
 
+    public boolean isWaterRemoverActive() {
+        return waterRemover != null;
+    }
 }

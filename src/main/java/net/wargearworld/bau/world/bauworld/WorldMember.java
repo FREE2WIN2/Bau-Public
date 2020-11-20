@@ -6,10 +6,12 @@ import java.util.UUID;
 public class WorldMember {
     private String name;
     private UUID uuid;
+    private boolean hasRights;
 
-    public WorldMember(String name, UUID uuid) {
+    public WorldMember(String name, UUID uuid, boolean hasRights) {
         this.name = name;
         this.uuid = uuid;
+        this.hasRights = hasRights;
     }
 
     public String getName() {
@@ -18,6 +20,10 @@ public class WorldMember {
 
     public UUID getUuid() {
         return uuid;
+    }
+
+    public boolean hasRights() {
+        return hasRights;
     }
 
     @Override

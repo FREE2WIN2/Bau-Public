@@ -32,6 +32,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import static net.wargearworld.command_manager.nodes.LiteralNode.literal;
 import static net.wargearworld.command_manager.nodes.InvisibleNode.invisible;
 import static net.wargearworld.bau.utils.CommandUtil.getPlayer;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -93,7 +94,7 @@ public class AutoCannonReloaderListener implements Listener, TabExecutor {
                         autoCannonReloader.save(new Location(world, block.getX(), block.getY(), block.getZ()), p);
                     }
                 }
-            p.sendMessage(MessageHandler.getInstance().getString(p,"cannonreloader_regionSaved",autoCannonReloader.getSize()+ ""));
+                p.sendMessage(MessageHandler.getInstance().getString(p, "cannonreloader_regionSaved", autoCannonReloader.getSize() + ""));
             });
         } catch (IncompleteRegionException e) {
             e.printStackTrace();
@@ -183,7 +184,8 @@ public class AutoCannonReloaderListener implements Listener, TabExecutor {
             }
         } else if (a.equals(Action.LEFT_CLICK_AIR) || a.equals(Action.LEFT_CLICK_BLOCK)) {
             /* delete */
-            autoCannonReloader.deleteRecord(p, false);
+            if (autoCannonReloader.hasConent())
+                autoCannonReloader.deleteRecord(p, false);
         }
     }
 
@@ -217,7 +219,7 @@ public class AutoCannonReloaderListener implements Listener, TabExecutor {
     }
 
     @EventHandler
-    public void unregister(WorldEditMoveEvent event) {
+    public void moveEvent(WorldEditMoveEvent event) {
         Player p = event.getPlayer();
         AutoCannonReloader autoCannonReloader = BauPlayer.getBauPlayer(p.getUniqueId()).getCannonReloader();
         autoCannonReloader.move(event.getRegion(), event.getOffset());

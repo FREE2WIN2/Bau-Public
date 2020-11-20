@@ -31,7 +31,7 @@ public class Team {
             for (WargearTeamMember wargearTeamMember : wargearTeam.getMembers()) {
                 UUID uuid = wargearTeamMember.getMember().getUuid();
                 String name = wargearTeamMember.getMember().getName();
-                WorldMember worldMember = new WorldMember(name, uuid);
+                WorldMember worldMember = new WorldMember(name, uuid,!wargearTeamMember.isNewcomer());
                 if (wargearTeamMember.isLeader()) {
                     leaders.add(worldMember);
                 } else if (wargearTeamMember.isNewcomer()) {

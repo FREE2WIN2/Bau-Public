@@ -60,7 +60,7 @@ public class PlayerWorld extends BauWorld {
                 worldMembers = new ArrayList<>();
                 Plot dbPlot = em.find(Plot.class, plotID);
                 for (PlotMember member : dbPlot.getMembers()) {
-                    worldMembers.add(new WorldMember(member.getMember().getName(), member.getMember().getUuid()));
+                    worldMembers.add(new WorldMember(member.getMember().getName(), member.getMember().getUuid(),member.hasRights()));
                 }
             });
         }

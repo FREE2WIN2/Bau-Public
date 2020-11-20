@@ -145,6 +145,6 @@ public class TeamWorld extends BauWorld {
     @Override
     public void spawn(Player p){
         super.spawn(p);
-        MessageHandler.getInstance().send(p, "world_tp", getName(), "Team: " + getOwner());
+        MessageHandler.getInstance().send(p, "world_tp", "", "Team: " + getOwner());
     }
 }

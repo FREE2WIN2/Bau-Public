@@ -15,6 +15,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.block.banner.PatternType;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -43,10 +44,15 @@ public class GUITeamWorld implements IGUIWorld{
 
     @Override
     public Item getTeleportItem(Player p) {
-        return new DefaultItem(Material.ENDER_PEARL, MessageHandler.getInstance().getString(p, "world_gui_world_teleport", "Team: " + team.getName()), s -> {
-            p.performCommand("/gs team");
+        Item teleportItem = new DefaultItem(Material.ENDER_PEARL, MessageHandler.getInstance().getString(p, "world_gui_world_teleport", "Team: " + team.getName()), s -> {
+            p.performCommand("gs team");
             p.closeInventory();
         }).addLore(MessageHandler.getInstance().getString(p, "world_gui_world_teleport_lore", "Team: " + team.getName()));
+        if(p.getWorld().getName().equalsIgnoreCase("team_" + team.getId())){
+            teleportItem.addEnchantment(Enchantment.BINDING_CURSE,1);
+            teleportItem.addItemFLags(ItemFlag.HIDE_ENCHANTS);
+        }
+        return teleportItem;
     }
 
     @Override

@@ -10,7 +10,9 @@ import net.wargearworld.bau.world.WorldManager;
 import net.wargearworld.bau.world.WorldTemplate;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
 
 import java.util.UUID;
 
@@ -43,11 +45,16 @@ public class GUIPlayerWorld implements IGUIWorld {
     }
 
     public Item getTeleportItem(Player p) {
-        return new DefaultItem(Material.ENDER_PEARL, MessageHandler.getInstance().getString(p, "world_gui_world_teleport", name), s -> {
+        Item teleportItem = new DefaultItem(Material.ENDER_PEARL, MessageHandler.getInstance().getString(p, "world_gui_world_teleport", name), s -> {
             WorldManager.getPlayerWorld(name, owner).spawn(p);
-
             p.closeInventory();
         }).addLore(MessageHandler.getInstance().getString(p, "world_gui_world_teleport_lore", name));
+
+        if(p.getWorld().getName().equalsIgnoreCase(owner.toString() + "_" + name)){
+            teleportItem.addEnchantment(Enchantment.BINDING_CURSE,1);
+            teleportItem.addItemFLags(ItemFlag.HIDE_ENCHANTS);
+        }
+        return teleportItem;
     }
 
     public Item getRenameItem(Player p) {

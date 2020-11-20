@@ -17,6 +17,7 @@ commands:
    gui:
       usage: /<command>
       description: Open a GUI for your plot.
+      aliases: [tools]
    tbs:
       usage: /<command> [undo,last,1,2,3,4] [N,S] [N,S,F,R]
       description: Opens Tnt-Slave

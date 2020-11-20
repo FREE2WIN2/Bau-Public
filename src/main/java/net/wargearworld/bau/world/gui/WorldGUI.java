@@ -28,6 +28,7 @@ import net.wargearworld.bau.world.bauworld.WorldMember;
 import net.wargearworld.db.EntityManagerExecuter;
 import net.wargearworld.db.model.Plot;
 import net.wargearworld.db.model.PlotMember;
+import net.wargearworld.economy.core.account.Account;
 import net.wargearworld.economy.core.utils.EconomyFormatter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -81,8 +82,9 @@ public class WorldGUI implements Listener {
                 mainGUI.setItem(currentColumn + 27, templateIcon);
 
             Item teleportItem = iguiWorld.getTeleportItem(p);
-            if (teleportItem != null)
+            if (teleportItem != null) {
                 mainGUI.setItem(currentColumn + 36, teleportItem);
+            }
 
             Item renameItem = iguiWorld.getRenameItem(p);
             if (renameItem != null)
@@ -137,7 +139,6 @@ public class WorldGUI implements Listener {
     }
 
     public static void openTemplates(Player p, BauWorld bauWorld) {
-        //TODO only open if you are on this world! -> Set Executor null?
         MessageHandler msgHandler = MessageHandler.getInstance();
         BauPlayer bauPlayer = BauPlayer.getBauPlayer(p);
         Map<WorldTemplate, Boolean> playersTemplates = PlayerDAO.getPlayersTeamplates(bauPlayer.getUuid());
@@ -164,14 +165,12 @@ public class WorldGUI implements Listener {
                             MessageHandler.getInstance().send(p, "world_template_not_on_world", bauWorld.getName(), worldTemplate.getName());
                         } else {
                             p.performCommand("gs setTemplate " + worldTemplate.getName());
-//                            bauWorld.setTemplate(worldTemplate);
-//                            MessageHandler.getInstance().send(p, "world_template_setted", bauWorld.getName(), worldTemplate.getName());
                         }
                     }
                 });
             } else {
                 worldTemplateItem.addLore(msgHandler.getString(p, "worldTemplateGUI_template_not_available_lore"));
-                worldTemplateItem.addLore(msgHandler.getString(p, "worldTemplateGUI_template_price_lore", economyFormatter.format(worldTemplate.getPrice())));
+                    worldTemplateItem.addLore(msgHandler.getString(p, "worldTemplateGUI_template_price_lore", economyFormatter.format(worldTemplate.getPrice())));
                 worldTemplateItem.setExecutor(s -> {
                     p.performCommand("buy template " + worldTemplate.getName());
                     p.getOpenInventory().close();
@@ -221,7 +220,8 @@ public class WorldGUI implements Listener {
         }
         for (WorldMember member : members) {
             HeadItem memberHead = new HeadItem(member.getUuid(), "§3" + member.getName(), 1);
-            memberHead.setExecutor(s->{}).setCancelled(true);
+            memberHead.setExecutor(s -> {
+            }).setCancelled(true);
             if (bauWorld.isOwner(p)) {
                 memberHead.setExecutor(s -> {
                     bauWorld.removeMember(member.getUuid());
@@ -229,6 +229,7 @@ public class WorldGUI implements Listener {
                     p.updateInventory();
                 }).addLore(msgHandler.getString(p, "world_gui_member_lore", member.getName()));
             }
+            memberHead.addLore(msgHandler.getString(p,"world_gui_member_rights_lore_" + member.hasRights()));
             gui.addItem(memberHead);
         }
 
@@ -236,7 +237,11 @@ public class WorldGUI implements Listener {
         List<Item> items = new ArrayList<>();
         items.add(guiWorld.getOwnerItem(p));
         items.add(guiWorld.getRenameItem(p));
-        items.add(guiWorld.getTeleportItem(p));
+        if (p.getWorld().getUID().equals(bauWorld.getWorldUUID())) {
+            items.add(guiWorld.getTemplateIcon(p));
+        } else {
+            items.add(guiWorld.getTeleportItem(p));
+        }
         items.add(guiWorld.getIconItem(p));//Icon
         items.add(guiWorld.getTimeIcon(p, bauWorld.getWorld(), bauWorld.getName()));
         items.remove(null);
