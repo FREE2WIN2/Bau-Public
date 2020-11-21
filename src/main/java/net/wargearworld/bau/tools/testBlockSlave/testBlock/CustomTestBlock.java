@@ -8,7 +8,7 @@ import net.wargearworld.bau.utils.Banner;
 
 import java.util.UUID;
 
-public class CustomTestBlock implements ITestBlock {
+public class CustomTestBlock implements ITestBlock,Comparable<CustomTestBlock> {
 
 	/*
 	 * This is a TestBlock out of the personal .yml of the Player.
@@ -114,5 +114,10 @@ public class CustomTestBlock implements ITestBlock {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	@Override
+	public int compareTo(CustomTestBlock o) {
+		return getName().compareTo(o.getName());
 	}
 }

@@ -85,8 +85,8 @@ public class TestBlockSlave {
         });
     }
 
-    private HashSet<CustomTestBlock> readFavs() {
-        HashSet<CustomTestBlock> favs = new HashSet<>();
+    private Set<CustomTestBlock> readFavs() {
+        Set<CustomTestBlock> favs = new TreeSet<>();
         for (Entry<Integer, Set<CustomTestBlock>> tbs : testblocks.entrySet()) {
             for (CustomTestBlock block : tbs.getValue()) {
                 if (block.isFavorite()) {
