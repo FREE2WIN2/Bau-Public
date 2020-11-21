@@ -221,10 +221,8 @@ public class GUI implements TabExecutor, Listener {
         }).setName(msgHandler.getString(p, "gui_worldGUI_icon"));
 
         Item cannonTimerClock = new DefaultItem(BauConfig.getInstance().getCannonTimerTool(), msgHandler.getString(p, "gui_cannon_timer_tool"), s -> {
-            openGUI2(s.getPlayer());
         }).setCancelled(false).addLore(msgHandler.getString(p, "gui_cannon_timer_tool_lore_leftklick")).addLore(msgHandler.getString(p, "gui_cannon_timer_tool_lore_rightklick"));
         Item cannonTimerShulker = new DefaultItem(BauConfig.getInstance().getCannonTimerActiveBlock(), msgHandler.getString(p, "gui_cannon_timer_block"), s -> {
-            openGUI2(s.getPlayer());
         }).setCancelled(false).addLore(msgHandler.getString(p, "gui_cannon_timer_block_lore"));
         /* Set Items into GUI */
 
