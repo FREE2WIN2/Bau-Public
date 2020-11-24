@@ -78,7 +78,6 @@ public class Main extends JavaPlugin {
     }
 
     private void registerListener() {
-
         new PlayerListener(this);
         new SignListener(this);
         new PlayerMovement(this);
@@ -99,7 +98,7 @@ public class Main extends JavaPlugin {
         pm.registerEvents(new SaWE(), this);
         pm.registerEvents(AutoCannonReloaderListener.getInstance(), this);
         pm.registerEvents(new PlotRights(), this);
-
+        pm.registerEvents(new PlayerPreCommand(),this);
     }
 
     private void registerCommands() {
