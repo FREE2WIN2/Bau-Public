@@ -69,13 +69,13 @@ public class Stoplag implements Listener, TabExecutor {
 			setSL(false, getPlayer(s));
 		}));
 
-		commandHandle.addSubNode(literal("paste").addSubNode(literal("an")).setCallback(s -> {
+		commandHandle.addSubNode(literal("paste").addSubNode(literal("an").setCallback(s -> {
 			setSLPaste(true, getPlayer(s));
-		}).addSubNode(literal("aus")).setCallback(s -> {
+		})).addSubNode(literal("aus").setCallback(s -> {
 			setSLPaste(false, getPlayer(s));
-		}).addSubNode(argument("time", new IntegerArgument())).setCallback(s -> {
+		})).addSubNode(argument("time", new IntegerArgument()).setCallback(s -> {
 			setSLPasteTime(s);
-		}));
+		})));
 	}
 
 	public void setSLPasteTime(ArgumentList s) {
@@ -96,15 +96,18 @@ public class Stoplag implements Listener, TabExecutor {
 	}
 
 	public void setStatusTemp(Location loc, boolean on, int time) {
-		Plot plot = WorldManager.get(loc.getWorld()).getPlot(loc);
+		BauWorld bauWorld = WorldManager.get(loc.getWorld());
+		Plot plot = bauWorld.getPlot(loc);
 		boolean stateBefore = plot.getSL();
 		plot.setSL(true);
+		bauWorld.updateScoreboards();
 		/* remove after time secs */
 		Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(), new Runnable() {
 
 			@Override
 			public void run() {
 				plot.setSL(stateBefore);
+				bauWorld.updateScoreboards();
 			}
 		}, 20 * time);
 	}

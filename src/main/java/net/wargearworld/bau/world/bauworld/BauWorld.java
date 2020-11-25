@@ -97,6 +97,12 @@ public abstract class BauWorld {
         ScoreBoardBau.cmdUpdate(p);
     }
 
+    public void updateScoreboards(){
+        for(Player player:getWorld().getPlayers()){
+            ScoreBoardBau.cmdUpdate(player);
+        }
+    }
+
     public abstract boolean isAuthorized(UUID uuid);
 
     public void showInfo(Player p) {

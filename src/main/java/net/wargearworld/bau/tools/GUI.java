@@ -142,7 +142,7 @@ public class GUI implements TabExecutor, Listener {
         Item waterRemoverActivate = new DefaultItem(Material.WATER_BUCKET, msgHandler.getString(p, "gui_wr_activate"), createCommandExecutor("wr"));
         Item waterRemoverDeactivate = new DefaultItem(Material.BUCKET, msgHandler.getString(p, "gui_wr_deactivate"), createCommandExecutor("wr"));
 
-        Item heads = new HeadItem(new CustomHead(CustomHeadValues.KING.getValue()), createCommandExecutor("head")).setName(msgHandler.getString(p, "gui_head"));
+        Item heads = new HeadItem(new CustomHead(CustomHeadValues.KING.getValue()), createCommandExecutor("heads")).setName(msgHandler.getString(p, "gui_head"));
 
         Item guiItem = new DefaultItem(Material.NETHER_STAR, "§6GUI", 1).setCancelled(false);
         Item particleGUI = new DefaultItem(Material.MELON_SEEDS, msgHandler.getString(p, "gui_particles"), s -> {
@@ -162,8 +162,8 @@ public class GUI implements TabExecutor, Listener {
         gui.setItem(10, s -> !plot.getTNT(), tntNotActiveItem);
         gui.setItem(10, s -> plot.getTNT(), tntActiveItem);
         gui.setItem(13, tntChest);
-        gui.setItem(16, s -> plot.isWaterRemoverActive(), waterRemoverActivate);
-        gui.setItem(16, s -> !plot.isWaterRemoverActive(), waterRemoverDeactivate);
+        gui.setItem(16, s -> plot.isWaterRemoverActive(), waterRemoverDeactivate);
+        gui.setItem(16, s -> !plot.isWaterRemoverActive(), waterRemoverActivate);
 
 
         gui.setItem(18, guiItem);

@@ -1,4 +1,4 @@
-package net.wargearworld.bau.worldedit;
+package net.wargearworld.bau.listener;
 
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
@@ -10,6 +10,7 @@ import com.sk89q.worldedit.util.Location;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.event.WorldEditMoveEvent;
 import net.wargearworld.bau.utils.HelperMethods;
+import net.wargearworld.bau.worldedit.WorldEditHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -51,6 +52,13 @@ public class WorldEditPreCommand implements Listener {
                     Bukkit.getPluginManager().callEvent(new WorldEditMoveEvent(offset, selection, p));
                 });
             } catch (IncompleteRegionException e) {
+            }
+        }
+
+
+        if (event.getMessage().startsWith("//cut") || event.getMessage().startsWith("//copy")) {
+            if (p.getWorld().getName().startsWith("test")) {
+                event.setCancelled(true);
             }
         }
     }
