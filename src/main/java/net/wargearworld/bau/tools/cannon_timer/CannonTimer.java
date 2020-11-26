@@ -155,6 +155,7 @@ public class CannonTimer implements Serializable, Cloneable {
         for (Map.Entry<Loc, CannonTimerBlock> entry : map.entrySet()) {
             Loc loc = entry.getKey();
             CannonTimerBlock cannonTimerBlock = entry.getValue();
+            cannonTimerBlock.setPreviousLoc(loc);
             loc.getBlock(world).setType(Material.AIR);
             loc = loc.move(offset);
             cannonTimerBlock.setLoc(loc);
@@ -174,10 +175,12 @@ public class CannonTimer implements Serializable, Cloneable {
 
     public void moveBlock(CannonTimerBlock cannonTimerBlock, Loc offset) {
         Loc loc = cannonTimerBlock.getLoc();
+        cannonTimerBlock.setPreviousLoc(loc);
         blocks.remove(loc);
         Loc newLoc = loc.move(offset);
-        blocks.put(newLoc, cannonTimerBlock);
         cannonTimerBlock.setLoc(newLoc);
+        blocks.put(newLoc, cannonTimerBlock);
+        System.out.println("prevloc2: " + cannonTimerBlock.getPreviousLoc());
     }
 
     public void clear() {
@@ -198,6 +201,19 @@ public class CannonTimer implements Serializable, Cloneable {
             return (CannonTimer) super.clone();
         } catch (CloneNotSupportedException ex) {
             return null;
+        }
+    }
+
+    public void undo(Loc from) {
+        CannonTimerBlock cannonTimerBlock = blocks.get(from);
+        if (cannonTimerBlock != null) {
+            Loc loc = cannonTimerBlock.getLoc();
+            Loc newLoc = cannonTimerBlock.getPreviousLoc();
+            System.out.println("oldLoc: " + loc + " newLoc: " + newLoc);
+            cannonTimerBlock.setPreviousLoc(loc);
+            blocks.remove(loc);
+            blocks.put(newLoc, cannonTimerBlock);
+            cannonTimerBlock.setLoc(newLoc);
         }
     }
 }

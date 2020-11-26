@@ -107,13 +107,10 @@ public class Loc implements Serializable {
      * Moves this Loc by the values of by
      *
      * @param by the values to move
-     * @return this
+     * @return new Loc
      */
     public Loc move(Loc by) {
-        x += by.x;
-        y += by.y;
-        z += by.z;
-        return this;
+        return new Loc(x + by.x, y+by.y,z+by.z);
     }
 
     public double getX() {

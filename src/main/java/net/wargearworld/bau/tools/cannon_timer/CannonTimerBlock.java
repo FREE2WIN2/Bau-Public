@@ -20,6 +20,7 @@ import java.util.TreeMap;
 public class CannonTimerBlock implements Serializable, Cloneable {
     private static final long serialVersionUID = -4112709504886629938L;
     private Loc loc;
+    private Loc previousLoc;
     private boolean active;
     private Map<Integer, CannonTimerTick> ticks;
     private CannonTimerSettings settings;
@@ -154,6 +155,14 @@ public class CannonTimerBlock implements Serializable, Cloneable {
 
     public void setLoc(Loc loc) {
         this.loc = loc;
+    }
+
+    public void setPreviousLoc(Loc previousLoc) {
+        this.previousLoc = previousLoc;
+    }
+
+    public Loc getPreviousLoc() {
+        return previousLoc;
     }
 
     public void remove(Integer key) {
