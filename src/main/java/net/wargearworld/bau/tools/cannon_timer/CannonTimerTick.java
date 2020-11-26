@@ -15,7 +15,7 @@ import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.Random;
 
-public class CannonTimerTick implements Serializable {
+public class CannonTimerTick implements Serializable,Cloneable {
 
     private static final long serialVersionUID = -2350542064188343999L;
     private CannonTimerSettings settings;
@@ -111,6 +111,11 @@ public class CannonTimerTick implements Serializable {
                 "settings=" + settings +
                 ", amount=" + amount +
                 '}';
+    }
+
+    @Override
+    public CannonTimerTick clone() throws CloneNotSupportedException {
+        return (CannonTimerTick) super.clone();
     }
 
 

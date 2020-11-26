@@ -132,7 +132,6 @@ public abstract class Plot {
         WorldEditHandler.pasteground(ground, middleNorth);
         undoCannonTimer = cannonTimer.clone();
         cannonTimer = null;
-        System.out.println(undoCannonTimer);
         return true;
 
     }
@@ -151,7 +150,6 @@ public abstract class Plot {
             undo = null;
         }
         if (undoCannonTimer != null) {
-            System.out.println(undoCannonTimer);
             cannonTimer = undoCannonTimer.clone();
             undoCannonTimer = null;
         }

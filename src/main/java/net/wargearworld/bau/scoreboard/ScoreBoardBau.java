@@ -107,7 +107,7 @@ public class ScoreBoardBau {
         obj.setDisplaySlot(DisplaySlot.SIDEBAR);
         if (bauWorld instanceof PlayerWorld) {
             obj.getScore(MessageHandler.getInstance().getString(p, "scoreboard_world", bauWorld.getName())).setScore(12);
-        } else {
+        } else if(bauWorld != null){
             obj.getScore(MessageHandler.getInstance().getString(p, "scoreboard_teamworld", ((TeamWorld) bauWorld).getTeam().getAbbreviation())).setScore(12);
         }
         obj.getScore("§a§8§l§m               §r").setScore(11);

@@ -34,7 +34,7 @@ public class GUIPlayerWorld implements IGUIWorld {
             return null;
         }
         return worldIcon.toItem().setName(MessageHandler.getInstance().getString(p, "world_gui_icon_change", name)).setExecutor(s -> {
-            WorldGUI.openIcon(p, owner, name,IconType.WORLD);
+            WorldGUI.openIcon(p, owner, name, IconType.WORLD);
         }).addLore(MessageHandler.getInstance().getString(p, "world_gui_icon_change_lore", name));
     }
 
@@ -50,15 +50,15 @@ public class GUIPlayerWorld implements IGUIWorld {
             p.closeInventory();
         }).addLore(MessageHandler.getInstance().getString(p, "world_gui_world_teleport_lore", name));
 
-        if(p.getWorld().getName().equalsIgnoreCase(owner.toString() + "_" + name)){
-            teleportItem.addEnchantment(Enchantment.BINDING_CURSE,1);
+        if (p.getWorld().getName().equalsIgnoreCase(owner.toString() + "_" + name)) {
+            teleportItem.addEnchantment(Enchantment.BINDING_CURSE, 1);
             teleportItem.addItemFLags(ItemFlag.HIDE_ENCHANTS);
         }
         return teleportItem;
     }
 
     public Item getRenameItem(Player p) {
-        if (owner != p.getUniqueId()) {
+        if (!owner.equals(p.getUniqueId())) {
             return null;
         }
         return new DefaultItem(Material.NAME_TAG, MessageHandler.getInstance().getString(p, "world_gui_world_rename", name), s -> {
@@ -77,7 +77,7 @@ public class GUIPlayerWorld implements IGUIWorld {
         if (owner.equals(p.getUniqueId())) {
             timeItem.addLore(MessageHandler.getInstance().getString(p, "world_gui_item_time_lore", w.getTime() + ""));
             timeItem.setExecutor(s -> {
-                WorldGUI.openTimeChange(p, w,worldName);
+                WorldGUI.openTimeChange(p, w, worldName);
             });
         }
         return timeItem;
@@ -85,8 +85,8 @@ public class GUIPlayerWorld implements IGUIWorld {
 
     @Override
     public Item getTemplateIcon(Player p) {
-        WorldTemplate worldTemplate = PlotDAO.getTemplate(owner,name);
-        if(worldTemplate == null)
+        WorldTemplate worldTemplate = PlotDAO.getTemplate(owner, name);
+        if (worldTemplate == null)
             return null;
         Item item = worldTemplate.getItem(p.getUniqueId()).setName(MessageHandler.getInstance().getString(p, "world_gui_world_template", worldTemplate.getName()));
         if (p.getUniqueId().equals(owner) && p.getWorld().getName().equals(owner + "_" + name)) {
@@ -99,18 +99,18 @@ public class GUIPlayerWorld implements IGUIWorld {
     }
 
     @Override
-    public Item getDefaultItem(Player p,int page) {
+    public Item getDefaultItem(Player p, int page) {
         boolean isOwner = p.getUniqueId().equals(owner);
         boolean isDefault = PlayerDAO.getDefaultWorldName(owner).equalsIgnoreCase(name);
         Item item = null;
-        if(isDefault){
-        item = new DefaultItem(Material.NETHER_STAR,MessageHandler.getInstance().getString(p,"world_gui_item_default"),s->{
-        });
-        }else if(isOwner) {
-            item = new DefaultItem(Material.FIREWORK_STAR,MessageHandler.getInstance().getString(p,"world_gui_item_default_change"),s->{
-                PlotDAO.changeToDefault(owner,name);
-                WorldGUI.openMain(p,page);
-            }).addLore(MessageHandler.getInstance().getString(p,"world_gui_item_default_change_lore",name));
+        if (isDefault) {
+            item = new DefaultItem(Material.NETHER_STAR, MessageHandler.getInstance().getString(p, "world_gui_item_default"), s -> {
+            });
+        } else if (isOwner) {
+            item = new DefaultItem(Material.FIREWORK_STAR, MessageHandler.getInstance().getString(p, "world_gui_item_default_change"), s -> {
+                PlotDAO.changeToDefault(owner, name);
+                WorldGUI.openMain(p, page);
+            }).addLore(MessageHandler.getInstance().getString(p, "world_gui_item_default_change_lore", name));
         }
         return item;
     }

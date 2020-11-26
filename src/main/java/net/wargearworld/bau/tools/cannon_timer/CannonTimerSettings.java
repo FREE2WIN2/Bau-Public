@@ -12,7 +12,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CannonTimerSettings implements Serializable {
+public class CannonTimerSettings implements Serializable,Cloneable {
     private static final long serialVersionUID = -4625095191290257419L;
     private double xOffset = 0;
     private double zOffset = 0;
@@ -87,5 +87,10 @@ public class CannonTimerSettings implements Serializable {
                 ", zOffset=" + zOffset +
                 ", velocity=" + velocity +
                 '}';
+    }
+
+    @Override
+    public CannonTimerSettings clone() throws CloneNotSupportedException {
+        return (CannonTimerSettings) super.clone();
     }
 }

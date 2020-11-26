@@ -250,16 +250,13 @@ public class BauPlayer {
     public void saveClipboard() {
         Player p = getBukkitPlayer();
         if (p == null) {
-            System.out.println("p == null");
             return;
         }
-        System.out.println("save");
         LocalSession localSession = WorldEdit.getInstance().getSessionManager().get(BukkitAdapter.adapt(p));
         try {
             WorldEditHandler.saveClipboardAsSchematic(Main.getPlugin().getDataFolder() + "/users/" + uuid.toString(), "clipboard.schem", localSession.getClipboard().getClipboard());
             MessageHandler.getInstance().send(p, "clipboard_saved");
         } catch (EmptyClipboardException e) {
-            System.out.println("NoCLip");
         }
 
     }

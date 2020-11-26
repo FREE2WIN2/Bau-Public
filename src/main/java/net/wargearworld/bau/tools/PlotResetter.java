@@ -129,7 +129,7 @@ public class PlotResetter implements TabExecutor {
                     MessageHandler.getInstance().getString(p, "deletePlotHere", rgID.replace("plot", "")));
             creater2.addHoverEvent(
                     MessageHandler.getInstance().getString(p, "delePlotHover", rgID.replace("plot", "")));
-            creater2.addClickEvent("/plotreset " + p.getUniqueId(), ClickAction.RUN_COMMAND);
+            creater2.addClickEvent("/plotreset " + rgID + " " + p.getUniqueId(), ClickAction.RUN_COMMAND);
             creater1.addJson(creater2).send(p);
         } else {
             String plotName = rgID.replace("plot", "");

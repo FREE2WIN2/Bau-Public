@@ -324,7 +324,6 @@ public class GS implements TabExecutor {
         // /gs
         String name = s.getString("Spielername");
         String worldName = s.getString("Worldname");
-        System.out.println("Spielername: " + name + " worldName: " + worldName);
         if (name != null && name.equalsIgnoreCase("team")) {
             tpTeam(s);
             return;
@@ -343,7 +342,6 @@ public class GS implements TabExecutor {
         if (defaultWorld || worldName == null) {
             worldName = PlayerDAO.getDefaultWorldName(ownerUUID);
         }
-        System.out.println(worldName + " " + ownerUUID.toString());
         WorldManager.getPlayerWorld(worldName, ownerUUID).spawn(p);
     }
 

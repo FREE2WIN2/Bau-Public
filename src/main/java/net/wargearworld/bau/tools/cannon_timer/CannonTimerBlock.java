@@ -210,6 +210,13 @@ public class CannonTimerBlock implements Serializable, Cloneable {
 
     @Override
     public CannonTimerBlock clone() throws CloneNotSupportedException {
-        return (CannonTimerBlock) super.clone();
+        CannonTimerBlock cannonTimerBlock = new CannonTimerBlock(loc);
+        cannonTimerBlock.ticks = new LinkedHashMap<>();
+        for(Map.Entry<Integer, CannonTimerTick> entry:this.ticks.entrySet()){
+            cannonTimerBlock.ticks.put(entry.getKey(),entry.getValue().clone());
+        }
+        cannonTimerBlock.active = this.active;
+        cannonTimerBlock.settings = this.settings.clone();
+        return cannonTimerBlock;
     }
 }

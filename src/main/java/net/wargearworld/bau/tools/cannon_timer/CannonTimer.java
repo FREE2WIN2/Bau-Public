@@ -180,7 +180,6 @@ public class CannonTimer implements Serializable, Cloneable {
         Loc newLoc = loc.move(offset);
         cannonTimerBlock.setLoc(newLoc);
         blocks.put(newLoc, cannonTimerBlock);
-        System.out.println("prevloc2: " + cannonTimerBlock.getPreviousLoc());
     }
 
     public void clear() {
@@ -211,7 +210,6 @@ public class CannonTimer implements Serializable, Cloneable {
             Loc newLoc = cannonTimerBlock.getPreviousLoc();
             if(newLoc == null)
                 return;
-            System.out.println("oldLoc: " + loc + " newLoc: " + newLoc);
             cannonTimerBlock.setPreviousLoc(loc);
             blocks.remove(loc);
             blocks.put(newLoc, cannonTimerBlock);

@@ -111,21 +111,22 @@ public class WorldManager {
             return;
         }
         if (!world.getName().contains("test") && !world.getName().contains("world") && world.getName().length() != 5) {
-            worlds.get(world.getUID()).unload();
-            worlds.remove(world.getUID());
+            BauWorld bauWorld = worlds.get(world.getUID());
+            if (bauWorld != null) {
+                worlds.get(world.getUID()).unload();
+                worlds.remove(world.getUID());
+            }
         }
         Bukkit.unloadWorld(world, true);
     }
 
     public static void createWorldDir(String worldName, WorldTemplate worldTemplate) {
-        System.out.println("createWorldDIr: worldname: " + worldName + " Template: " + worldTemplate.getName());
         // File neu = new File(path + "/Worlds/" + uuid);
         File neu = new File(Bukkit.getWorldContainer(), worldName);
         neu.mkdirs();
         neu.setExecutable(true, false);
         neu.setReadable(true, false);
         neu.setWritable(true, false);
-        System.out.println(worldTemplate.getWorldDir());
         copyFolder_raw(worldTemplate.getWorldDir(), neu);
         // worldguard regionen
         File worldGuardWorldDir = new File(Bukkit.getWorldContainer(),
@@ -236,13 +237,20 @@ public class WorldManager {
             p.kickPlayer("GS Rename!");
         }
         String newWorldName = world.rename(newName);
-        oldWorld.getWorldFolder().renameTo(new File(Bukkit.getWorldContainer(), newWorldName));
+        File newWorld = new File(Bukkit.getWorldContainer(), newWorldName);
+        oldWorld.getWorldFolder().renameTo(newWorld);
+        File uid = new File(newWorld, "uid.dat");
+        if (uid.exists()) uid.delete();
+
+        File session = new File(newWorld, "session.lock");
+        if (session.exists()) session.delete();
+
         new File(Main.getPlugin().getDataFolder(), "worlds/" + oldWorld.getName()).renameTo(new File(Main.getPlugin().getDataFolder(), "worlds/" + newWorldName));
         //delete
 
         File worldGuardDir = new File(Bukkit.getWorldContainer(), "plugins/WorldGuard/worlds/" + oldWorld.getName());
-                worldGuardDir.renameTo(new File(Bukkit.getWorldContainer(),
-                        "plugins/WorldGuard/worlds/" + newWorldName));
+        worldGuardDir.renameTo(new File(Bukkit.getWorldContainer(),
+                "plugins/WorldGuard/worlds/" + newWorldName));
         File persistDir = new File(Main.getPlugin().getDataFolder(), "worlds/" + oldWorld.getName());
         persistDir.renameTo(new File(Main.getPlugin().getDataFolder(), "worlds/" + newWorldName));
     }

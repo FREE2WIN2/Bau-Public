@@ -163,11 +163,16 @@ public class CannonTimerListener implements TabExecutor, Listener {
                 MessageHandler.getInstance().send(p, "cannonTimer_no_copy");
                 return;
             }
-            Loc loc = Loc.getByLocation(event.getClickedBlock().getLocation());
-            cannonTimer.setBlock(loc, cannonTimerBlock);
-            cannonTimerBlock.setLoc(loc);
-            MessageHandler.getInstance().send(p, "cannonTimer_pasted");
-            return;
+            try {
+                CannonTimerBlock clonedCannonTimerBlock = cannonTimerBlock.clone();
+                Loc loc = Loc.getByLocation(event.getClickedBlock().getLocation());
+                clonedCannonTimerBlock.setLoc(loc);
+                cannonTimer.setBlock(loc, clonedCannonTimerBlock);
+                MessageHandler.getInstance().send(p, "cannonTimer_pasted");
+                return;
+            } catch (CloneNotSupportedException e) {
+            }
+
         } else if (event.getAction() == Action.RIGHT_CLICK_AIR && event.getItem().getType() == toolMaterial) {
             cannonTimer.start(p);
             event.setCancelled(true);
