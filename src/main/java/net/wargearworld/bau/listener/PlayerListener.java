@@ -75,6 +75,7 @@ public class PlayerListener implements Listener {
         p.getInventory().setItem(0, ItemStackCreator.createNewItemStack(Material.NETHER_STAR, "§6GUI"));
         new ScoreBoardBau(p);
         BauPlayer.getBauPlayer(p).loadClipboard();
+        e.setJoinMessage("");
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -93,6 +94,7 @@ public class PlayerListener implements Listener {
             }
         }, 10 * 60 * 60);//1hour
 
+        e.setQuitMessage("");
 
     }
 
