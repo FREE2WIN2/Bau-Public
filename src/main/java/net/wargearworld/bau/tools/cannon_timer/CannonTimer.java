@@ -209,6 +209,8 @@ public class CannonTimer implements Serializable, Cloneable {
         if (cannonTimerBlock != null) {
             Loc loc = cannonTimerBlock.getLoc();
             Loc newLoc = cannonTimerBlock.getPreviousLoc();
+            if(newLoc == null)
+                return;
             System.out.println("oldLoc: " + loc + " newLoc: " + newLoc);
             cannonTimerBlock.setPreviousLoc(loc);
             blocks.remove(loc);

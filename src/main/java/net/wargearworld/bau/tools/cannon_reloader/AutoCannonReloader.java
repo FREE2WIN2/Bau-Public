@@ -149,7 +149,8 @@ public class AutoCannonReloader {
         if (tntLocations.containsKey(loc)) {
             AutoCannonReloaderBlock autoCannonReloaderBlock = tntLocations.get(loc);
             Loc newLoc = autoCannonReloaderBlock.getPreviousLoc();
-
+            if(newLoc == null)
+                return;
             autoCannonReloaderBlock.setLoc(newLoc);
             autoCannonReloaderBlock.setPreviousLoc(loc);
 

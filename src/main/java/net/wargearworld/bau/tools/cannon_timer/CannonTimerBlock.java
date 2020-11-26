@@ -20,7 +20,7 @@ import java.util.TreeMap;
 public class CannonTimerBlock implements Serializable, Cloneable {
     private static final long serialVersionUID = -4112709504886629938L;
     private Loc loc;
-    private Loc previousLoc;
+    private transient Loc previousLoc;
     private boolean active;
     private Map<Integer, CannonTimerTick> ticks;
     private CannonTimerSettings settings;
