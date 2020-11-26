@@ -27,12 +27,10 @@ public class ScoreBoardBau {
     public static HashMap<UUID, ScoreBoardBau> playersScoreboard = new HashMap<>();
 
     private Scheduler scheduler;
-    private Player p;
     private BauPlayer player;
 
     public ScoreBoardBau(Player p) {
         scheduler = new Scheduler();
-        this.p = p;
         player = BauPlayer.getBauPlayer(p);
         playersScoreboard.put(p.getUniqueId(), this);
         scheduler.setTask(Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), new Runnable() {
@@ -62,21 +60,26 @@ public class ScoreBoardBau {
     private String getTNT(Plot currentPlot) {
         if (currentPlot.getTNT()) {
             // System.out.println("tnt on");
-            return MessageHandler.getInstance().getString(p, "boardOn");
+            return MessageHandler.getInstance().getString(player, "boardOn");
         } else {
             // System.out.println("tnt off");
-            return MessageHandler.getInstance().getString(p, "boardOff");
+            return MessageHandler.getInstance().getString(player, "boardOff");
         }
     }
 
     private String getSl() {
-        String rgID = PlayerMovement.playersLastPlot.get(p.getUniqueId());
+        String rgID = PlayerMovement.playersLastPlot.get(player.getUuid());
+        Player p = player.getBukkitPlayer();
+        if(p == null) {
+            cancel();
+            return null;
+        }
         if (Stoplag.getStatus(p.getWorld(), rgID)) {
             // System.out.println("sl on");
-            return MessageHandler.getInstance().getString(p, "boardOn");
+            return MessageHandler.getInstance().getString(player, "boardOn");
         } else {
             // System.out.println("sl off");
-            return MessageHandler.getInstance().getString(p, "boardOff");
+            return MessageHandler.getInstance().getString(player, "boardOff");
         }
 
     }
@@ -91,6 +94,11 @@ public class ScoreBoardBau {
     }
 
     public void update() {
+        Player p = player.getBukkitPlayer();
+        if(p == null) {
+            cancel();
+            return;
+        }
         Scoreboard board = p.getScoreboard() == null ? board = Bukkit.getScoreboardManager().getNewScoreboard()
                 : p.getScoreboard();
         Objective obj;
@@ -132,36 +140,36 @@ public class ScoreBoardBau {
 
     private String getWorldFuscator(Plot currentPlot) {
         if (currentPlot.isWorldFuscated()) {
-            return MessageHandler.getInstance().getString(p, "boardOn");
+            return MessageHandler.getInstance().getString(player, "boardOn");
         } else {
-            return MessageHandler.getInstance().getString(p, "boardOff");
+            return MessageHandler.getInstance().getString(player, "boardOff");
         }
     }
 
     private String getWaterRemover(Plot currentPlot) {
         if (currentPlot.getWaterRemover() != null) {
             // System.out.println("dt on");
-            return MessageHandler.getInstance().getString(p, "boardOn");
+            return MessageHandler.getInstance().getString(player, "boardOn");
         } else {
             // System.out.println("dt off");
-            return MessageHandler.getInstance().getString(p, "boardOff");
+            return MessageHandler.getInstance().getString(player, "boardOff");
         }
     }
 
     private String getDt() {
         if (player.getDT()) {
             // System.out.println("dt on");
-            return MessageHandler.getInstance().getString(p, "boardOn");
+            return MessageHandler.getInstance().getString(player, "boardOn");
         } else {
             // System.out.println("dt off");
-            return MessageHandler.getInstance().getString(p, "boardOff");
+            return MessageHandler.getInstance().getString(player, "boardOff");
         }
     }
 
     @SuppressWarnings("deprecation")
     public void cancel() {
         scheduler.cancel();
-        playersScoreboard.remove(p.getUniqueId());
+        playersScoreboard.remove(player.getUuid());
         try {
             this.finalize();
         } catch (Throwable e) {
