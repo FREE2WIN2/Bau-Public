@@ -231,7 +231,10 @@ public class WorldManager {
 
     public static void renameWorld(BauWorld world, String newName) {
         World oldWorld = world.getWorld();
-        Bukkit.unloadWorld(oldWorld, true);
+        System.out.println(oldWorld);
+        world.unload();
+        Bukkit.getServer().unloadWorld(oldWorld, true);
+        Bukkit.getServer().unloadWorld(oldWorld, false);
         worlds.remove(oldWorld.getUID());
         for (Player p : oldWorld.getPlayers()) {
             p.kickPlayer("GS Rename!");
