@@ -3,6 +3,7 @@ package net.wargearworld.bau.world.bauworld;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.dao.DatabaseDAO;
+import net.wargearworld.bau.dao.PlayerDAO;
 import net.wargearworld.bau.dao.PlotDAO;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.utils.ClickAction;
@@ -308,7 +309,7 @@ public class PlayerWorld extends BauWorld {
         if (ownerPlayer == null || ownerPlayer == p)
             return;
         MessageHandler.getInstance().send(ownerPlayer, "plot_entered", p.getName(), getName());
-        MessageHandler.getInstance().send(p, "world_tp", getName(), getOwner());
+        MessageHandler.getInstance().send(p, "world_tp", getName(), PlayerDAO.getName(owner));
     }
 
 }

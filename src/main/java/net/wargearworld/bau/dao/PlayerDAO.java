@@ -127,4 +127,11 @@ public class PlayerDAO {
             return dbPlayer.getMemberedPlots();
         });
     }
+
+    public static String getName(UUID owner) {
+        return EntityManagerExecuter.run(em->{
+            Player dbPlayer = em.find(Player.class,owner);
+            return dbPlayer.getName();
+        });
+    }
 }
