@@ -2,6 +2,9 @@ package net.wargearworld.bau.dao;
 
 import net.wargearworld.db.EntityManagerExecuter;
 import net.wargearworld.db.model.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
 
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;

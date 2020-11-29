@@ -18,6 +18,10 @@ public class TeamManager {
 
     private static Map<Long, Team> teams = new HashMap<>();
 
+    public static boolean containsTeam(Long teamID) {
+        return teams.containsKey(teamID);
+    }
+
     public static Team getTeam(Long teamID) {
         if (teamID == null)
             return null;
@@ -51,4 +55,6 @@ public class TeamManager {
     public static void updateTeams() {
         teams.clear(); //So every single Team will be updated
     }
+
+
 }

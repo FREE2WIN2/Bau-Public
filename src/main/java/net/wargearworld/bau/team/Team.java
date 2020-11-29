@@ -24,23 +24,7 @@ public class Team {
         leaders = new HashSet<>();
         members = new HashSet<>();
         newcomers = new HashSet<>();
-        EntityManagerExecuter.run(em -> {
-            WargearTeam wargearTeam = em.find(WargearTeam.class, this.id);
-            this.abbreviation = wargearTeam.getAbbreviation();
-            this.name = wargearTeam.getName();
-            for (WargearTeamMember wargearTeamMember : wargearTeam.getMembers()) {
-                UUID uuid = wargearTeamMember.getMember().getUuid();
-                String name = wargearTeamMember.getMember().getName();
-                WorldMember worldMember = new WorldMember(name, uuid,!wargearTeamMember.isNewcomer());
-                if (wargearTeamMember.isLeader()) {
-                    leaders.add(worldMember);
-                } else if (wargearTeamMember.isNewcomer()) {
-                    newcomers.add(worldMember);
-                } else {
-                    members.add(worldMember);
-                }
-            }
-        });
+        update();
     }
 
     public boolean isMember(UUID playerUUID) {
@@ -140,5 +124,25 @@ public class Team {
             }
         }
         return false;
+    }
+
+    public void update() {
+        EntityManagerExecuter.run(em -> {
+            WargearTeam wargearTeam = em.find(WargearTeam.class, this.id);
+            this.abbreviation = wargearTeam.getAbbreviation();
+            this.name = wargearTeam.getName();
+            for (WargearTeamMember wargearTeamMember : wargearTeam.getMembers()) {
+                UUID uuid = wargearTeamMember.getMember().getUuid();
+                String name = wargearTeamMember.getMember().getName();
+                WorldMember worldMember = new WorldMember(name, uuid,!wargearTeamMember.isNewcomer());
+                if (wargearTeamMember.isLeader()) {
+                    leaders.add(worldMember);
+                } else if (wargearTeamMember.isNewcomer()) {
+                    newcomers.add(worldMember);
+                } else {
+                    members.add(worldMember);
+                }
+            }
+        });
     }
 }
