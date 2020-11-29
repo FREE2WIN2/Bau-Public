@@ -10,6 +10,7 @@ import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class DatabaseDAO {
@@ -58,6 +59,7 @@ public class DatabaseDAO {
             mail.setMessage(message);
             mail.setReceiver(receiver);
             mail.setSender(sender);
+            mail.setTimestamp(LocalDateTime.now());
             em.persist(mail);
         });
     }
