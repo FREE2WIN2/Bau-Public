@@ -43,6 +43,10 @@ public class WorldManager {
         return get(loadWorld(team));
     }
 
+    public static boolean containsTeamWorld(Team team) {
+        return Bukkit.getWorld("team_" + team.getId()) != null;
+    }
+
     public static BauWorld getWorld(UUID worldUUID) {
         return worlds.get(worldUUID);
     }
@@ -297,6 +301,7 @@ public class WorldManager {
             return null;
         return loadWorld(worldName, uuid);
     }
+
 
 
 }

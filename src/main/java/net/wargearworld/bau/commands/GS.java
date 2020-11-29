@@ -284,8 +284,12 @@ public class GS implements TabExecutor {
         if (team == null) {
             MessageHandler.getInstance().send(p, "no_team");
         } else {
+            if(team.isNewcomer(p.getUniqueId())){
+                MessageHandler.getInstance().send(p, "team_newcomer");
+            }else{
             BauWorld teamWorld = WorldManager.getTeamWorld(team);
             teamWorld.spawn(p);
+            }
         }
     }
 

@@ -147,4 +147,14 @@ public class TeamWorld extends BauWorld {
         super.spawn(p);
         MessageHandler.getInstance().send(p, "world_tp", "", "Team: " + getOwner());
     }
+
+    public void update() {
+        super.updateScoreboards();
+        for(Player player: getWorld().getPlayers()){
+            if(!isAuthorized(player.getUniqueId())){
+                player.performCommand("gs");
+                MessageHandler.getInstance().send(player,"team_world_noLongerAuthorised");
+            }
+        }
+    }
 }

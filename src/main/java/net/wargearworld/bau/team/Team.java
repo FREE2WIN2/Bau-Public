@@ -3,6 +3,7 @@ package net.wargearworld.bau.team;
 import net.wargearworld.bau.dao.DatabaseDAO;
 import net.wargearworld.bau.world.WorldManager;
 import net.wargearworld.bau.world.WorldTemplate;
+import net.wargearworld.bau.world.bauworld.TeamWorld;
 import net.wargearworld.bau.world.bauworld.WorldMember;
 import net.wargearworld.db.EntityManagerExecuter;
 import net.wargearworld.db.model.WargearTeam;
@@ -144,5 +145,13 @@ public class Team {
                 }
             }
         });
+
+        if(WorldManager.containsTeamWorld(this)){
+            ((TeamWorld)WorldManager.getTeamWorld(this)).update();
+        }
+    }
+
+    public boolean isNewcomer(UUID uniqueId) {
+        return newcomers.contains(uniqueId);
     }
 }
