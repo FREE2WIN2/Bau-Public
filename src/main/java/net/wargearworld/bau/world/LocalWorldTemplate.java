@@ -8,10 +8,10 @@ import net.wargearworld.GUI_API.Items.CustomHead;
 import net.wargearworld.GUI_API.Items.DefaultItem;
 import net.wargearworld.GUI_API.Items.HeadItem;
 import net.wargearworld.GUI_API.Items.Item;
-import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.db.EntityManagerExecuter;
-import net.wargearworld.db.model.PlotTemplate;
-import net.wargearworld.db.model.PlotTemplate_;
+import net.wargearworld.db.model.WorldTemplate;
+import net.wargearworld.db.model.WorldTemplate_;
+import net.wargearworld.db.model.WorldTemplate;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -25,26 +25,24 @@ import net.wargearworld.bau.world.plot.PlotType;
 import net.wargearworld.bau.worldedit.Schematic;
 import net.wargearworld.bau.utils.Loc;
 
-import javax.enterprise.inject.spi.CDI;
-import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-public class WorldTemplate implements Comparable {
-    private static HashMap<String, WorldTemplate> templates;
+public class LocalWorldTemplate implements Comparable {
+    private static HashMap<String, LocalWorldTemplate> templates;
 
     public static void load() {
         templates = new HashMap<>();
         File dir = new File(Main.getPlugin().getDataFolder(), "worldConfigs");
         for (File file : dir.listFiles()) {
-            WorldTemplate template = new WorldTemplate(file);
+            LocalWorldTemplate template = new LocalWorldTemplate(file);
             templates.put(template.getName(), template);
         }
     }
 
-    public static WorldTemplate getTemplate(String name) {
+    public static LocalWorldTemplate getTemplate(String name) {
         if (templates == null)
             load();
         return templates.get(name);
@@ -61,7 +59,7 @@ public class WorldTemplate implements Comparable {
     private String spawnPlotID;
     private Double price;
 
-    private WorldTemplate(File configFile) {
+    private LocalWorldTemplate(File configFile) {
         name = configFile.getName().split("\\.")[0];
         worldguardDir = new File(Bukkit.getPluginManager().getPlugin("WorldGuard").getDataFolder(), "worlds/" + name);
         worldDir = new File(Bukkit.getWorldContainer(), name);
@@ -127,14 +125,14 @@ public class WorldTemplate implements Comparable {
         return EntityManagerExecuter.run(em -> {
 
             CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
-            CriteriaQuery<PlotTemplate> criteriaQuery = criteriaBuilder.createQuery(PlotTemplate.class);
-            Root<PlotTemplate> root = criteriaQuery.from(PlotTemplate.class);
-            criteriaQuery.where(criteriaBuilder.equal(root.get(PlotTemplate_.name), name));
+            CriteriaQuery<WorldTemplate> criteriaQuery = criteriaBuilder.createQuery(WorldTemplate.class);
+            Root<WorldTemplate> root = criteriaQuery.from(WorldTemplate.class);
+            criteriaQuery.where(criteriaBuilder.equal(root.get(WorldTemplate_.name), name));
             Query query = em.createQuery(criteriaQuery);
 
-            PlotTemplate template = null;
+            WorldTemplate template = null;
             try {
-                template = (PlotTemplate) query.getSingleResult();
+                template = (WorldTemplate) query.getSingleResult();
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
@@ -150,7 +148,7 @@ public class WorldTemplate implements Comparable {
 
     public Item getItem(UUID playerUUID) {
         return EntityManagerExecuter.run(em -> {
-            PlotTemplate plotTemplate = em.find(PlotTemplate.class, id);
+            WorldTemplate plotTemplate = em.find(WorldTemplate.class, id);
             Item item;
             if (plotTemplate.getIcon().getValue() != null) {
                 item = new HeadItem(new CustomHead(plotTemplate.getIcon().getValue()), s -> {
@@ -166,8 +164,8 @@ public class WorldTemplate implements Comparable {
 
     @Override
     public int compareTo(Object o) {
-        if (o instanceof WorldTemplate) {
-            return name.compareTo(((WorldTemplate) o).getName());
+        if (o instanceof LocalWorldTemplate) {
+            return name.compareTo(((LocalWorldTemplate) o).getName());
         }
         return 0;
     }
@@ -176,7 +174,7 @@ public class WorldTemplate implements Comparable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        WorldTemplate that = (WorldTemplate) o;
+        LocalWorldTemplate that = (LocalWorldTemplate) o;
         return id == that.id;
     }
 }

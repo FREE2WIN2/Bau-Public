@@ -46,9 +46,9 @@ public class DatabaseDAO {
         });
     }
 
-    public static Plot getPlot(long id) {
+    public static World getPlot(long id) {
         return EntityManagerExecuter.run(em -> {
-            return em.find(Plot.class, id);
+            return em.find(World.class, id);
         });
     }
 

@@ -11,7 +11,7 @@ import net.wargearworld.bau.dao.PlayerDAO;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.utils.HelperMethods;
 import net.wargearworld.bau.world.WorldManager;
-import net.wargearworld.bau.world.WorldTemplate;
+import net.wargearworld.bau.world.LocalWorldTemplate;
 import net.wargearworld.bau.world.gui.WorldGUI;
 import net.wargearworld.command_manager.ArgumentList;
 import net.wargearworld.command_manager.CommandHandel;
@@ -76,7 +76,7 @@ public class Buy implements TabExecutor {
 
     private void buyWorld(ArgumentList s, boolean confirmed) {
         Player p = getPlayer(s);
-        int amountOfWorlds = EntityManagerExecuter.run(em->{return BauPlayer.getBauPlayer(p).getdbPlots().size();});
+        int amountOfWorlds = EntityManagerExecuter.run(em->{return BauPlayer.getBauPlayer(p).getdbWorlds().size();});
         MessageHandler msgHandler = MessageHandler.getInstance();
         if(amountOfWorlds >= BauConfig.getInstance().getMaxworlds()){
             msgHandler.send(p,"max_worlds");
@@ -127,26 +127,26 @@ public class Buy implements TabExecutor {
     private void buyTemplate(ArgumentList s, boolean confirmed) {
         Player p = getPlayer(s);
         MessageHandler msgHandler = MessageHandler.getInstance();
-        WorldTemplate worldTemplate = WorldTemplate.getTemplate(s.getString("TemplateName"));
+        LocalWorldTemplate localWorldTemplate = LocalWorldTemplate.getTemplate(s.getString("TemplateName"));
         EconomyFormatter economyFormatter = EconomyFormatter.getInstance();
         if (confirmed) {
             Account senderAccount = Account.getByUUID(p.getUniqueId());
-            Transaction transaction = new Transaction(senderAccount, null, worldTemplate.getPrice(), TransactionType.PAY);
+            Transaction transaction = new Transaction(senderAccount, null, localWorldTemplate.getPrice(), TransactionType.PAY);
             transaction.setSenderMessageKey("MONEY.BUY.TEMPLATE");
-            transaction.setSenderMessageArguments(List.of(worldTemplate.getName(), worldTemplate.getPrice() + ""));
+            transaction.setSenderMessageArguments(List.of(localWorldTemplate.getName(), localWorldTemplate.getPrice() + ""));
             try {
                 transaction.execute();
-                PlayerDAO.addPlotTemplate(worldTemplate, p.getUniqueId());
-                msgHandler.send(p, "worldtemplate_bought", worldTemplate.getName(), economyFormatter.format(worldTemplate.getPrice()), worldTemplate.getName());
+                PlayerDAO.addWorldTemplate(localWorldTemplate, p.getUniqueId());
+                msgHandler.send(p, "worldtemplate_bought", localWorldTemplate.getName(), economyFormatter.format(localWorldTemplate.getPrice()), localWorldTemplate.getName());
             } catch (NotEnoughMoneyException e) {
-                msgHandler.send(p, "not_enough_money_template", (worldTemplate.getPrice() - senderAccount.getBalance()) + economyFormatter.getCurrencySymbol(), worldTemplate.getName());
+                msgHandler.send(p, "not_enough_money_template", (localWorldTemplate.getPrice() - senderAccount.getBalance()) + economyFormatter.getCurrencySymbol(), localWorldTemplate.getName());
             } catch (NegativeAmountException e) {
             }
         } else {
-            TextComponent tc = new TextComponent(Main.prefix + msgHandler.getString(p, "worldtemplate_buy_confirm", worldTemplate.getName(), economyFormatter.format(worldTemplate.getPrice())));
+            TextComponent tc = new TextComponent(Main.prefix + msgHandler.getString(p, "worldtemplate_buy_confirm", localWorldTemplate.getName(), economyFormatter.format(localWorldTemplate.getPrice())));
             TextComponent click = new TextComponent(msgHandler.getString(p, "worldtemplate_buy_confirm_button"));
-            click.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(msgHandler.getString(p, "worldtemplate_buy_confirm_button_hover", worldTemplate.getName())).create()));
-            click.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/buy template " + worldTemplate.getName() + " confirm"));
+            click.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(msgHandler.getString(p, "worldtemplate_buy_confirm_button_hover", localWorldTemplate.getName())).create()));
+            click.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/buy template " + localWorldTemplate.getName() + " confirm"));
             p.spigot().sendMessage(tc, click);
         }
     }

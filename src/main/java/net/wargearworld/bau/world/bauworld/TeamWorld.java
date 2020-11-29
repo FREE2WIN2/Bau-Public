@@ -1,12 +1,10 @@
 package net.wargearworld.bau.world.bauworld;
 
-import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
-import net.wargearworld.bau.dao.PlotDAO;
+import net.wargearworld.bau.dao.WorldDAO;
 import net.wargearworld.bau.team.Team;
-import net.wargearworld.bau.utils.JsonCreater;
 import net.wargearworld.bau.utils.MethodResult;
-import net.wargearworld.bau.world.WorldTemplate;
+import net.wargearworld.bau.world.LocalWorldTemplate;
 import net.wargearworld.bau.world.gui.GUITeamWorld;
 import net.wargearworld.bau.world.gui.IGUIWorld;
 import net.wargearworld.bau.world.gui.WorldGUI;
@@ -20,7 +18,7 @@ public class TeamWorld extends BauWorld {
 
     private Team team;
     private IGUIWorld iGuiWorld;
-    private Collection<WorldMember> worldMembers;
+    private Collection<LocalWorldMember> localWorldMembers;
     public TeamWorld(Team team, World w) {
         super(w);
         this.team = team;
@@ -42,11 +40,11 @@ public class TeamWorld extends BauWorld {
     }
 
     @Override
-    public Collection<WorldMember> getMembers() {
-        if(worldMembers == null){
-            worldMembers = team.getWorldMembers();
+    public Collection<LocalWorldMember> getMembers() {
+        if(localWorldMembers == null){
+            localWorldMembers = team.getWorldMembers();
         }
-        return worldMembers;
+        return localWorldMembers;
     }
 
     @Override
@@ -75,34 +73,34 @@ public class TeamWorld extends BauWorld {
     }
 
     @Override
-    public void setTemplate(WorldTemplate template) {
+    public void setTemplate(LocalWorldTemplate template) {
         super.template = template;
-        PlotDAO.update(this);
+        WorldDAO.update(this);
     }
 
     @Override
     public void removeAllMembersFromRegions() {
-        for (WorldMember worldMember : team.getLeaders()) {
-            removeMemberFromAllRegions(worldMember.getUuid());
+        for (LocalWorldMember localWorldMember : team.getLeaders()) {
+            removeMemberFromAllRegions(localWorldMember.getUuid());
         }
-        for (WorldMember worldMember : team.getMembers()) {
-            removeMemberFromAllRegions(worldMember.getUuid());
+        for (LocalWorldMember localWorldMember : team.getMembers()) {
+            removeMemberFromAllRegions(localWorldMember.getUuid());
         }
-        for (WorldMember worldMember : team.getNewcomers()) {
-            removeMemberFromAllRegions(worldMember.getUuid());
+        for (LocalWorldMember localWorldMember : team.getNewcomers()) {
+            removeMemberFromAllRegions(localWorldMember.getUuid());
         }
     }
 
     @Override
     public void addAllMembersToRegions() {
-        for (WorldMember worldMember : team.getLeaders()) {
-            addPlayerToAllRegions(worldMember.getUuid());
+        for (LocalWorldMember localWorldMember : team.getLeaders()) {
+            addPlayerToAllRegions(localWorldMember.getUuid());
         }
-        for (WorldMember worldMember : team.getMembers()) {
-            addPlayerToAllRegions(worldMember.getUuid());
+        for (LocalWorldMember localWorldMember : team.getMembers()) {
+            addPlayerToAllRegions(localWorldMember.getUuid());
         }
-        for (WorldMember worldMember : team.getNewcomers()) {
-            addPlayerToAllRegions(worldMember.getUuid());
+        for (LocalWorldMember localWorldMember : team.getNewcomers()) {
+            addPlayerToAllRegions(localWorldMember.getUuid());
         }
     }
 

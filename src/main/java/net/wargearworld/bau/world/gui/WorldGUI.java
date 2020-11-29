@@ -10,25 +10,21 @@ import net.wargearworld.GUI_API.Items.Item;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.config.BauConfig;
-import net.wargearworld.bau.dao.DatabaseDAO;
 import net.wargearworld.bau.dao.PlayerDAO;
-import net.wargearworld.bau.dao.PlotDAO;
+import net.wargearworld.bau.dao.WorldDAO;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.team.Team;
 import net.wargearworld.bau.team.TeamManager;
-import net.wargearworld.bau.tools.cannon_timer.CannonTimerTick;
 import net.wargearworld.bau.utils.CustomHeadValues;
 import net.wargearworld.bau.utils.HelperMethods;
 import net.wargearworld.bau.world.WorldManager;
-import net.wargearworld.bau.world.WorldTemplate;
+import net.wargearworld.bau.world.LocalWorldTemplate;
 import net.wargearworld.bau.world.bauworld.BauWorld;
 import net.wargearworld.bau.world.bauworld.PlayerWorld;
 import net.wargearworld.bau.world.bauworld.TeamWorld;
-import net.wargearworld.bau.world.bauworld.WorldMember;
+import net.wargearworld.bau.world.bauworld.LocalWorldMember;
 import net.wargearworld.db.EntityManagerExecuter;
-import net.wargearworld.db.model.Plot;
-import net.wargearworld.db.model.PlotMember;
-import net.wargearworld.economy.core.account.Account;
+import net.wargearworld.db.model.WorldMember;
 import net.wargearworld.economy.core.utils.EconomyFormatter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -38,7 +34,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.awt.image.ShortLookupTable;
 import java.util.*;
 
 public class WorldGUI implements Listener {
@@ -116,8 +111,8 @@ public class WorldGUI implements Listener {
         return EntityManagerExecuter.run(em -> {
             List<IGUIWorld> worlds = new ArrayList<>();
             //First Own
-            for (Plot plot : bauPlayer.getdbPlots()) {
-                worlds.add(new GUIPlayerWorld(plot.getName(), plot.getOwner().getUuid(), plot.getOwner().getName(), new WorldIcon(plot.getIcon())));
+            for (net.wargearworld.db.model.World dbWorld : bauPlayer.getdbWorlds()) {
+                worlds.add(new GUIPlayerWorld(dbWorld.getName(), dbWorld.getOwner().getUuid(), dbWorld.getOwner().getName(), new WorldIcon(dbWorld.getIcon())));
             }
             for (int i = worlds.size(); i < BauConfig.getInstance().getMaxworlds(); i++) {
                 worlds.add(new GUIMissingPlayerWorld());
@@ -129,8 +124,8 @@ public class WorldGUI implements Listener {
                 worlds.add(new GUIMissingTeamWorld());
             }
             //Then membered
-            for (PlotMember plotMember : PlayerDAO.getMemberedPlots(p.getUniqueId())) {
-                Plot plot = plotMember.getPlot();
+            for (WorldMember plotMember : PlayerDAO.getMemberedWorlds(p.getUniqueId())) {
+                net.wargearworld.db.model.World plot = plotMember.getWorld();
                 worlds.add(new GUIPlayerWorld(plot.getName(), plot.getOwner().getUuid(), plot.getOwner().getName(), new WorldIcon(plot.getIcon())));
             }
             return worlds;
@@ -141,20 +136,20 @@ public class WorldGUI implements Listener {
     public static void openTemplates(Player p, BauWorld bauWorld) {
         MessageHandler msgHandler = MessageHandler.getInstance();
         BauPlayer bauPlayer = BauPlayer.getBauPlayer(p);
-        Map<WorldTemplate, Boolean> playersTemplates = PlayerDAO.getPlayersTeamplates(bauPlayer.getUuid());
+        Map<LocalWorldTemplate, Boolean> playersTemplates = PlayerDAO.getPlayersTeamplates(bauPlayer.getUuid());
         int invSize = (playersTemplates.size() + 8) / 9;
         GUI gui = new ChestGUI(invSize * 9, MessageHandler.getInstance().getString(p, "worldTemplateGUI_title"));
         EconomyFormatter economyFormatter = EconomyFormatter.getInstance();
-        for (Map.Entry<WorldTemplate, Boolean> entry : playersTemplates.entrySet()) {
-            WorldTemplate worldTemplate = entry.getKey();
+        for (Map.Entry<LocalWorldTemplate, Boolean> entry : playersTemplates.entrySet()) {
+            LocalWorldTemplate localWorldTemplate = entry.getKey();
             Item worldTemplateItem = entry.getKey().getItem(bauPlayer.getUuid());
             String prefix = "§c";
 
             worldTemplateItem.addLore("§8§m                    ");
             worldTemplateItem.addLore(" ");
-            if (entry.getValue() || worldTemplate.getPrice() == 0) {
+            if (entry.getValue() || localWorldTemplate.getPrice() == 0) {
                 if (!entry.getValue()) {
-                    PlayerDAO.addPlotTemplate(worldTemplate, p.getUniqueId());
+                    PlayerDAO.addWorldTemplate(localWorldTemplate, p.getUniqueId());
                 }
                 prefix = "§3";
                 worldTemplateItem.addLore(msgHandler.getString(p, "worldTemplateGUI_template_available_lore"));
@@ -162,17 +157,17 @@ public class WorldGUI implements Listener {
                     if (bauWorld.isOwner(s.getPlayer())) {
                         s.getPlayer().closeInventory();
                         if (!p.getWorld().equals(bauWorld.getWorld())) {
-                            MessageHandler.getInstance().send(p, "world_template_not_on_world", bauWorld.getName(), worldTemplate.getName());
+                            MessageHandler.getInstance().send(p, "world_template_not_on_world", bauWorld.getName(), localWorldTemplate.getName());
                         } else {
-                            p.performCommand("gs setTemplate " + worldTemplate.getName());
+                            p.performCommand("gs setTemplate " + localWorldTemplate.getName());
                         }
                     }
                 });
             } else {
                 worldTemplateItem.addLore(msgHandler.getString(p, "worldTemplateGUI_template_not_available_lore"));
-                    worldTemplateItem.addLore(msgHandler.getString(p, "worldTemplateGUI_template_price_lore", economyFormatter.format(worldTemplate.getPrice())));
+                    worldTemplateItem.addLore(msgHandler.getString(p, "worldTemplateGUI_template_price_lore", economyFormatter.format(localWorldTemplate.getPrice())));
                 worldTemplateItem.setExecutor(s -> {
-                    p.performCommand("buy template " + worldTemplate.getName());
+                    p.performCommand("buy template " + localWorldTemplate.getName());
                     p.getOpenInventory().close();
                 });
             }
@@ -209,7 +204,7 @@ public class WorldGUI implements Listener {
             //TODO Message
             return;
         }
-        Collection<WorldMember> members = bauWorld.getMembers();
+        Collection<LocalWorldMember> members = bauWorld.getMembers();
         int size = ((members.size() + 8) / 9) * 9 + 18;
         if (size > 54) size = 54;
         GUI gui;
@@ -218,7 +213,7 @@ public class WorldGUI implements Listener {
         } else {
             gui = new ChestGUI(size, msgHandler.getString(p, "world_gui_title_team", bauWorld.getName()));
         }
-        for (WorldMember member : members) {
+        for (LocalWorldMember member : members) {
             HeadItem memberHead = new HeadItem(member.getUuid(), "§3" + member.getName(), 1);
             memberHead.setExecutor(s -> {
             }).setCancelled(true);
@@ -276,7 +271,7 @@ public class WorldGUI implements Listener {
         GUI gui = new ChestGUI(size, MessageHandler.getInstance().getString(p, "world_choose_icon_gui", worldName));
         for (WorldIcon worldIcon : icons) {
             gui.addItem(worldIcon.toItem().setExecutor(s -> {
-                PlotDAO.setIcon(owner, worldName, worldIcon.getId());
+                WorldDAO.setIcon(owner, worldName, worldIcon.getId());
                 openMain(p, 1);
             }));
         }

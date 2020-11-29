@@ -5,9 +5,9 @@ import net.wargearworld.GUI_API.Items.HeadItem;
 import net.wargearworld.GUI_API.Items.Item;
 import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.dao.PlayerDAO;
-import net.wargearworld.bau.dao.PlotDAO;
+import net.wargearworld.bau.dao.WorldDAO;
 import net.wargearworld.bau.world.WorldManager;
-import net.wargearworld.bau.world.WorldTemplate;
+import net.wargearworld.bau.world.LocalWorldTemplate;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
@@ -85,10 +85,10 @@ public class GUIPlayerWorld implements IGUIWorld {
 
     @Override
     public Item getTemplateIcon(Player p) {
-        WorldTemplate worldTemplate = PlotDAO.getTemplate(owner, name);
-        if (worldTemplate == null)
+        LocalWorldTemplate localWorldTemplate = WorldDAO.getTemplate(owner, name);
+        if (localWorldTemplate == null)
             return null;
-        Item item = worldTemplate.getItem(p.getUniqueId()).setName(MessageHandler.getInstance().getString(p, "world_gui_world_template", worldTemplate.getName()));
+        Item item = localWorldTemplate.getItem(p.getUniqueId()).setName(MessageHandler.getInstance().getString(p, "world_gui_world_template", localWorldTemplate.getName()));
         if (p.getUniqueId().equals(owner) && p.getWorld().getName().equals(owner + "_" + name)) {
             item.setExecutor(s -> {
                 WorldGUI.openTemplates(p, WorldManager.getPlayerWorld(name, owner));
@@ -108,7 +108,7 @@ public class GUIPlayerWorld implements IGUIWorld {
             });
         } else if (isOwner) {
             item = new DefaultItem(Material.FIREWORK_STAR, MessageHandler.getInstance().getString(p, "world_gui_item_default_change"), s -> {
-                PlotDAO.changeToDefault(owner, name);
+                WorldDAO.changeToDefault(owner, name);
                 WorldGUI.openMain(p, page);
             }).addLore(MessageHandler.getInstance().getString(p, "world_gui_item_default_change_lore", name));
         }

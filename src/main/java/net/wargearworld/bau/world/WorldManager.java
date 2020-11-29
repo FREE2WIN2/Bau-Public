@@ -7,8 +7,7 @@ import net.wargearworld.bau.world.bauworld.BauWorld;
 import net.wargearworld.bau.world.bauworld.PlayerWorld;
 import net.wargearworld.bau.world.bauworld.TeamWorld;
 import net.wargearworld.db.EntityManagerExecuter;
-import net.wargearworld.db.model.Plot;
-import net.wargearworld.db.model.Plot_;
+import net.wargearworld.db.model.World_;
 import org.bukkit.WorldType;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -22,7 +21,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
-import java.util.Set;
 import java.util.UUID;
 
 public class WorldManager {
@@ -64,15 +62,15 @@ public class WorldManager {
         String bukkitWorldName = owner + "_" + worldName;
         World w = Bukkit.getWorld(bukkitWorldName);
         if (w == null) {
-            Plot plot = readPlot(owner, worldName);
-            if (plot == null)
+            net.wargearworld.db.model.World dbWorld = readPlot(owner, worldName);
+            if (dbWorld == null)
                 return null;
-            long id = readPlot(owner, worldName).getId();
+            long id = dbWorld.getId();
             if (id == 0)
                 return null;
             if (!new File(Bukkit.getWorldContainer(), bukkitWorldName).exists()) {
                 EntityManagerExecuter.run(em -> {
-                    createWorldDir(bukkitWorldName, WorldTemplate.getTemplate(em.find(Plot.class, id).getTemplate().getName()));
+                    createWorldDir(bukkitWorldName, LocalWorldTemplate.getTemplate(em.find(net.wargearworld.db.model.World.class, id).getTemplate().getName()));
                 });
             }
 
@@ -124,18 +122,18 @@ public class WorldManager {
         Bukkit.unloadWorld(world, true);
     }
 
-    public static void createWorldDir(String worldName, WorldTemplate worldTemplate) {
+    public static void createWorldDir(String worldName, LocalWorldTemplate localWorldTemplate) {
         // File neu = new File(path + "/Worlds/" + uuid);
         File neu = new File(Bukkit.getWorldContainer(), worldName);
         neu.mkdirs();
         neu.setExecutable(true, false);
         neu.setReadable(true, false);
         neu.setWritable(true, false);
-        copyFolder_raw(worldTemplate.getWorldDir(), neu);
+        copyFolder_raw(localWorldTemplate.getWorldDir(), neu);
         // worldguard regionen
         File worldGuardWorldDir = new File(Bukkit.getWorldContainer(),
                 "plugins/WorldGuard/worlds/" + worldName);
-        copyFolder_raw(worldTemplate.getWorldguardDir(), worldGuardWorldDir);
+        copyFolder_raw(localWorldTemplate.getWorldguardDir(), worldGuardWorldDir);
     }
 
     public static boolean deleteWorld(World w) {
@@ -278,16 +276,16 @@ public class WorldManager {
 
     }
 
-    public static Plot readPlot(UUID owner, String name) {
+    public static net.wargearworld.db.model.World readPlot(UUID owner, String name) {
         return EntityManagerExecuter.run(em -> {
             CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
-            CriteriaQuery<Plot> criteriaQuery = criteriaBuilder.createQuery(Plot.class);
-            Root<Plot> root = criteriaQuery.from(Plot.class);
-            criteriaQuery.where(criteriaBuilder.equal(root.get(Plot_.name), name), criteriaBuilder.equal(root.get(Plot_.owner), em.find(net.wargearworld.db.model.Player.class, owner)));
+            CriteriaQuery<net.wargearworld.db.model.World > criteriaQuery = criteriaBuilder.createQuery(net.wargearworld.db.model.World .class);
+            Root<net.wargearworld.db.model.World > root = criteriaQuery.from(net.wargearworld.db.model.World .class);
+            criteriaQuery.where(criteriaBuilder.equal(root.get(World_.name), name), criteriaBuilder.equal(root.get(World_.owner), em.find(net.wargearworld.db.model.Player.class, owner)));
             Query query = em.createQuery(criteriaQuery);
-            Plot plot = null;
+            net.wargearworld.db.model.World  plot = null;
             try {
-                plot = (Plot) query.getSingleResult();
+                plot = (net.wargearworld.db.model.World ) query.getSingleResult();
             } catch (Exception exception) {
             }
             return plot;

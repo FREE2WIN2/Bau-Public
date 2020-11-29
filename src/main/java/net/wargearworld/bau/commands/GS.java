@@ -21,8 +21,8 @@ import net.wargearworld.command_manager.ParseState;
 import net.wargearworld.command_manager.arguments.DynamicListGetter;
 import net.wargearworld.commandframework.player.BukkitCommandPlayer;
 import net.wargearworld.db.EntityManagerExecuter;
-import net.wargearworld.db.model.Plot;
-import net.wargearworld.db.model.PlotMember;
+import net.wargearworld.db.model.World;
+import net.wargearworld.db.model.WorldMember;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -141,21 +141,21 @@ public class GS implements TabExecutor {
                     tpTeam(s);
                 }))
                 .addSubNode(argument("Worldname", dynamicList("Worldname", state -> {
-                    return PlayerDAO.getPlayersPlotNames(getPlayer(state.getArgumentList()).getName());
+                    return PlayerDAO.getPlayersWorldNames(getPlayer(state.getArgumentList()).getName());
                 }))
                         .setCallback(s -> {
                             tp(s, false);
                         }))
                 .addSubNode(argument("Spielername", dynamicList("Spielername", state -> {
                     if (getPlayer(state.getArgumentList()).hasPermission("bau.move.bypass"))
-                        return PlayerDAO.getAllPlayersWithPlot();
-                    return PlayerDAO.getPlayersAddedPlotsPlayerNames(state.getPlayer().getUUID());
+                        return PlayerDAO.getAllPlayersWithWorld();
+                    return PlayerDAO.getPlayersAddedWorldsPlayerNames(state.getPlayer().getUUID());
                 }))
                         .setCallback(s -> {
                             tp(s, true);
                         })
                         .addSubNode(argument("Worldname", dynamicList("Worldname", state -> {
-                            return PlayerDAO.getPlayersPlotNames(state.getArgumentList().getString("Spielername"));
+                            return PlayerDAO.getPlayersWorldNames(state.getArgumentList().getString("Spielername"));
                         }))
                                 .setCallback(s -> {
                                     tp(s, false);
@@ -301,9 +301,9 @@ public class GS implements TabExecutor {
         EntityManagerExecuter.run(em -> {
             BauWorld bauWorld = WorldManager.get(p.getWorld());
             long id = bauWorld.getId();
-            Plot dbPlot = em.find(Plot.class, id);
+            World dbWorld = em.find(World.class, id);
             net.wargearworld.db.model.Player dbPlayer = em.find(net.wargearworld.db.model.Player.class, memberUUID);
-            PlotMember plotMember = dbPlot.getMember(dbPlayer);
+            WorldMember plotMember = dbWorld.getMember(dbPlayer);
             plotMember.setRights(b);
             if (b) {
                 MessageHandler.getInstance().send(p, "plotrights_setted", memberName);

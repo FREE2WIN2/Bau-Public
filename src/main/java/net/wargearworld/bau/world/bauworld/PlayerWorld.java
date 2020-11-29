@@ -4,20 +4,17 @@ import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.dao.DatabaseDAO;
 import net.wargearworld.bau.dao.PlayerDAO;
-import net.wargearworld.bau.dao.PlotDAO;
+import net.wargearworld.bau.dao.WorldDAO;
 import net.wargearworld.bau.player.BauPlayer;
-import net.wargearworld.bau.utils.ClickAction;
-import net.wargearworld.bau.utils.JsonCreater;
 import net.wargearworld.bau.utils.MethodResult;
 import net.wargearworld.bau.world.WorldManager;
-import net.wargearworld.bau.world.WorldTemplate;
+import net.wargearworld.bau.world.LocalWorldTemplate;
 import net.wargearworld.bau.world.gui.GUIPlayerWorld;
 import net.wargearworld.bau.world.gui.IGUIWorld;
 import net.wargearworld.bau.world.gui.WorldGUI;
 import net.wargearworld.bau.world.plot.PlotPattern;
 import net.wargearworld.db.EntityManagerExecuter;
-import net.wargearworld.db.model.Plot;
-import net.wargearworld.db.model.PlotMember;
+import net.wargearworld.db.model.WorldMember;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -31,13 +28,13 @@ public class PlayerWorld extends BauWorld {
     UUID owner;
     private long plotID;
     private IGUIWorld iguiWorld;
-    private Collection<WorldMember> worldMembers;
+    private Collection<LocalWorldMember> localWorldMembers;
 
     public PlayerWorld(long id, UUID owner, World world) {
         super(world);
         this.plotID = id;
         EntityManagerExecuter.run(em -> {
-            Plot dbPlot = em.find(Plot.class, plotID);
+            net.wargearworld.db.model.World dbPlot = em.find(net.wargearworld.db.model.World.class, plotID);
             this.owner = owner;
             setTemplate(dbPlot.getTemplate().getName());
             plots = new HashMap<>();
@@ -55,23 +52,23 @@ public class PlayerWorld extends BauWorld {
     }
 
     @Override
-    public Collection<WorldMember> getMembers() {
-        if (worldMembers == null) {
+    public Collection<LocalWorldMember> getMembers() {
+        if (localWorldMembers == null) {
             EntityManagerExecuter.run(em -> {
-                worldMembers = new ArrayList<>();
-                Plot dbPlot = em.find(Plot.class, plotID);
-                for (PlotMember member : dbPlot.getMembers()) {
-                    worldMembers.add(new WorldMember(member.getMember().getName(), member.getMember().getUuid(),member.hasRights()));
+                localWorldMembers = new ArrayList<>();
+                net.wargearworld.db.model.World dbWorld = em.find(net.wargearworld.db.model.World.class, plotID);
+                for (WorldMember member : dbWorld.getMembers()) {
+                    localWorldMembers.add(new LocalWorldMember(member.getMember().getName(), member.getMember().getUuid(),member.hasRights()));
                 }
             });
         }
-        return worldMembers;
+        return localWorldMembers;
     }
 
     @Override
     public boolean isMember(UUID memberUUID) {
-        for(WorldMember worldMember:getMembers()){
-            if(worldMember.getUuid().equals(memberUUID))
+        for(LocalWorldMember localWorldMember :getMembers()){
+            if(localWorldMember.getUuid().equals(memberUUID))
                 return true;
         }
         return false;
@@ -80,9 +77,9 @@ public class PlayerWorld extends BauWorld {
     public Collection<String> getMemberNames() {
         return EntityManagerExecuter.run(em -> {
             Set<String> out = new HashSet<>();
-            Plot plot = em.find(Plot.class, plotID);
-            for (PlotMember plotMember : plot.getMembers()) {
-                out.add(plotMember.getMember().getName());
+            net.wargearworld.db.model.World dbWorld = em.find(net.wargearworld.db.model.World.class, plotID);
+            for (WorldMember worldMember : dbWorld.getMembers()) {
+                out.add(worldMember.getMember().getName());
             }
             return out;
         });
@@ -101,9 +98,9 @@ public class PlayerWorld extends BauWorld {
         if(p != null && p.hasPermission("bau.rights.bypass")) return true;
         return EntityManagerExecuter.run(em -> {
             net.wargearworld.db.model.Player dbPlayer = em.find(net.wargearworld.db.model.Player.class, uuid);
-            for (PlotMember plotMember : dbPlayer.getMemberedPlots()) {
-                if (plotMember.getPlot().getId() == plotID) {
-                    return plotMember.hasRights();
+            for (WorldMember worldMember : dbPlayer.getMemberedWorlds()) {
+                if (worldMember.getWorld().getId() == plotID) {
+                    return worldMember.hasRights();
                 }
             }
 
@@ -121,8 +118,8 @@ public class PlayerWorld extends BauWorld {
     @Override
     public void removeAllMembersFromRegions() {
         EntityManagerExecuter.run(em -> {
-            Plot dbPlot = em.find(Plot.class, plotID);
-            for (PlotMember member : dbPlot.getMembers()) {
+            net.wargearworld.db.model.World dbWorld = em.find(net.wargearworld.db.model.World.class, plotID);
+            for (WorldMember member : dbWorld.getMembers()) {
                 super.removeMemberFromAllRegions(member.getMember().getUuid());
             }
         });
@@ -132,8 +129,8 @@ public class PlayerWorld extends BauWorld {
     @Override
     public void addAllMembersToRegions() {
         EntityManagerExecuter.run(em -> {
-            Plot dbPlot = em.find(Plot.class, plotID);
-            for (PlotMember member : dbPlot.getMembers()) {
+            net.wargearworld.db.model.World dbWorld = em.find(net.wargearworld.db.model.World.class, plotID);
+            for (WorldMember member : dbWorld.getMembers()) {
                 super.addPlayerToAllRegions(member.getMember().getUuid());
             }
         });
@@ -159,16 +156,16 @@ public class PlayerWorld extends BauWorld {
         UUID uuidMember = DatabaseDAO.getUUID(playerName);
         if (!isAuthorized(uuidMember)) {
             EntityManagerExecuter.run(em -> {
-                Plot dbPlot = em.find(Plot.class, plotID);
+                net.wargearworld.db.model.World dbWorld = em.find(net.wargearworld.db.model.World.class, plotID);
                 net.wargearworld.db.model.Player member = em.find(net.wargearworld.db.model.Player.class, uuidMember);
-                PlotMember plotMember = new PlotMember();
+                WorldMember plotMember = new WorldMember();
                 plotMember.setRights(true);
-                plotMember.setPlot(dbPlot);
+                plotMember.setWorld(dbWorld);
                 plotMember.setMember(member);
                 if (to != null) {
                     plotMember.setAddedTo(new Timestamp(to.getTime()).toLocalDateTime());
                 }
-                dbPlot.addMember(plotMember);
+                dbWorld.addMember(plotMember);
                 em.persist(plotMember);
             });
 
@@ -193,8 +190,8 @@ public class PlayerWorld extends BauWorld {
         LocalDateTime now = LocalDateTime.now();
         Set<UUID> uuidsToRemove = new HashSet<>();
         EntityManagerExecuter.run(em -> {
-            Plot dbPlot = em.find(Plot.class, plotID);
-            for (PlotMember member : dbPlot.getMembers()) {
+            net.wargearworld.db.model.World dbWorld = em.find(net.wargearworld.db.model.World.class, plotID);
+            for (WorldMember member : dbWorld.getMembers()) {
                 if (member.getAddedTo() != null && member.getAddedTo().isBefore(now)) {
                     uuidsToRemove.add(member.getMember().getUuid());
                 }
@@ -215,18 +212,18 @@ public class PlayerWorld extends BauWorld {
             BauPlayer memberBauPlayer = BauPlayer.getBauPlayer(member);
             EntityManagerExecuter.run(em -> {
 
-                Plot dbPlot = em.find(Plot.class, plotID);
-                PlotMember plotMember = dbPlot.getMember(memberBauPlayer.getDbPlayer());
-                dbPlot.removeMember(plotMember);
+                net.wargearworld.db.model.World dbWorld = em.find(net.wargearworld.db.model.World.class, plotID);
+                WorldMember plotMember = dbWorld.getMember(memberBauPlayer.getDbPlayer());
+                dbWorld.removeMember(plotMember);
 
                 removeMemberFromAllRegions(plotMember.getMember().getUuid());
                 memberRemoved(plotMember.getMember().getUuid());
                 em.remove(plotMember);
             });
 
-            for(WorldMember worldMember:worldMembers){
-                if(worldMember.getUuid().equals(member)){
-                    worldMembers.remove(worldMember);
+            for(LocalWorldMember localWorldMember : localWorldMembers){
+                if(localWorldMember.getUuid().equals(member)){
+                    localWorldMembers.remove(localWorldMember);
                     break;
                 }
             }
@@ -236,9 +233,9 @@ public class PlayerWorld extends BauWorld {
     }
 
     @Override
-    public void setTemplate(WorldTemplate template) {
+    public void setTemplate(LocalWorldTemplate template) {
         super.template = template;
-        PlotDAO.update(this);
+        WorldDAO.update(this);
     }
 
     private void memberRemoved(UUID uuid) {
@@ -291,14 +288,14 @@ public class PlayerWorld extends BauWorld {
         super.setWorldName(newName);
         super.setName(newName);
         super.worldName = owner + "_" + newName;
-        PlotDAO.update(this);
+        WorldDAO.update(this);
         return getOwner() + "_" + newName;
     }
 
     @Override
     public IGUIWorld getGUIWorld() {
         if (iguiWorld == null)
-            iguiWorld = new GUIPlayerWorld(getName(), owner, DatabaseDAO.getPlayer(owner).getName(), PlotDAO.getWorldIcon(plotID));
+            iguiWorld = new GUIPlayerWorld(getName(), owner, DatabaseDAO.getPlayer(owner).getName(), WorldDAO.getWorldIcon(plotID));
         return iguiWorld;
     }
 

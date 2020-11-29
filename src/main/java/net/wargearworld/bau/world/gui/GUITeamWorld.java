@@ -5,11 +5,9 @@ import net.wargearworld.GUI_API.Items.DefaultItem;
 import net.wargearworld.GUI_API.Items.HeadItem;
 import net.wargearworld.GUI_API.Items.Item;
 import net.wargearworld.bau.MessageHandler;
-import net.wargearworld.bau.dao.PlotDAO;
 import net.wargearworld.bau.team.Team;
 import net.wargearworld.bau.world.WorldManager;
-import net.wargearworld.bau.world.WorldTemplate;
-import net.wargearworld.db.EntityManagerExecuter;
+import net.wargearworld.bau.world.LocalWorldTemplate;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -89,8 +87,8 @@ public class GUITeamWorld implements IGUIWorld{
 
     @Override
     public Item getTemplateIcon(Player p) {
-        WorldTemplate worldTemplate = team.getTemplate();
-        Item item = worldTemplate.getItem(p.getUniqueId()).setName(MessageHandler.getInstance().getString(p, "world_gui_world_template", worldTemplate.getName()));
+        LocalWorldTemplate localWorldTemplate = team.getTemplate();
+        Item item = localWorldTemplate.getItem(p.getUniqueId()).setName(MessageHandler.getInstance().getString(p, "world_gui_world_template", localWorldTemplate.getName()));
         if (team.isLeader(p.getUniqueId())&& p.getWorld().getName().equals("team_" + team.getId())) {
             item.setExecutor(s -> {
                 WorldGUI.openTemplates(p, WorldManager.getTeamWorld(team));

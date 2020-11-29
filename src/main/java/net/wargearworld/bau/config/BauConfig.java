@@ -1,6 +1,6 @@
 package net.wargearworld.bau.config;
 
-import net.wargearworld.bau.world.WorldTemplate;
+import net.wargearworld.bau.world.LocalWorldTemplate;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -22,7 +22,7 @@ public class BauConfig {
     private File configFile;
 
     private int weMaxBlocksPerTick;
-    private WorldTemplate defaultTemplate;
+    private LocalWorldTemplate defaultTemplate;
     private String schemPath;
     private int tntReloadMaxTnT;
     private Material tntReloadItem;
@@ -33,7 +33,7 @@ public class BauConfig {
     private Material cannonTimerInactiveBlock;
     private Material cannonTimerTool;
     private int cannonTimerMaxTicks;
-    private WorldTemplate testWorldsTemplates;
+    private LocalWorldTemplate testWorldsTemplates;
     private double worldprice;
     private int maxworlds;
 
@@ -51,7 +51,7 @@ public class BauConfig {
 
     private void loadContent() {
         this.weMaxBlocksPerTick = configuration.getInt("worldEdit.maxBlockPerSecond");
-        this.defaultTemplate = WorldTemplate.getTemplate(configuration.getString("plottemplate"));
+        this.defaultTemplate = LocalWorldTemplate.getTemplate(configuration.getString("plottemplate"));
         this.schemPath = configuration.getString("schempath");
         this.tntReloadMaxTnT = configuration.getInt("tntReload.maxTnt");
         this.tntReloadItem = Material.valueOf(configuration.getString("tntReload.materialType").toUpperCase());
@@ -62,7 +62,7 @@ public class BauConfig {
         this.cannonTimerInactiveBlock = Material.valueOf(configuration.getString("cannontimer.block.inactive").toUpperCase());
         this.cannonTimerTool = Material.valueOf(configuration.getString("cannontimer.tool").toUpperCase());
         this.cannonTimerMaxTicks = configuration.getInt("cannontimer.maxticks");
-        this.testWorldsTemplates = WorldTemplate.getTemplate(configuration.getString("testworlds.template"));
+        this.testWorldsTemplates = LocalWorldTemplate.getTemplate(configuration.getString("testworlds.template"));
         this.worldprice = configuration.getDouble("worldprice");
         this.maxworlds = configuration.getInt("maxworlds");
 
@@ -79,7 +79,7 @@ public class BauConfig {
         return weMaxBlocksPerTick;
     }
 
-    public WorldTemplate getDefaultTemplate() {
+    public LocalWorldTemplate getDefaultTemplate() {
         return defaultTemplate;
     }
 
@@ -119,7 +119,7 @@ public class BauConfig {
         return cannonTimerTool;
     }
 
-    public WorldTemplate getTestWorldsTemplates() {
+    public LocalWorldTemplate getTestWorldsTemplates() {
         return testWorldsTemplates;
     }
 

@@ -20,7 +20,7 @@ public class GUIMissingPlayerWorld implements IGUIWorld{
 
     @Override
     public Item getWorldItem(Player p) {
-        int amountOfWorlds = EntityManagerExecuter.run(em->{return BauPlayer.getBauPlayer(p).getdbPlots().size();});
+        int amountOfWorlds = EntityManagerExecuter.run(em->{return BauPlayer.getBauPlayer(p).getdbWorlds().size();});
         Double price = amountOfWorlds * BauConfig.getInstance().getWorldprice();
        Item item = new HeadItem(new CustomHead(CustomHeadValues.PLUS.getValue()),s->{
             p.performCommand("buy world");

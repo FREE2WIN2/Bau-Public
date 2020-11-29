@@ -22,7 +22,7 @@ import net.wargearworld.bau.world.gui.WorldGUI;
 import net.wargearworld.bau.world.plot.Plot;
 import net.wargearworld.bau.worldedit.WorldEditHandler;
 import net.wargearworld.db.EntityManagerExecuter;
-import net.wargearworld.db.model.PlotMember;
+import net.wargearworld.db.model.World;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -195,15 +195,15 @@ public class BauPlayer {
         return language;
     }
 
-    public Set<net.wargearworld.db.model.Plot> getdbPlots() {
+    public Set<World> getdbWorlds() {
         return EntityManagerExecuter.run(em -> {
-            return em.find(net.wargearworld.db.model.Player.class, uuid).getPlots();
+            return em.find(net.wargearworld.db.model.Player.class, uuid).getWorlds();
         });
     }
 
-    public boolean hasPlots() {
+    public boolean hasWorlds() {
         return EntityManagerExecuter.run(em -> {
-            Set<net.wargearworld.db.model.Plot> plots = em.find(net.wargearworld.db.model.Player.class, uuid).getPlots();
+            Set<World> plots = em.find(net.wargearworld.db.model.Player.class, uuid).getWorlds();
             return plots != null && !plots.isEmpty();
         });
     }

@@ -8,7 +8,6 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import net.wargearworld.bau.Main;
-import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.listener.PlayerMovement;
 import net.wargearworld.bau.scoreboard.ScoreBoardBau;
 import net.wargearworld.bau.tools.cannon_timer.CannonTimer;
@@ -16,7 +15,7 @@ import net.wargearworld.bau.tools.explosion_cache.ExplosionCache;
 import net.wargearworld.bau.utils.HelperMethods;
 import net.wargearworld.bau.utils.MethodResult;
 import net.wargearworld.bau.world.WorldManager;
-import net.wargearworld.bau.world.WorldTemplate;
+import net.wargearworld.bau.world.LocalWorldTemplate;
 import net.wargearworld.bau.world.gui.IGUIWorld;
 import net.wargearworld.bau.world.gui.WorldGUI;
 import net.wargearworld.bau.world.plot.Plot;
@@ -39,7 +38,7 @@ public abstract class BauWorld {
     private String name;
     HashMap<String, Plot> plots;
     protected RegionManager regionManager;
-    WorldTemplate template;
+    LocalWorldTemplate template;
     private File logFile;
     private File worldSettingsDir;
     ExplosionCache explosionCache;
@@ -109,7 +108,7 @@ public abstract class BauWorld {
         WorldGUI.openWorldInfo(p, this,false);
     }
 
-    public abstract Collection<WorldMember> getMembers();
+    public abstract Collection<LocalWorldMember> getMembers();
 
     public abstract boolean isOwner(Player player);
 
@@ -171,15 +170,15 @@ public abstract class BauWorld {
     }
 
     public void setTemplate(String templateName) {
-        WorldTemplate template = WorldTemplate.getTemplate(templateName);
+        LocalWorldTemplate template = LocalWorldTemplate.getTemplate(templateName);
         setTemplate(template);
     }
 
-    public WorldTemplate getTemplate() {
+    public LocalWorldTemplate getTemplate() {
         return template;
     }
 
-    public abstract void setTemplate(WorldTemplate template);
+    public abstract void setTemplate(LocalWorldTemplate template);
 
     public abstract void removeAllMembersFromRegions();
 

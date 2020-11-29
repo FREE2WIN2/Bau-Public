@@ -1,14 +1,12 @@
 package net.wargearworld.bau.team;
 
-import net.wargearworld.bau.dao.DatabaseDAO;
 import net.wargearworld.bau.world.WorldManager;
-import net.wargearworld.bau.world.WorldTemplate;
+import net.wargearworld.bau.world.LocalWorldTemplate;
 import net.wargearworld.bau.world.bauworld.TeamWorld;
-import net.wargearworld.bau.world.bauworld.WorldMember;
+import net.wargearworld.bau.world.bauworld.LocalWorldMember;
 import net.wargearworld.db.EntityManagerExecuter;
 import net.wargearworld.db.model.WargearTeam;
 import net.wargearworld.db.model.WargearTeamMember;
-import org.bukkit.World;
 
 import java.util.*;
 
@@ -16,9 +14,9 @@ public class Team {
     private Long id;
     private String name;
     private String abbreviation;
-    private Set<WorldMember> leaders;
-    private Set<WorldMember> members;
-    private Set<WorldMember> newcomers;
+    private Set<LocalWorldMember> leaders;
+    private Set<LocalWorldMember> members;
+    private Set<LocalWorldMember> newcomers;
 
     public Team(Long id) {
         this.id = Objects.requireNonNull(id);
@@ -33,12 +31,12 @@ public class Team {
     }
 
     public boolean isAuthorized(UUID uuid) {
-        for (WorldMember worldMember : leaders) {
-            if (worldMember.getUuid().equals(uuid))
+        for (LocalWorldMember localWorldMember : leaders) {
+            if (localWorldMember.getUuid().equals(uuid))
                 return true;
         }
-        for (WorldMember worldMember : members) {
-            if (worldMember.getUuid().equals(uuid))
+        for (LocalWorldMember localWorldMember : members) {
+            if (localWorldMember.getUuid().equals(uuid))
                 return true;
         }
         return false;
@@ -56,15 +54,15 @@ public class Team {
         return abbreviation;
     }
 
-    public Set<WorldMember> getLeaders() {
+    public Set<LocalWorldMember> getLeaders() {
         return leaders;
     }
 
-    public Set<WorldMember> getMembers() {
+    public Set<LocalWorldMember> getMembers() {
         return members;
     }
 
-    public Set<WorldMember> getNewcomers() {
+    public Set<LocalWorldMember> getNewcomers() {
         return newcomers;
     }
 
@@ -76,16 +74,16 @@ public class Team {
         return out;
     }
 
-    private void getNameOfMembers(Collection<WorldMember> membersList, Collection<String> outList) {
-        for (WorldMember worldMember : membersList) {
-            outList.add(worldMember.getName());
+    private void getNameOfMembers(Collection<LocalWorldMember> membersList, Collection<String> outList) {
+        for (LocalWorldMember localWorldMember : membersList) {
+            outList.add(localWorldMember.getName());
         }
     }
 
-    public WorldTemplate getTemplate() {
+    public LocalWorldTemplate getTemplate() {
         return EntityManagerExecuter.run(em -> {
             WargearTeam wargearTeam = em.find(WargearTeam.class, this.id);
-            return WorldTemplate.getTemplate(wargearTeam.getTemplate().getName());
+            return LocalWorldTemplate.getTemplate(wargearTeam.getTemplate().getName());
         });
     }
 
@@ -107,20 +105,20 @@ public class Team {
         });
     }
 
-    public void setNewcomers(Set<WorldMember> newcomers) {
+    public void setNewcomers(Set<LocalWorldMember> newcomers) {
         this.newcomers = newcomers;
     }
 
-    public Collection<WorldMember> getWorldMembers() {
-        List<WorldMember> out = new ArrayList<>(leaders);
+    public Collection<LocalWorldMember> getWorldMembers() {
+        List<LocalWorldMember> out = new ArrayList<>(leaders);
         out.addAll(members);
         out.addAll(newcomers);
         return out;
     }
 
     public boolean isLeader(UUID uniqueId) {
-        for (WorldMember worldMember : leaders) {
-            if (worldMember.getUuid().equals(uniqueId)) {
+        for (LocalWorldMember localWorldMember : leaders) {
+            if (localWorldMember.getUuid().equals(uniqueId)) {
                 return true;
             }
         }
@@ -135,13 +133,13 @@ public class Team {
             for (WargearTeamMember wargearTeamMember : wargearTeam.getMembers()) {
                 UUID uuid = wargearTeamMember.getMember().getUuid();
                 String name = wargearTeamMember.getMember().getName();
-                WorldMember worldMember = new WorldMember(name, uuid,!wargearTeamMember.isNewcomer());
+                LocalWorldMember localWorldMember = new LocalWorldMember(name, uuid,!wargearTeamMember.isNewcomer());
                 if (wargearTeamMember.isLeader()) {
-                    leaders.add(worldMember);
+                    leaders.add(localWorldMember);
                 } else if (wargearTeamMember.isNewcomer()) {
-                    newcomers.add(worldMember);
+                    newcomers.add(localWorldMember);
                 } else {
-                    members.add(worldMember);
+                    members.add(localWorldMember);
                 }
             }
         });
