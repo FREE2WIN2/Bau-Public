@@ -7,6 +7,7 @@ import net.wargearworld.command_manager.CommandNode;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.player.DefaultPlayer;
+import net.wargearworld.command_manager.arguments.EnumArgument;
 import net.wargearworld.commandframework.player.BukkitCommandPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -124,7 +125,7 @@ public class Particles implements TabExecutor, Listener {
 		r.addSubNode(g.addSubNode(b.setCallback(s -> {
 			setColor(s);
 		})));
-		CommandNode colorArg = argument("Color", Colors.asArgument());
+		CommandNode colorArg = argument("Color", new EnumArgument<Colors>(Colors.class));
 		try {
 			selection
 					.addSubNode(colorArg.clone()

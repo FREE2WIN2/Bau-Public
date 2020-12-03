@@ -41,7 +41,7 @@ public class DatabaseCommunication {
             CriteriaQuery<PluginCommunication> criteriaQuery = criteriaBuilder.createQuery(PluginCommunication.class);
             Root<PluginCommunication> root = criteriaQuery.from(PluginCommunication.class);
 
-            criteriaQuery.where(criteriaBuilder.notEqual(root.get(PluginCommunication_.sender), NAME_OF_ME));
+            criteriaQuery.where(criteriaBuilder.equal(root.get(PluginCommunication_.receiver), NAME_OF_ME));
             criteriaQuery.orderBy(criteriaBuilder.asc(root.get(PluginCommunication_.id.getName())));
 
             Query query = em.createQuery(criteriaQuery);

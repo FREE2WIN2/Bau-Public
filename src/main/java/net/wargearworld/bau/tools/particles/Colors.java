@@ -1,11 +1,8 @@
 package net.wargearworld.bau.tools.particles;
 
-import net.wargearworld.command_manager.ArgumentType;
 import net.wargearworld.command_manager.arguments.EnumArgument;
-import net.wargearworld.command_manager.arguments.EnumArgumentInterface;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
-import org.w3c.dom.Entity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,27 +72,5 @@ public enum Colors {
 			outlist.add(color.name());
 		}
 		return outlist.toArray(new String[outlist.size()]);
-	}
-
-	static public EnumArgument<Colors> asArgument(){
-		return new EnumArgument<Colors>(new EnumArgumentInterface<Colors>() {
-
-			@Override
-			public Colors fromString(String s) {
-				return Colors.valueOf(s.toUpperCase());
-			}
-
-			@Override
-			public String getTypeName() {
-				return "Color";///TODO: make bilingual
-			}
-
-			@Override
-			public String[] getPossibleOptions() {
-				return Colors.getPossibleOptions();
-			}
-
-		});
-
 	}
 }
