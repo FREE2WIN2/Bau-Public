@@ -92,7 +92,7 @@ public class CannonTimerListener implements TabExecutor, Listener {
         }
         Player p = (Player) commandSender;
         BukkitCommandPlayer commandPlayer = new BukkitCommandPlayer(p);
-        commandHandel.execute(commandPlayer, MessageHandler.getInstance().getLanguage(p), args);
+        commandHandel.execute(commandPlayer, args);
         return true;
     }
 
@@ -104,7 +104,7 @@ public class CannonTimerListener implements TabExecutor, Listener {
         }
         Player p = (Player) commandSender;
         BukkitCommandPlayer commandPlayer = new BukkitCommandPlayer(p);
-        commandHandel.tabComplete(commandPlayer, MessageHandler.getInstance().getLanguage(p), args, out);
+        commandHandel.tabComplete(commandPlayer, args, out);
         return out;
     }
 

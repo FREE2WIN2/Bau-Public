@@ -138,7 +138,7 @@ public class AutoCannonReloaderListener implements Listener, TabExecutor {
         }
         Player p = (Player) sender;
         BukkitCommandPlayer commandPlayer = new BukkitCommandPlayer(p);
-        if (!commandHandel.execute(commandPlayer, MessageHandler.getInstance().getLanguage(p), args))
+        if (!commandHandel.execute(commandPlayer, args))
             Main.send(p, true, MessageHandler.getInstance().getString(p, "cannonReloader_prefix"), "cannonReloader_wrongCommand");
         return true;
     }
@@ -151,7 +151,7 @@ public class AutoCannonReloaderListener implements Listener, TabExecutor {
         Player p = (Player) sender;
         List<String> ret = new ArrayList<>();
         BukkitCommandPlayer commandPlayer = new BukkitCommandPlayer(p);
-        commandHandel.tabComplete(commandPlayer, MessageHandler.getInstance().getLanguage(p), args, ret);
+        commandHandel.tabComplete(commandPlayer, args, ret);
         return ret;
     }
 

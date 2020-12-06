@@ -82,7 +82,7 @@ public class GUI implements TabExecutor, Listener {
         if (sender instanceof Player) {
             Player p = (Player) sender;
             CommandPlayer commandPlayer = new BukkitCommandPlayer(p);
-            commandHandel.execute(commandPlayer, MessageHandler.getInstance().getLanguage(p.getUniqueId()), args);
+            commandHandel.execute(commandPlayer,  args);
         }
         return true;
     }
@@ -93,7 +93,7 @@ public class GUI implements TabExecutor, Listener {
         if (sender instanceof Player) {
             Player p = (Player) sender;
             CommandPlayer commandPlayer = new BukkitCommandPlayer(p);
-            commandHandel.tabComplete(commandPlayer, MessageHandler.getInstance().getLanguage(p.getUniqueId()), args, out);
+            commandHandel.tabComplete(commandPlayer,  args, out);
         }
         return out;
     }

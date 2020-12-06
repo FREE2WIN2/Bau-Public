@@ -96,7 +96,7 @@ public class PlotResetter implements TabExecutor {
         if (sender instanceof Player) {
             Player p = (Player) sender;
             BukkitCommandPlayer commandPlayer = new BukkitCommandPlayer(p);
-            return commandHandle.execute(commandPlayer, MessageHandler.getInstance().getLanguage(p), args);
+            return commandHandle.execute(commandPlayer, args);
         }
         return false;
     }
@@ -107,7 +107,7 @@ public class PlotResetter implements TabExecutor {
         List<String> out = new ArrayList<>();
         Player p = (Player) sender;
         BukkitCommandPlayer commandPlayer = new BukkitCommandPlayer(p);
-        commandHandle.tabComplete(commandPlayer, MessageHandler.getInstance().getLanguage(p), args, out);
+        commandHandle.tabComplete(commandPlayer, args, out);
         return out;
     }
 

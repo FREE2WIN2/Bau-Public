@@ -43,7 +43,7 @@ public class WorldCommand implements TabExecutor {
         if(sender instanceof Player) {
             Player p = (Player) sender;
             BukkitCommandPlayer commandPlayer = new BukkitCommandPlayer(p);
-            handle.execute(commandPlayer, Language.DE, args);
+            handle.execute(commandPlayer, args);
         }
         return true;
     }

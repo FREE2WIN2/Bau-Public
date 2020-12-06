@@ -202,7 +202,7 @@ public class Particles implements TabExecutor, Listener {
 		Player p = (Player) sender;
 		List<String> out = new ArrayList<>();
 		BukkitCommandPlayer commandPlayer = new BukkitCommandPlayer(p);
-		commandHandle.tabComplete(commandPlayer, MessageHandler.getInstance().getLanguage(p), args,out);
+		commandHandle.tabComplete(commandPlayer, args,out);
 		return out;
 	}
 
@@ -217,7 +217,7 @@ public class Particles implements TabExecutor, Listener {
 		}
 		Player p = (Player) sender;
 		BukkitCommandPlayer commandPlayer = new BukkitCommandPlayer(p);
-		if (!commandHandle.execute(commandPlayer, MessageHandler.getInstance().getLanguage(p), args)) {
+		if (!commandHandle.execute(commandPlayer, args)) {
 			Main.send(p, "particles_wrongCommand");
 		}
 		return true;

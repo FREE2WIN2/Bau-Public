@@ -157,7 +157,7 @@ public class Buy implements TabExecutor {
         Player p = (Player) sender;
         List<String> ret = new ArrayList<>();
         BukkitCommandPlayer commandPlayer = new BukkitCommandPlayer(p);
-        commandHandel.tabComplete(commandPlayer, MessageHandler.getInstance().getLanguage(p), args, ret);
+        commandHandel.tabComplete(commandPlayer, args, ret);
         return ret;
     }
 
@@ -165,6 +165,6 @@ public class Buy implements TabExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String string, String[] args) {
         Player p = (Player) sender;
         BukkitCommandPlayer commandPlayer = new BukkitCommandPlayer(p);
-        return commandHandel.execute(commandPlayer, MessageHandler.getInstance().getLanguage(p), args);
+        return commandHandel.execute(commandPlayer, args);
     }
 }

@@ -51,7 +51,7 @@ public class PlotCommand implements TabExecutor {
         Player p = (Player) sender;
         List<String> ret = new ArrayList<>();
         BukkitCommandPlayer commandPlayer = new BukkitCommandPlayer(p);
-        commandHandle.tabComplete(commandPlayer, MessageHandler.getInstance().getLanguage(p), args, ret);
+        commandHandle.tabComplete(commandPlayer, args, ret);
         return ret;
     }
 
@@ -59,6 +59,6 @@ public class PlotCommand implements TabExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String string, String[] args) {
         Player p = (Player) sender;
         BukkitCommandPlayer commandPlayer = new BukkitCommandPlayer(p);
-        return commandHandle.execute(commandPlayer, MessageHandler.getInstance().getLanguage(p), args);
+        return commandHandle.execute(commandPlayer, args);
     }
 }

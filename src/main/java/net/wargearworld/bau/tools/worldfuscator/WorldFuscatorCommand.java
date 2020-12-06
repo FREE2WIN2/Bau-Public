@@ -62,7 +62,7 @@ public class WorldFuscatorCommand implements TabExecutor {
         }
 
         BukkitCommandPlayer commandPlayer = new BukkitCommandPlayer((Player) commandSender);
-        return commandHandel.execute(commandPlayer, MessageHandler.getInstance().getLanguage(((Player) commandSender).getUniqueId()), strings);
+        return commandHandel.execute(commandPlayer, strings);
     }
 
     @Override
@@ -72,7 +72,7 @@ public class WorldFuscatorCommand implements TabExecutor {
         }
         List<String> ret = new ArrayList<>();
         BukkitCommandPlayer commandPlayer = new BukkitCommandPlayer((Player) commandSender);
-        commandHandel.tabComplete(commandPlayer, MessageHandler.getInstance().getLanguage(((Player) commandSender).getUniqueId()), strings, ret);
+        commandHandel.tabComplete(commandPlayer, strings, ret);
         return ret;
 
     }
