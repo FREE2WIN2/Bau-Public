@@ -2,7 +2,7 @@ package net.wargearworld.bau.utils;
 
 
 import net.wargearworld.command_manager.ArgumentList;
-import net.wargearworld.commandframework.player.BukkitCommandPlayer;
+import net.wargearworld.command_manager.player.BukkitCommandPlayer;
 import org.bukkit.entity.Player;
 
 public class CommandUtil {

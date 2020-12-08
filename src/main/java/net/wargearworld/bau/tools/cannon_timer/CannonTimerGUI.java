@@ -96,6 +96,8 @@ public class CannonTimerGUI {
 
                 Item increaseTick = getHeadItem(p, CustomHeadValues.ARROW_UP.getValue(), "cannonTimer_gui_increaseTick").setExecutor(s -> {
                     ItemStack tickIs = s.getClickedInventory().getItem(s.getClickedIndex() + 9);
+                    if(cannonTimerBlock == null || tickIs ==  null)
+                        return;
                     Integer newAmount = cannonTimerBlock.increaseTick(tickIs.getAmount(), s.getClickType());
                     if (newAmount == null)
                         return;

@@ -15,7 +15,7 @@ import net.wargearworld.bau.world.LocalWorldTemplate;
 import net.wargearworld.bau.world.gui.WorldGUI;
 import net.wargearworld.command_manager.ArgumentList;
 import net.wargearworld.command_manager.CommandHandel;
-import net.wargearworld.commandframework.player.BukkitCommandPlayer;
+import net.wargearworld.command_manager.player.BukkitCommandPlayer;
 import net.wargearworld.db.EntityManagerExecuter;
 import net.wargearworld.db.model.enums.TransactionType;
 import net.wargearworld.economy.core.account.Account;

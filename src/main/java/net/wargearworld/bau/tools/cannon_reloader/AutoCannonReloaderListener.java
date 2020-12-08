@@ -13,7 +13,7 @@ import net.wargearworld.command_manager.CommandHandel;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.player.BauPlayer;
-import net.wargearworld.commandframework.player.BukkitCommandPlayer;
+import net.wargearworld.command_manager.player.BukkitCommandPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;

@@ -18,7 +18,7 @@ import net.wargearworld.bau.world.plot.Plot;
 import net.wargearworld.bau.worldedit.WorldGuardHandler;
 import net.wargearworld.command_manager.CommandHandel;
 import net.wargearworld.command_manager.player.CommandPlayer;
-import net.wargearworld.commandframework.player.BukkitCommandPlayer;
+import net.wargearworld.command_manager.player.BukkitCommandPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -142,7 +142,7 @@ public class GUI implements TabExecutor, Listener {
         Item waterRemoverActivate = new DefaultItem(Material.WATER_BUCKET, msgHandler.getString(p, "gui_wr_activate"), createCommandExecutor("wr"));
         Item waterRemoverDeactivate = new DefaultItem(Material.BUCKET, msgHandler.getString(p, "gui_wr_deactivate"), createCommandExecutor("wr"));
 
-        Item heads = new HeadItem(new CustomHead(CustomHeadValues.KING.getValue()), createCommandExecutor("heads")).setName(msgHandler.getString(p, "gui_head"));
+        Item heads = new HeadItem(new CustomHead(CustomHeadValues.KING.getValue()), createCommandExecutor("head")).setName(msgHandler.getString(p, "gui_head"));
 
         Item guiItem = new DefaultItem(Material.NETHER_STAR, "§6GUI", 1).setCancelled(false);
         Item particleGUI = new DefaultItem(Material.MELON_SEEDS, msgHandler.getString(p, "gui_particles"), s -> {
@@ -258,6 +258,4 @@ public class GUI implements TabExecutor, Listener {
             s.getPlayer().performCommand(command);
         };
     }
-
-
 }

@@ -12,7 +12,7 @@ import net.wargearworld.bau.world.bauworld.BauWorld;
 import net.wargearworld.bau.world.bauworld.PlayerWorld;
 import net.wargearworld.bau.world.WorldManager;
 import net.wargearworld.command_manager.CommandHandel;
-import net.wargearworld.commandframework.player.BukkitCommandPlayer;
+import net.wargearworld.command_manager.player.BukkitCommandPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;

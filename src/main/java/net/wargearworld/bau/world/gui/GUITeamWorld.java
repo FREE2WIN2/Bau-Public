@@ -67,9 +67,10 @@ public class GUITeamWorld implements IGUIWorld{
         bannerMeta.addPattern(new Pattern(DyeColor.GRAY, PatternType.RHOMBUS_MIDDLE));
         bannerMeta.addPattern(new Pattern(DyeColor.GRAY, PatternType.CURLY_BORDER));
         bannerMeta.addPattern(new Pattern(DyeColor.YELLOW, PatternType.GLOBE));
-        bannerMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS,ItemFlag.HIDE_ATTRIBUTES,ItemFlag.HIDE_UNBREAKABLE);
+        bannerMeta.addItemFlags(ItemFlag.values());
+        bannerMeta.setDisplayName(MessageHandler.getInstance().getString(p,"world_gui_item_owner", "Team: " + team.getName()));
         bannerItem.setItemMeta(bannerMeta);
-        Item item = new DefaultItem(bannerItem,s->{}).setName(MessageHandler.getInstance().getString(p,"world_gui_item_owner", "Team: " + team.getName()));
+        Item item = new DefaultItem(bannerItem,s->{});
         return item;
     }
 

@@ -18,7 +18,7 @@ import net.wargearworld.bau.world.plot.PlotType;
 import net.wargearworld.command_manager.ArgumentList;
 import net.wargearworld.command_manager.CommandHandel;
 import net.wargearworld.command_manager.arguments.StringArgument;
-import net.wargearworld.commandframework.player.BukkitCommandPlayer;
+import net.wargearworld.command_manager.player.BukkitCommandPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;

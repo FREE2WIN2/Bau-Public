@@ -7,7 +7,7 @@ import net.wargearworld.bau.world.WorldManager;
 import net.wargearworld.command_manager.ArgumentList;
 import net.wargearworld.command_manager.CommandHandel;
 import net.wargearworld.command_manager.player.CommandPlayer;
-import net.wargearworld.commandframework.player.BukkitCommandPlayer;
+import net.wargearworld.command_manager.player.BukkitCommandPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;

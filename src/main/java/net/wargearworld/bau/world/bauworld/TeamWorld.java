@@ -123,7 +123,7 @@ public class TeamWorld extends BauWorld {
     public IGUIWorld getGUIWorld() {
         if(iGuiWorld == null)
             iGuiWorld = new GUITeamWorld(team);
-        return null;
+        return iGuiWorld;
     }
 
     @Override

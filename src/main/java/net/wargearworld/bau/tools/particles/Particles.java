@@ -8,7 +8,7 @@ import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.player.DefaultPlayer;
 import net.wargearworld.command_manager.arguments.EnumArgument;
-import net.wargearworld.commandframework.player.BukkitCommandPlayer;
+import net.wargearworld.command_manager.player.BukkitCommandPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.command.Command;

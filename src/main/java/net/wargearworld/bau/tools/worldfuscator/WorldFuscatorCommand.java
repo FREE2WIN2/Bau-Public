@@ -8,7 +8,7 @@ import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.scoreboard.ScoreBoardBau;
 import net.wargearworld.bau.utils.PacketMapChunk;
 import net.wargearworld.bau.world.plot.Plot;
-import net.wargearworld.commandframework.player.BukkitCommandPlayer;
+import net.wargearworld.command_manager.player.BukkitCommandPlayer;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.command.Command;

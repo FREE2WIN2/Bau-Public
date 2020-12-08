@@ -9,7 +9,7 @@ import net.wargearworld.bau.scoreboard.ScoreBoardBau;
 import net.wargearworld.bau.world.WorldManager;
 import net.wargearworld.bau.world.plot.Plot;
 
-import net.wargearworld.commandframework.player.BukkitCommandPlayer;
+import net.wargearworld.command_manager.player.BukkitCommandPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;

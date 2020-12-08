@@ -12,6 +12,7 @@ import com.sk89q.worldguard.protection.regions.RegionQuery;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.scoreboard.ScoreBoardBau;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -23,23 +24,37 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class TNT implements CommandExecutor, Listener {
     public TNT(JavaPlugin plugin) {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
         plugin.getCommand("tnt").setExecutor(this);
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.NORMAL)
     public void onTntExplosion(EntityExplodeEvent event) {
-
+        if (event.blockList().isEmpty()) {
+            return;
+        }
         Entity e = event.getEntity();
         Location loc = BukkitAdapter.adapt(e.getLocation());
         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
         RegionQuery query = container.createQuery();
         if (!query.testState(loc, null, Main.TntExplosion)) {
             event.blockList().clear();
-        }
+        } else {
 
+            List<Block> blockList = new ArrayList<>(event.blockList());
+            for (Block block : blockList) {
+                if (!query.testState(BukkitAdapter.adapt(block.getLocation()), null, Main.TntExplosion)) {
+                    event.blockList().remove(block);
+                }
+            }
+
+
+        }
     }
 
     @Override
@@ -57,8 +72,8 @@ public class TNT implements CommandExecutor, Listener {
                 rg.setFlag(Main.TntExplosion, StateFlag.State.DENY);
                 for (Player a : p.getWorld().getPlayers()) {
                     ScoreBoardBau.cmdUpdate(a);
-                    a.sendTitle(MessageHandler.getInstance().getString(p,"tntDeactivatedTitle"),
-                            MessageHandler.getInstance().getString(p,"tntTitleSmall").replace("%r", rgID.replace("plot", "")), 1,
+                    a.sendTitle(MessageHandler.getInstance().getString(p, "tntDeactivatedTitle"),
+                            MessageHandler.getInstance().getString(p, "tntTitleSmall").replace("%r", rgID.replace("plot", "")), 1,
                             1, 60);
                 }
                 p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "tntDeniedMessage"));
@@ -66,8 +81,8 @@ public class TNT implements CommandExecutor, Listener {
                 rg.setFlag(Main.TntExplosion, StateFlag.State.ALLOW);
                 for (Player a : p.getWorld().getPlayers()) {
                     ScoreBoardBau.cmdUpdate(a);
-                    a.sendTitle(MessageHandler.getInstance().getString(p,"tntActivatedTitle"),
-                            MessageHandler.getInstance().getString(p,"tntTitleSmall").replace("%r", rgID.replace("plot", "")), 1,
+                    a.sendTitle(MessageHandler.getInstance().getString(p, "tntActivatedTitle"),
+                            MessageHandler.getInstance().getString(p, "tntTitleSmall").replace("%r", rgID.replace("plot", "")), 1,
                             1, 60);
                 }
                 p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "tntAllowedMessage"));

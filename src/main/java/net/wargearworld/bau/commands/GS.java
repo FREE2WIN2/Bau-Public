@@ -19,7 +19,7 @@ import net.wargearworld.command_manager.CommandHandel;
 import net.wargearworld.command_manager.CommandNode;
 import net.wargearworld.command_manager.ParseState;
 import net.wargearworld.command_manager.arguments.DynamicListGetter;
-import net.wargearworld.commandframework.player.BukkitCommandPlayer;
+import net.wargearworld.command_manager.player.BukkitCommandPlayer;
 import net.wargearworld.db.EntityManagerExecuter;
 import net.wargearworld.db.model.World;
 import net.wargearworld.db.model.WorldMember;
