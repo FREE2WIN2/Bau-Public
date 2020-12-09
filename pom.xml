@@ -79,7 +79,7 @@
             <groupId>net.wargearworld</groupId>
             <artifactId>CommandFramework-Bukkit</artifactId>
             <version>1.2.1-SNAPSHOT</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Test dependencies -->

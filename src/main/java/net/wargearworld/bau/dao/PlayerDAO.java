@@ -24,8 +24,8 @@ public class PlayerDAO {
             /*Get All WorldTemplates*/
 
             CriteriaBuilder cb = em.getCriteriaBuilder();
-            CriteriaQuery<LocalWorldTemplate> cq = cb.createQuery(LocalWorldTemplate.class);
-            cq.from(LocalWorldTemplate.class);
+            CriteriaQuery<WorldTemplate> cq = cb.createQuery(WorldTemplate.class);
+            cq.from(WorldTemplate.class);
             em.createQuery(cq).getResultList().forEach(s -> {
                 LocalWorldTemplate localWorldTemplate = LocalWorldTemplate.getTemplate(s.getName());
                 if (!out.containsKey(localWorldTemplate)) {

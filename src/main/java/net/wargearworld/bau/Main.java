@@ -6,6 +6,7 @@ import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import net.wargearworld.GUI_API.GUI_API;
+import net.wargearworld.bau.advancement.AdvManager;
 import net.wargearworld.bau.commands.*;
 import net.wargearworld.bau.communication.DatabaseCommunication;
 import net.wargearworld.bau.config.BauConfig;
@@ -67,12 +68,13 @@ public class Main extends JavaPlugin {
         WorldManager.startCheckForTempAddRemoves();
         WorldManager.checkForWorldsToUnload();
         new CompassBar();
-        new GUI_API(this, MessageHandler.getInstance());
+//        new GUI_API(this, MessageHandler.getInstance());
         new WorldGUI(this);
         DefaultTestBlock.generateDefaultTestBlocks();
         DatabaseCommunication.startRecieve();
         integration =  new WorldFuscatorIntegration(this);
         integration.start();
+        AdvManager.start(this);
     }
 
     private void registerListener() {

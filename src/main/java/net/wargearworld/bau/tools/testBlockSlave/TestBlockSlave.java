@@ -10,6 +10,7 @@ import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
+import net.wargearworld.bau.advancement.event.PlayerSaveTestBlockEvent;
 import net.wargearworld.bau.config.BauConfig;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.tools.testBlockSlave.testBlock.*;
@@ -386,6 +387,7 @@ public class TestBlockSlave {
         if (addNewCustomTestBlock(name)) {
             /* Message to player */
             msgHandler.send(ownerPlayer, "tbs_saveOwnTB_success", "" + newTBToSave.getTier(), name);
+            Bukkit.getPluginManager().callEvent(new PlayerSaveTestBlockEvent(Bukkit.getPlayer(owner)));
         }
     }
 

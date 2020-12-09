@@ -8,6 +8,7 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
+import net.wargearworld.bau.advancement.event.PlayerUseCannonReloaderEvent;
 import net.wargearworld.bau.config.BauConfig;
 import net.wargearworld.bau.utils.Loc;
 import org.bukkit.Bukkit;
@@ -72,7 +73,10 @@ public class AutoCannonReloader {
             autoCannonReloaderBlock.spawn(world);
         }
         Main.send(p, true, MessageHandler.getInstance().getString(p, "cannonReloader_prefix"), "cannonReloader_pasteRecord");
+        Bukkit.getPluginManager().callEvent(new PlayerUseCannonReloaderEvent(p));
         antispam(uuid);
+
+
     }
 
     private void antispam(UUID uuid) {

@@ -96,8 +96,6 @@ public class CannonTimerGUI {
 
                 Item increaseTick = getHeadItem(p, CustomHeadValues.ARROW_UP.getValue(), "cannonTimer_gui_increaseTick").setExecutor(s -> {
                     ItemStack tickIs = s.getClickedInventory().getItem(s.getClickedIndex() + 9);
-                    if(cannonTimerBlock == null || tickIs ==  null)
-                        return;
                     Integer newAmount = cannonTimerBlock.increaseTick(tickIs.getAmount(), s.getClickType());
                     if (newAmount == null)
                         return;
@@ -205,7 +203,9 @@ public class CannonTimerGUI {
             });
         }).addLore(msgHandler.getString(p, "cannonTimer_gui_settings_lore_zOffset", settings.getzOffset() + ""));
         Item setRandom = getRandomItem(p, settings).setExecutor(s -> {
-            settings.setVelocity(!settings.isVelocity());
+            System.out.println("clicked");
+            boolean newVelocity = !settings.isVelocity();
+            settings.setVelocity(newVelocity);
             openGloalSettings(p, cannonTimerBlock);
         });
 
@@ -237,16 +237,15 @@ public class CannonTimerGUI {
                 openLocalSettings(p, cannonTimerTick, cannonTimerBlock, tick);
             });
         }).addLore(List.of(msgHandler.getString(p, "cannonTimer_gui_settings_lore_xOffset", settings.getxOffset() + "")));
-        ;
         Item setZOffset = getHeadItem(p, CustomHeadValues.Z.getValue(), "cannonTimer_settings_zOffset").setExecutor(s -> {
             openOffset(p, finalSettings, "Z", list -> {
                 openLocalSettings(p, cannonTimerTick, cannonTimerBlock, tick);
             });
         }).addLore(List.of(msgHandler.getString(p, "cannonTimer_gui_settings_lore_zOffset", settings.getzOffset() + "")));
-        ;
         Item setRandom = getRandomItem(p, finalSettings).setExecutor(s -> {
-            finalSettings.setVelocity(!finalSettings.isVelocity());
-            openLocalSettings(p, cannonTimerTick, cannonTimerBlock, tick);
+            boolean newVelocity = !finalSettings.isVelocity();
+            finalSettings.setVelocity(newVelocity);
+            Bukkit.getScheduler().runTaskLater(Main.getPlugin(),()->  openLocalSettings(p, cannonTimerTick, cannonTimerBlock, tick),1);
         });
 
         chestGUI.setItem(1, setXOffset);

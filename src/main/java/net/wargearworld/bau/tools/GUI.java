@@ -104,10 +104,10 @@ public class GUI implements TabExecutor, Listener {
         Plot plot = WorldManager.get(p.getWorld()).getPlot(p.getLocation());
         ChestGUI gui = new ChestGUI(27, inventoryName);
         Executor<ArgumentList> tntExecutor = createCommandExecutor("tnt");
-        Item tntActiveItem = ItemBuilder.build(tntExecutor, Material.TNT, 1, ItemType.DEFAULT, msgHandler.getString(p, "tntAllowed"))
+        Item tntActiveItem = new DefaultItem(Material.TNT, msgHandler.getString(p, "tntAllowed"),tntExecutor)
                 .addEnchantment(Enchantment.PROTECTION_EXPLOSIONS, 1).addItemFLags(ItemFlag.HIDE_ENCHANTS);
 
-        Item tntNotActiveItem = ItemBuilder.build(tntExecutor, Material.TNT, 1, ItemType.DEFAULT, msgHandler.getString(p, "tntDenied"));
+        Item tntNotActiveItem = new DefaultItem(Material.TNT, msgHandler.getString(p, "tntDenied"),tntExecutor);
         Executor<ArgumentList> stoplag = createCommandExecutor("sl");
 
 

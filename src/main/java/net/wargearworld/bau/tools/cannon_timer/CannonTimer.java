@@ -6,6 +6,7 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
+import net.wargearworld.bau.advancement.event.PlayerUseCannonTimerEvent;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.utils.Loc;
 import net.wargearworld.bau.utils.Scheduler;
@@ -56,6 +57,7 @@ public class CannonTimer implements Serializable, Cloneable {
 
 
         MessageHandler.getInstance().send(p, "cannonTimer_start");
+        Bukkit.getPluginManager().callEvent(new PlayerUseCannonTimerEvent(p));
         Scheduler scheduler = new Scheduler();
         scheduler.setX(0); // X = variable -> ticktime
         scheduler.setTask(Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), () -> {

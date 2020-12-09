@@ -4,7 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import net.wargearworld.bau.advancement.event.PlayerEditTestBlockEvent;
+import net.wargearworld.bau.advancement.event.PlayerUseCannonTimerEvent;
 import net.wargearworld.bau.player.BauPlayer;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -99,6 +102,7 @@ public class TestBlockEditorCore implements Listener {
 		getEditor(p).removeModule(getEditor(p).getPos());
 		if (type != null) {
 			getEditor(p).addModule(type);
+			Bukkit.getPluginManager().callEvent(new PlayerEditTestBlockEvent(p));
 		}
 		getEditor(p).openMainInv();
 

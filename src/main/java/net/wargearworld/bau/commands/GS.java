@@ -2,6 +2,7 @@ package net.wargearworld.bau.commands;
 
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
+import net.wargearworld.bau.advancement.event.PlayerSwitchTemplateEvent;
 import net.wargearworld.bau.dao.DatabaseDAO;
 import net.wargearworld.bau.dao.PlayerDAO;
 import net.wargearworld.bau.dao.WorldDAO;
@@ -23,6 +24,7 @@ import net.wargearworld.command_manager.player.BukkitCommandPlayer;
 import net.wargearworld.db.EntityManagerExecuter;
 import net.wargearworld.db.model.World;
 import net.wargearworld.db.model.WorldMember;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -260,6 +262,7 @@ public class GS implements TabExecutor {
         String templateName = s.getString("template");
         if (argsLength == 3 && p.getUniqueId().toString().equals(s.getString("UUID2"))) {
             Main.send(p, "gs_newTemplateGenerating", templateName);
+            Bukkit.getPluginManager().callEvent(new PlayerSwitchTemplateEvent(p));
             BauWorld bauWorld = WorldManager.get(p.getWorld());
             bauWorld.newWorld();
             bauWorld.setTemplate(s.getString("template"));

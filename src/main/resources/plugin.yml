@@ -4,6 +4,7 @@ author: FREE2WIN
 main: net.wargearworld.bau.Main
 api-version: 1.15
 depend: [WorldEdit, WorldGuard, TheDependencyPlugin, ProtocolLib]
+softdepend: [SpigotCore]
 description: Bauplugin
 commands:
    stats:
