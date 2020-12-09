@@ -38,7 +38,7 @@ public class SpawnEvent implements Listener {
 			return;
 		}
 			if (!(etype == EntityType.PLAYER || etype == EntityType.PRIMED_TNT || etype == EntityType.FALLING_BLOCK
-					|| etype == EntityType.ARROW || etype == EntityType.TRIDENT || etype == EntityType.FIREWORK)) {
+					|| etype == EntityType.ARROW || etype == EntityType.TRIDENT || etype == EntityType.FIREWORK || etype == EntityType.FIREBALL)) {
 				e.setCancelled(true);
 			}
 		if (e.getLocation().getWorld().getName().contains("test")) {
