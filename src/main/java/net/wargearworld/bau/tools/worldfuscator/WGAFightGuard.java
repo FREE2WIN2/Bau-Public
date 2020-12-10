@@ -40,6 +40,8 @@ public class WGAFightGuard implements WorldFuscatorGuard {
         String maxRgID = maxRegionIds.get(0);
 
         BauWorld bauWorld = WorldManager.get(world);
+        if(bauWorld == null)
+            return true;
         Plot minPlot = bauWorld.getPlot(minRgID);
         Plot maxPlot = bauWorld.getPlot(maxRgID);
         if (minPlot == null && maxPlot == null) {
@@ -58,6 +60,10 @@ public class WGAFightGuard implements WorldFuscatorGuard {
     public boolean hasRights(Player player, int x, int y, int z, World world) {
         BlockVector3 vector3 = BlockVector3.at(x, y, z);
         RegionManager regionManager = getRegionManager(world);
+        List<String> regionIds = regionManager.getApplicableRegionsIDs(vector3);
+        if(regionIds == null || regionIds.isEmpty()){
+            return true;
+        }
         String rgID = regionManager.getApplicableRegionsIDs(vector3).get(0);
 
         BauWorld bauWorld = WorldManager.get(world);

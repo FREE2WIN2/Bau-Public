@@ -13,6 +13,6 @@ public class AdvEnter extends AdvTemplate {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        Bukkit.getScheduler().runTaskLater(Main.getPlugin(), () -> grantSingleCriterion(event.getPlayer()), 40);
+        Bukkit.getScheduler().runTaskLater(Main.getPlugin(), () -> grantSingleCriterion(event.getPlayer()), 20);
     }
 }

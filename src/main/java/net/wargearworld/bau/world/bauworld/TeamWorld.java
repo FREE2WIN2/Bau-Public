@@ -27,6 +27,7 @@ public class TeamWorld extends BauWorld {
         for (PlotPattern plotPattern : getTemplate().getPlots()) {
             plots.put(plotPattern.getID(), plotPattern.toPlot(this));
         }
+        addAllMembersToRegions();
     }
 
     @Override

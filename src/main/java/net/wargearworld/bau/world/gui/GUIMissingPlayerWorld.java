@@ -8,6 +8,7 @@ import net.wargearworld.bau.config.BauConfig;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.utils.CustomHeadValues;
 import net.wargearworld.db.EntityManagerExecuter;
+import net.wargearworld.economy.core.utils.EconomyFormatter;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
@@ -24,7 +25,7 @@ public class GUIMissingPlayerWorld implements IGUIWorld{
         Double price = amountOfWorlds * BauConfig.getInstance().getWorldprice();
        Item item = new HeadItem(new CustomHead(CustomHeadValues.PLUS.getValue()),s->{
             p.performCommand("buy world");
-        }).addItemFLags(ItemFlag.values()).addLore(MessageHandler.getInstance().getString(p,"world_gui_item_addworld_lore",price + "")).setName(MessageHandler.getInstance().getString(p,"world_gui_item_addworld"));
+        }).addItemFLags(ItemFlag.values()).addLore(MessageHandler.getInstance().getString(p,"world_gui_item_addworld_lore",price + "§6" + EconomyFormatter.getInstance().getCurrencySymbol())).setName(MessageHandler.getInstance().getString(p,"world_gui_item_addworld"));
        return item;
     }
 

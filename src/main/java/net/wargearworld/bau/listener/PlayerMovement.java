@@ -5,6 +5,7 @@ import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.scoreboard.ScoreBoardBau;
 import net.wargearworld.bau.world.bauworld.BauWorld;
 import net.wargearworld.bau.world.WorldManager;
+import net.wargearworld.bau.world.bauworld.TeamWorld;
 import net.wargearworld.bau.worldedit.WorldGuardHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -71,7 +72,15 @@ public class PlayerMovement implements Listener {
         if (!world.isAuthorized(p.getUniqueId())) {
             // wenn er nicht owner und nicht Member ist
             e.setCancelled(true);
+            if(world instanceof TeamWorld){
+                if(((TeamWorld)world).getTeam().isNewcomer(p.getUniqueId())){
+                    p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "team_world_newcomer"));
+                    return;
+                }
+            }
             p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "noPlotMember"));
+
+            return;
         }
         BauWorld from = WorldManager.get(e.getFrom().getWorld());
         if (from != null) {

@@ -245,7 +245,6 @@ public class WorldGUI implements Listener {
         while (iterator.hasNext() && itemIterator.hasNext()) {
             Item item = itemIterator.next();
             if (item == null) {
-                iterator.next();
                 continue;
             }
             gui.setItem(size - (9 - iterator.next()), item);

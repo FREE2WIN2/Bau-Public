@@ -80,7 +80,6 @@ public class BauPlayer {
         try {
             if (!configFile.exists()) {
                 configFile.getParentFile().mkdirs();
-                configFile.createNewFile();
                 Files.copy(DefaultPlayer.configFile.toPath(), configFile.toPath());
             }
             config.load(configFile);

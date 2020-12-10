@@ -2,7 +2,9 @@ package net.wargearworld.bau.tools;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
 import net.wargearworld.bau.Main;
@@ -19,6 +21,10 @@ public class CompassBar {
 			@Override
 			public void run() {
 				for (Player p : Bukkit.getOnlinePlayers()) {
+					ItemStack itemInHand = p.getEquipment().getItemInMainHand();
+					if(itemInHand!= null &&itemInHand.getType() == Material.DEBUG_STICK){
+						return;
+					}
 					Location loc = p.getLocation();
 					Face face = Face.fromYaw(loc.getYaw());
 					MessageHandler.getInstance().sendHotBar(p, "compass_bar", loc.getBlockX() + "",

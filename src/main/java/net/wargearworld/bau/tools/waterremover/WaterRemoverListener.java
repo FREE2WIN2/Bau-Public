@@ -1,6 +1,7 @@
 package net.wargearworld.bau.tools.waterremover;
 
 import com.sk89q.worldguard.protection.flags.StateFlag;
+import net.wargearworld.bau.world.bauworld.BauWorld;
 import net.wargearworld.command_manager.CommandHandel;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
@@ -81,7 +82,11 @@ public class WaterRemoverListener implements Listener, TabExecutor {
             return;
         }
         Location loc = event.getLocation();
-        Plot plot = WorldManager.get(loc.getWorld()).getPlot(loc);
+        BauWorld bauWorld = WorldManager.get(loc.getWorld());
+        if(bauWorld == null)
+            return;
+        Plot plot = bauWorld.getPlot(loc);
+        if(plot == null) return;
         WaterRemover waterRemover = plot.getWaterRemover();
         if (waterRemover != null) {
             waterRemover.handleExplode(event);

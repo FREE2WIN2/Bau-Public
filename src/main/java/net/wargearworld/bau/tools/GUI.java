@@ -180,15 +180,19 @@ public class GUI implements TabExecutor, Listener {
         MessageHandler msgHandler = MessageHandler.getInstance();
         String inventoryName = MessageHandler.getInstance().getString(p, "GUI_title", 1 + "");
         BauWorld bauWorld = WorldManager.get(p.getWorld());
+        if(bauWorld == null)
+            return;
 
         ChestGUI gui = new ChestGUI(27, inventoryName);
 
-        HeadItem playerHead = new HeadItem(p.getUniqueId(), msgHandler.getString(p, "guiMember").replace("%r", bauWorld.getName()), 1);
+        HeadItem playerHead = new HeadItem(p.getUniqueId(), msgHandler.getString(p, "guiMember",bauWorld.getName()), 1);
         playerHead.setExecutor(s -> {
             s.getPlayer().performCommand("gs info");
             s.getPlayer().closeInventory();
         });
         String rgID = WorldGuardHandler.getPlotId(p.getLocation());
+        if(rgID == null)
+            return;
         Item reset = ItemBuilder.build(s -> {
             Player player = s.getPlayer();
             player.closeInventory();

@@ -126,6 +126,9 @@ public class Team {
     }
 
     public void update() {
+        leaders = new HashSet<>();
+        members = new HashSet<>();
+        newcomers = new HashSet<>();
         EntityManagerExecuter.run(em -> {
             WargearTeam wargearTeam = em.find(WargearTeam.class, this.id);
             this.abbreviation = wargearTeam.getAbbreviation();

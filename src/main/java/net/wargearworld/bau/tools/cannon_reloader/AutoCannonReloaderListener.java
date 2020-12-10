@@ -94,7 +94,7 @@ public class AutoCannonReloaderListener implements Listener, TabExecutor {
                         autoCannonReloader.save(new Location(world, block.getX(), block.getY(), block.getZ()), p);
                     }
                 }
-                p.sendMessage(MessageHandler.getInstance().getString(p, "cannonreloader_regionSaved", autoCannonReloader.getSize() + ""));
+                Bukkit.getScheduler().runTask(Main.getPlugin(),()->{p.sendMessage(MessageHandler.getInstance().getString(p, "cannonreloader_regionSaved", autoCannonReloader.getSize() + ""));});
             });
         } catch (IncompleteRegionException e) {
             e.printStackTrace();

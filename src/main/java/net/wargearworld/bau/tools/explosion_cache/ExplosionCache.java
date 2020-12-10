@@ -41,8 +41,10 @@ public class ExplosionCache {
         if(plot == null)
             return;
         int z = plot.getTeleportPoint().getBlockZ();
-        boolean primeZSmallerThanMiddleZ = tnts.get(event.getEntity().getUniqueId());
-        boolean explosionZSmallerThanMiddleZ = event.getEntity().getLocation().getBlockZ() < z;
+        Boolean primeZSmallerThanMiddleZ = tnts.get(event.getEntity().getUniqueId());
+        Boolean explosionZSmallerThanMiddleZ = event.getEntity().getLocation().getBlockZ() < z;
+        if(primeZSmallerThanMiddleZ == null)
+            return;
 
         boolean sameTeam = !explosionZSmallerThanMiddleZ ^ primeZSmallerThanMiddleZ;
         if (sameTeam) {
@@ -99,7 +101,13 @@ public class ExplosionCache {
 
     public void onEntityPrime(EntitySpawnEvent event) {
         Location loc = event.getLocation();
-        int z = WorldManager.get(loc.getWorld()).getPlot(loc).getTeleportPoint().getBlockZ();
+        BauWorld bauWorld = WorldManager.get(loc.getWorld());
+        if(bauWorld == null)
+            return;
+        Plot plot = bauWorld.getPlot(loc);
+        if(plot == null)
+            return;
+        int z = plot.getTeleportPoint().getBlockZ();
         tnts.put(event.getEntity().getUniqueId(), loc.getZ() < z);
     }
 
