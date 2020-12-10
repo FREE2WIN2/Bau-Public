@@ -31,7 +31,13 @@ public class CustomTestBlock implements ITestBlock,Comparable<CustomTestBlock> {
 	}
 
 	public static CustomTestBlock fromDb(net.wargearworld.db.model.TestBlock block) {
-		CustomTestBlock tb = new CustomTestBlock(block.getOwner().getUuid(),block.getName(), block.getName(),Facing.valueOf(block.getDirection().name()), block.getTier(), block.getFavorite(),block.getId());
+		CustomTestBlock tb = new CustomTestBlock(block.getOwner().getUuid(),
+				block.getName() + ".schem",
+				block.getName(),
+				Facing.valueOf(block.getDirection().name()),
+				block.getTier(),
+				block.getFavorite(),
+				block.getId());
 		return tb;
 	}
 

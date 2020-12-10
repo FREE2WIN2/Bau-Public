@@ -217,11 +217,11 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 
 	private void chooseActionToCustomTB(Player p, ItemStack clicked) {
 		TestBlockSlave slave = BauPlayer.getBauPlayer(p).getTestBlockSlave();
-		ITestBlock tb = slave.getChooseTB().getTestBlock();
+		ChooseTestBlock chooseTB = slave.getChooseTB();
+		ITestBlock tb = chooseTB.getTestBlock();
 		String clickedName = clicked.getItemMeta().getDisplayName();
 		String south = MessageHandler.getInstance().getString(p, "facingSouth");
 		String north = MessageHandler.getInstance().getString(p, "facingNorth");
-		ChooseTestBlock chooseTB = slave.getChooseTB();
 
 		if (clicked.getType().equals(Material.BARRIER)) {
 			/* Delete */

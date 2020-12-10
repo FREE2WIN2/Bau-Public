@@ -75,7 +75,7 @@ public class TestBlockSlave {
             CriteriaBuilder cb = em.getCriteriaBuilder();
             CriteriaQuery cq = cb.createQuery(net.wargearworld.db.model.TestBlock.class);
             Root root = cq.from(net.wargearworld.db.model.TestBlock.class);
-            cq.where(cb.equal(root.get(TestBlock_.OWNER), dbPlayer), cb.equal(root.get(TestBlock_.TIER), tier));
+            cq.where(cb.equal(root.get(TestBlock_.owner), dbPlayer), cb.equal(root.get(TestBlock_.tier), tier));
 
             Query query = em.createQuery(cq);
             List<net.wargearworld.db.model.TestBlock> testBlocks = query.getResultList();
