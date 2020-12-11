@@ -88,7 +88,11 @@ public class WorldDAO {
             World world = em.find(World.class, playerWorld.getId());
             world.setTemplate(em.find(WorldTemplate.class, playerWorld.getTemplate().getId()));
             world.setName(playerWorld.getName());
-            em.merge(world);
+            try {
+                em.merge(world);
+            }catch(Exception exception){
+                exception.printStackTrace();
+            }
         });
     }
 
@@ -100,7 +104,11 @@ public class WorldDAO {
             WorldTemplate worldTemplate = em.find(WorldTemplate.class, teamWorld.getTemplate().getId());
             worldTemplate.getWargearTeams().add(wargearTeam);
             wargearTeam.setTemplate(worldTemplate);
-            em.merge(wargearTeam);
+            try {
+                em.merge(wargearTeam);
+            }catch(Exception exception){
+                exception.printStackTrace();
+            }
         });
 
         EntityManagerExecuter.run(em -> {
@@ -110,7 +118,11 @@ public class WorldDAO {
             WorldTemplate worldTemplate = em.find(WorldTemplate.class, teamWorld.getTemplate().getId());
             worldTemplate.getWargearTeams().add(wargearTeam);
             wargearTeam.setTemplate(worldTemplate);
-            em.merge(wargearTeam);
+            try {
+                em.merge(wargearTeam);
+            }catch(Exception exception){
+                exception.printStackTrace();
+            }
         });
     }
 
@@ -141,14 +153,22 @@ public class WorldDAO {
             for(World world:dbPlayer.getWorlds()){
                 if(world.getDefault()){
                     world.setDefault(false);
-                    em.merge(world);
+                    try {
+                        em.merge(world);
+                    }catch(Exception exception){
+                        exception.printStackTrace();
+                    }
                     break;
                 }
             }
             for(World world: dbPlayer.getWorlds()){
                 if(world.getName().equals(name)){
                     world.setDefault(true);
-                    em.merge(world);
+                    try {
+                        em.merge(world);
+                    }catch(Exception exception){
+                        exception.printStackTrace();
+                    }
                     break;
                 }
             }
@@ -165,7 +185,11 @@ public class WorldDAO {
                 World world = em.createQuery(cq).getSingleResult();
                 Icon icon = em.find(Icon.class,id);
                 world.setIcon(icon);
-                em.merge(world);
+                try {
+                    em.merge(world);
+                }catch(Exception exception){
+                    exception.printStackTrace();
+                }
             }catch(NoResultException ex){}
         });
     }

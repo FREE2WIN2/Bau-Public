@@ -213,11 +213,19 @@ public class PlayerWorld extends BauWorld {
 
                 net.wargearworld.db.model.World dbWorld = em.find(net.wargearworld.db.model.World.class, plotID);
                 WorldMember plotMember = dbWorld.getMember(memberBauPlayer.getDbPlayer());
-                dbWorld.removeMember(plotMember);
 
-                removeMemberFromAllRegions(plotMember.getMember().getUuid());
-                memberRemoved(plotMember.getMember().getUuid());
+                dbWorld.removeMember(plotMember);
+                plotMember.getMember().removePlotMember(plotMember);
+                try{
                 em.remove(plotMember);
+
+                }catch(Exception exception){
+                    Main.send(ownerPlayer, "error");
+                    return;
+                }
+                removeMemberFromAllRegions(member);
+
+                memberRemoved(member);
             });
 
             for(LocalWorldMember localWorldMember : localWorldMembers){
