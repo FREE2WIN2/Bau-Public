@@ -100,7 +100,10 @@ public class GS implements TabExecutor {
         }));
         Predicate<ArgumentList> owner = s -> {
             Player p = getPlayer(s);
-            return WorldManager.get(p.getWorld()).isOwner(p);
+            BauWorld bauWorld = WorldManager.get(p.getWorld());
+            if(bauWorld == null)
+                return false;
+            return bauWorld.isOwner(p);
         };
         Predicate<ArgumentList> authorised = s -> {
             return getWorld(s).isAuthorized(getPlayer(s).getUniqueId()) || getPlayer(s).hasPermission("moderator");

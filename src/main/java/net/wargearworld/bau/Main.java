@@ -176,7 +176,7 @@ public class Main extends JavaPlugin {
             // create a flag with the name "my-custom-flag", defaulting to true
             StateFlag flag = new StateFlag("TntExplosion", true);
             StateFlag stoplag = new StateFlag("stoplag", true);
-            StateFlag waterRemoverFlag = new StateFlag("waterremover", false);
+            StateFlag waterRemoverFlag = new StateFlag("waterremover", true);
             StateFlag worldfuscatorFlag = new StateFlag("worldfuscator", true);
             registry.register(flag);
             registry.register(stoplag);
