@@ -287,11 +287,11 @@ public class GS implements TabExecutor {
         if (team == null) {
             MessageHandler.getInstance().send(p, "no_team");
         } else {
-            if(team.isNewcomer(p.getUniqueId())){
+            if (team.isNewcomer(p.getUniqueId())) {
                 MessageHandler.getInstance().send(p, "team_newcomer");
-            }else{
-            BauWorld teamWorld = WorldManager.getTeamWorld(team);
-            teamWorld.spawn(p);
+            } else {
+                BauWorld teamWorld = WorldManager.getTeamWorld(team);
+                teamWorld.spawn(p);
             }
         }
     }
@@ -349,7 +349,12 @@ public class GS implements TabExecutor {
         if (defaultWorld || worldName == null) {
             worldName = PlayerDAO.getDefaultWorldName(ownerUUID);
         }
-        WorldManager.getPlayerWorld(worldName, ownerUUID).spawn(p);
+        BauWorld bauWorld = WorldManager.getPlayerWorld(worldName, ownerUUID);
+        if (bauWorld != null) {
+            bauWorld.spawn(p);
+        }else{
+            MessageHandler.getInstance().send(p,"error");
+        }
     }
 
     @Override

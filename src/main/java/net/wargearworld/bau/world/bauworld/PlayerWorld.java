@@ -167,9 +167,8 @@ public class PlayerWorld extends BauWorld {
                 }
                 dbWorld.addMember(plotMember);
                 em.persist(plotMember);
+            localWorldMembers.add(new LocalWorldMember(playerName,member.getUuid(),true));
             });
-
-
             addPlayerToAllRegions(uuidMember);
             if (to == null) {
                 log(WorldAction.ADD, uuidMember.toString(), playerName);
