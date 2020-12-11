@@ -19,6 +19,7 @@ import net.wargearworld.bau.world.LocalWorldTemplate;
 import net.wargearworld.bau.world.gui.IGUIWorld;
 import net.wargearworld.bau.world.gui.WorldGUI;
 import net.wargearworld.bau.world.plot.Plot;
+import net.wargearworld.bau.world.plot.PlotPattern;
 import net.wargearworld.bau.world.plot.PlotType;
 
 import org.bukkit.Bukkit;
@@ -117,7 +118,8 @@ public abstract class BauWorld {
     public abstract MethodResult add(String playerName, Date to);
 
     public void addPlayerToAllRegions(UUID uuidMember) {
-        for (ProtectedRegion region : regionManager.getRegions().values()) {
+        for (PlotPattern plotPattern : template.getPlots()) {
+            ProtectedRegion region = regionManager.getRegion(plotPattern.getID());
             DefaultDomain members = region.getMembers();
             members.addPlayer(uuidMember);
             region.setMembers(members);
@@ -130,7 +132,8 @@ public abstract class BauWorld {
     }
 
     public void removeMemberFromAllRegions(UUID uuidMember) {
-        for (ProtectedRegion region : regionManager.getRegions().values()) {
+        for (PlotPattern plotPattern : template.getPlots()) {
+            ProtectedRegion region = regionManager.getRegion(plotPattern.getID());
             DefaultDomain members = region.getMembers();
             members.removePlayer(uuidMember);
             region.setMembers(members);
