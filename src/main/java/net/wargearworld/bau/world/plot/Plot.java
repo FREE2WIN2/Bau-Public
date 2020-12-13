@@ -1,7 +1,10 @@
 package net.wargearworld.bau.world.plot;
 
 import com.sk89q.worldedit.math.BlockVector3;
+import net.wargearworld.bau.MessageHandler;
+import net.wargearworld.bau.scoreboard.ScoreBoardBau;
 import net.wargearworld.bau.tools.cannon_timer.CannonTimer;
+import net.wargearworld.bau.tools.explosion_cache.ExplosionCache;
 import net.wargearworld.bau.tools.waterremover.WaterRemover;
 import net.wargearworld.bau.tools.waterremover.WaterRemoverListener;
 import net.wargearworld.bau.tools.worldfuscator.WorldFuscatorIntegration;
@@ -26,8 +29,14 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.worldedit.Schematic;
 import net.wargearworld.bau.worldedit.WorldEditHandler;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public abstract class Plot {
 
@@ -43,6 +52,11 @@ public abstract class Plot {
     private Clipboard undo; //Undo from Reset
     private CannonTimer undoCannonTimer;
 
+    private int deactivatedExplosionCache = 0;
+    private BukkitTask bukkitTask;
+
+    ExplosionCache explosionCache;
+
     protected Plot(ProtectedRegion region, String id, Location middleNorth, Schematic ground, BauWorld bauWorld) {
         this.region = region;
         this.id = id;
@@ -53,6 +67,8 @@ public abstract class Plot {
         cannonTimer = deserializeCannonTimer(bauWorld);
         if (cannonTimer == null)
             cannonTimer = new CannonTimer();
+
+        explosionCache = new ExplosionCache();
     }
 
 
@@ -266,5 +282,54 @@ public abstract class Plot {
 
     public boolean isWaterRemoverActive() {
         return waterRemover != null;
+    }
+
+    public int getDeactivatedExplosionCache() {
+        return deactivatedExplosionCache;
+    }
+
+    public boolean isDeactivatedExplosionCache() {
+        return deactivatedExplosionCache != 0;
+    }
+
+    public void deactivateExplosionCache(int seconds, BauWorld bauWorld) {
+        deactivatedExplosionCache = seconds;
+        for (Player player : getPlayers(bauWorld)) {
+            ScoreBoardBau.cmdUpdate(player);
+            if (seconds == 0) {
+                MessageHandler.getInstance().send(player, "tnt_allowExplosion_deactivated");
+            }
+        }
+        if (seconds == 0)
+            return;
+        bukkitTask = Bukkit.getScheduler().runTaskTimer(Main.getPlugin(), () -> {
+            deactivatedExplosionCache--;
+            Collection<Player> players = getPlayers(bauWorld);
+            for (Player player : players) {
+                ScoreBoardBau.cmdUpdate(player);
+            }
+            if (deactivatedExplosionCache == 0) {
+                bukkitTask.cancel();
+                bukkitTask = null;
+                for (Player player : players) {
+                    MessageHandler.getInstance().send(player, "tnt_allowExplosion_deactivated");
+                }
+            }
+        }, 20, 20);
+    }
+
+    public ExplosionCache getExplosionCache() {
+        return explosionCache;
+    }
+
+
+    public Collection<Player> getPlayers(BauWorld bauWorld) {
+        List<Player> out = new ArrayList<>();
+        for (Player p : bauWorld.getWorld().getPlayers()) {
+            if (bauWorld.getPlot(p.getLocation()).equals(this)) {
+                out.add(p);
+            }
+        }
+        return out;
     }
 }

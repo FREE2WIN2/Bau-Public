@@ -1,4 +1,4 @@
-package net.wargearworld.bau.tools.testBlockSlave.testBlockEditor;
+package net.wargearworld.bau.tools.testBlock.testBlockEditor;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

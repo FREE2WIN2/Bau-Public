@@ -1,10 +1,10 @@
-package net.wargearworld.bau.tools.testBlockSlave;
+package net.wargearworld.bau.tools.testBlock;
 
-import net.wargearworld.bau.tools.testBlockSlave.testBlock.DefaultTestBlock;
-import net.wargearworld.bau.tools.testBlockSlave.testBlock.Facing;
-import net.wargearworld.bau.tools.testBlockSlave.testBlock.ITestBlock;
-import net.wargearworld.bau.tools.testBlockSlave.testBlock.TestBlockType;
-import net.wargearworld.bau.tools.testBlockSlave.testBlock.Type;
+import net.wargearworld.bau.tools.testBlock.testBlock.DefaultTestBlock;
+import net.wargearworld.bau.tools.testBlock.testBlock.Facing;
+import net.wargearworld.bau.tools.testBlock.testBlock.ITestBlock;
+import net.wargearworld.bau.tools.testBlock.testBlock.TestBlockType;
+import net.wargearworld.bau.tools.testBlock.testBlock.Type;
 
 public class ChooseTestBlock {
 	private ITestBlock block;

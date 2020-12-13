@@ -1,115 +1,68 @@
 package net.wargearworld.bau.tools.explosion_cache;
 
-import com.sk89q.worldguard.protection.flags.StateFlag;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
-import net.wargearworld.bau.world.bauworld.BauWorld;
+import net.wargearworld.bau.tools.TNT;
 import net.wargearworld.bau.world.WorldManager;
+import net.wargearworld.bau.world.bauworld.BauWorld;
 import net.wargearworld.bau.world.plot.Plot;
+import net.wargearworld.command_manager.ArgumentList;
+import net.wargearworld.command_manager.CommandHandel;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class ExplosionCache {
-    public static StateFlag explosionCache;
-
-
-    private Stack<List<ExplodedBlock>> explodedBlocks;
     private Map<UUID, Boolean> tnts;
 
     public ExplosionCache() {
         tnts = new HashMap<>();
-        explodedBlocks = new Stack<>();
-        explodedBlocks.push(new ArrayList<>());
-    }
+       }
 
     public void handleExplode(EntityExplodeEvent event) {
         Location loc = event.getLocation();
         BauWorld bauWorld = WorldManager.get(loc.getWorld());
-        if(bauWorld == null)
+        if (bauWorld == null)
             return;
         Plot plot = bauWorld.getPlot(loc);
-        if(plot == null)
+        if (plot == null)
+            return;
+        if(plot.isDeactivatedExplosionCache())
             return;
         int z = plot.getTeleportPoint().getBlockZ();
         Boolean primeZSmallerThanMiddleZ = tnts.get(event.getEntity().getUniqueId());
         Boolean explosionZSmallerThanMiddleZ = event.getEntity().getLocation().getBlockZ() < z;
-        if(primeZSmallerThanMiddleZ == null)
+        if (primeZSmallerThanMiddleZ == null)
             return;
 
         boolean sameTeam = !explosionZSmallerThanMiddleZ ^ primeZSmallerThanMiddleZ;
         if (sameTeam) {
-            List<ExplodedBlock> blocks = explodedBlocks.pop();
-            for (Block block : event.blockList()) {
-                blocks.add(new ExplodedBlock(block));
-            }
-            explodedBlocks.push(blocks);
             tnts.remove(event.getEntity().getUniqueId());
             event.blockList().clear();
         }
-        Bukkit.getScheduler().runTaskLater(Main.getPlugin(), () -> {
-            if (getTnts(event.getLocation().getWorld()) == 0 && !explodedBlocks.peek().isEmpty()) {
-                explodedBlocks.push(new ArrayList<>());
-                for (Player player : loc.getWorld().getPlayers()) {
-                    MessageHandler msgHandler = MessageHandler.getInstance();
-                    TextComponent tc = new TextComponent(Main.prefix + msgHandler.getString(player, "explosion_cached"));
-                    TextComponent click = new TextComponent(msgHandler.getString(player, "deletePlotHere"));
-                    click.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/explosion redo"));
-                    click.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(msgHandler.getString(player, "explosion_hover")).create()));
-                    player.spigot().sendMessage(tc, click);
-                }
-                removeRedo(explodedBlocks.size());
+        if (getTnts(event.getLocation().getWorld()) == 1) {
+            for (Player player : plot.getPlayers(bauWorld)) {
+                MessageHandler.getInstance().send(player, "explosion_cached");
             }
-
-        }, 2);
-    }
-
-    private void removeRedo(int size) {
-        Bukkit.getScheduler().runTaskLater(Main.getPlugin(), () -> {
-            if (explodedBlocks.size() >= size) {
-                explodedBlocks.remove(size - 2);
-            }
-        }, 20 * 60 * 5);
-    }
-
-    public void redo(Player player) {
-        if (explodedBlocks.size() == 1) {
-            MessageHandler.getInstance().send(player, "explosion_noRedo");
-            return;
         }
-        try {
-            explodedBlocks.pop();
-            List<ExplodedBlock> blocks = explodedBlocks.pop();
-            for (ExplodedBlock block : blocks) {
-                block.place();
-            }
-        } catch (Exception ex) {
-        }
-        explodedBlocks.push(new ArrayList<>());
-        MessageHandler.getInstance().send(player, "explosion_redoed");
-
     }
 
     public void onEntityPrime(EntitySpawnEvent event) {
         Location loc = event.getLocation();
         BauWorld bauWorld = WorldManager.get(loc.getWorld());
-        if(bauWorld == null)
+        if (bauWorld == null)
             return;
         Plot plot = bauWorld.getPlot(loc);
-        if(plot == null)
+        if (plot == null)
             return;
         int z = plot.getTeleportPoint().getBlockZ();
         tnts.put(event.getEntity().getUniqueId(), loc.getZ() < z);

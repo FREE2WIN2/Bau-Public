@@ -2,16 +2,14 @@ package net.wargearworld.bau.tools.explosion_cache;
 
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
-import net.wargearworld.bau.world.bauworld.BauWorld;
+import net.wargearworld.bau.tools.TNT;
 import net.wargearworld.bau.world.WorldManager;
+import net.wargearworld.bau.world.bauworld.BauWorld;
+import net.wargearworld.bau.world.plot.Plot;
 import net.wargearworld.command_manager.ArgumentList;
 import net.wargearworld.command_manager.CommandHandel;
-import net.wargearworld.command_manager.player.CommandPlayer;
-import net.wargearworld.command_manager.player.BukkitCommandPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -21,54 +19,41 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static net.wargearworld.command_manager.nodes.LiteralNode.literal;
 import static net.wargearworld.bau.utils.CommandUtil.getPlayer;
-public class ExplosionCacheListener implements Listener, TabExecutor {
-
-    private CommandHandel commandHandel;
+import static net.wargearworld.command_manager.arguments.IntegerArgument.integer;
+import static net.wargearworld.command_manager.nodes.ArgumentNode.argument;
+import static net.wargearworld.command_manager.nodes.LiteralNode.literal;
+public class ExplosionCacheListener implements Listener {
 
     public ExplosionCacheListener() {
-        Main.getPlugin().getCommand("explosion").setExecutor(this);
-        Main.getPlugin().getCommand("explosion").setTabCompleter(this);
 
         Bukkit.getPluginManager().registerEvents(this, Main.getPlugin());
-        commandHandel = new CommandHandel("explosion", Main.prefix, MessageHandler.getInstance());
-        commandHandel.addSubNode(literal("redo").setCallback(s -> {
-            redo(s);
-        }));
+        CommandHandel commandHandel = TNT.commandHandle;
+        commandHandel
+                .addSubNode(literal("protectCannons").setCallback(s -> allowExplosion(s, 0)))
+                .addSubNode(literal("unprotectCannons")
+                        .setCallback(s -> allowExplosion(s, 30))
+                        .addSubNode(argument("Duration", integer(1))
+                                .setCallback(s -> allowExplosion(s, s.getInt("Duration")))));
 
-//        commandHandel.addSubNode(literal("deactivate")
+
     }
 
-    private void redo(ArgumentList s) {
+    private void allowExplosion(ArgumentList s, int seconds) {
         Player p = getPlayer(s);
-        WorldManager.get(p.getWorld()).getExplosionCache().redo(p);
-    }
-
-    @Override
-    public boolean onCommand(CommandSender commandSender, Command command, String s, String[] args) {
-        if (!(commandSender instanceof Player)) {
-            return false;
+        Location loc = p.getLocation();
+        BauWorld bauWorld = WorldManager.get(loc.getWorld());
+        if (bauWorld == null)
+            return;
+        Plot plot = bauWorld.getPlot(loc);
+        if (plot == null)
+            return;
+        plot.deactivateExplosionCache(seconds, bauWorld);
+        if (seconds > 0) {
+            for (Player player : plot.getPlayers(bauWorld)) {
+                MessageHandler.getInstance().send(player, "tnt_allowExplosion_activated", seconds + "");
+            }
         }
-        Player p = (Player) commandSender;
-        CommandPlayer commandPlayer = new BukkitCommandPlayer(p);
-        commandHandel.execute(commandPlayer, args);
-        return true;
-    }
-
-    @Override
-    public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] args) {
-        if (!(commandSender instanceof Player)) {
-            return null;
-        }
-        List<String> out = new ArrayList<>();
-        Player p = (Player) commandSender;
-        CommandPlayer commandPlayer = new BukkitCommandPlayer(p);
-        commandHandel.tabComplete(commandPlayer, args, out);
-        return out;
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -77,10 +62,9 @@ public class ExplosionCacheListener implements Listener, TabExecutor {
             return;
         }
         Location loc = event.getLocation();
-        BauWorld world = WorldManager.get(loc.getWorld());
-        if(world == null)
-            return;
-        ExplosionCache explosionCache = world.getExplosionCache();
+        ExplosionCache explosionCache = getExplosionCache(loc);
+        if (explosionCache != null)
+            explosionCache.handleExplode(event);
         explosionCache.handleExplode(event);
     }
 
@@ -90,14 +74,18 @@ public class ExplosionCacheListener implements Listener, TabExecutor {
             return;
         }
         Location loc = event.getLocation();
-        BauWorld world = WorldManager.get(loc.getWorld());
-        ExplosionCache explosionCache = world.getExplosionCache();
-        explosionCache.onEntityPrime(event);
+        ExplosionCache explosionCache = getExplosionCache(loc);
+        if (explosionCache != null)
+            explosionCache.onEntityPrime(event);
     }
 
-   /* @EventHandler
-    public void onBlockDisappear(BlockDestroyEvent event){
-        System.out.println(event.getBlock().getType().name() + " TO " + event.getNewState().getMaterial().name());
-    }*/
-
+    private ExplosionCache getExplosionCache(Location loc) {
+        BauWorld world = WorldManager.get(loc.getWorld());
+        if (world == null)
+            return null;
+        Plot plot = world.getPlot(loc);
+        if (plot == null)
+            return null;
+        return plot.getExplosionCache();
+    }
 }

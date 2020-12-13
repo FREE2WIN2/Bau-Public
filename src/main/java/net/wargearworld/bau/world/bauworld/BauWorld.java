@@ -42,7 +42,7 @@ public abstract class BauWorld {
     LocalWorldTemplate template;
     private File logFile;
     private File worldSettingsDir;
-    ExplosionCache explosionCache;
+
     String worldName;
 
     public BauWorld(World world) {
@@ -62,7 +62,7 @@ public abstract class BauWorld {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        explosionCache = new ExplosionCache();
+
     }
 
     public String getName() {
@@ -110,6 +110,8 @@ public abstract class BauWorld {
     }
 
     public abstract Collection<LocalWorldMember> getMembers();
+
+    public abstract boolean hasRights(UUID uuid);
 
     public abstract boolean isOwner(Player player);
 
@@ -251,9 +253,6 @@ public abstract class BauWorld {
         return worldUUID;
     }
 
-    public ExplosionCache getExplosionCache() {
-        return explosionCache;
-    }
 
     public abstract String getOwner();
 

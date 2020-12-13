@@ -90,6 +90,7 @@ public class PlayerWorld extends BauWorld {
         return owner.equals(uuid) || isMember(uuid);
     }
 
+    @Override
     public boolean hasRights(UUID uuid) {
         if (owner.equals(uuid)) {
             return true;

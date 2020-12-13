@@ -1,4 +1,4 @@
-package net.wargearworld.bau.tools.testBlockSlave.testBlockEditor;
+package net.wargearworld.bau.tools.testBlock.testBlockEditor;
 
 import java.util.Iterator;
 
@@ -16,11 +16,11 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionOperationException;
 
-import net.wargearworld.bau.tools.testBlockSlave.TestBlockSlaveCore;
-import net.wargearworld.bau.tools.testBlockSlave.testBlock.Facing;
-import net.wargearworld.bau.tools.testBlockSlave.testBlockEditor.iterators.FrontIterator;
-import net.wargearworld.bau.tools.testBlockSlave.testBlockEditor.iterators.RoofIterator;
-import net.wargearworld.bau.tools.testBlockSlave.testBlockEditor.iterators.SideIterator;
+import net.wargearworld.bau.tools.testBlock.TestBlockCore;
+import net.wargearworld.bau.tools.testBlock.testBlock.Facing;
+import net.wargearworld.bau.tools.testBlock.testBlockEditor.iterators.FrontIterator;
+import net.wargearworld.bau.tools.testBlock.testBlockEditor.iterators.RoofIterator;
+import net.wargearworld.bau.tools.testBlock.testBlockEditor.iterators.SideIterator;
 
 public class ShieldModule {
 
@@ -210,7 +210,7 @@ public class ShieldModule {
             case FRONTLEFT:
             case FRONTRIGHT:
                 if (type == ShieldType.ARTILLERY && position.name().contains("FRONT")) {
-                    int shieldSize = TestBlockSlaveCore.getMaxShieldSizeOfTier(tier);
+                    int shieldSize = TestBlockCore.getMaxShieldSizeOfTier(tier);
                     max = max.add(0, shieldSize, 0);
                 }
                 switch (facing) {
@@ -281,10 +281,10 @@ public class ShieldModule {
     }
 
     public BlockVector3 getMin(Plot plot, int tier, Facing facing) {
-        Region blockRegion = TestBlockSlaveCore.getTBRegion(tier, plot, facing);
+        Region blockRegion = TestBlockCore.getTBRegion(tier, plot, facing);
         BlockVector3 minOfBlock = blockRegion.getMinimumPoint();
         BlockVector3 blockSize = CoordGetter.getMaxSizeOfBlock(tier);
-        int shieldSizes = TestBlockSlaveCore.getMaxShieldSizeOfTier(tier);
+        int shieldSizes = TestBlockCore.getMaxShieldSizeOfTier(tier);
         switch (position) {
             case BACK:
                 if (facing == Facing.NORTH) {
@@ -351,10 +351,10 @@ public class ShieldModule {
     }
 
     public BlockVector3 getMax(Plot plot, int tier, Facing facing) {
-        Region blockRegion = TestBlockSlaveCore.getTBRegion(tier, plot, facing);
+        Region blockRegion = TestBlockCore.getTBRegion(tier, plot, facing);
         BlockVector3 maxOfBlock = blockRegion.getMaximumPoint();
         BlockVector3 blockSize = CoordGetter.getMaxSizeOfBlock(tier);
-        int shieldSizes = TestBlockSlaveCore.getMaxShieldSizeOfTier(tier);
+        int shieldSizes = TestBlockCore.getMaxShieldSizeOfTier(tier);
         switch (position) {
             case BACK:
                 if (facing == Facing.NORTH) {

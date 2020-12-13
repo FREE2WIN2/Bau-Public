@@ -1,9 +1,7 @@
-package net.wargearworld.bau.tools.testBlockSlave.testBlockEditor;
+package net.wargearworld.bau.tools.testBlock.testBlockEditor;
 
 import java.util.*;
 
-import net.wargearworld.bau.advancement.event.PlayerSaveTestBlockEvent;
-import net.wargearworld.bau.advancement.event.PlayerUseCannonTimerEvent;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.utils.CoordGetter;
 import net.wargearworld.bau.world.plot.Plot;
@@ -22,13 +20,12 @@ import com.sk89q.worldedit.regions.RegionOperationException;
 
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
-import net.wargearworld.bau.tools.testBlockSlave.ChooseTestBlock;
-import net.wargearworld.bau.tools.testBlockSlave.TestBlockSlave;
-import net.wargearworld.bau.tools.testBlockSlave.TestBlockSlaveCore;
-import net.wargearworld.bau.tools.testBlockSlave.testBlock.Facing;
-import net.wargearworld.bau.tools.testBlockSlave.testBlock.TestBlockType;
-import net.wargearworld.bau.tools.testBlockSlave.testBlock.Type;
-import net.wargearworld.bau.worldedit.WorldGuardHandler;
+import net.wargearworld.bau.tools.testBlock.ChooseTestBlock;
+import net.wargearworld.bau.tools.testBlock.TestBlock;
+import net.wargearworld.bau.tools.testBlock.TestBlockCore;
+import net.wargearworld.bau.tools.testBlock.testBlock.Facing;
+import net.wargearworld.bau.tools.testBlock.testBlock.TestBlockType;
+import net.wargearworld.bau.tools.testBlock.testBlock.Type;
 import net.wargearworld.bau.utils.Banner;
 import net.wargearworld.bau.utils.ItemStackCreator;
 import net.wargearworld.bau.utils.Scheduler;
@@ -170,7 +167,7 @@ public class TestBlockEditor {
 
 	public void save(ChooseTestBlock chooseTB) {
 		chooseTB.setType(Type.SHIELDS).setTestBlockType(TestBlockType.NEW);
-		TestBlockSlave slave = BauPlayer.getBauPlayer(owner).getTestBlockSlave();
+		TestBlock slave = BauPlayer.getBauPlayer(owner).getTestBlockSlave();
 		slave.setChooseTB(chooseTB);
 		slave.showParticle();
 		save = false;
@@ -189,7 +186,7 @@ public class TestBlockEditor {
 		/* Save bigger region to UndoManager */
 		Player ownerPlayer = Objects.requireNonNull(Bukkit.getPlayer(owner));
 
-		TestBlockSlave slave = BauPlayer.getBauPlayer(owner).getTestBlockSlave();
+		TestBlock slave = BauPlayer.getBauPlayer(owner).getTestBlockSlave();
 		Region rg = calcUndoRegion();
 		slave.getUndoManager().addUndo(rg, CoordGetter.locToVec(ownerPlayer.getLocation()),
 				BukkitAdapter.adapt(ownerPlayer.getWorld()));
@@ -232,8 +229,8 @@ public class TestBlockEditor {
 	}
 
 	private Region calcUndoRegion() {
-		Region normal = TestBlockSlaveCore.getTBRegion(tier, BauPlayer.getBauPlayer(owner).getCurrentPlot(), facing);
-		int shieldSize = TestBlockSlaveCore.getMaxShieldSizeOfTier(tier);
+		Region normal = TestBlockCore.getTBRegion(tier, BauPlayer.getBauPlayer(owner).getCurrentPlot(), facing);
+		int shieldSize = TestBlockCore.getMaxShieldSizeOfTier(tier);
 		BlockVector3 min = BlockVector3.at(-shieldSize, 0, -shieldSize);
 		BlockVector3 max = BlockVector3.at(shieldSize, shieldSize, shieldSize);
 		try {

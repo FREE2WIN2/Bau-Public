@@ -1,4 +1,4 @@
-package net.wargearworld.bau.tools.testBlockSlave.testBlock;
+package net.wargearworld.bau.tools.testBlock.testBlock;
 
 public enum Type {
 	NORMAL,SHIELDS,FRAME;

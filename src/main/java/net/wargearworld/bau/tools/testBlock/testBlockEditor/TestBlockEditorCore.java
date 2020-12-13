@@ -1,11 +1,10 @@
-package net.wargearworld.bau.tools.testBlockSlave.testBlockEditor;
+package net.wargearworld.bau.tools.testBlock.testBlockEditor;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 import net.wargearworld.bau.advancement.event.PlayerEditTestBlockEvent;
-import net.wargearworld.bau.advancement.event.PlayerUseCannonTimerEvent;
 import net.wargearworld.bau.player.BauPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -17,7 +16,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import net.wargearworld.bau.MessageHandler;
-import net.wargearworld.bau.tools.testBlockSlave.testBlock.Facing;
+import net.wargearworld.bau.tools.testBlock.testBlock.Facing;
 
 public class TestBlockEditorCore implements Listener {
 

@@ -8,8 +8,7 @@ import org.bukkit.Location;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.session.ClipboardHolder;
 
-import net.wargearworld.bau.Main;
-import net.wargearworld.bau.tools.testBlockSlave.testBlock.Facing;
+import net.wargearworld.bau.tools.testBlock.testBlock.Facing;
 
 public class Schematic {
 

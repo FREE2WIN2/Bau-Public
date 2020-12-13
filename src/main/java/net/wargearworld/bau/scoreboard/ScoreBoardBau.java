@@ -70,7 +70,7 @@ public class ScoreBoardBau {
     private String getSl() {
         String rgID = PlayerMovement.playersLastPlot.get(player.getUuid());
         Player p = player.getBukkitPlayer();
-        if(p == null) {
+        if (p == null) {
             cancel();
             return null;
         }
@@ -95,7 +95,7 @@ public class ScoreBoardBau {
 
     public void update() {
         Player p = player.getBukkitPlayer();
-        if(p == null) {
+        if (p == null) {
             cancel();
             return;
         }
@@ -116,17 +116,19 @@ public class ScoreBoardBau {
         obj.setDisplayName("§6Time: §c" + getTime());
         obj.setDisplaySlot(DisplaySlot.SIDEBAR);
         if (bauWorld instanceof PlayerWorld) {
-            obj.getScore(MessageHandler.getInstance().getString(p, "scoreboard_world", bauWorld.getName())).setScore(12);
-        } else if(bauWorld != null){
-            obj.getScore(MessageHandler.getInstance().getString(p, "scoreboard_teamworld", ((TeamWorld) bauWorld).getTeam().getAbbreviation())).setScore(12);
+            obj.getScore(MessageHandler.getInstance().getString(p, "scoreboard_world", bauWorld.getName())).setScore(14);
+        } else if (bauWorld != null) {
+            obj.getScore(MessageHandler.getInstance().getString(p, "scoreboard_teamworld", ((TeamWorld) bauWorld).getTeam().getAbbreviation())).setScore(14);
         }
-        obj.getScore("§a§8§l§m               §r").setScore(11);
-        obj.getScore("§6Plot: §c" + currentPlot.getId().replace("plot", "")).setScore(10);
-        obj.getScore("§1§8§l§m               §r").setScore(9);
-        obj.getScore("§6TNT: " + getTNT(currentPlot)).setScore(8);
-        obj.getScore("§2§8§l§m               §r").setScore(7);
-        obj.getScore("§6Stoplag: " + getSl()).setScore(6);
-        obj.getScore("§3§8§l§m               §r").setScore(5);
+        obj.getScore("§a§8§l§m                    §r").setScore(13);
+        obj.getScore("§6Plot: §c" + currentPlot.getId().replace("plot", "")).setScore(12);
+        obj.getScore("§1§8§l§m                    §r").setScore(11);
+        obj.getScore("§6TNT: " + getTNT(currentPlot)).setScore(10);
+        obj.getScore("§2§8§l§m                    §r").setScore(9);
+        obj.getScore("§6Stoplag: " + getSl()).setScore(8);
+        obj.getScore("§3§8§l§m                    §r").setScore(7);
+        obj.getScore(getExplosionBlocker(currentPlot)).setScore(6);
+        obj.getScore("§4§8§l§m                    §r").setScore(5);
         obj.getScore("§6Aktive Tools:").setScore(4);
         if (player.getDT()) {
             obj.getScore("§aDesignTool").setScore(3);
@@ -138,6 +140,17 @@ public class ScoreBoardBau {
             obj.getScore("§aWorldFuscator").setScore(1);
         }
         p.setScoreboard(board);
+    }
+
+    private String getExplosionBlocker(Plot currentPlot) {
+
+        String out = MessageHandler.getInstance().getString(player, "explosion_scoreboard_prefix");
+        if (currentPlot.isDeactivatedExplosionCache()) {
+            out += " " + MessageHandler.getInstance().getString(player, "explosion_scoreboard_unprotected", currentPlot.getDeactivatedExplosionCache() + "");
+        } else {
+            out += " " + MessageHandler.getInstance().getString(player, "explosion_scoreboard_protected");
+        }
+        return out;
     }
 
     private String getWorldFuscator(Plot currentPlot) {

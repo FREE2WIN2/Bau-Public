@@ -1,8 +1,8 @@
-package net.wargearworld.bau.tools.testBlockSlave.testBlock;
+package net.wargearworld.bau.tools.testBlock.testBlock;
 
 import java.util.HashMap;
 
-import net.wargearworld.bau.tools.testBlockSlave.ChooseTestBlock;
+import net.wargearworld.bau.tools.testBlock.ChooseTestBlock;
 import net.wargearworld.bau.worldedit.Schematic;
 
 public class DefaultTestBlock implements ITestBlock {

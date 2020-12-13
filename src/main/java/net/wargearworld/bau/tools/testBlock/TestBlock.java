@@ -1,4 +1,4 @@
-package net.wargearworld.bau.tools.testBlockSlave;
+package net.wargearworld.bau.tools.testBlock;
 
 import com.google.common.base.CharMatcher;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -13,7 +13,7 @@ import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.advancement.event.PlayerSaveTestBlockEvent;
 import net.wargearworld.bau.config.BauConfig;
 import net.wargearworld.bau.player.BauPlayer;
-import net.wargearworld.bau.tools.testBlockSlave.testBlock.*;
+import net.wargearworld.bau.tools.testBlock.testBlock.*;
 import net.wargearworld.bau.utils.ClickAction;
 import net.wargearworld.bau.utils.CoordGetter;
 import net.wargearworld.bau.utils.JsonCreater;
@@ -22,15 +22,12 @@ import net.wargearworld.bau.world.plot.Plot;
 import net.wargearworld.bau.worldedit.UndoManager;
 import net.wargearworld.bau.worldedit.WorldEditHandler;
 import net.wargearworld.db.EntityManagerExecuter;
-import net.wargearworld.db.model.TestBlock;
 import net.wargearworld.db.model.TestBlock_;
 import net.wargearworld.db.model.enums.schematic.SchematicDirection;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import javax.enterprise.inject.spi.CDI;
-import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -39,7 +36,7 @@ import javax.transaction.Transactional;
 import java.util.*;
 import java.util.Map.Entry;
 
-public class TestBlockSlave {
+public class TestBlock {
 
     /*
      * this is the personal testBlockSlave for every Player it handles all personal
@@ -56,7 +53,7 @@ public class TestBlockSlave {
     private ChooseTestBlock chooseTB;
     /* init */
 
-    public TestBlockSlave(UUID owner) {
+    public TestBlock(UUID owner) {
         this.owner = owner;
         testblocks = new HashMap<>();
         testblocks.put(1, readTestBlocks(1));
@@ -100,7 +97,7 @@ public class TestBlockSlave {
 
     public void openGUI() {
         Player ownerPlayer = Bukkit.getPlayer(owner);
-        ownerPlayer.openInventory(TestBlockSlaveGUI.tbsStartInv(ownerPlayer, readFavs()));
+        ownerPlayer.openInventory(TestBlockGUI.tbsStartInv(ownerPlayer, readFavs()));
     }
 
     /* Getter */
@@ -209,9 +206,9 @@ public class TestBlockSlave {
         Player ownerPlayer = Bukkit.getPlayer(owner);
         if (ownerPlayer == null) return;
 
-        Region rg = TestBlockSlaveCore.getTBRegion(tier, plot, facing);
+        Region rg = TestBlockCore.getTBRegion(tier, plot, facing);
         if (type.equals(Type.SHIELDS)) {
-            int shielsSize = TestBlockSlaveCore.getMaxShieldSizeOfTier(tier);
+            int shielsSize = TestBlockCore.getMaxShieldSizeOfTier(tier);
             try {
                 rg.expand(BlockVector3.at(shielsSize, shielsSize, shielsSize), BlockVector3.at(-shielsSize, 0, -shielsSize));
             } catch (RegionOperationException e) {
@@ -280,11 +277,11 @@ public class TestBlockSlave {
         EntityManagerExecuter.run(em -> {
             net.wargearworld.db.model.Player dbPlayer = em.find(net.wargearworld.db.model.Player.class, owner);
             CriteriaBuilder cb = em.getCriteriaBuilder();
-            CriteriaQuery<TestBlock> cq = cb.createQuery(TestBlock.class);
-            Root<TestBlock> root = cq.from(TestBlock.class);
+            CriteriaQuery<net.wargearworld.db.model.TestBlock> cq = cb.createQuery(net.wargearworld.db.model.TestBlock.class);
+            Root<net.wargearworld.db.model.TestBlock> root = cq.from(net.wargearworld.db.model.TestBlock.class);
             cq.where(cb.equal(root.get(TestBlock_.OWNER), dbPlayer), cb.equal(root.get(TestBlock_.NAME), name), cb.equal(root.get(TestBlock_.TIER), tier));
             Query query = em.createQuery(cq);
-            TestBlock tb = (TestBlock) query.getSingleResult();
+            net.wargearworld.db.model.TestBlock tb = (net.wargearworld.db.model.TestBlock) query.getSingleResult();
             dbPlayer.getTestBlocks().remove(tb);
             em.merge(dbPlayer);
         });
@@ -326,12 +323,12 @@ public class TestBlockSlave {
         EntityManagerExecuter.run(em -> {
             net.wargearworld.db.model.Player dbPlayer = em.find(net.wargearworld.db.model.Player.class, owner);
             CriteriaBuilder cb = em.getCriteriaBuilder();
-            CriteriaQuery<TestBlock> cq = cb.createQuery(TestBlock.class);
-            Root<TestBlock> root = cq.from(TestBlock.class);
+            CriteriaQuery<net.wargearworld.db.model.TestBlock> cq = cb.createQuery(net.wargearworld.db.model.TestBlock.class);
+            Root<net.wargearworld.db.model.TestBlock> root = cq.from(net.wargearworld.db.model.TestBlock.class);
 
             cq.where(cb.equal(root.get(TestBlock_.OWNER), dbPlayer), cb.equal(root.get(TestBlock_.NAME), name), cb.equal(root.get(TestBlock_.TIER), tier));
             Query query = em.createQuery(cq);
-            TestBlock tb = (TestBlock) query.getSingleResult();
+            net.wargearworld.db.model.TestBlock tb = (net.wargearworld.db.model.TestBlock) query.getSingleResult();
             tb.setFavorite(fav);
             em.merge(tb);
         });
@@ -344,13 +341,13 @@ public class TestBlockSlave {
     public void showTBManager() {
         Player ownerPlayer = Bukkit.getPlayer(owner);
         if (ownerPlayer == null) return;
-        ownerPlayer.openInventory(TestBlockSlaveGUI.tbManager(testblocks, ownerPlayer));
+        ownerPlayer.openInventory(TestBlockGUI.tbManager(testblocks, ownerPlayer));
     }
 
     public void openAddFavoriteInv() {
         Player ownerPlayer = Bukkit.getPlayer(owner);
         if (ownerPlayer == null) return;
-        ownerPlayer.openInventory(TestBlockSlaveGUI.showAllNonFavorites(testblocks, ownerPlayer));
+        ownerPlayer.openInventory(TestBlockGUI.showAllNonFavorites(testblocks, ownerPlayer));
     }
 
     public void startSavingNewTB() {
@@ -358,7 +355,7 @@ public class TestBlockSlave {
         if (ownerPlayer == null) return;
         startNewChoose();
         chooseTB.setTestBlockType(TestBlockType.NEW);
-        ownerPlayer.openInventory(TestBlockSlaveGUI.tierInv(ownerPlayer));
+        ownerPlayer.openInventory(TestBlockGUI.tierInv(ownerPlayer));
 
     }
 
@@ -367,7 +364,7 @@ public class TestBlockSlave {
         if (ownerPlayer == null) return;
         saveTBParticles.cancel();
         /* Anvil Inv opening */
-        TestBlockSlaveGUI.ChooseNameInv(ownerPlayer, chooseTB.getTier());
+        TestBlockGUI.ChooseNameInv(ownerPlayer, chooseTB.getTier());
     }
 
     public void saveNewCustomTB(String name) {
@@ -421,11 +418,11 @@ public class TestBlockSlave {
 
         Facing facing = chooseTB.getFacing();
         int tier = chooseTB.getTier();
-        Region rg = TestBlockSlaveCore.getTBRegion(tier, plot, facing);
+        Region rg = TestBlockCore.getTBRegion(tier, plot, facing);
         BlockVector3 min = rg.getMinimumPoint();
         BlockVector3 max = rg.getMaximumPoint();
         if (chooseTB.getType().equals(Type.SHIELDS)) {
-            int shieldSize = TestBlockSlaveCore.getMaxShieldSizeOfTier(tier);
+            int shieldSize = TestBlockCore.getMaxShieldSizeOfTier(tier);
             min = min.subtract(shieldSize, 0, shieldSize);
             max = max.add(shieldSize, shieldSize, shieldSize);
         }
@@ -437,7 +434,7 @@ public class TestBlockSlave {
 
             @Override
             public void run() {
-                TestBlockSlaveParticles.showTBParticlesShield(ownerPlayer, minVector, maxVector);
+                TestBlockParticles.showTBParticlesShield(ownerPlayer, minVector, maxVector);
             }
         }, 0, 20));
 

@@ -7,7 +7,7 @@ import net.wargearworld.bau.config.BauConfig;
 import net.wargearworld.bau.dao.PlayerDAO;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.scoreboard.ScoreBoardBau;
-import net.wargearworld.bau.tools.testBlockSlave.testBlockEditor.TestBlockEditorCore;
+import net.wargearworld.bau.tools.testBlock.testBlockEditor.TestBlockEditorCore;
 import net.wargearworld.bau.utils.ItemStackCreator;
 import net.wargearworld.bau.world.LocalWorldTemplate;
 import net.wargearworld.bau.world.bauworld.BauWorld;

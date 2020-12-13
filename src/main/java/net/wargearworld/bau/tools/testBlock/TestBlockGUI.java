@@ -1,10 +1,10 @@
-package net.wargearworld.bau.tools.testBlockSlave;
+package net.wargearworld.bau.tools.testBlock;
 
 import net.wargearworld.GUI_API.GUI.AnvilGUI;
 import net.wargearworld.GUI_API.GUI.Slot;
 import net.wargearworld.GUI_API.Items.DefaultItem;
 import net.wargearworld.bau.MessageHandler;
-import net.wargearworld.bau.tools.testBlockSlave.testBlock.CustomTestBlock;
+import net.wargearworld.bau.tools.testBlock.testBlock.CustomTestBlock;
 import net.wargearworld.bau.utils.Banner;
 import net.wargearworld.bau.utils.ItemStackCreator;
 import org.bukkit.Bukkit;
@@ -21,7 +21,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 
-public class TestBlockSlaveGUI implements Listener {
+public class TestBlockGUI implements Listener {
 
 	/*
 	 * Main gui: save Block as own TestBlock personal tbs (nether star?) TBS Editor

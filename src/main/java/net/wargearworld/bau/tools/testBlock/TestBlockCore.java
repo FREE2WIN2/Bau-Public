@@ -1,4 +1,4 @@
-package net.wargearworld.bau.tools.testBlockSlave;
+package net.wargearworld.bau.tools.testBlock;
 
 import net.wargearworld.bau.config.BauConfig;
 import net.wargearworld.bau.config.Sizes;
@@ -10,7 +10,6 @@ import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -27,25 +26,25 @@ import com.sk89q.worldedit.regions.Region;
 
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
-import net.wargearworld.bau.tools.testBlockSlave.testBlock.Facing;
-import net.wargearworld.bau.tools.testBlockSlave.testBlock.ITestBlock;
-import net.wargearworld.bau.tools.testBlockSlave.testBlock.TestBlockType;
-import net.wargearworld.bau.tools.testBlockSlave.testBlock.Type;
-import net.wargearworld.bau.tools.testBlockSlave.testBlockEditor.TestBlockEditorCore;
+import net.wargearworld.bau.tools.testBlock.testBlock.Facing;
+import net.wargearworld.bau.tools.testBlock.testBlock.ITestBlock;
+import net.wargearworld.bau.tools.testBlock.testBlock.TestBlockType;
+import net.wargearworld.bau.tools.testBlock.testBlock.Type;
+import net.wargearworld.bau.tools.testBlock.testBlockEditor.TestBlockEditorCore;
 import net.wargearworld.bau.utils.Banner;
 import net.wargearworld.bau.utils.ClickAction;
 import net.wargearworld.bau.utils.JsonCreater;
 
-public class TestBlockSlaveCore implements CommandExecutor, Listener {
+public class TestBlockCore implements CommandExecutor, Listener {
 
-	private static TestBlockSlaveCore instance;
+	private static TestBlockCore instance;
 
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmds, String string, String[] args) {
 		Player p = (Player) sender;
 		BauPlayer bauPlayer = BauPlayer.getBauPlayer(p);
-		TestBlockSlave slave = bauPlayer.getTestBlockSlave();
+		TestBlock slave = bauPlayer.getTestBlockSlave();
 		if (args.length == 0) {
 			slave.openGUI();
 			return true;
@@ -206,17 +205,17 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 			chooseTB.setTier(3);
 			break;
 		}
-		p.openInventory(TestBlockSlaveGUI.richtungsInventory(p));
+		p.openInventory(TestBlockGUI.richtungsInventory(p));
 	}
 
 	private void tbManagerInv(Player p, ItemStack clicked) {
 		/* open Next Inv */
 		BauPlayer.getBauPlayer(p).getTestBlockSlave().startNewChoose(clicked);
-		p.openInventory(TestBlockSlaveGUI.tbManagerActionInv(p));
+		p.openInventory(TestBlockGUI.tbManagerActionInv(p));
 	}
 
 	private void chooseActionToCustomTB(Player p, ItemStack clicked) {
-		TestBlockSlave slave = BauPlayer.getBauPlayer(p).getTestBlockSlave();
+		TestBlock slave = BauPlayer.getBauPlayer(p).getTestBlockSlave();
 		ChooseTestBlock chooseTB = slave.getChooseTB();
 		ITestBlock tb = chooseTB.getTestBlock();
 		String clickedName = clicked.getItemMeta().getDisplayName();
@@ -267,19 +266,19 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 		String close = MessageHandler.getInstance().getString(p, "tbs_gui_close");
 		String lastPaste = MessageHandler.getInstance().getString(p, "tbs_gui_lastPaste");
 		String clickedName = clicked.getItemMeta().getDisplayName();
-		TestBlockSlave slave = BauPlayer.getBauPlayer(p).getTestBlockSlave();
+		TestBlock slave = BauPlayer.getBauPlayer(p).getTestBlockSlave();
 		switch (clickedName) {
 		case "§rTier I":
 			slave.startNewChoose(TestBlockType.DEFAULT, 1);
-			p.openInventory(TestBlockSlaveGUI.richtungsInventory(p));
+			p.openInventory(TestBlockGUI.richtungsInventory(p));
 			return;
 		case "§rTier II":
 			slave.startNewChoose(TestBlockType.DEFAULT, 2);
-			p.openInventory(TestBlockSlaveGUI.richtungsInventory(p));
+			p.openInventory(TestBlockGUI.richtungsInventory(p));
 			return;
 		case "§rTier III/IV":
 			slave.startNewChoose(TestBlockType.DEFAULT, 3);
-			p.openInventory(TestBlockSlaveGUI.richtungsInventory(p));
+			p.openInventory(TestBlockGUI.richtungsInventory(p));
 			return;
 		}
 		if (clickedName.equals(close)) {
@@ -299,7 +298,7 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 			} else {
 				/* Paste Favorite */
 				slave.startNewChoose(clicked);
-				p.openInventory(TestBlockSlaveGUI.richtungsInventory(p));
+				p.openInventory(TestBlockGUI.richtungsInventory(p));
 			}
 
 		} else if (clicked.getType().equals(Material.WOODEN_AXE)) {
@@ -318,7 +317,7 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 		String south = MessageHandler.getInstance().getString(p, "facingSouth");
 		String north = MessageHandler.getInstance().getString(p, "facingNorth");
 		String clickedName = clicked.getItemMeta().getDisplayName();
-		TestBlockSlave slave = BauPlayer.getBauPlayer(p).getTestBlockSlave();
+		TestBlock slave = BauPlayer.getBauPlayer(p).getTestBlockSlave();
 		ChooseTestBlock chooseTB = slave.getChooseTB();
 		if (north.equals(clickedName)) {
 			chooseTB.setFacing(Facing.NORTH);
@@ -326,9 +325,9 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 			chooseTB.setFacing(Facing.SOUTH);
 		}
 		if (chooseTB.getTestBlockType().equals(TestBlockType.DEFAULT)) {
-			p.openInventory(TestBlockSlaveGUI.schildRahmenNormalInventory(p));
+			p.openInventory(TestBlockGUI.schildRahmenNormalInventory(p));
 		} else if (chooseTB.getTestBlockType().equals(TestBlockType.NEW)) {
-			p.openInventory(TestBlockSlaveGUI.schildNormalInventory(p));
+			p.openInventory(TestBlockGUI.schildNormalInventory(p));
 		} else {
 			p.closeInventory();
 			slave.pasteBlock(chooseTB,true);
@@ -341,7 +340,7 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 		String frame = MessageHandler.getInstance().getString(p, "frame");
 		String shield = MessageHandler.getInstance().getString(p, "shield");
 		String clickedName = clicked.getItemMeta().getDisplayName();
-		TestBlockSlave slave = BauPlayer.getBauPlayer(p).getTestBlockSlave();
+		TestBlock slave = BauPlayer.getBauPlayer(p).getTestBlockSlave();
 		ChooseTestBlock chooseTB = slave.getChooseTB();
 
 		if (clickedName.equals(normal)) {
@@ -367,9 +366,9 @@ public class TestBlockSlaveCore implements CommandExecutor, Listener {
 
 	}
 
-	public static TestBlockSlaveCore getInstance() {
+	public static TestBlockCore getInstance() {
 		if (instance == null) {
-			instance = new TestBlockSlaveCore();
+			instance = new TestBlockCore();
 		}
 		return instance;
 	}

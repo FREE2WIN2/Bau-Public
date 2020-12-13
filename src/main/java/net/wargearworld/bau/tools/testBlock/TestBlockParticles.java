@@ -1,4 +1,4 @@
-package net.wargearworld.bau.tools.testBlockSlave;
+package net.wargearworld.bau.tools.testBlock;
 
 import org.bukkit.Color;
 import org.bukkit.Particle;
@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 
 import com.sk89q.worldedit.math.BlockVector3;
 
-public class TestBlockSlaveParticles {
+public class TestBlockParticles {
 
 	public static void showTBParticlesShield(Player p, BlockVector3 min, BlockVector3 max) {
 

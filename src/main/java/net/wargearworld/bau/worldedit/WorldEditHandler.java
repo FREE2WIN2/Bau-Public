@@ -38,7 +38,7 @@ import com.sk89q.worldedit.world.World;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.player.BauPlayer;
 import net.wargearworld.bau.tools.Stoplag;
-import net.wargearworld.bau.tools.testBlockSlave.testBlock.Facing;
+import net.wargearworld.bau.tools.testBlock.testBlock.Facing;
 import net.wargearworld.bau.utils.Scheduler;
 
 public class WorldEditHandler {

@@ -49,6 +49,11 @@ public class TeamWorld extends BauWorld {
     }
 
     @Override
+    public boolean hasRights(UUID uuid) {
+        return isAuthorized(uuid);
+    }
+
+    @Override
     public boolean isOwner(Player player) {
         return team.getLeaders().contains(player.getUniqueId());
     }

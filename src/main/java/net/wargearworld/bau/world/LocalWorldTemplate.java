@@ -11,7 +11,6 @@ import net.wargearworld.GUI_API.Items.Item;
 import net.wargearworld.db.EntityManagerExecuter;
 import net.wargearworld.db.model.WorldTemplate;
 import net.wargearworld.db.model.WorldTemplate_;
-import net.wargearworld.db.model.WorldTemplate;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -19,7 +18,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import net.wargearworld.bau.Main;
-import net.wargearworld.bau.tools.testBlockSlave.testBlock.Facing;
+import net.wargearworld.bau.tools.testBlock.testBlock.Facing;
 import net.wargearworld.bau.world.plot.PlotPattern;
 import net.wargearworld.bau.world.plot.PlotType;
 import net.wargearworld.bau.worldedit.Schematic;

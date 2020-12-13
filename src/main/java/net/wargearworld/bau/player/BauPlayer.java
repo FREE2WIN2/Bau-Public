@@ -6,17 +6,13 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.session.ClipboardHolder;
-import net.minecraft.server.v1_15_R1.IChatBaseComponent;
-import net.minecraft.server.v1_15_R1.IChatBaseComponent.ChatSerializer;
-import net.minecraft.server.v1_15_R1.PacketPlayOutChat;
-import net.minecraft.server.v1_15_R1.PlayerConnection;
 import net.wargearworld.StringGetter.Language;
 import net.wargearworld.bau.Main;
 import net.wargearworld.bau.MessageHandler;
 import net.wargearworld.bau.tools.cannon_reloader.AutoCannonReloader;
 import net.wargearworld.bau.tools.cannon_timer.CannonTimerBlock;
-import net.wargearworld.bau.tools.testBlockSlave.TestBlockSlave;
-import net.wargearworld.bau.tools.testBlockSlave.testBlockEditor.TestBlockEditor;
+import net.wargearworld.bau.tools.testBlock.TestBlock;
+import net.wargearworld.bau.tools.testBlock.testBlockEditor.TestBlockEditor;
 import net.wargearworld.bau.world.WorldManager;
 import net.wargearworld.bau.world.gui.WorldGUI;
 import net.wargearworld.bau.world.plot.Plot;
@@ -28,13 +24,11 @@ import org.bukkit.Location;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.UUID;
@@ -67,7 +61,7 @@ public class BauPlayer {
     File configFile;
     private Language language;
     /* Tools */
-    private TestBlockSlave testBlockSlave;
+    private TestBlock testBlockSlave;
     private TestBlockEditor testBlockEditor;
     private AutoCannonReloader cannonReloader;
     private CannonTimerBlock copiedCannonTimerBlock;
@@ -207,9 +201,9 @@ public class BauPlayer {
         });
     }
 
-    public TestBlockSlave getTestBlockSlave() {
+    public TestBlock getTestBlockSlave() {
         if (testBlockSlave == null)
-            testBlockSlave = new TestBlockSlave(uuid);
+            testBlockSlave = new TestBlock(uuid);
         return testBlockSlave;
     }
 

@@ -5,7 +5,6 @@ import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
-import net.wargearworld.GUI_API.GUI_API;
 import net.wargearworld.bau.advancement.AdvManager;
 import net.wargearworld.bau.commands.*;
 import net.wargearworld.bau.communication.DatabaseCommunication;
@@ -18,13 +17,12 @@ import net.wargearworld.bau.tabCompleter.tbsTC;
 import net.wargearworld.bau.tools.*;
 import net.wargearworld.bau.tools.cannon_reloader.AutoCannonReloaderListener;
 import net.wargearworld.bau.tools.cannon_timer.CannonTimerListener;
-import net.wargearworld.bau.tools.explosion_cache.ExplosionCache;
 import net.wargearworld.bau.tools.explosion_cache.ExplosionCacheListener;
 import net.wargearworld.bau.tools.particles.Particles;
 import net.wargearworld.bau.tools.plotrights.PlotRights;
-import net.wargearworld.bau.tools.testBlockSlave.TestBlockSlaveCore;
-import net.wargearworld.bau.tools.testBlockSlave.testBlock.DefaultTestBlock;
-import net.wargearworld.bau.tools.testBlockSlave.testBlockEditor.TestBlockEditorCore;
+import net.wargearworld.bau.tools.testBlock.TestBlockCore;
+import net.wargearworld.bau.tools.testBlock.testBlock.DefaultTestBlock;
+import net.wargearworld.bau.tools.testBlock.testBlockEditor.TestBlockEditorCore;
 import net.wargearworld.bau.tools.waterremover.WaterRemoverListener;
 import net.wargearworld.bau.tools.worldfuscator.WorldFuscatorCommand;
 import net.wargearworld.bau.tools.worldfuscator.WorldFuscatorIntegration;
@@ -81,6 +79,7 @@ public class Main extends JavaPlugin {
     }
 
     private void registerListener() {
+        new TNT(this);
         new PlayerListener(this);
         new SignListener(this);
         new PlayerMovement(this);
@@ -88,10 +87,9 @@ public class Main extends JavaPlugin {
         new WaterRemoverListener(this);
         new ExplosionCacheListener();
         new GUI(this);
-        new TNT(this);
         new CannonTimerListener(this);
         PluginManager pm = Bukkit.getPluginManager();
-        pm.registerEvents(TestBlockSlaveCore.getInstance(), this);
+        pm.registerEvents(TestBlockCore.getInstance(), this);
         pm.registerEvents(new EventsToCancel(), this);
         pm.registerEvents(new Stoplag(), this);
         pm.registerEvents(new WorldEditPreCommand(), this);
@@ -112,7 +110,7 @@ public class Main extends JavaPlugin {
         new WorldCommand(this);
         new PlotCommand(this);
         new Buy(this);
-        getCommand("tbs").setExecutor(TestBlockSlaveCore.getInstance());
+        getCommand("tbs").setExecutor(TestBlockCore.getInstance());
         getCommand("tbs").setTabCompleter(new tbsTC());
         getCommand("sl").setExecutor(new Stoplag());
         getCommand("dt").setExecutor(new DesignTool());
@@ -177,33 +175,28 @@ public class Main extends JavaPlugin {
         FlagRegistry registry = WorldGuard.getInstance().getFlagRegistry();
         try {
             // create a flag with the name "my-custom-flag", defaulting to true
-            StateFlag flag = new StateFlag("TntExplosion", true);
-            StateFlag stoplag = new StateFlag("stoplag", true);
-            StateFlag waterRemoverFlag = new StateFlag("waterremover", true);
-            StateFlag worldfuscatorFlag = new StateFlag("worldfuscator", true);
-            StateFlag explosionCacheFlag = new StateFlag("explosioncache", true);
+            StateFlag flag = new StateFlag("TntExplosion", false);
+            StateFlag stoplag = new StateFlag("stoplag", false);
+            StateFlag waterRemoverFlag = new StateFlag("waterremover", false);
+            StateFlag worldfuscatorFlag = new StateFlag("worldfuscator", false);
             registry.register(flag);
             registry.register(stoplag);
             registry.register(waterRemoverFlag);
             registry.register(worldfuscatorFlag);
-            registry.register(explosionCacheFlag);
             TntExplosion = flag; // only set our field if there was no error
             Main.stoplag = stoplag;
             WaterRemoverListener.waterRemoverFlag = waterRemoverFlag;
             WorldFuscatorIntegration.worldfuscatorFlag = worldfuscatorFlag;
-            ExplosionCache.explosionCache = explosionCacheFlag;
         } catch (FlagConflictException e) {
             Flag<?> existing = registry.get("TntExplosion");
             Flag<?> existingSL = registry.get("stoplag");
             Flag<?> existingWR = registry.get("waterremover");
             Flag<?> existingWF = registry.get("worldfuscator");
-            Flag<?> existingEC = registry.get("explosioncache");
-            if ((existing instanceof StateFlag) && existingSL instanceof StateFlag && existingWR instanceof StateFlag && existingWF instanceof StateFlag && existingEC instanceof StateFlag) {
+            if ((existing instanceof StateFlag) && existingSL instanceof StateFlag && existingWR instanceof StateFlag && existingWF instanceof StateFlag) {
                 TntExplosion = (StateFlag) existing;
                 stoplag = (StateFlag) existingSL;
                 WaterRemoverListener.waterRemoverFlag = (StateFlag) existingWR;
                 WorldFuscatorIntegration.worldfuscatorFlag = (StateFlag) existingWF;
-                ExplosionCache.explosionCache = (StateFlag) existingEC;
             } else {
                 System.out.println("Fehler");
                 // types don't match - this is bad news! some other plugin conflicts with you

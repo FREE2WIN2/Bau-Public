@@ -1,4 +1,4 @@
-package net.wargearworld.bau.tools.testBlockSlave.testBlockEditor.iterators;
+package net.wargearworld.bau.tools.testBlock.testBlockEditor.iterators;
 
 import java.util.Iterator;
 
@@ -6,16 +6,17 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 
-public class SideIterator implements Iterator<Region> {
+public class FrontIterator implements Iterator<Region> {
+
 	Region origin;
 	BlockVector3 startPoint;
 	BlockVector3 maxPoint;
-	int zstart;
-	public SideIterator(Region rg) {
+	int xstart;
+	public FrontIterator(Region rg) {
 		this.origin = rg;
 		startPoint = rg.getMinimumPoint();
 		maxPoint = rg.getMaximumPoint();
-		zstart = startPoint.getBlockZ();
+		xstart = startPoint.getX();
 	}
 
 	@Override
@@ -29,21 +30,21 @@ public class SideIterator implements Iterator<Region> {
 	@Override
 	public Region next() {
 		Region out = new CuboidRegion(startPoint,
-				BlockVector3.at(maxPoint.getX(), startPoint.getY(), startPoint.getZ()));
+				BlockVector3.at(startPoint.getX(), startPoint.getY(), maxPoint.getZ()));
 		calcNewStartPoint();
 		return out;
 	}
 
 	private void calcNewStartPoint() {
-		int z = startPoint.getZ() + 2;
+		int x = startPoint.getX() + 2;
 		int y = startPoint.getY();
-		if(z>maxPoint.getZ()) {
-			z=origin.getMinimumPoint().getZ();
-			if(zstart == origin.getMinimumPoint().getZ()) {
-				z++;
-				zstart++;
+		if(x>maxPoint.getX()) {
+			x=origin.getMinimumPoint().getX();
+			if(xstart == origin.getMinimumPoint().getX()) {
+				xstart++;
+				x++;
 			}else {
-				zstart--;
+				xstart--;
 			}
 			y+=1;
 			if(y>maxPoint.getY()) {
@@ -51,7 +52,7 @@ public class SideIterator implements Iterator<Region> {
 				return;
 			}
 		}
-		startPoint = BlockVector3.at(origin.getMinimumPoint().getX(), y, z);
+		startPoint = BlockVector3.at(x, y, origin.getMinimumPoint().getBlockZ());
 	}
 
 }
