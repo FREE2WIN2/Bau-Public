@@ -220,7 +220,8 @@ public class WorldEditHandler {
                             /* set block in world out of schematic */
 
                             BlockVector3 blockLoc = BlockVector3.at(x, y, z);
-                            if (WorldGuardHandler.getPlotId(blockLoc.add(offset), world).equals(originRegion) || !tbs) {
+                            String plotId = WorldGuardHandler.getPlotId(blockLoc.add(offset), world);
+                            if (plotId != null && (plotId.equals(originRegion) || !tbs)) {
                                 if (!(clipboard.getFullBlock(blockLoc).getBlockType().getMaterial().isAir()
                                         && ignoreAir)) {
                                     try {

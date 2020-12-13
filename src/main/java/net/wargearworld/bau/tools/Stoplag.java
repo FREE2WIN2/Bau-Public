@@ -9,6 +9,7 @@ import java.util.List;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.protection.flags.StateFlag;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import net.wargearworld.command_manager.player.BukkitCommandPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -98,6 +99,7 @@ public class Stoplag implements Listener, TabExecutor {
 
     public void setStatusTemp(Location loc, boolean on, int time) {
         BauWorld bauWorld = WorldManager.get(loc.getWorld());
+
         Plot plot = bauWorld.getPlot(loc);
         boolean stateBefore = plot.getSL();
         plot.setSL(true);
@@ -111,6 +113,16 @@ public class Stoplag implements Listener, TabExecutor {
 
     public void setSL(boolean on, Player p) {
         BauWorld world = WorldManager.get(p.getWorld());
+        if (world == null) {
+            if (on) {
+                WorldGuardHandler.getRegion(p.getLocation()).setFlag(Main.stoplag, StateFlag.State.ALLOW);
+                p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "slOn"));
+            } else {
+                WorldGuardHandler.getRegion(p.getLocation()).setFlag(Main.stoplag, StateFlag.State.DENY);
+                p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "slOff"));
+            }
+            return;
+        }
         Plot plot = world.getPlot(p.getLocation());
 
         plot.setSL(on);
@@ -125,6 +137,17 @@ public class Stoplag implements Listener, TabExecutor {
     private void toggleSL(ArgumentList s) {
         Player p = getPlayer(s);
         BauWorld world = WorldManager.get(p.getWorld());
+        if (world == null) {
+            ProtectedRegion region = WorldGuardHandler.getRegion(p.getLocation());
+            if (region.getFlag(Main.stoplag) == StateFlag.State.DENY) {
+                region.setFlag(Main.stoplag, StateFlag.State.ALLOW);
+                p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "slOn"));
+            } else {
+                region.setFlag(Main.stoplag, StateFlag.State.DENY);
+                p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "slOff"));
+            }
+            return;
+        }
         BlockVector3 pos = BlockVector3.at(p.getLocation().getX(), p.getLocation().getY(), p.getLocation().getZ());
         Plot plot = world.getPlot(world.getRegionManager().getApplicableRegionsIDs(pos).get(0));
         plot.setSL(!plot.getSL());

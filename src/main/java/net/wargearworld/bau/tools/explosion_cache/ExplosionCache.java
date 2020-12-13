@@ -1,5 +1,6 @@
 package net.wargearworld.bau.tools.explosion_cache;
 
+import com.sk89q.worldguard.protection.flags.StateFlag;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -16,12 +17,15 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 
 import java.util.*;
 
 public class ExplosionCache {
+    public static StateFlag explosionCache;
+
 
     private Stack<List<ExplodedBlock>> explodedBlocks;
     private Map<UUID, Boolean> tnts;

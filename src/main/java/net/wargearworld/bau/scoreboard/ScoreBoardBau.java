@@ -99,6 +99,10 @@ public class ScoreBoardBau {
             cancel();
             return;
         }
+        Plot currentPlot = player.getCurrentPlot();
+        if (currentPlot == null)
+            return;
+
         Scoreboard board = p.getScoreboard() == null ? board = Bukkit.getScoreboardManager().getNewScoreboard()
                 : p.getScoreboard();
         Objective obj;
@@ -106,9 +110,7 @@ public class ScoreBoardBau {
             obj = board.getObjective(p.getName());
             obj.unregister();
         }
-        Plot currentPlot = player.getCurrentPlot();
-        if (currentPlot == null)
-            return;
+
         BauWorld bauWorld = WorldManager.get(p.getWorld());
         obj = board.registerNewObjective(p.getName(), p.getName() + "bbbb", p.getName() + "cccc");
         obj.setDisplayName("§6Time: §c" + getTime());

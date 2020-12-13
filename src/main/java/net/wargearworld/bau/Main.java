@@ -18,6 +18,7 @@ import net.wargearworld.bau.tabCompleter.tbsTC;
 import net.wargearworld.bau.tools.*;
 import net.wargearworld.bau.tools.cannon_reloader.AutoCannonReloaderListener;
 import net.wargearworld.bau.tools.cannon_timer.CannonTimerListener;
+import net.wargearworld.bau.tools.explosion_cache.ExplosionCache;
 import net.wargearworld.bau.tools.explosion_cache.ExplosionCacheListener;
 import net.wargearworld.bau.tools.particles.Particles;
 import net.wargearworld.bau.tools.plotrights.PlotRights;
@@ -50,6 +51,8 @@ public class Main extends JavaPlugin {
     private static Main plugin;
     public static StateFlag TntExplosion;
     public static StateFlag stoplag;
+
+
 
     public static String prefix = "§8[§6Bau§8] §r";
     public static File tempAddConfigFile;
@@ -178,24 +181,29 @@ public class Main extends JavaPlugin {
             StateFlag stoplag = new StateFlag("stoplag", true);
             StateFlag waterRemoverFlag = new StateFlag("waterremover", true);
             StateFlag worldfuscatorFlag = new StateFlag("worldfuscator", true);
+            StateFlag explosionCacheFlag = new StateFlag("explosioncache", true);
             registry.register(flag);
             registry.register(stoplag);
             registry.register(waterRemoverFlag);
             registry.register(worldfuscatorFlag);
+            registry.register(explosionCacheFlag);
             TntExplosion = flag; // only set our field if there was no error
             Main.stoplag = stoplag;
             WaterRemoverListener.waterRemoverFlag = waterRemoverFlag;
             WorldFuscatorIntegration.worldfuscatorFlag = worldfuscatorFlag;
+            ExplosionCache.explosionCache = explosionCacheFlag;
         } catch (FlagConflictException e) {
             Flag<?> existing = registry.get("TntExplosion");
             Flag<?> existingSL = registry.get("stoplag");
             Flag<?> existingWR = registry.get("waterremover");
             Flag<?> existingWF = registry.get("worldfuscator");
-            if ((existing instanceof StateFlag) && existingSL instanceof StateFlag && existingWR instanceof StateFlag && existingWF instanceof StateFlag) {
+            Flag<?> existingEC = registry.get("explosioncache");
+            if ((existing instanceof StateFlag) && existingSL instanceof StateFlag && existingWR instanceof StateFlag && existingWF instanceof StateFlag && existingEC instanceof StateFlag) {
                 TntExplosion = (StateFlag) existing;
                 stoplag = (StateFlag) existingSL;
                 WaterRemoverListener.waterRemoverFlag = (StateFlag) existingWR;
                 WorldFuscatorIntegration.worldfuscatorFlag = (StateFlag) existingWF;
+                ExplosionCache.explosionCache = (StateFlag) existingEC;
             } else {
                 System.out.println("Fehler");
                 // types don't match - this is bad news! some other plugin conflicts with you

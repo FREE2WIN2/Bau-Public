@@ -57,7 +57,9 @@ public class PlayerMovement implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerTeleportEvent(PlayerTeleportEvent e) {
         Player p = e.getPlayer();
-        if (e.getTo().getWorld().getName().contains("test") && p.hasPermission("supporter")) {
+        if (e.getTo().getWorld().getName().contains("test") && !p.hasPermission("supporter")) {
+            e.setCancelled(true);
+            p.sendMessage(Main.prefix + MessageHandler.getInstance().getString(p, "noPlotMember"));
             return;
         }
         if (e.getTo().getWorld() == e.getFrom().getWorld()) {

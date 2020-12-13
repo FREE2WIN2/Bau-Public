@@ -39,6 +39,8 @@ public class ExplosionCacheListener implements Listener, TabExecutor {
         commandHandel.addSubNode(literal("redo").setCallback(s -> {
             redo(s);
         }));
+
+//        commandHandel.addSubNode(literal("deactivate")
     }
 
     private void redo(ArgumentList s) {
