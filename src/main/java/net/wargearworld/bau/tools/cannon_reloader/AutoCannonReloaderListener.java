@@ -64,10 +64,7 @@ public class AutoCannonReloaderListener implements Listener, TabExecutor {
         commandHandel.addSubNode(literal("stop").setCallback(s -> {
             stop(s);
         }));
-        commandHandel.addSubNode(literal("reload").setCallback(s -> {
-            paste(s);
-        }));
-        commandHandel.addSubNode(literal("paste").setCallback(s -> {
+        commandHandel.addSubNode(literal("reload","paste").setCallback(s -> {
             paste(s);
         }));
         commandHandel.addSubNode(literal("help").setCallback(s -> {

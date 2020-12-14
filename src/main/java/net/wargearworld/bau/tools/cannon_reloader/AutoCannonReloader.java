@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class AutoCannonReloader {
-    public static Map<Loc, AutoCannonReloaderBlock> tntLocations;
+    private Map<Loc, AutoCannonReloaderBlock> tntLocations;
     private boolean recording;
     private boolean antiSpam;
 
@@ -65,7 +65,7 @@ public class AutoCannonReloader {
         UUID uuid = p.getUniqueId();
         if (antiSpam) {
             Main.send(p, true, MessageHandler.getInstance().getString(p, "cannonReloader_prefix"), "cannonReloader_antispam",
-                    String.valueOf(BauConfig.getInstance().getTntReloadMaxTnT() / 20));
+                    String.valueOf(BauConfig.getInstance().getTntReloadMaxTnT()));
             return;
         }
         World world = p.getWorld();
@@ -74,20 +74,17 @@ public class AutoCannonReloader {
         }
         Main.send(p, true, MessageHandler.getInstance().getString(p, "cannonReloader_prefix"), "cannonReloader_pasteRecord");
         Bukkit.getPluginManager().callEvent(new PlayerUseCannonReloaderEvent(p));
-        antispam(uuid);
+        antispam();
 
 
     }
 
-    private void antispam(UUID uuid) {
+    private void antispam() {
         antiSpam = true;
-        Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(), new Runnable() {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(), () -> {
 
-            @Override
-            public void run() {
-                antiSpam = false;
-            }
-        }, BauConfig.getInstance().getTntReloadTimeout());
+            antiSpam = false;
+        }, BauConfig.getInstance().getTntReloadTimeout() * 20);
     }
 
     protected void showHelp(Player p) {
@@ -119,7 +116,7 @@ public class AutoCannonReloader {
         }
 
         Loc loc = new Loc(location);
-        tntLocations.put(loc,new AutoCannonReloaderBlock(loc));
+        tntLocations.put(loc, new AutoCannonReloaderBlock(loc));
         if (tntLocations.size() == maxTnT) {
             Main.send(p, true, MessageHandler.getInstance().getString(p, "cannonReloader_prefix"), "cannonReloader_maxTnt",
                     String.valueOf(maxTnT));
@@ -143,7 +140,7 @@ public class AutoCannonReloader {
                     autoCannonReloaderBlock.move(Loc.getByBlockVector(offset));
                     tntLocations.remove(loc);
                     Loc newLoc = autoCannonReloaderBlock.getLoc();
-                    tntLocations.put(newLoc,autoCannonReloaderBlock);
+                    tntLocations.put(newLoc, autoCannonReloaderBlock);
                 }
             }
         });
@@ -153,13 +150,13 @@ public class AutoCannonReloader {
         if (tntLocations.containsKey(loc)) {
             AutoCannonReloaderBlock autoCannonReloaderBlock = tntLocations.get(loc);
             Loc newLoc = autoCannonReloaderBlock.getPreviousLoc();
-            if(newLoc == null)
+            if (newLoc == null)
                 return;
             autoCannonReloaderBlock.setLoc(newLoc);
             autoCannonReloaderBlock.setPreviousLoc(loc);
 
             tntLocations.remove(loc);
-            tntLocations.put(newLoc,autoCannonReloaderBlock);
+            tntLocations.put(newLoc, autoCannonReloaderBlock);
         }
     }
 }
