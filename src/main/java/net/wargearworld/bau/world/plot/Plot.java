@@ -62,8 +62,6 @@ public abstract class Plot {
         this.id = id;
         this.middleNorth = middleNorth;
         this.ground = ground;
-        if (region != null)
-            setWaterRemover(region.getFlag(WaterRemoverListener.waterRemoverFlag) == State.DENY);
         cannonTimer = deserializeCannonTimer(bauWorld);
         if (cannonTimer == null)
             cannonTimer = new CannonTimer();
@@ -294,13 +292,21 @@ public abstract class Plot {
 
     public void deactivateExplosionCache(int seconds, BauWorld bauWorld) {
         deactivatedExplosionCache = seconds;
-        for (Player player : getPlayers(bauWorld)) {
-            ScoreBoardBau.cmdUpdate(player);
-            if (seconds == 0) {
-                MessageHandler.getInstance().send(player, "tnt_allowExplosion_deactivated");
+        if (seconds == 0) {
+            if (bukkitTask != null){
+                bukkitTask.cancel();
+                bukkitTask = null;
             }
+            deactivatedExplosionCache = 0;
+            for (Player player : getPlayers(bauWorld)) {
+                ScoreBoardBau.cmdUpdate(player);
+                if (seconds == 0) {
+                    MessageHandler.getInstance().send(player, "tnt_allowExplosion_deactivated");
+                }
+            }
+            return;
         }
-        if (seconds == 0)
+        if(bukkitTask != null)
             return;
         bukkitTask = Bukkit.getScheduler().runTaskTimer(Main.getPlugin(), () -> {
             deactivatedExplosionCache--;
@@ -308,7 +314,8 @@ public abstract class Plot {
             for (Player player : players) {
                 ScoreBoardBau.cmdUpdate(player);
             }
-            if (deactivatedExplosionCache == 0) {
+            if (deactivatedExplosionCache <= 0) {
+                deactivatedExplosionCache = 0;
                 bukkitTask.cancel();
                 bukkitTask = null;
                 for (Player player : players) {
