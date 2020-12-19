@@ -48,6 +48,7 @@ public class ExplosionCache {
         if (sameTeam) {
             tnts.remove(event.getEntity().getUniqueId());
             event.blockList().clear();
+            return;
         }
         if (getTnts(event.getLocation().getWorld()) == 1) {
             for (Player player : plot.getPlayers(bauWorld)) {
