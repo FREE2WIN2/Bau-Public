@@ -103,8 +103,7 @@ public class ScoreBoardBau {
         if (currentPlot == null)
             return;
 
-        Scoreboard board = p.getScoreboard() == null ? board = Bukkit.getScoreboardManager().getNewScoreboard()
-                : p.getScoreboard();
+        Scoreboard board = p.getScoreboard();
         Objective obj;
         if (board.getObjective(p.getName()) != null) {
             obj = board.getObjective(p.getName());

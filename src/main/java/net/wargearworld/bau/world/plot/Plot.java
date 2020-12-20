@@ -264,9 +264,8 @@ public abstract class Plot {
         if (!serializationFile.exists()) {
             return new CannonTimer();
         }
-        FileInputStream fis = null;
         try {
-            fis = new FileInputStream(serializationFile);
+            FileInputStream fis = new FileInputStream(serializationFile);
             ObjectInputStream ois = new ObjectInputStream(fis);
             CannonTimer out = (CannonTimer) ois.readObject();
             ois.close();
@@ -332,6 +331,9 @@ public abstract class Plot {
 
     public Collection<Player> getPlayers(BauWorld bauWorld) {
         List<Player> out = new ArrayList<>();
+        if(bauWorld == null)
+            return out;
+
         for (Player p : bauWorld.getWorld().getPlayers()) {
             if (bauWorld.getPlot(p.getLocation()).equals(this)) {
                 out.add(p);
