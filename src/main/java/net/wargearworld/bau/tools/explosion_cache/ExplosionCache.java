@@ -11,6 +11,7 @@ import net.wargearworld.command_manager.CommandHandel;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftTNTPrimed;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -71,7 +72,7 @@ public class ExplosionCache {
 
     private int getTnts(World w) {
         int count = 0;
-        for (Entity entity : w.getEntities()) {
+        for (Entity entity : w.getEntitiesByClass(CraftTNTPrimed.class)) {
             if (entity.getType() == EntityType.PRIMED_TNT) {
                 count++;
             }

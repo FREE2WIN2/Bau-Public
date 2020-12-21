@@ -152,7 +152,7 @@ public class GS implements TabExecutor {
                             tp(s, false);
                         }))
                 .addSubNode(argument("Spielername", dynamicList("Spielername", state -> {
-                    if (getPlayer(state.getArgumentList()).hasPermission("bau.move.bypass"))
+                    if (getPlayer(state.getArgumentList()).hasPermission("bau.tp.bypass"))
                         return PlayerDAO.getAllPlayersWithWorld();
                     return PlayerDAO.getPlayersAddedWorldsPlayerNames(state.getPlayer().getUUID());
                 }))

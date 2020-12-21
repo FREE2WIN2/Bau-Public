@@ -67,7 +67,7 @@ public class PlayerMovement implements Listener {
             return;
         }
 
-        if (p.hasPermission("moderator")) {
+        if (p.hasPermission("bau.tp.bypass")) {
             return;
         }
         BauWorld world = WorldManager.get(e.getTo().getWorld());
