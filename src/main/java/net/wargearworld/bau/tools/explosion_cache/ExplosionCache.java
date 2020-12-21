@@ -26,7 +26,7 @@ public class ExplosionCache {
 
     public ExplosionCache() {
         tnts = new HashMap<>();
-       }
+    }
 
     public void handleExplode(EntityExplodeEvent event) {
         Location loc = event.getLocation();
@@ -36,7 +36,7 @@ public class ExplosionCache {
         Plot plot = bauWorld.getPlot(loc);
         if (plot == null)
             return;
-        if(plot.isDeactivatedExplosionCache())
+        if (plot.isDeactivatedExplosionCache())
             return;
         int z = plot.getTeleportPoint().getBlockZ();
         Boolean primeZSmallerThanMiddleZ = tnts.get(event.getEntity().getUniqueId());
@@ -48,11 +48,11 @@ public class ExplosionCache {
         if (sameTeam) {
             tnts.remove(event.getEntity().getUniqueId());
             event.blockList().clear();
-            return;
-        }
-        if (getTnts(event.getLocation().getWorld()) == 1) {
-            for (Player player : plot.getPlayers(bauWorld)) {
-                MessageHandler.getInstance().send(player, "explosion_cached");
+
+            if (getTnts(event.getLocation().getWorld()) == 1) {
+                for (Player player : plot.getPlayers(bauWorld)) {
+                    MessageHandler.getInstance().send(player, "explosion_cached");
+                }
             }
         }
     }
