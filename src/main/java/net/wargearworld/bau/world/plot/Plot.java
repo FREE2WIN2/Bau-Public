@@ -144,8 +144,10 @@ public abstract class Plot {
         delundo();
 
         WorldEditHandler.pasteground(ground, middleNorth);
-        undoCannonTimer = cannonTimer.clone();
-        cannonTimer = null;
+        if (cannonTimer != null)
+            undoCannonTimer = cannonTimer.clone();
+
+        cannonTimer = new CannonTimer();
         return true;
 
     }
@@ -292,7 +294,7 @@ public abstract class Plot {
     public void deactivateExplosionCache(int seconds, BauWorld bauWorld) {
         deactivatedExplosionCache = seconds;
         if (seconds == 0) {
-            if (bukkitTask != null){
+            if (bukkitTask != null) {
                 bukkitTask.cancel();
                 bukkitTask = null;
             }
@@ -305,7 +307,7 @@ public abstract class Plot {
             }
             return;
         }
-        if(bukkitTask != null)
+        if (bukkitTask != null)
             return;
         bukkitTask = Bukkit.getScheduler().runTaskTimer(Main.getPlugin(), () -> {
             deactivatedExplosionCache--;
@@ -331,11 +333,14 @@ public abstract class Plot {
 
     public Collection<Player> getPlayers(BauWorld bauWorld) {
         List<Player> out = new ArrayList<>();
-        if(bauWorld == null)
+        if (bauWorld == null)
             return out;
 
         for (Player p : bauWorld.getWorld().getPlayers()) {
-            if (bauWorld.getPlot(p.getLocation()).equals(this)) {
+            Plot plot = bauWorld.getPlot(p.getLocation());
+            if (plot == null)
+                continue;
+            if (plot.equals(this)) {
                 out.add(p);
             }
         }

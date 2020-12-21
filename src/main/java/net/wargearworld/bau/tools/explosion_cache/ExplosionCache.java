@@ -63,7 +63,7 @@ public class ExplosionCache {
         if (bauWorld == null)
             return;
         Plot plot = bauWorld.getPlot(loc);
-        if (plot == null)
+        if (plot == null || plot.getTeleportPoint() == null)
             return;
         int z = plot.getTeleportPoint().getBlockZ();
         tnts.put(event.getEntity().getUniqueId(), loc.getZ() < z);

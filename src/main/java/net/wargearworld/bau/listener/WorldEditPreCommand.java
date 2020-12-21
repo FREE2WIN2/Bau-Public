@@ -11,6 +11,7 @@ import com.sk89q.worldedit.history.change.Change;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import net.wargearworld.bau.Main;
@@ -56,6 +57,7 @@ public class WorldEditPreCommand implements Listener {
             try {
                 Region selection = localSession.getSelection(BukkitAdapter.adapt(p.getWorld()));
                 Location loc = BukkitAdapter.adapt(p.getLocation());
+                System.out.println("WE direction: " + loc.getDirectionEnum());
                 int movement = 1;
                 if (args.length > 1 && HelperMethods.isInt(args[1])) {
                     movement = Integer.parseInt(args[1]);
