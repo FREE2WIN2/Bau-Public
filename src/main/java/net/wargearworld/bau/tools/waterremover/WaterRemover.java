@@ -68,17 +68,21 @@ public class WaterRemover {
     private void removeWater() {
         for (int i = this.waterList.size() - 1; i > -1; i--) {
             Block current = this.waterList.get(i);
-            for (Block removeBlock : getSourceBlocksOfWater(current)) {
-                if (removeBlock.getBlockData() instanceof Waterlogged) {
-                    Waterlogged logged = (Waterlogged) removeBlock.getBlockData();
-                    logged.setWaterlogged(false);
-                    removeBlock.setBlockData(logged);
-                } else {
-                    removeBlock.setType(Material.AIR);
-                }
-            }
+            removeWaterStream(current);
             if (current.getType() == Material.AIR && !(current.getBlockData() instanceof Waterlogged)) {
                 this.waterList.remove(i);
+            }
+        }
+    }
+
+    private void removeWaterStream(Block block){
+        for (Block removeBlock : getSourceBlocksOfWater(block)) {
+            if (removeBlock.getBlockData() instanceof Waterlogged) {
+                Waterlogged logged = (Waterlogged) removeBlock.getBlockData();
+                logged.setWaterlogged(false);
+                removeBlock.setBlockData(logged);
+            } else {
+                removeBlock.setType(Material.AIR);
             }
         }
     }
@@ -124,12 +128,8 @@ public class WaterRemover {
 
         if (event.blockList().isEmpty() && !sameTeam) {
             Block block = event.getLocation().getBlock();
-            if (block.isLiquid()) {
-                block.setType(Material.AIR);
-            } else if (block.getBlockData() instanceof Waterlogged) {
-                Waterlogged waterlogged = (Waterlogged) block.getBlockData();
-                waterlogged.setWaterlogged(false);
-                block.setBlockData(waterlogged, true);
+            if (block.isLiquid() || block.getBlockData() instanceof Waterlogged) {
+                removeWaterStream(block);
             } else {
                 return;
             }
